@@ -155,6 +155,7 @@
       var(--color-secondary) 80%,
       transparent
     );
+    transform: scale(1.05);
   }
 
   .btn-ghost {
