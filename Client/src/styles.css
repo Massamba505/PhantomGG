@@ -1,166 +1,228 @@
 @import "tailwindcss";
 @plugin "tailwindcss-primeui";
 
-@layer base {
-  :root {
-    --background: 210 20% 98%;
-    --foreground: 215 20% 15%;
+@theme {
+  --color-background: hsl(210 20% 98%);
+  --color-foreground: hsl(215 20% 15%);
 
-    --card: 210 20% 100%;
-    --card-foreground: 215 20% 20%;
+  --color-card: hsl(210 20% 100%);
+  --color-card-foreground: hsl(215 20% 20%);
 
-    --popover: 210 20% 100%;
-    --popover-foreground: 215 20% 15%;
+  --color-popover: hsl(210 20% 100%);
+  --color-popover-foreground: hsl(215 20% 15%);
 
-    --primary: 200 100% 40%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 200 100% 50%;
+  --color-primary: hsl(200 100% 40%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-primary-glow: hsl(200 100% 50%);
 
-    --secondary: 210 20% 92%;
-    --secondary-foreground: 215 15% 35%;
+  --color-secondary: hsl(210 20% 92%);
+  --color-secondary-foreground: hsl(215 15% 35%);
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 15% 55%;
+  --color-muted: hsl(210 20% 96%);
+  --color-muted-foreground: hsl(215 15% 55%);
 
-    --accent: 200 80% 45%;
-    --accent-foreground: 0 0% 100%;
+  --color-accent: hsl(200 80% 45%);
+  --color-accent-foreground: hsl(0 0% 100%);
 
-    --destructive: 0 75% 50%;
-    --destructive-foreground: 0 0% 100%;
+  --color-destructive: hsl(0 75% 50%);
+  --color-destructive-foreground: hsl(0 0% 100%);
 
-    --success: 142 70% 35%;
-    --success-foreground: 0 0% 100%;
+  --color-success: hsl(142 70% 35%);
+  --color-success-foreground: hsl(0 0% 100%);
 
-    --border: 210 20% 85%;
-    --input: 210 20% 95%;
-    --ring: 200 100% 40%;
+  --color-border: hsl(210 20% 85%);
+  --color-input: hsl(210 20% 95%);
+  --color-ring: hsl(200 100% 40%);
 
-    --sidebar-bg: 210 25% 96%;
-    --sidebar-border: 210 20% 88%;
+  --color-sidebar-bg: hsl(210 25% 96%);
+  --color-sidebar-border: hsl(210 20% 88%);
 
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-glow))
-    );
-    --gradient-dark: linear-gradient(
-      180deg,
-      hsl(var(--background)),
-      hsl(210 20% 94%)
-    );
-    --gradient-card: linear-gradient(
-      145deg,
-      hsl(var(--card)),
-      hsl(210 20% 98%)
-    );
+  --gradient-primary: linear-gradient(
+    135deg,
+    hsl(var(--color-primary)),
+    hsl(var(--color-primary-glow))
+  );
 
-    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.15);
+  --gradient-dark: linear-gradient(
+    180deg,
+    hsl(var(--color-background)),
+    hsl(210 20% 94%)
+  );
 
-    --radius: 0.75rem;
-  }
+  --gradient-card: linear-gradient(
+    145deg,
+    hsl(var(--color-card)),
+    hsl(210 20% 98%)
+  );
 
-  .dark {
-    --background: 213 27% 8%;
-    --foreground: 210 40% 98%;
+  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 30px hsl(var(--color-primary) / 0.15);
 
-    --card: 214 25% 12%;
-    --card-foreground: 210 40% 95%;
+  --radius-md: 0.75rem;
+}
 
-    --popover: 214 27% 10%;
-    --popover-foreground: 210 40% 98%;
+@theme .dark {
+  --color-background: hsl(213 27% 8%);
+  --color-foreground: hsl(210 40% 98%);
 
-    --primary: 200 100% 45%;
-    --primary-foreground: 210 40% 98%;
-    --primary-glow: 200 100% 55%;
+  --color-card: hsl(214 25% 12%);
+  --color-card-foreground: hsl(210 40% 95%);
 
-    --secondary: 215 25% 20%;
-    --secondary-foreground: 210 40% 90%;
+  --color-popover: hsl(214 27% 10%);
+  --color-popover-foreground: hsl(210 40% 98%);
 
-    --muted: 215 27% 15%;
-    --muted-foreground: 215 15% 65%;
+  --color-primary: hsl(200 100% 45%);
+  --color-primary-foreground: hsl(210 40% 98%);
+  --color-primary-glow: hsl(200 100% 55%);
 
-    --accent: 200 80% 35%;
-    --accent-foreground: 210 40% 98%;
+  --color-secondary: hsl(215 25% 20%);
+  --color-secondary-foreground: hsl(210 40% 90%);
 
-    --destructive: 0 84% 55%;
-    --destructive-foreground: 210 40% 98%;
+  --color-muted: hsl(215 27% 15%);
+  --color-muted-foreground: hsl(215 15% 65%);
 
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
+  --color-accent: hsl(200 80% 35%);
+  --color-accent-foreground: hsl(210 40% 98%);
 
-    --border: 215 25% 20%;
-    --input: 215 25% 18%;
-    --ring: 200 100% 45%;
+  --color-destructive: hsl(0 84% 55%);
+  --color-destructive-foreground: hsl(210 40% 98%);
 
-    --sidebar-bg: 213 30% 6%;
-    --sidebar-border: 215 25% 15%;
+  --color-success: hsl(142 76% 36%);
+  --color-success-foreground: hsl(210 40% 98%);
 
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-glow))
-    );
-    --gradient-dark: linear-gradient(
-      180deg,
-      hsl(var(--background)),
-      hsl(215 30% 5%)
-    );
-    --gradient-card: linear-gradient(
-      145deg,
-      hsl(var(--card)),
-      hsl(215 25% 14%)
-    );
+  --color-border: hsl(215 25% 20%);
+  --color-input: hsl(215 25% 18%);
+  --color-ring: hsl(200 100% 45%);
 
-    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2);
-  }
+  --color-sidebar-bg: hsl(213 30% 6%);
+  --color-sidebar-border: hsl(215 25% 15%);
+
+  --gradient-primary: linear-gradient(
+    135deg,
+    hsl(var(--color-primary)),
+    hsl(var(--color-primary-glow))
+  );
+
+  --gradient-dark: linear-gradient(
+    180deg,
+    hsl(var(--color-background)),
+    hsl(215 30% 5%)
+  );
+
+  --gradient-card: linear-gradient(
+    145deg,
+    hsl(var(--color-card)),
+    hsl(215 25% 14%)
+  );
+
+  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 30px hsl(var(--color-primary) / 0.2);
+
+  --radius-md: 0.75rem;
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-glow hover:scale-105;
+    background-image: linear-gradient(
+      to right,
+      var(--color-primary),
+      var(--color-primary-glow)
+    );
+    color: var(--color-primary-foreground);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    box-shadow: var(--shadow-glow);
+    transform: scale(1.05);
   }
 
   .btn-secondary {
-    @apply bg-secondary text-secondary-foreground px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-secondary/80;
+    background-color: var(--color-secondary);
+    color: var(--color-secondary-foreground);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--color-secondary) 80%,
+      transparent
+    );
   }
 
   .btn-ghost {
-    @apply text-foreground px-4 py-2 rounded-lg transition-all duration-300 hover:bg-muted;
+    color: var(--color-foreground);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-ghost:hover {
+    background-color: var(--color-muted);
   }
 
   .btn-danger {
-    @apply bg-destructive text-destructive-foreground px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-destructive/80;
+    background-color: var(--color-destructive);
+    color: var(--color-destructive-foreground);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-danger:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--color-destructive) 80%,
+      transparent
+    );
   }
 
   .card-tournament {
-    @apply bg-gradient-card border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-lg hover:border-primary/30;
+    background: var(--gradient-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .card-tournament:hover {
+    box-shadow: var(--shadow-lg);
+    border-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
   }
 
   .card-team {
-    @apply bg-card border border-border rounded-lg p-4 transition-all duration-300 hover:shadow-md hover:border-primary/20;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .card-team:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    border-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
   }
 
   .input-field {
-    @apply bg-input border border-border text-foreground px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300;
+    background-color: var(--color-input);
+    border: 1px solid var(--color-border);
+    color: var(--color-foreground);
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
   }
 
-  .animate-fade-in {
-    @apply animate-[fadeIn_0.5s_ease-out];
-  }
-
-  .animate-slide-up {
-    @apply animate-[slideUp_0.4s_ease-out];
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
+  .input-field:focus {
+    outline: none;
+    border-color: transparent;
+    box-shadow: 0 0 0 2px var(--color-ring);
   }
 }
