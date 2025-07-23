@@ -1,2 +1,166 @@
 @import "tailwindcss";
 @plugin "tailwindcss-primeui";
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 215 20% 15%;
+
+    --card: 210 20% 100%;
+    --card-foreground: 215 20% 20%;
+
+    --popover: 210 20% 100%;
+    --popover-foreground: 215 20% 15%;
+
+    --primary: 200 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 200 100% 50%;
+
+    --secondary: 210 20% 92%;
+    --secondary-foreground: 215 15% 35%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 15% 55%;
+
+    --accent: 200 80% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 70% 35%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 210 20% 85%;
+    --input: 210 20% 95%;
+    --ring: 200 100% 40%;
+
+    --sidebar-bg: 210 25% 96%;
+    --sidebar-border: 210 20% 88%;
+
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-glow))
+    );
+    --gradient-dark: linear-gradient(
+      180deg,
+      hsl(var(--background)),
+      hsl(210 20% 94%)
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(var(--card)),
+      hsl(210 20% 98%)
+    );
+
+    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.15);
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 213 27% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 214 25% 12%;
+    --card-foreground: 210 40% 95%;
+
+    --popover: 214 27% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 200 100% 45%;
+    --primary-foreground: 210 40% 98%;
+    --primary-glow: 200 100% 55%;
+
+    --secondary: 215 25% 20%;
+    --secondary-foreground: 210 40% 90%;
+
+    --muted: 215 27% 15%;
+    --muted-foreground: 215 15% 65%;
+
+    --accent: 200 80% 35%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+
+    --border: 215 25% 20%;
+    --input: 215 25% 18%;
+    --ring: 200 100% 45%;
+
+    --sidebar-bg: 213 30% 6%;
+    --sidebar-border: 215 25% 15%;
+
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-glow))
+    );
+    --gradient-dark: linear-gradient(
+      180deg,
+      hsl(var(--background)),
+      hsl(215 30% 5%)
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(var(--card)),
+      hsl(215 25% 14%)
+    );
+
+    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-primary-glow text-primary-foreground px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-glow hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-secondary/80;
+  }
+
+  .btn-ghost {
+    @apply text-foreground px-4 py-2 rounded-lg transition-all duration-300 hover:bg-muted;
+  }
+
+  .btn-danger {
+    @apply bg-destructive text-destructive-foreground px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:bg-destructive/80;
+  }
+
+  .card-tournament {
+    @apply bg-gradient-card border border-border rounded-xl p-6 transition-all duration-300 hover:shadow-lg hover:border-primary/30;
+  }
+
+  .card-team {
+    @apply bg-card border border-border rounded-lg p-4 transition-all duration-300 hover:shadow-md hover:border-primary/20;
+  }
+
+  .input-field {
+    @apply bg-input border border-border text-foreground px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300;
+  }
+
+  .animate-fade-in {
+    @apply animate-[fadeIn_0.5s_ease-out];
+  }
+
+  .animate-slide-up {
+    @apply animate-[slideUp_0.4s_ease-out];
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
