@@ -11,6 +11,12 @@ public class TournamentsController(PhantomGGContext context) : ControllerBase
 {
     private readonly PhantomGGContext _context = context;
 
+    /// <summary>
+    /// Counts the number of tournaments in the database.
+    /// </summary>
+    /// <returns>
+    /// Returns a success message with the count.
+    /// </returns>
     [HttpGet]
     public async Task<IActionResult> CountTournamentsAsync()
     {
