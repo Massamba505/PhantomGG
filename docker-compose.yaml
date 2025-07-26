@@ -1,0 +1,56 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SQL_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${SQL_PASSWORD}" -C -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - PhantomGGNetwork
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./Database/init:/sql
+    command: >
+      /bin/bash -c '
+      /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P ${SQL_PASSWORD} -C -i /sql/V0__Create_PhantomGG_Database.sql;
+      '
+    networks:
+      - PhantomGGNetwork
+
+  flyway:
+    image: flyway/flyway:9-alpine
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    entrypoint:
+      [
+        "flyway",
+        "-url=jdbc:sqlserver://sqlserver:1433;databaseName=PhantomGG;trustServerCertificate=true",
+        "-user=sa",
+        "-password=${SQL_PASSWORD}",
+        "migrate",
+      ]
+    volumes:
+      - ./Database/Migrations:/flyway/sql
+    networks:
+      - PhantomGGNetwork
+
+volumes:
+  sqlserver_data:
+
+networks:
+  PhantomGGNetwork:
