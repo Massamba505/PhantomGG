@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -15,7 +17,7 @@ services:
       retries: 3
       start_period: 15s
     networks:
-      - PhantomGGNetwork
+      - phantomgg-network
 
   db-init:
     image: mcr.microsoft.com/mssql-tools
@@ -25,11 +27,10 @@ services:
     volumes:
       - ./Database/init:/sql
     command: >
-      /bin/bash -c '
-      /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P ${SQL_PASSWORD} -C -i /sql/V0__Create_PhantomGG_Database.sql;
-      '
+      /bin/bash -c  
+      '/opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P ${SQL_PASSWORD} -C -i /sql/V0__Create_PhantomGG_Database.sql;'
     networks:
-      - PhantomGGNetwork
+      - phantomgg-network
 
   flyway:
     image: flyway/flyway:9-alpine
@@ -47,10 +48,37 @@ services:
     volumes:
       - ./Database/Migrations:/flyway/sql
     networks:
-      - PhantomGGNetwork
+      - phantomgg-network
+
+  api:
+    build:
+      context: ./Server/PhantomGG.API
+      dockerfile: Dockerfile
+    depends_on:
+      flyway:
+        condition: service_completed_successfully
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=PhantomGG;User=sa;Password=${SQL_PASSWORD};TrustServerCertificate=true
+    networks:
+      - phantomgg-network
+
+  client:
+    build:
+      context: ./Client
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    environment:
+      - API_URL=http://api:80
+    networks:
+      - phantomgg-network
 
 volumes:
   sqlserver_data:
 
 networks:
-  PhantomGGNetwork:
+  phantomgg-network:
+    driver: bridge
