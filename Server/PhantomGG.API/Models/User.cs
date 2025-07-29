@@ -12,6 +12,8 @@ public partial class User
 
     public string PasswordHash { get; set; } = null!;
 
+    public string PasswordSalt { get; set; } = null!;
+
     public string ProfilePictureUrl { get; set; } = null!;
 
     public string Role { get; set; } = null!;
@@ -19,6 +21,8 @@ public partial class User
     public DateTime CreatedAt { get; set; }
 
     public bool IsActive { get; set; }
+
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
     public virtual ICollection<Tournament> Tournaments { get; set; } = new List<Tournament>();
 }

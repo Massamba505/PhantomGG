@@ -22,6 +22,8 @@ public partial class PhantomGGContext : DbContext
 
     public virtual DbSet<PlayerStat> PlayerStats { get; set; }
 
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
     public virtual DbSet<Team> Teams { get; set; }
 
     public virtual DbSet<Tournament> Tournaments { get; set; }
@@ -32,7 +34,7 @@ public partial class PhantomGGContext : DbContext
     {
         modelBuilder.Entity<Match>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Matches__3214EC07D2DFF1FB");
+            entity.HasKey(e => e.Id).HasName("PK__Matches__3214EC0731ABE440");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.AwayTeamScore).HasDefaultValue((short)0);
@@ -59,7 +61,7 @@ public partial class PhantomGGContext : DbContext
 
         modelBuilder.Entity<Player>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Players__3214EC07BE66A8D4");
+            entity.HasKey(e => e.Id).HasName("PK__Players__3214EC075828BB0F");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
@@ -75,7 +77,7 @@ public partial class PhantomGGContext : DbContext
 
         modelBuilder.Entity<PlayerStat>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__PlayerSt__3214EC07CF9143D6");
+            entity.HasKey(e => e.Id).HasName("PK__PlayerSt__3214EC079BA31BFF");
 
             entity.HasIndex(e => new { e.PlayerId, e.MatchId }, "PlayerPerMatch").IsUnique();
 
@@ -92,9 +94,22 @@ public partial class PhantomGGContext : DbContext
                 .HasConstraintName("FK_Player");
         });
 
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__RefreshT__3214EC07ACB1DBAC");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.TokenHash).HasMaxLength(255);
+
+            entity.HasOne(d => d.User).WithMany(p => p.RefreshTokens)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_RefreshTokens_Users");
+        });
+
         modelBuilder.Entity<Team>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Teams__3214EC07F32F7A61");
+            entity.HasKey(e => e.Id).HasName("PK__Teams__3214EC07A47A36E4");
 
             entity.HasIndex(e => new { e.TournamentId, e.Name }, "TeamPerTournament").IsUnique();
 
@@ -111,7 +126,7 @@ public partial class PhantomGGContext : DbContext
 
         modelBuilder.Entity<Tournament>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Tourname__3214EC07B82FFBAA");
+            entity.HasKey(e => e.Id).HasName("PK__Tourname__3214EC07691BDA51");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.BannerImageUrl).HasMaxLength(255);
@@ -133,9 +148,9 @@ public partial class PhantomGGContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC07109BFEDD");
+            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC0728861A53");
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D105341EEF6EAB").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D105346CE29E30").IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
@@ -144,6 +159,7 @@ public partial class PhantomGGContext : DbContext
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
+            entity.Property(e => e.PasswordSalt).HasMaxLength(128);
             entity.Property(e => e.ProfilePictureUrl).HasMaxLength(255);
             entity.Property(e => e.Role)
                 .HasMaxLength(20)
