@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using PhantomGG.API.Config;
 using PhantomGG.API.Models;
 using PhantomGG.API.Services.Interfaces;
@@ -14,9 +13,9 @@ public class TokenService : ITokenService
 {
     private readonly JwtConfig _jwtConfig;
 
-    public TokenService(IOptions<JwtConfig> jwtConfig)
+    public TokenService(JwtConfig jwtConfig)
     {
-        _jwtConfig = jwtConfig.Value;
+        _jwtConfig = jwtConfig;
     }
 
     public string GenerateAccessToken(User user)
@@ -63,7 +62,7 @@ public class TokenService : ITokenService
         return Convert.ToBase64String(hash);
     }
 
-    public ClaimsPrincipal ValidateToken(string token)
+    public ClaimsPrincipal? ValidateToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);

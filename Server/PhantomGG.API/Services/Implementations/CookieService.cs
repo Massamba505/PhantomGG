@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using PhantomGG.API.Config;
+﻿using PhantomGG.API.Config;
 using PhantomGG.API.Services.Interfaces;
 
 namespace PhantomGG.API.Services.Implementations;
@@ -8,9 +7,9 @@ public class CookieService : ICookieService
 {
     private readonly JwtConfig _jwtConfig;
 
-    public CookieService(IOptions<JwtConfig> jwtConfig)
+    public CookieService(JwtConfig jwtConfig)
     {
-        _jwtConfig = jwtConfig.Value;
+        _jwtConfig = jwtConfig;
     }
 
     public void SetAuthCookies(HttpResponse response, string accessToken, string refreshToken)

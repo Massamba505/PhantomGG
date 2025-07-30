@@ -58,7 +58,12 @@ services:
       - "${API_PORT}:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=PhantomGG;User=sa;Password=${SQL_PASSWORD};TrustServerCertificate=true
+      - ConnectionStrings__PhantomDb=Server=sqlserver;Database=PhantomGG;User=sa;Password=${SQL_PASSWORD};TrustServerCertificate=true
+      - JwtConfig__Secret=${JwtConfig__Secret}
+      - JwtConfig__Issuer=${JwtConfig__Issuer}
+      - JwtConfig__Audience=${JwtConfig__Audience}
+      - JwtConfig__AccessTokenExpiryMinutes=${JwtConfig__AccessTokenExpiryMinutes}
+      - JwtConfig__RefreshTokenExpiryDays=${JwtConfig__RefreshTokenExpiryDays}
     depends_on:
       flyway:
         condition: service_completed_successfully

@@ -98,7 +98,13 @@ public class Program
 
     private static void ConfigureJwt(IServiceCollection services, ConfigurationManager configuration)
     {
-        services.Configure<JwtConfig>(configuration.GetSection("JwtConfig"));
+        var jwtConfig = configuration.GetSection("JwtConfig").Get<JwtConfig>();
+        if(jwtConfig == null)
+        {
+            throw new InvalidOperationException("JWT configuration is not set");
+        }
+
+        services.AddSingleton(jwtConfig);
 
         services.AddAuthentication(options =>
         {
@@ -110,12 +116,12 @@ public class Program
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
-                ValidIssuer = configuration["JwtConfig:Issuer"],
+                ValidIssuer = jwtConfig.Issuer,
                 ValidateAudience = true,
-                ValidAudience = configuration["JwtConfig:Audience"],
+                ValidAudience = jwtConfig.Audience,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Secret"]!)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
                 ClockSkew = TimeSpan.Zero
             };
         });
