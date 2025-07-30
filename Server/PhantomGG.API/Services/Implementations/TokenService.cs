@@ -11,19 +11,21 @@ namespace PhantomGG.API.Services.Implementations;
 
 public class TokenService : ITokenService
 {
-    private readonly JwtConfig _jwtConfig;
+    private readonly JwtConfig _config;
+    private readonly ILogger<TokenService> _logger;
 
-    public TokenService(JwtConfig jwtConfig)
+    public TokenService(JwtConfig config, ILogger<TokenService> logger)
     {
-        _jwtConfig = jwtConfig;
+        _config = config;
+        _logger = logger;
     }
 
     public string GenerateAccessToken(User user)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.Secret));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new List<Claim>
+        var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
@@ -31,27 +33,24 @@ public class TokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpiryMinutes),
-            Issuer = _jwtConfig.Issuer,
-            Audience = _jwtConfig.Audience,
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
-        };
+        var token = new JwtSecurityToken(
+            issuer: _config.Issuer,
+            audience: _config.Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(15),
+            signingCredentials: credentials
+        );
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     public string GenerateRefreshToken()
     {
-        var randomBytes = new byte[32];
+        var randomNumber = new byte[32];
         using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomBytes);
-        return Convert.ToBase64String(randomBytes);
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
+    
     }
 
     public string HashToken(string token)
@@ -64,22 +63,26 @@ public class TokenService : ITokenService
 
     public ClaimsPrincipal? ValidateToken(string token)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
-
         try
         {
-            return tokenHandler.ValidateToken(token, new TokenValidationParameters
+            if (string.IsNullOrEmpty(token)) return null;
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_config.Secret);
+
+            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = true,
-                ValidIssuer = _jwtConfig.Issuer,
+                ValidIssuer = _config.Issuer,
                 ValidateAudience = true,
-                ValidAudience = _jwtConfig.Audience,
+                ValidAudience = _config.Audience,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             }, out _);
+
+            return principal;
         }
         catch
         {

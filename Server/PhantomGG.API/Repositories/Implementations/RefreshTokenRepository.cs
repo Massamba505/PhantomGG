@@ -2,46 +2,34 @@
 using PhantomGG.API.Data;
 using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
-using PhantomGG.API.Services.Interfaces;
 
 namespace PhantomGG.API.Repositories.Implementations;
 
-public class RefreshTokenRepository(PhantomGGContext context, ITokenService tokenService) : IRefreshTokenRepository
+public class RefreshTokenRepository(PhantomGGContext context) : IRefreshTokenRepository
 {
     private readonly PhantomGGContext _context = context;
-    private readonly ITokenService _tokenService = tokenService;
-
-    public async Task<IEnumerable<RefreshToken>> GetAllAsync()
-    {
-        return await _context.RefreshTokens.ToListAsync();
-    }
-
-    public async Task<RefreshToken?> GetByIdAsync(Guid tokenId)
-    {
-        return await _context.RefreshTokens.FindAsync(tokenId);
-    }
-
-    public async Task<IEnumerable<RefreshToken>> GetTokensByUserIdAsync(Guid userId)
-    {
-        return await _context.RefreshTokens
-            .Where(rt => rt.UserId == userId)
-            .ToListAsync();
-    }
-
-    public async Task<RefreshToken?> GetValidTokenAsync(string token)
-    {
-        var hashedToken = _tokenService.HashToken(token);
-        return await _context.RefreshTokens
-            .FirstOrDefaultAsync(rt =>
-                rt.TokenHash == hashedToken &&
-                !rt.IsRevoked &&
-                rt.Expires > DateTime.UtcNow);
-    }
 
     public async Task CreateAsync(RefreshToken token)
     {
         await _context.RefreshTokens.AddAsync(token);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<RefreshToken?> GetByUserIdAsync(Guid userId)
+    {
+        return await _context.RefreshTokens
+            .FirstOrDefaultAsync(t => t.UserId == userId);
+    }
+
+    public async Task<RefreshToken?> GetByIdAsync(Guid id)
+    {
+        return await _context.RefreshTokens.FindAsync(id);
+    }
+
+    public async Task<RefreshToken?> GetByTokenHashAsync(string tokenHash)
+    {
+        return await _context.RefreshTokens
+            .FirstOrDefaultAsync(t => t.TokenHash == tokenHash);
     }
 
     public async Task UpdateAsync(RefreshToken token)
@@ -50,9 +38,9 @@ public class RefreshTokenRepository(PhantomGGContext context, ITokenService toke
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid tokenId)
+    public async Task DeleteAsync(Guid id)
     {
-        var token = await _context.RefreshTokens.FindAsync(tokenId);
+        var token = await _context.RefreshTokens.FindAsync(id);
         if (token != null)
         {
             _context.RefreshTokens.Remove(token);
@@ -74,7 +62,7 @@ public class RefreshTokenRepository(PhantomGGContext context, ITokenService toke
     public async Task DeleteExpiredTokensAsync()
     {
         var expiredTokens = await _context.RefreshTokens
-            .Where(rt => rt.Expires < DateTime.UtcNow)
+            .Where(t => t.Expires < DateTime.UtcNow)
             .ToListAsync();
 
         _context.RefreshTokens.RemoveRange(expiredTokens);

@@ -6,77 +6,53 @@ namespace PhantomGG.API.Services.Implementations;
 
 public class RefreshTokenService : IRefreshTokenService
 {
-    private readonly IRefreshTokenRepository _refreshTokenRepository;
-    private readonly IUserRepository _userRepository;
+    private readonly IRefreshTokenRepository _tokenRepo;
     private readonly ITokenService _tokenService;
+    private readonly ILogger<RefreshTokenService> _logger;
 
     public RefreshTokenService(
-        IRefreshTokenRepository refreshTokenRepository,
-        IUserRepository userRepository,
-        ITokenService tokenService)
+        IRefreshTokenRepository tokenRepo,
+        ITokenService tokenService,
+        ILogger<RefreshTokenService> logger)
     {
-        _refreshTokenRepository = refreshTokenRepository;
-        _userRepository = userRepository;
+        _tokenRepo = tokenRepo;
         _tokenService = tokenService;
+        _logger = logger;
     }
 
-    public async Task<string> CreateRefreshTokenAsync(Guid userId)
+    public async Task CreateRefreshTokenAsync(Guid userId, string token)
     {
-        var tokenValue = _tokenService.GenerateRefreshToken();
-        var token = new RefreshToken
+        var tokenEntity = new RefreshToken
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            TokenHash = _tokenService.HashToken(tokenValue),
+            TokenHash = _tokenService.HashToken(token),
             Expires = DateTime.UtcNow.AddDays(7),
             CreatedAt = DateTime.UtcNow
         };
 
-        await _refreshTokenRepository.CreateAsync(token);
-        return tokenValue;
+        await _tokenRepo.CreateAsync(tokenEntity);
     }
 
-    public async Task RevokeTokenAsync(Guid tokenId)
+    public async Task<RefreshToken?> ValidateRefreshTokenAsync(string token)
     {
-        await _refreshTokenRepository.RevokeAsync(tokenId);
+        var tokenHash = _tokenService.HashToken(token);
+        var tokenEntity = await _tokenRepo.GetByTokenHashAsync(tokenHash);
+
+        if (tokenEntity == null || tokenEntity.IsRevoked || tokenEntity.Expires < DateTime.UtcNow)
+            return null;
+
+        return tokenEntity;
     }
 
-    public async Task RevokeAllTokensForUserAsync(Guid userId)
+    public async Task RevokeRefreshTokenAsync(Guid tokenId)
     {
-        var tokens = await _refreshTokenRepository.GetTokensByUserIdAsync(userId);
-        foreach (var token in tokens.Where(t => !t.IsRevoked))
-        {
-            await _refreshTokenRepository.RevokeAsync(token.Id);
-        }
-    }
+        var token = await _tokenRepo.GetByIdAsync(tokenId);
+        if (token == null) return;
 
-    public async Task<RefreshToken> ValidateTokenAsync(string token)
-    {
-        var validToken = await _refreshTokenRepository.GetValidTokenAsync(token);
-        if (validToken == null) return null;
+        token.IsRevoked = true;
+        token.RevokedAt = DateTime.UtcNow;
 
-        // Include user information
-        validToken.User = await _userRepository.GetByIdAsync(validToken.UserId);
-        return validToken;
-    }
-
-    public async Task<IEnumerable<RefreshToken>> GetTokensForUserAsync(Guid userId)
-    {
-        return await _refreshTokenRepository.GetTokensByUserIdAsync(userId);
-    }
-
-    public async Task DeleteExpiredTokensAsync()
-    {
-        await _refreshTokenRepository.DeleteExpiredTokensAsync();
-    }
-
-    public Task<string> RotateTokenAsync(string oldToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> IsTokenExpiringSoonAsync(Guid tokenId)
-    {
-        throw new NotImplementedException();
+        await _tokenRepo.UpdateAsync(token);
     }
 }

@@ -2,20 +2,16 @@
 using PhantomGG.API.Data;
 using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
+using System;
 
 namespace PhantomGG.API.Repositories.Implementations;
 
 public class UserRepository(PhantomGGContext context) : IUserRepository
 {
     private readonly PhantomGGContext _context = context;
-    public async Task<IEnumerable<User>> GetAllAsync()
+    public async Task<User?> GetByIdAsync(Guid id)
     {
-        return await _context.Users.ToListAsync();
-    }
-
-    public async Task<User?> GetByIdAsync(Guid userId)
-    {
-        return await _context.Users.FindAsync(userId);
+        return await _context.Users.FindAsync(id);
     }
 
     public async Task<User?> GetByEmailAsync(string email)
@@ -24,10 +20,9 @@ public class UserRepository(PhantomGGContext context) : IUserRepository
             .FirstOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<bool> ExistsByEmailAsync(string email)
+    public async Task<IEnumerable<User>> GetAllAsync()
     {
-        return await _context.Users
-            .AnyAsync(u => u.Email == email);
+        return await _context.Users.ToListAsync();
     }
 
     public async Task CreateAsync(User user)
@@ -42,9 +37,9 @@ public class UserRepository(PhantomGGContext context) : IUserRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid userId)
+    public async Task DeleteAsync(Guid id)
     {
-        var user = await _context.Users.FindAsync(userId);
+        var user = await _context.Users.FindAsync(id);
         if (user != null)
         {
             _context.Users.Remove(user);
@@ -52,9 +47,9 @@ public class UserRepository(PhantomGGContext context) : IUserRepository
         }
     }
 
-    public async Task<bool> ExistsByIdAsync(Guid userId)
+    public async Task<bool> EmailExistsAsync(string email)
     {
         return await _context.Users
-            .AnyAsync(u => u.Id == userId);
+            .AnyAsync(u => u.Email == email);
     }
 }

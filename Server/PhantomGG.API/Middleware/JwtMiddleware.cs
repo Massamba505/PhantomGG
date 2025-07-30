@@ -1,14 +1,8 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using PhantomGG.API.Config;
-using PhantomGG.API.Services.Interfaces;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using System.Security.Claims;
+﻿using PhantomGG.API.Services.Interfaces;
 
 namespace PhantomGG.API.Middleware;
 
- public class JwtMiddleware
+public class JwtMiddleware
 {
     private readonly RequestDelegate _next;
 
@@ -19,22 +13,55 @@ namespace PhantomGG.API.Middleware;
 
     public async Task Invoke(HttpContext context, ITokenService tokenService)
     {
-        var token = context.Request.Cookies["accessToken"];
-        
-        if (!string.IsNullOrEmpty(token))
+        var invalidMessage = "Invalid or expired token.";
+
+        string? headerToken = GetTokenFromHeader(context);
+        string? cookieToken = GetTokenFromCookie(context);
+
+        if (string.IsNullOrEmpty(headerToken) && string.IsNullOrEmpty(cookieToken))
         {
-            var principal = tokenService.ValidateToken(token);
-            if (principal != null)
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync(invalidMessage);
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(headerToken) && !string.IsNullOrEmpty(cookieToken))
+        {
+            if (!string.Equals(headerToken, cookieToken, StringComparison.Ordinal))
             {
-                context.User = principal;
-                
-                // Attach user info to context for easy access
-                context.Items["UserId"] = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                context.Items["UserEmail"] = principal.FindFirst(ClaimTypes.Email)?.Value;
-                context.Items["UserRole"] = principal.FindFirst(ClaimTypes.Role)?.Value;
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await context.Response.WriteAsync(invalidMessage);
+                return;
             }
         }
 
+        var principal = tokenService.ValidateToken(headerToken!);
+        if (principal == null)
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync(invalidMessage);
+            return;
+        }
+
+        context.User = principal;
         await _next(context);
+    }
+
+    private string? GetTokenFromHeader(HttpContext context)
+    {
+        var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+
+        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+        {
+            return authHeader.Substring("Bearer ".Length).Trim();
+        }
+
+        return null;
+    }
+
+    private string? GetTokenFromCookie(HttpContext context)
+    {
+        context.Request.Cookies.TryGetValue("accessToken", out var token);
+        return token;
     }
 }

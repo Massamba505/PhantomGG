@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -10,6 +11,7 @@ using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Implementations;
 using PhantomGG.API.Services.Interfaces;
 using System.Text;
+using System.Text.Json;
 
 namespace PhantomGG.API;
 
@@ -20,6 +22,8 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers();
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddAuthorization();
         AddSwagger(builder.Services);
         ConfigureDatabase(builder.Services, builder.Configuration);
         ConfigureJwt(builder.Services, builder.Configuration);
@@ -38,6 +42,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseMiddleware<JwtMiddleware>();
         app.UseAuthentication();
         app.UseAuthorization();
@@ -135,6 +140,8 @@ public class Program
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordService, PasswordService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();

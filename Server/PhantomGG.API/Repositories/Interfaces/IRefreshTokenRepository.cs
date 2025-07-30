@@ -4,13 +4,12 @@ namespace PhantomGG.API.Repositories.Interfaces;
 
 public interface IRefreshTokenRepository
 {
-    Task<IEnumerable<RefreshToken>> GetAllAsync();
-    Task<RefreshToken?> GetByIdAsync(Guid tokenId);
-    Task<IEnumerable<RefreshToken>> GetTokensByUserIdAsync(Guid userId);
-    Task<RefreshToken?> GetValidTokenAsync(string token);
     Task CreateAsync(RefreshToken token);
+    Task<RefreshToken?> GetByIdAsync(Guid id);
+    Task<RefreshToken?> GetByTokenHashAsync(string tokenHash);
+    Task<RefreshToken?> GetByUserIdAsync(Guid userId);
     Task UpdateAsync(RefreshToken token);
-    Task DeleteAsync(Guid tokenId);
+    Task DeleteAsync(Guid id);
     Task RevokeAsync(Guid tokenId);
     Task DeleteExpiredTokensAsync();
 }

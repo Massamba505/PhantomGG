@@ -6,28 +6,34 @@ namespace PhantomGG.API.Services.Implementations;
 public class CurrentUserService : ICurrentUserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILogger<CurrentUserService> _logger;
 
-    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+    public CurrentUserService(
+        IHttpContextAccessor httpContextAccessor,
+        ILogger<CurrentUserService> logger)
     {
         _httpContextAccessor = httpContextAccessor;
+        _logger = logger;
     }
 
     public Guid? UserId
     {
         get
         {
-            var userId = _httpContextAccessor.HttpContext?.User?
-                .FindFirstValue(ClaimTypes.NameIdentifier);
-
-            return Guid.TryParse(userId, out var id) ? id : null;
+            var userId = GetClaimValue(ClaimTypes.NameIdentifier);
+            if (Guid.TryParse(userId, out var id))
+                return id;
+            return null;
         }
     }
 
-    public string? Email =>
-        _httpContextAccessor.HttpContext?.User?
-            .FindFirstValue(ClaimTypes.Email);
+    public string Email => GetClaimValue(ClaimTypes.Email);
+    public string Role => GetClaimValue(ClaimTypes.Role);
+    public bool IsAuthenticated => UserId.HasValue;
 
-    public string? Role =>
-        _httpContextAccessor.HttpContext?.User?
-            .FindFirstValue(ClaimTypes.Role);
+    private string GetClaimValue(string claimType)
+    {
+        return _httpContextAccessor.HttpContext?.User?
+            .FindFirstValue(claimType) ?? string.Empty;
+    }
 }

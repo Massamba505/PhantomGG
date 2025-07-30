@@ -7,41 +7,38 @@ namespace PhantomGG.API.Services.Implementations;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly ICurrentUserService _currentUserService;
-    private readonly IRefreshTokenService _refreshTokenService;
+    private readonly IUserRepository _userRepo;
+    private readonly ICurrentUserService _currentUser;
+    private readonly ILogger<UserService> _logger;
 
     public UserService(
-        IUserRepository userRepository,
-        ICurrentUserService currentUserService,
-        IRefreshTokenService refreshTokenService)
+        IUserRepository userRepo,
+        ICurrentUserService currentUser,
+        ILogger<UserService> logger)
     {
-        _userRepository = userRepository;
-        _currentUserService = currentUserService;
-        _refreshTokenService = refreshTokenService;
+        _userRepo = userRepo;
+        _currentUser = currentUser;
+        _logger = logger;
     }
 
-    public async Task<User?> GetUserByIdAsync(Guid userId)
+    public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
     {
-        return await _userRepository.GetByIdAsync(userId);
+        if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
+            throw new UnauthorizedAccessException("Access denied");
+
+        var user = await _userRepo.GetByIdAsync(userId);
+        if(user == null)
+            throw new KeyNotFoundException("User not found");
+        return ToProfileDto(user);
     }
 
-    public async Task<IEnumerable<User>> GetAllUsersAsync()
+    public async Task UpdateUserProfileAsync(Guid userId, UpdateUserRequest request)
     {
-        // Only admins should access all users
-        if (_currentUserService.Role != "Admin")
-            throw new UnauthorizedAccessException("Insufficient permissions");
+        if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
+            throw new UnauthorizedAccessException("Access denied");
 
-        return await _userRepository.GetAllAsync();
-    }
-
-    public async Task UpdateUserAsync(Guid userId, UpdateUserRequest request)
-    {
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userRepo.GetByIdAsync(userId);
         if (user == null) throw new KeyNotFoundException("User not found");
-
-        if (_currentUserService.UserId != userId && _currentUserService.Role != "Admin")
-            throw new UnauthorizedAccessException("Cannot update other users");
 
         if (!string.IsNullOrEmpty(request.FirstName))
             user.FirstName = request.FirstName;
@@ -51,7 +48,7 @@ public class UserService : IUserService
 
         if (!string.IsNullOrEmpty(request.Email) && request.Email != user.Email)
         {
-            if (await _userRepository.ExistsByEmailAsync(request.Email))
+            if (await _userRepo.EmailExistsAsync(request.Email))
                 throw new ArgumentException("Email already in use");
 
             user.Email = request.Email;
@@ -60,31 +57,20 @@ public class UserService : IUserService
         if (!string.IsNullOrEmpty(request.ProfilePictureUrl))
             user.ProfilePictureUrl = request.ProfilePictureUrl;
 
-        if (!string.IsNullOrEmpty(request.Role) && _currentUserService.Role == "Admin")
-            user.Role = request.Role;
-
-        await _userRepository.UpdateAsync(user);
+        await _userRepo.UpdateAsync(user);
     }
-
-    public async Task DeleteUserAsync(Guid userId)
+    
+    public UserProfileDto ToProfileDto(User user)
     {
-        if (_currentUserService.UserId != userId && _currentUserService.Role != "Admin")
-            throw new UnauthorizedAccessException("Cannot delete other users");
-
-        await _userRepository.DeleteAsync(userId);
-
-        await _refreshTokenService.RevokeAllTokensForUserAsync(userId);
-    }
-
-    public async Task UpdateUserRoleAsync(Guid userId, string newRole)
-    {
-        if (_currentUserService.Role != "Admin")
-            throw new UnauthorizedAccessException("Admin access required");
-
-        var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null) throw new KeyNotFoundException("User not found");
-
-        user.Role = newRole;
-        await _userRepository.UpdateAsync(user);
+        return new UserProfileDto
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            ProfilePictureUrl = user.ProfilePictureUrl,
+            Role = user.Role,
+            CreatedAt = user.CreatedAt
+        };
     }
 }

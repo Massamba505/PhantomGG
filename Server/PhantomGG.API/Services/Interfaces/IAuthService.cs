@@ -1,10 +1,12 @@
 ﻿using PhantomGG.API.DTOs.Auth;
+using PhantomGG.API.DTOs.RefreshToken;
 
 namespace PhantomGG.API.Services.Interfaces;
 
 public interface IAuthService
 {
-    Task<AuthResult> RegisterUserAsync(RegisterRequest request);
-    Task<AuthResult> AuthenticateUserAsync(string email, string password);
-    Task<AuthResult> RefreshTokensAsync(string refreshToken);
+    Task<AuthResponse> RegisterAsync(RegisterRequest request);
+    Task<AuthResponse> LoginAsync(LoginRequest request);
+    Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request);
+    Task LogoutAsync();
 }

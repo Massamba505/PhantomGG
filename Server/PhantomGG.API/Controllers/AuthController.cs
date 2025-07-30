@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PhantomGG.API.DTOs.Auth;
+using PhantomGG.API.DTOs.RefreshToken;
 using PhantomGG.API.Services.Interfaces;
 using System.Security.Claims;
 
@@ -12,53 +14,85 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly ICookieService _cookieService;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService, ICookieService cookieService)
+    public AuthController(
+        IAuthService authService,
+        ICookieService cookieService,
+        ILogger<AuthController> logger)
     {
         _authService = authService;
         _cookieService = cookieService;
+        _logger = logger;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
-        var result = await _authService.RegisterUserAsync(request);
-        if (!result.Success)
-            return BadRequest(new { Message = result.Message });
+        var response = await _authService.RegisterAsync(request);
 
-        return Ok(new { Message = "Registration successful" });
+        if (response.Success)
+        {
+            _cookieService.SetAuthCookies(Response, response.Tokens);
+            return Ok(response);
+        }
+
+        return BadRequest(response);
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        var result = await _authService.AuthenticateUserAsync(request.Email, request.Password);
-        if (!result.Success)
-            return Unauthorized(new { Message = result.Message });
+        var response = await _authService.LoginAsync(request);
 
-        _cookieService.SetAuthCookies(Response, result.AccessToken, result.RefreshToken);
-        return Ok(new { Message = "Login successful" });
+        if (response.Success)
+        {
+            _cookieService.SetAuthCookies(Response, response.Tokens);
+            return Ok(response);
+        }
+
+        return Unauthorized(response);
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh()
+    public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
     {
-        var refreshToken = Request.Cookies["refreshToken"];
-        if (string.IsNullOrEmpty(refreshToken))
-            return Unauthorized("Invalid refresh token");
+        var response = await _authService.RefreshTokenAsync(request);
 
-        var result = await _authService.RefreshTokensAsync(refreshToken);
-        if (!result.Success)
-            return Unauthorized(new { Message = result.Message });
+        if (response.Success)
+        {
+            _cookieService.SetAuthCookies(Response, response.Tokens);
+            return Ok(response);
+        }
 
-        _cookieService.SetAuthCookies(Response, result.AccessToken, result.RefreshToken);
-        return Ok(new { Message = "Tokens refreshed" });
+        return Unauthorized(response);
     }
 
+    [Authorize]
     [HttpPost("logout")]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout()
     {
+        await _authService.LogoutAsync();
         _cookieService.ClearAuthCookies(Response);
         return Ok(new { Message = "Logout successful" });
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public IActionResult GetCurrentUser()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        var role = User.FindFirstValue(ClaimTypes.Role);
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized(new { Message = "Invalid user information" });
+
+        return Ok(new
+        {
+            UserId = userId,
+            Email = email,
+            Role = role
+        });
     }
 }
