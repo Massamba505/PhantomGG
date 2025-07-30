@@ -1,7 +1,10 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS dev
-WORKDIR /app/server
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS dev
 
-COPY . .
+WORKDIR /app
+
+COPY . ./
+
+RUN dotnet restore
 
 EXPOSE 5000
 
