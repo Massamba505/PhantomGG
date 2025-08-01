@@ -29,6 +29,7 @@ public class RefreshTokenRepository(PhantomGGContext context) : IRefreshTokenRep
     public async Task<RefreshToken?> GetByTokenHashAsync(string tokenHash)
     {
         return await _context.RefreshTokens
+            .Include(t => t.User)
             .FirstOrDefaultAsync(t => t.TokenHash == tokenHash);
     }
 

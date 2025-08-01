@@ -7,6 +7,6 @@ public interface ITokenService
 {
     string GenerateAccessToken(User user);
     string GenerateRefreshToken();
-    string HashToken(string token);
+    string HashToBase64(string tokenHash);
     ClaimsPrincipal? ValidateToken(string token);
 }

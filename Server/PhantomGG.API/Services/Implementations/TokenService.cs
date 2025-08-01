@@ -12,12 +12,10 @@ namespace PhantomGG.API.Services.Implementations;
 public class TokenService : ITokenService
 {
     private readonly JwtConfig _config;
-    private readonly ILogger<TokenService> _logger;
 
-    public TokenService(JwtConfig config, ILogger<TokenService> logger)
+    public TokenService(JwtConfig config)
     {
         _config = config;
-        _logger = logger;
     }
 
     public string GenerateAccessToken(User user)
@@ -30,14 +28,13 @@ public class TokenService : ITokenService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Role, user.Role),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
         var token = new JwtSecurityToken(
             issuer: _config.Issuer,
             audience: _config.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(15),
+            expires: DateTime.UtcNow.AddMinutes(_config.AccessTokenExpiryMinutes),
             signingCredentials: credentials
         );
 
@@ -53,7 +50,7 @@ public class TokenService : ITokenService
     
     }
 
-    public string HashToken(string token)
+    public string HashToBase64(string token)
     {
         using var sha256 = SHA256.Create();
         var bytes = Encoding.UTF8.GetBytes(token);

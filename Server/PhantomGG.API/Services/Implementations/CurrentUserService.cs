@@ -6,14 +6,11 @@ namespace PhantomGG.API.Services.Implementations;
 public class CurrentUserService : ICurrentUserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ILogger<CurrentUserService> _logger;
 
     public CurrentUserService(
-        IHttpContextAccessor httpContextAccessor,
-        ILogger<CurrentUserService> logger)
+        IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
-        _logger = logger;
     }
 
     public Guid? UserId
@@ -23,6 +20,7 @@ public class CurrentUserService : ICurrentUserService
             var userId = GetClaimValue(ClaimTypes.NameIdentifier);
             if (Guid.TryParse(userId, out var id))
                 return id;
+
             return null;
         }
     }

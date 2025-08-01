@@ -7,18 +7,15 @@ namespace PhantomGG.API.Services.Implementations;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepo;
+    private readonly IUserRepository _userRepository;
     private readonly ICurrentUserService _currentUser;
-    private readonly ILogger<UserService> _logger;
 
     public UserService(
         IUserRepository userRepo,
-        ICurrentUserService currentUser,
-        ILogger<UserService> logger)
+        ICurrentUserService currentUser)
     {
-        _userRepo = userRepo;
+        _userRepository = userRepo;
         _currentUser = currentUser;
-        _logger = logger;
     }
 
     public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
@@ -26,7 +23,7 @@ public class UserService : IUserService
         if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
             throw new UnauthorizedAccessException("Access denied");
 
-        var user = await _userRepo.GetByIdAsync(userId);
+        var user = await _userRepository.GetByIdAsync(userId);
         if(user == null)
             throw new KeyNotFoundException("User not found");
         return ToProfileDto(user);
@@ -37,7 +34,7 @@ public class UserService : IUserService
         if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
             throw new UnauthorizedAccessException("Access denied");
 
-        var user = await _userRepo.GetByIdAsync(userId);
+        var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) throw new KeyNotFoundException("User not found");
 
         if (!string.IsNullOrEmpty(request.FirstName))
@@ -48,7 +45,7 @@ public class UserService : IUserService
 
         if (!string.IsNullOrEmpty(request.Email) && request.Email != user.Email)
         {
-            if (await _userRepo.EmailExistsAsync(request.Email))
+            if (await _userRepository.EmailExistsAsync(request.Email))
                 throw new ArgumentException("Email already in use");
 
             user.Email = request.Email;
@@ -57,7 +54,7 @@ public class UserService : IUserService
         if (!string.IsNullOrEmpty(request.ProfilePictureUrl))
             user.ProfilePictureUrl = request.ProfilePictureUrl;
 
-        await _userRepo.UpdateAsync(user);
+        await _userRepository.UpdateAsync(user);
     }
     
     public UserProfileDto ToProfileDto(User user)

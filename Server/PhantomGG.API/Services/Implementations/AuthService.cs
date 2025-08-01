@@ -10,38 +10,30 @@ namespace PhantomGG.API.Services.Implementations;
 
 public class AuthService : IAuthService
 {
-    private readonly IUserRepository _userRepo;
-    private readonly IRefreshTokenRepository _refreshTokenRepo;
+    private readonly IUserRepository _userRepository;
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly IPasswordService _passwordService;
     private readonly ICurrentUserService _currentUserService;
     private readonly ITokenService _tokenService;
-    private readonly ICookieService _cookieService;
-    private readonly ILogger<AuthService> _logger;
 
     public AuthService(
-        IUserRepository userRepo,
+        IUserRepository userRepository,
         IRefreshTokenService refreshTokenService,
         IPasswordService passwordService,
         ITokenService tokenService,
-        ICookieService cookieService,
-        ICurrentUserService currentUserService,
-        IRefreshTokenRepository refreshTokenRepo,
-        ILogger<AuthService> logger)
+        ICurrentUserService currentUserService)
     {
-        _userRepo = userRepo;
+        _userRepository = userRepository;
         _refreshTokenService = refreshTokenService;
         _passwordService = passwordService;
         _tokenService = tokenService;
-        _cookieService = cookieService;
-        _logger = logger;
         _currentUserService = currentUserService;
-        _refreshTokenRepo = refreshTokenRepo;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
-        if (await _userRepo.EmailExistsAsync(request.Email))
+        bool isEmailDuplicate = await _userRepository.EmailExistsAsync(request.Email);
+        if (isEmailDuplicate)
             return new AuthResponse { Success = false, Message = "Email already registered" };
 
         var passwordHashResult = _passwordService.CreatePasswordHash(request.Password);
@@ -60,7 +52,7 @@ public class AuthService : IAuthService
             IsActive = true
         };
 
-        await _userRepo.CreateAsync(user);
+        await _userRepository.CreateAsync(user);
 
         var tokens = await GenerateTokensAsync(user);
 
@@ -75,24 +67,14 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
-        var user = await _userRepo.GetByEmailAsync(request.Email);
+        var user = await _userRepository.GetByEmailAsync(request.Email);
 
-        if (user == null )
+        if (user == null || !user.IsActive || !_passwordService.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt))
         {
             return new AuthResponse { Success = false, Message = "Invalid credentials" };
         }
-        
-        if (!user.IsActive)
-        {
-            return new AuthResponse { Success = false, Message = "User account is not active" };
-        }
 
-        var isPasswordValid = _passwordService.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt);
-        if (!isPasswordValid)
-        {
-            return new AuthResponse { Success = false, Message = "Invalid credentials" };
-        }
-        var tokens_refresh = await _refreshTokenRepo.GetByUserIdAsync(user.Id);
+        var tokens_refresh = await _refreshTokenService.GetByUserIdAsync(user.Id);
         if (tokens_refresh != null)
         {
             await _refreshTokenService.RevokeRefreshTokenAsync(tokens_refresh.Id);
@@ -139,7 +121,7 @@ public class AuthService : IAuthService
     public async Task LogoutAsync()
     {
         var userId = _currentUserService.UserId!;
-        var refreshtoken = await _refreshTokenRepo.GetByUserIdAsync(userId.Value);
+        var refreshtoken = await _refreshTokenService.GetByUserIdAsync(userId.Value);
         if (refreshtoken != null)
         {
             await _refreshTokenService.RevokeRefreshTokenAsync(refreshtoken.Id);

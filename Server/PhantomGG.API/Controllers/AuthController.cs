@@ -14,16 +14,13 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly ICookieService _cookieService;
-    private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         IAuthService authService,
-        ICookieService cookieService,
-        ILogger<AuthController> logger)
+        ICookieService cookieService)
     {
         _authService = authService;
         _cookieService = cookieService;
-        _logger = logger;
     }
 
     [HttpPost("register")]

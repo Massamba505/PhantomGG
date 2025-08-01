@@ -7,4 +7,5 @@ public interface IRefreshTokenService
     Task CreateRefreshTokenAsync(Guid userId, string refreshToken);
     Task<RefreshToken?> ValidateRefreshTokenAsync(string refreshToken);
     Task RevokeRefreshTokenAsync(Guid tokenId);
+    Task<RefreshToken?> GetByUserIdAsync(Guid userId);
 }

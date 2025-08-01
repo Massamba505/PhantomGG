@@ -1,4 +1,5 @@
-﻿using PhantomGG.API.Models;
+﻿using PhantomGG.API.Config;
+using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
 
@@ -6,53 +7,52 @@ namespace PhantomGG.API.Services.Implementations;
 
 public class RefreshTokenService : IRefreshTokenService
 {
-    private readonly IRefreshTokenRepository _tokenRepo;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly ITokenService _tokenService;
-    private readonly ILogger<RefreshTokenService> _logger;
+    private readonly JwtConfig _config;
 
     public RefreshTokenService(
-        IRefreshTokenRepository tokenRepo,
+        IRefreshTokenRepository refreshTokenRepository,
         ITokenService tokenService,
-        ILogger<RefreshTokenService> logger)
+        JwtConfig config)
     {
-        _tokenRepo = tokenRepo;
+        _config = config;
+        _refreshTokenRepository = refreshTokenRepository;
         _tokenService = tokenService;
-        _logger = logger;
     }
 
-    public async Task CreateRefreshTokenAsync(Guid userId, string token)
+    public async Task CreateRefreshTokenAsync(Guid userId, string refreshToken)
     {
         var tokenEntity = new RefreshToken
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            TokenHash = _tokenService.HashToken(token),
-            Expires = DateTime.UtcNow.AddDays(7),
+            TokenHash = _tokenService.HashToBase64(refreshToken),
+            Expires = DateTime.UtcNow.AddDays(_config.RefreshTokenExpiryDays),
             CreatedAt = DateTime.UtcNow
         };
 
-        await _tokenRepo.CreateAsync(tokenEntity);
+        await _refreshTokenRepository.CreateAsync(tokenEntity);
     }
 
     public async Task<RefreshToken?> ValidateRefreshTokenAsync(string token)
     {
-        var tokenHash = _tokenService.HashToken(token);
-        var tokenEntity = await _tokenRepo.GetByTokenHashAsync(tokenHash);
+        var tokenHash = _tokenService.HashToBase64(token);
+        var refreshToken = await _refreshTokenRepository.GetByTokenHashAsync(tokenHash);
 
-        if (tokenEntity == null || tokenEntity.IsRevoked || tokenEntity.Expires < DateTime.UtcNow)
+        if (refreshToken == null || refreshToken.IsRevoked || refreshToken.Expires < DateTime.UtcNow)
             return null;
 
-        return tokenEntity;
+        return refreshToken;
     }
 
     public async Task RevokeRefreshTokenAsync(Guid tokenId)
     {
-        var token = await _tokenRepo.GetByIdAsync(tokenId);
-        if (token == null) return;
+        await _refreshTokenRepository.RevokeAsync(tokenId);
+    }
 
-        token.IsRevoked = true;
-        token.RevokedAt = DateTime.UtcNow;
-
-        await _tokenRepo.UpdateAsync(token);
+    public async Task<RefreshToken?> GetByUserIdAsync(Guid userId)
+    {
+        return await _refreshTokenRepository.GetByUserIdAsync(userId);
     }
 }
