@@ -1,12 +1,11 @@
-﻿using PhantomGG.API.Models;
+﻿using PhantomGG.API.DTOs.Auth;
+using PhantomGG.API.Models;
 using System.Security.Claims;
 
 namespace PhantomGG.API.Services.Interfaces;
 
 public interface ITokenService
 {
-    string GenerateAccessToken(User user);
-    string GenerateRefreshToken();
-    string HashToBase64(string tokenHash);
+    Task<TokenPair> GenerateAuthResponseAsync(User user);
     ClaimsPrincipal? ValidateToken(string token);
 }

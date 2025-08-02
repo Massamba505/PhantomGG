@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -10,6 +9,7 @@ using PhantomGG.API.Repositories.Implementations;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Implementations;
 using PhantomGG.API.Services.Interfaces;
+using PhantomGG.API.Utils;
 using System.Text;
 using System.Text.Json;
 
@@ -139,12 +139,13 @@ public class Program
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         // Services
+        services.AddScoped<JwtUtils>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordService, PasswordService>();
-        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ICookieService, CookieService>();
     }
 }

@@ -32,10 +32,15 @@ public class UserService : IUserService
     public async Task UpdateUserProfileAsync(Guid userId, UpdateUserRequest request)
     {
         if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
+        {
             throw new UnauthorizedAccessException("Access denied");
+        }
 
         var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null) throw new KeyNotFoundException("User not found");
+        if (user == null)
+        {
+            throw new KeyNotFoundException("User not found");
+        }
 
         if (!string.IsNullOrEmpty(request.FirstName))
             user.FirstName = request.FirstName;
@@ -46,7 +51,9 @@ public class UserService : IUserService
         if (!string.IsNullOrEmpty(request.Email) && request.Email != user.Email)
         {
             if (await _userRepository.EmailExistsAsync(request.Email))
+            {
                 throw new ArgumentException("Email already in use");
+            }
 
             user.Email = request.Email;
         }

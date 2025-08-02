@@ -1,4 +1,6 @@
-﻿using PhantomGG.API.Services.Interfaces;
+﻿using System.Security.Claims;
+using PhantomGG.API.Repositories.Interfaces;
+using PhantomGG.API.Utils;
 
 namespace PhantomGG.API.Middleware;
 
@@ -11,57 +13,38 @@ public class JwtMiddleware
         _next = next;
     }
 
-    public async Task Invoke(HttpContext context, ITokenService tokenService)
+    public async Task Invoke(HttpContext context, JwtUtils jwtUtils, IUserRepository userRepo)
     {
-        var invalidMessage = "Invalid or expired token.";
+        var token = GetTokenFromHeaderOrCookie(context);
 
-        string? headerToken = GetTokenFromHeader(context);
-        string? cookieToken = GetTokenFromCookie(context);
-
-        if (string.IsNullOrEmpty(headerToken) && string.IsNullOrEmpty(cookieToken))
+        if (token != null)
         {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync(invalidMessage);
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(headerToken) && !string.IsNullOrEmpty(cookieToken))
-        {
-            if (!string.Equals(headerToken, cookieToken, StringComparison.Ordinal))
+            var principal = jwtUtils.ValidateAccessToken(token);
+            if (principal != null)
             {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsync(invalidMessage);
-                return;
+                var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (Guid.TryParse(userId, out var id))
+                {
+                    var user = await userRepo.GetByIdAsync(id);
+                    if (user != null)
+                    {
+                        context.Items["User"] = user;
+                    }
+                }
             }
         }
 
-        var principal = tokenService.ValidateToken(headerToken!);
-        if (principal == null)
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync(invalidMessage);
-            return;
-        }
-
-        context.User = principal;
         await _next(context);
     }
 
-    private string? GetTokenFromHeader(HttpContext context)
+    private string? GetTokenFromHeaderOrCookie(HttpContext context)
     {
-        var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-
-        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+        var bearer = context.Request.Headers.Authorization.FirstOrDefault();
+        if (!string.IsNullOrEmpty(bearer) && bearer.StartsWith("Bearer "))
         {
-            return authHeader.Substring("Bearer ".Length).Trim();
+            return bearer.Split(" ").Last();
         }
 
-        return null;
-    }
-
-    private string? GetTokenFromCookie(HttpContext context)
-    {
-        context.Request.Cookies.TryGetValue("accessToken", out var token);
-        return token;
+        return context.Request.Cookies["access_token"];
     }
 }

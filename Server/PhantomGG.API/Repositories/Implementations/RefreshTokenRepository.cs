@@ -9,64 +9,32 @@ public class RefreshTokenRepository(PhantomGGContext context) : IRefreshTokenRep
 {
     private readonly PhantomGGContext _context = context;
 
-    public async Task CreateAsync(RefreshToken token)
+    public async Task AddAsync(RefreshToken token)
     {
-        await _context.RefreshTokens.AddAsync(token);
+        _context.RefreshTokens.Add(token);
         await _context.SaveChangesAsync();
-    }
-
-    public async Task<RefreshToken?> GetByUserIdAsync(Guid userId)
-    {
-        return await _context.RefreshTokens
-            .FirstOrDefaultAsync(t => t.UserId == userId);
-    }
-
-    public async Task<RefreshToken?> GetByIdAsync(Guid id)
-    {
-        return await _context.RefreshTokens.FindAsync(id);
     }
 
     public async Task<RefreshToken?> GetByTokenHashAsync(string tokenHash)
     {
         return await _context.RefreshTokens
-            .Include(t => t.User)
-            .FirstOrDefaultAsync(t => t.TokenHash == tokenHash);
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash && !rt.IsRevoked && rt.Expires > DateTime.UtcNow);
     }
 
-    public async Task UpdateAsync(RefreshToken token)
+    public async Task<IEnumerable<RefreshToken>> GetValidTokensByUserIdAsync(Guid userId)
     {
-        _context.RefreshTokens.Update(token);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task DeleteAsync(Guid id)
-    {
-        var token = await _context.RefreshTokens.FindAsync(id);
-        if (token != null)
-        {
-            _context.RefreshTokens.Remove(token);
-            await _context.SaveChangesAsync();
-        }
-    }
-
-    public async Task RevokeAsync(Guid tokenId)
-    {
-        var token = await _context.RefreshTokens.FindAsync(tokenId);
-        if (token != null)
-        {
-            token.IsRevoked = true;
-            token.RevokedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-        }
-    }
-
-    public async Task DeleteExpiredTokensAsync()
-    {
-        var expiredTokens = await _context.RefreshTokens
-            .Where(t => t.Expires < DateTime.UtcNow)
+        return await _context.RefreshTokens
+            .Include(rt => rt.User)
+            .Where(rt => rt.UserId == userId && !rt.IsRevoked && rt.Expires > DateTime.UtcNow)
             .ToListAsync();
+    }
 
-        _context.RefreshTokens.RemoveRange(expiredTokens);
+    public async Task RevokeAsync(RefreshToken token)
+    {
+        token.IsRevoked = true;
+        token.RevokedAt = DateTime.UtcNow;
+        _context.RefreshTokens.Update(token);
         await _context.SaveChangesAsync();
     }
 }

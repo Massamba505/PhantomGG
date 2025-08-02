@@ -1,158 +1,120 @@
 ﻿using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.Auth;
-using PhantomGG.API.DTOs.RefreshToken;
-using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
+using PhantomGG.API.Utils;
 
 namespace PhantomGG.API.Services.Implementations;
 
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
-    private readonly IRefreshTokenService _refreshTokenService;
-    private readonly IPasswordService _passwordService;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IRefreshTokenRepository _tokenRepository;
+    private readonly JwtUtils _jwtUtils;
+    private readonly IPasswordService _passwordHasher;
     private readonly ITokenService _tokenService;
+    private readonly ICookieService _cookieService;
 
     public AuthService(
         IUserRepository userRepository,
-        IRefreshTokenService refreshTokenService,
-        IPasswordService passwordService,
+        IRefreshTokenRepository tokenRepository,
+        JwtUtils jwtUtils,
         ITokenService tokenService,
-        ICurrentUserService currentUserService)
+        IPasswordService passwordHasher,
+        ICookieService cookieService)
     {
         _userRepository = userRepository;
-        _refreshTokenService = refreshTokenService;
-        _passwordService = passwordService;
+        _tokenRepository = tokenRepository;
+        _jwtUtils = jwtUtils;
+        _passwordHasher = passwordHasher;
         _tokenService = tokenService;
-        _currentUserService = currentUserService;
+        _cookieService = cookieService;
     }
 
-    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
+    public async Task<TokenPair> RegisterAsync(RegisterRequest request)
     {
         bool isEmailDuplicate = await _userRepository.EmailExistsAsync(request.Email);
         if (isEmailDuplicate)
-            return new AuthResponse { Success = false, Message = "Email already registered" };
-
-        var passwordHashResult = _passwordService.CreatePasswordHash(request.Password);
-
+        {
+            throw new Exception("Email already exists");
+        }
+            
+        PasswordHashResult passwordHash = _passwordHasher.CreatePasswordHash(request.Password);
+        
         var user = new User
         {
-            Id = Guid.NewGuid(),
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            PasswordHash = passwordHashResult.Hash,
-            PasswordSalt = passwordHashResult.Salt,
+            PasswordHash = passwordHash.Hash,
+            PasswordSalt = passwordHash.Salt,
             ProfilePictureUrl = $"https://eu.ui-avatars.com/api/?name={request.FirstName}+{request.LastName}&size=250",
             Role = UserRoles.Organizer.ToString(),
             CreatedAt = DateTime.UtcNow,
             IsActive = true
         };
 
-        await _userRepository.CreateAsync(user);
+        await _userRepository.AddAsync(user);
 
-        var tokens = await GenerateTokensAsync(user);
-
-        return new AuthResponse
-        {
-            Success = true,
-            Message = "Registration successful",
-            User = ToProfileDto(user),
-            Tokens = tokens
-        };
+        return await GenerateAuthResponseAsync(user);
     }
 
-    public async Task<AuthResponse> LoginAsync(LoginRequest request)
+    public async Task<TokenPair> LoginAsync(LoginRequest request)
     {
         var user = await _userRepository.GetByEmailAsync(request.Email);
-
-        if (user == null || !user.IsActive || !_passwordService.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt))
+        if (user == null)
         {
-            return new AuthResponse { Success = false, Message = "Invalid credentials" };
+            throw new Exception("Invalid credentials");
         }
 
-        var tokens_refresh = await _refreshTokenService.GetByUserIdAsync(user.Id);
-        if (tokens_refresh != null)
+        bool isValidPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt);
+
+        if (!isValidPassword)
         {
-            await _refreshTokenService.RevokeRefreshTokenAsync(tokens_refresh.Id);
+            throw new Exception("Invalid credentials");
         }
 
-        var tokens = await GenerateTokensAsync(user);
-
-        return new AuthResponse
-        {
-            Success = true,
-            Message = "Login successful",
-            User = ToProfileDto(user),
-            Tokens = tokens
-        };
+        return await GenerateAuthResponseAsync(user);
     }
 
-    public async Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request)
+    public async Task<TokenPair> RefreshTokenAsync(string refreshToken)
     {
-        var token = await _refreshTokenService.ValidateRefreshTokenAsync(request.RefreshToken);
+        var tokenHash = _jwtUtils.HashRefreshToken(refreshToken);
+        var token = await _tokenRepository.GetByTokenHashAsync(tokenHash);
+
+        if (token == null || token.Expires < DateTime.UtcNow || token.IsRevoked) { 
+            throw new Exception("Invalid refresh token");
+        }
+
+        return await GenerateAuthResponseAsync(token.User);
+    }
+
+    public async Task RevokeRefreshTokenAsync(Guid userId, string refreshToken)
+    {
+        var tokenHash = _jwtUtils.HashRefreshToken(refreshToken);
+        var token = await _tokenRepository.GetByTokenHashAsync(tokenHash);
+
         if (token == null)
         {
-            return new AuthResponse { Success = false, Message = "Invalid refresh token" };
+            throw new Exception("Refresh token not found");
         }
 
-        var user = token.User;
-        if (user == null || !user.IsActive)
-        {            
-            return new AuthResponse { Success = false, Message = "User not found" };
+        if (token.UserId != userId)
+        {
+            throw new UnauthorizedAccessException("Not authorized to revoke this token");
         }
 
-        await _refreshTokenService.RevokeRefreshTokenAsync(token.Id);
-
-        var newTokens = await GenerateTokensAsync(user);
-
-        return new AuthResponse
-        {
-            Success = true,
-            Message = "Token refreshed",
-            User = ToProfileDto(user),
-            Tokens = newTokens
-        };
+        await _tokenRepository.RevokeAsync(token);
     }
 
-    public async Task LogoutAsync()
+    private async Task<TokenPair> GenerateAuthResponseAsync(User user)
     {
-        var userId = _currentUserService.UserId!;
-        var refreshtoken = await _refreshTokenService.GetByUserIdAsync(userId.Value);
-        if (refreshtoken != null)
-        {
-            await _refreshTokenService.RevokeRefreshTokenAsync(refreshtoken.Id);
-        }
-    }
+        TokenPair tokens = await _tokenService.GenerateAuthResponseAsync(user);
 
-    public async Task<TokenPair> GenerateTokensAsync(User user)
-    {
-        var accessToken = _tokenService.GenerateAccessToken(user);
-        var refreshToken = _tokenService.GenerateRefreshToken();
-
-        await _refreshTokenService.CreateRefreshTokenAsync(user.Id, refreshToken);
-
-        return new TokenPair
-        {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken
-        };
-    }
-
-    public UserProfileDto ToProfileDto(User user)
-    {
-        return new UserProfileDto
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email,
-            ProfilePictureUrl = user.ProfilePictureUrl,
-            Role = user.Role,
-            CreatedAt = user.CreatedAt
+        return new TokenPair { 
+            AccessToken = tokens.AccessToken,
+            RefreshToken = tokens.RefreshToken
         };
     }
 }

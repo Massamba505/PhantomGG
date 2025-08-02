@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PhantomGG.API.DTOs.Auth;
-using PhantomGG.API.DTOs.RefreshToken;
+using PhantomGG.API.DTOs.User;
+using PhantomGG.API.Models;
 using PhantomGG.API.Services.Interfaces;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace PhantomGG.API.Controllers;
 
@@ -14,82 +15,93 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly ICookieService _cookieService;
+    private readonly IUserService _userService;
 
-    public AuthController(
-        IAuthService authService,
-        ICookieService cookieService)
+    public AuthController(IAuthService authService, ICookieService cookieService, IUserService userService)
     {
         _authService = authService;
         _cookieService = cookieService;
+        _userService = userService;
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterRequest request)
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var response = await _authService.RegisterAsync(request);
+        var authResponse = await _authService.RegisterAsync(request);
 
-        if (response.Success)
+        _cookieService.SetAuthCookies(Response, authResponse);
+
+        return Ok(new AuthResponse
         {
-            _cookieService.SetAuthCookies(Response, response.Tokens);
-            return Ok(response);
-        }
-
-        return BadRequest(response);
+            AccessToken = authResponse.AccessToken
+        });
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var response = await _authService.LoginAsync(request);
+        var authResponse = await _authService.LoginAsync(request);
 
-        if (response.Success)
+        _cookieService.SetAuthCookies(Response, authResponse);
+
+        return Ok(new AuthResponse
         {
-            _cookieService.SetAuthCookies(Response, response.Tokens);
-            return Ok(response);
-        }
-
-        return Unauthorized(response);
+            AccessToken = authResponse.AccessToken
+        });
     }
 
+    [Authorize]
     [HttpPost("refresh")]
-    public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
+    public async Task<IActionResult> Refresh()
     {
-        var response = await _authService.RefreshTokenAsync(request);
-
-        if (response.Success)
+        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
         {
-            _cookieService.SetAuthCookies(Response, response.Tokens);
-            return Ok(response);
+            return Unauthorized("No refresh token found");
         }
 
-        return Unauthorized(response);
+        var authResponse = await _authService.RefreshTokenAsync(refreshToken);
+
+        _cookieService.SetAuthCookies(Response, authResponse);
+
+        return Ok(new AuthResponse
+        {
+            AccessToken = authResponse.AccessToken
+        });
     }
 
     [Authorize]
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        await _authService.LogoutAsync();
+        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+        {
+            return BadRequest("No refresh token found");
+        }
+
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        { 
+            return Unauthorized("Invalid user"); 
+        }
+
+        await _authService.RevokeRefreshTokenAsync(Guid.Parse(userId), refreshToken);
         _cookieService.ClearAuthCookies(Response);
-        return Ok(new { Message = "Logout successful" });
+
+        return Ok(new { message = "Logged out" });
     }
 
     [Authorize]
     [HttpGet("me")]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> Me()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var email = User.FindFirstValue(ClaimTypes.Email);
-        var role = User.FindFirstValue(ClaimTypes.Role);
-
-        if (string.IsNullOrEmpty(userId))
-            return Unauthorized(new { Message = "Invalid user information" });
-
-        return Ok(new
+        var user = HttpContext.Items["User"] as User;
+        if (user == null)
         {
-            UserId = userId,
-            Email = email,
-            Role = role
-        });
+            return Unauthorized("User not found");
+        }
+
+        var result = await _userService.GetUserProfileAsync(user.Id);
+
+        return Ok(result);
     }
 }

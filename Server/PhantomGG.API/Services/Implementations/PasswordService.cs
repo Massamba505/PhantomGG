@@ -1,20 +1,40 @@
 ﻿using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.Services.Interfaces;
 
-namespace PhantomGG.API.Services.Implementations;
-
-public class PasswordService : IPasswordService
+namespace PhantomGG.API.Services.Implementations
 {
-    public PasswordHashResult CreatePasswordHash(string password)
+    public class PasswordService : IPasswordService
     {
-        string salt = BCrypt.Net.BCrypt.GenerateSalt();
-        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
+        public PasswordHashResult CreatePasswordHash(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentException("Password cannot be null or empty.");
+            }
 
-        return new PasswordHashResult(hashedPassword, salt);
-    }
+            string salt = BCrypt.Net.BCrypt.GenerateSalt();
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
 
-    public bool VerifyPassword(string password, string storedHash, string storedSalt)
-    {
-        return BCrypt.Net.BCrypt.Verify(password, storedHash);
+            return new PasswordHashResult(hashedPassword, salt);
+        }
+
+        public bool VerifyPassword(string password, string storedHash, string storedSalt)
+        {
+            if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(storedHash) || string.IsNullOrWhiteSpace(storedSalt))
+            {
+                return false;
+            }
+
+            try
+            {
+                string hashToCompare = BCrypt.Net.BCrypt.HashPassword(password, storedSalt);
+
+                return hashToCompare == storedHash;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

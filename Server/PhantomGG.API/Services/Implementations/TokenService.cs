@@ -1,61 +1,52 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using PhantomGG.API.Config;
+using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.Models;
+using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
+using PhantomGG.API.Utils;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace PhantomGG.API.Services.Implementations;
 
 public class TokenService : ITokenService
 {
-    private readonly JwtConfig _config;
+    private readonly JwtUtils _jwtUtils;
+    private readonly JwtConfig _jwtConfig;
+    private readonly IRefreshTokenRepository _tokenRepository;
 
-    public TokenService(JwtConfig config)
+    public TokenService(JwtConfig jwtConfig, 
+           JwtUtils jwtUtils,
+           IRefreshTokenRepository tokenRepository)
     {
-        _config = config;
+        _jwtConfig = jwtConfig;
+        _jwtUtils = jwtUtils;
+        _tokenRepository = tokenRepository;
     }
 
-    public string GenerateAccessToken(User user)
+    public async Task<TokenPair> GenerateAuthResponseAsync(User user)
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.Secret));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        var accessToken = _jwtUtils.GenerateAccessToken(user);
+        var refreshTokenRaw = _jwtUtils.GenerateRefreshToken();
+        var refreshTokenHash = _jwtUtils.HashRefreshToken(refreshTokenRaw);
 
-        var claims = new[]
+        var refreshToken = new RefreshToken
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role),
+            UserId = user.Id,
+            TokenHash = refreshTokenHash,
+            CreatedAt = DateTime.UtcNow,
+            Expires = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpiryDays)
         };
 
-        var token = new JwtSecurityToken(
-            issuer: _config.Issuer,
-            audience: _config.Audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_config.AccessTokenExpiryMinutes),
-            signingCredentials: credentials
-        );
+        await _tokenRepository.AddAsync(refreshToken);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    public string GenerateRefreshToken()
-    {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return Convert.ToBase64String(randomNumber);
-    
-    }
-
-    public string HashToBase64(string token)
-    {
-        using var sha256 = SHA256.Create();
-        var bytes = Encoding.UTF8.GetBytes(token);
-        var hash = sha256.ComputeHash(bytes);
-        return Convert.ToBase64String(hash);
+        return new TokenPair
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshTokenRaw,
+        };
     }
 
     public ClaimsPrincipal? ValidateToken(string token)
@@ -65,16 +56,16 @@ public class TokenService : ITokenService
             if (string.IsNullOrEmpty(token)) return null;
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_config.Secret);
+            var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
 
             var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = true,
-                ValidIssuer = _config.Issuer,
+                ValidIssuer = _jwtConfig.Issuer,
                 ValidateAudience = true,
-                ValidAudience = _config.Audience,
+                ValidAudience = _jwtConfig.Audience,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             }, out _);

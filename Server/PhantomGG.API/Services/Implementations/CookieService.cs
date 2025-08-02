@@ -7,24 +7,21 @@ namespace PhantomGG.API.Services.Implementations;
 public class CookieService : ICookieService
 {
     private readonly JwtConfig _config;
-    private readonly ILogger<CookieService> _logger;
-
-    public CookieService(JwtConfig config, ILogger<CookieService> logger)
+    public CookieService(JwtConfig config)
     {
         _config = config;
-        _logger = logger;
     }
 
     public void SetAuthCookies(HttpResponse response, TokenPair tokens)
     {
-        response.Cookies.Append("accessToken", tokens.AccessToken, new CookieOptions
+        /*response.Cookies.Append("accessToken", tokens.AccessToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddMinutes(_config.AccessTokenExpiryMinutes),
             Path = "/",
-        });
+        });*/
 
         response.Cookies.Append("refreshToken", tokens.RefreshToken, new CookieOptions
         {
@@ -46,7 +43,7 @@ public class CookieService : ICookieService
             Path = "/",
         };
 
-        response.Cookies.Delete("accessToken", options);
+        //response.Cookies.Delete("accessToken", options);
         response.Cookies.Delete("refreshToken", options);
 
     }
