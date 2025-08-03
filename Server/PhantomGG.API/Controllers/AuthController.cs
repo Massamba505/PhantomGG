@@ -25,27 +25,27 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequestDto)
     {
-        var user = await _authService.RegisterAsync(request);
-        var authResponse = await _tokenService.GenerateAuthResponseAsync(user);
+        var newUser = await _authService.RegisterAsync(registerRequestDto);
+        var authTokens = await _tokenService.GenerateAuthResponseAsync(newUser);
 
-        _cookieService.SetAuthCookies(Response, authResponse);
+        _cookieService.SetAuthCookies(Response, authTokens);
 
-        return Ok(authResponse);
+        return Ok(authTokens);
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest loginRequestDto)
     {
-        var user = await _authService.LoginAsync(request);
-        var authResponse = await _tokenService.GenerateAuthResponseAsync(user);
+        var authenticatedUser = await _authService.LoginAsync(loginRequestDto);
+        var authTokens = await _tokenService.GenerateAuthResponseAsync(authenticatedUser);
 
-        _cookieService.SetAuthCookies(Response, authResponse);
+        _cookieService.SetAuthCookies(Response, authTokens);
 
         return Ok(new AuthResponse
         {
-            AccessToken = authResponse.AccessToken
+            AccessToken = authTokens.AccessToken
         });
     }
 
@@ -53,18 +53,18 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh()
     {
-        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+        if (!Request.Cookies.TryGetValue("refreshToken", out var storedRefreshToken))
         {
             return Unauthorized("No refresh token found");
         }
 
-        var authResponse = await _authService.RefreshTokenAsync(refreshToken);
+        var refreshedTokens = await _authService.RefreshTokenAsync(storedRefreshToken);
 
-        _cookieService.SetAuthCookies(Response, authResponse);
+        _cookieService.SetAuthCookies(Response, refreshedTokens);
 
         return Ok(new AuthResponse
         {
-            AccessToken = authResponse.AccessToken
+            AccessToken = refreshedTokens.AccessToken
         });
     }
 
@@ -72,18 +72,18 @@ public class AuthController : ControllerBase
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+        if (!Request.Cookies.TryGetValue("refreshToken", out var storedRefreshToken))
         {
             return BadRequest("No refresh token found");
         }
 
-        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
-        { 
-            return Unauthorized("Invalid user"); 
+        var authenticatedUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (authenticatedUserId == null)
+        {
+            return Unauthorized("Invalid user");
         }
 
-        await _authService.RevokeRefreshTokenAsync(Guid.Parse(userId), refreshToken);
+        await _authService.RevokeRefreshTokenAsync(Guid.Parse(authenticatedUserId), storedRefreshToken);
         _cookieService.ClearAuthCookies(Response);
 
         return Ok(new { message = "Logged out" });
@@ -93,14 +93,14 @@ public class AuthController : ControllerBase
     [HttpGet("me")]
     public async Task<IActionResult> Me()
     {
-        var user = HttpContext.Items["User"] as User;
-        if (user == null)
+        var currentUser = HttpContext.Items["User"] as User;
+        if (currentUser == null)
         {
             return Unauthorized("User not found");
         }
 
-        var result = await _userService.GetUserProfileAsync(user.Id);
+        var userProfile = await _userService.GetUserProfileAsync(currentUser.Id);
 
-        return Ok(result);
+        return Ok(userProfile);
     }
 }
