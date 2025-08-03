@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhantomGG.API.DTOs.Auth;
-using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Models;
 using PhantomGG.API.Services.Interfaces;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace PhantomGG.API.Controllers;
 
@@ -16,31 +14,32 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly ICookieService _cookieService;
     private readonly IUserService _userService;
+    private readonly ITokenService _tokenService;
 
-    public AuthController(IAuthService authService, ICookieService cookieService, IUserService userService)
+    public AuthController(IAuthService authService, ICookieService cookieService, IUserService userService, ITokenService tokenService)
     {
         _authService = authService;
         _cookieService = cookieService;
         _userService = userService;
+        _tokenService = tokenService;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var authResponse = await _authService.RegisterAsync(request);
+        var user = await _authService.RegisterAsync(request);
+        var authResponse = await _tokenService.GenerateAuthResponseAsync(user);
 
         _cookieService.SetAuthCookies(Response, authResponse);
 
-        return Ok(new AuthResponse
-        {
-            AccessToken = authResponse.AccessToken
-        });
+        return Ok(authResponse);
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var authResponse = await _authService.LoginAsync(request);
+        var user = await _authService.LoginAsync(request);
+        var authResponse = await _tokenService.GenerateAuthResponseAsync(user);
 
         _cookieService.SetAuthCookies(Response, authResponse);
 

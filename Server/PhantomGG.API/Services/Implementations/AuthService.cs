@@ -32,7 +32,7 @@ public class AuthService : IAuthService
         _cookieService = cookieService;
     }
 
-    public async Task<TokenPair> RegisterAsync(RegisterRequest request)
+    public async Task<User> RegisterAsync(RegisterRequest request)
     {
         bool isEmailDuplicate = await _userRepository.EmailExistsAsync(request.Email);
         if (isEmailDuplicate)
@@ -57,10 +57,10 @@ public class AuthService : IAuthService
 
         await _userRepository.AddAsync(user);
 
-        return await GenerateAuthResponseAsync(user);
+        return user;
     }
 
-    public async Task<TokenPair> LoginAsync(LoginRequest request)
+    public async Task<User> LoginAsync(LoginRequest request)
     {
         var user = await _userRepository.GetByEmailAsync(request.Email);
         if (user == null)
@@ -75,7 +75,7 @@ public class AuthService : IAuthService
             throw new Exception("Invalid credentials");
         }
 
-        return await GenerateAuthResponseAsync(user);
+        return user;
     }
 
     public async Task<TokenPair> RefreshTokenAsync(string refreshToken)
@@ -87,7 +87,7 @@ public class AuthService : IAuthService
             throw new Exception("Invalid refresh token");
         }
 
-        return await GenerateAuthResponseAsync(token.User);
+        return await _tokenService.GenerateAuthResponseAsync(token.User);
     }
 
     public async Task RevokeRefreshTokenAsync(Guid userId, string refreshToken)
@@ -106,15 +106,5 @@ public class AuthService : IAuthService
         }
 
         await _tokenRepository.RevokeAsync(token);
-    }
-
-    private async Task<TokenPair> GenerateAuthResponseAsync(User user)
-    {
-        TokenPair tokens = await _tokenService.GenerateAuthResponseAsync(user);
-
-        return new TokenPair { 
-            AccessToken = tokens.AccessToken,
-            RefreshToken = tokens.RefreshToken
-        };
     }
 }
