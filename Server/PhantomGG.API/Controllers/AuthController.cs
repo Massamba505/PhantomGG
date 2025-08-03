@@ -58,7 +58,7 @@ public class AuthController : ControllerBase
             return Unauthorized("No refresh token found");
         }
 
-        var refreshedTokens = await _authService.RefreshTokenAsync(storedRefreshToken);
+        var refreshedTokens = await _tokenService.RefreshTokenAsync(storedRefreshToken);
 
         _cookieService.SetAuthCookies(Response, refreshedTokens);
 
@@ -83,7 +83,7 @@ public class AuthController : ControllerBase
             return Unauthorized("Invalid user");
         }
 
-        await _authService.RevokeRefreshTokenAsync(Guid.Parse(authenticatedUserId), storedRefreshToken);
+        await _tokenService.RevokeRefreshTokenAsync(Guid.Parse(authenticatedUserId), storedRefreshToken);
         _cookieService.ClearAuthCookies(Response);
 
         return Ok(new { message = "Logged out" });

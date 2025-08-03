@@ -58,12 +58,13 @@ public class JwtUtils(JwtConfig jwtConfig)
         {
             return tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidIssuer = _jwtConfig.Issuer,
-                ValidAudience = _jwtConfig.Audience,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = _jwtConfig.Issuer,
+                ValidateAudience = true,
+                ValidAudience = _jwtConfig.Audience,
+                ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             }, out _);
         }

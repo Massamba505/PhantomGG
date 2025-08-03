@@ -3,30 +3,20 @@ using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
-using PhantomGG.API.Utils;
 
 namespace PhantomGG.API.Services.Implementations;
 
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
-    private readonly IRefreshTokenRepository _tokenRepository;
-    private readonly JwtUtils _jwtUtils;
     private readonly IPasswordService _passwordHasher;
-    private readonly ITokenService _tokenService;
 
     public AuthService(
         IUserRepository userRepository,
-        IRefreshTokenRepository tokenRepository,
-        JwtUtils jwtUtils,
-        ITokenService tokenService,
         IPasswordService passwordHasher)
     {
         _userRepository = userRepository;
-        _tokenRepository = tokenRepository;
-        _jwtUtils = jwtUtils;
         _passwordHasher = passwordHasher;
-        _tokenService = tokenService;
     }
 
     public async Task<User> RegisterAsync(RegisterRequest request)
@@ -73,35 +63,5 @@ public class AuthService : IAuthService
         }
 
         return user;
-    }
-
-    public async Task<TokenPair> RefreshTokenAsync(string refreshToken)
-    {
-        var tokenHash = _jwtUtils.HashRefreshToken(refreshToken);
-        var token = await _tokenRepository.GetByTokenHashAsync(tokenHash);
-
-        if (token == null || token.Expires < DateTime.UtcNow || token.IsRevoked) { 
-            throw new Exception("Invalid refresh token");
-        }
-
-        return await _tokenService.GenerateAuthResponseAsync(token.User);
-    }
-
-    public async Task RevokeRefreshTokenAsync(Guid userId, string refreshToken)
-    {
-        var tokenHash = _jwtUtils.HashRefreshToken(refreshToken);
-        var token = await _tokenRepository.GetByTokenHashAsync(tokenHash);
-
-        if (token == null)
-        {
-            throw new Exception("Refresh token not found");
-        }
-
-        if (token.UserId != userId)
-        {
-            throw new UnauthorizedAccessException("Not authorized to revoke this token");
-        }
-
-        await _tokenRepository.RevokeAsync(token);
     }
 }

@@ -1,13 +1,9 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using PhantomGG.API.Config;
+﻿using PhantomGG.API.Config;
 using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
 using PhantomGG.API.Utils;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace PhantomGG.API.Services.Implementations;
 
@@ -17,7 +13,7 @@ public class TokenService : ITokenService
     private readonly JwtConfig _jwtConfig;
     private readonly IRefreshTokenRepository _tokenRepository;
 
-    public TokenService(JwtConfig jwtConfig, 
+    public TokenService(JwtConfig jwtConfig,
            JwtUtils jwtUtils,
            IRefreshTokenRepository tokenRepository)
     {
@@ -48,33 +44,34 @@ public class TokenService : ITokenService
             RefreshToken = refreshTokenRaw,
         };
     }
-
-    public ClaimsPrincipal? ValidateToken(string token)
+    
+    public async Task<TokenPair> RefreshTokenAsync(string refreshToken)
     {
-        try
-        {
-            if (string.IsNullOrEmpty(token)) return null;
+        var tokenHash = _jwtUtils.HashRefreshToken(refreshToken);
+        var token = await _tokenRepository.GetByTokenHashAsync(tokenHash);
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
-
-            var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = true,
-                ValidIssuer = _jwtConfig.Issuer,
-                ValidateAudience = true,
-                ValidAudience = _jwtConfig.Audience,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            }, out _);
-
-            return principal;
+        if (token == null || token.Expires < DateTime.UtcNow || token.IsRevoked) { 
+            throw new Exception("Invalid refresh token");
         }
-        catch
+
+        return await GenerateAuthResponseAsync(token.User);
+    }
+
+    public async Task RevokeRefreshTokenAsync(Guid userId, string refreshToken)
+    {
+        var tokenHash = _jwtUtils.HashRefreshToken(refreshToken);
+        var token = await _tokenRepository.GetByTokenHashAsync(tokenHash);
+
+        if (token == null)
         {
-            return null;
+            throw new Exception("Refresh token not found");
         }
+
+        if (token.UserId != userId)
+        {
+            throw new UnauthorizedAccessException("Not authorized to revoke this token");
+        }
+
+        await _tokenRepository.RevokeAsync(token);
     }
 }
