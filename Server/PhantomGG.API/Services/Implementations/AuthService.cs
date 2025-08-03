@@ -14,22 +14,19 @@ public class AuthService : IAuthService
     private readonly JwtUtils _jwtUtils;
     private readonly IPasswordService _passwordHasher;
     private readonly ITokenService _tokenService;
-    private readonly ICookieService _cookieService;
 
     public AuthService(
         IUserRepository userRepository,
         IRefreshTokenRepository tokenRepository,
         JwtUtils jwtUtils,
         ITokenService tokenService,
-        IPasswordService passwordHasher,
-        ICookieService cookieService)
+        IPasswordService passwordHasher)
     {
         _userRepository = userRepository;
         _tokenRepository = tokenRepository;
         _jwtUtils = jwtUtils;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
-        _cookieService = cookieService;
     }
 
     public async Task<User> RegisterAsync(RegisterRequest request)
