@@ -19,6 +19,11 @@ public class JwtMiddleware
 
         if (token != null)
         {
+            if (!TokensMatch(context, token))
+            {
+                throw new UnauthorizedAccessException("Token mismatch - possible security violation");
+            }
+
             var principal = jwtUtils.ValidateAccessToken(token);
             if (principal != null)
             {
@@ -39,12 +44,32 @@ public class JwtMiddleware
 
     private string? GetTokenFromHeaderOrCookie(HttpContext context)
     {
-        var bearer = context.Request.Headers.Authorization.FirstOrDefault();
-        if (!string.IsNullOrEmpty(bearer) && bearer.StartsWith("Bearer "))
+        var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
         {
-            return bearer.Split(" ").Last();
+            return authHeader[7..]; 
         }
 
-        return context.Request.Cookies["access_token"];
+        return context.Request.Cookies["accessToken"];
+    }
+
+    private bool TokensMatch(HttpContext context, string token)
+    {
+        var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+        string? headerToken = null;
+
+        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+        {
+            headerToken = authHeader[7..];
+        }
+
+        var cookieToken = context.Request.Cookies["accessToken"];
+
+        if (headerToken != null)
+        {
+            return headerToken == cookieToken;
+        }
+
+        return true;
     }
 }

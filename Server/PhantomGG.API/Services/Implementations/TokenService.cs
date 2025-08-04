@@ -22,37 +22,45 @@ public class TokenService : ITokenService
         _tokenRepository = tokenRepository;
     }
 
-    public async Task<TokenPair> GenerateAuthResponseAsync(User user)
+    public async Task<AuthResult> GenerateAuthResponseAsync(User user)
     {
         var accessToken = _jwtUtils.GenerateAccessToken(user);
         var refreshTokenRaw = _jwtUtils.GenerateRefreshToken();
         var refreshTokenHash = _jwtUtils.HashRefreshToken(refreshTokenRaw);
+
+        var refreshTokenExpires = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpiryDays);
+        var accessTokenExpires = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpiryMinutes);
 
         var refreshToken = new RefreshToken
         {
             UserId = user.Id,
             TokenHash = refreshTokenHash,
             CreatedAt = DateTime.UtcNow,
-            Expires = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpiryDays)
+            Expires = refreshTokenExpires
         };
 
         await _tokenRepository.AddAsync(refreshToken);
 
-        return new TokenPair
+        return new AuthResult
         {
             AccessToken = accessToken,
             RefreshToken = refreshTokenRaw,
+            AccessTokenExpires = accessTokenExpires,
+            RefreshTokenExpires = refreshTokenExpires
         };
     }
     
-    public async Task<TokenPair> RefreshTokenAsync(string refreshToken)
+    public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
     {
         var tokenHash = _jwtUtils.HashRefreshToken(refreshToken);
         var token = await _tokenRepository.GetByTokenHashAsync(tokenHash);
 
-        if (token == null || token.Expires < DateTime.UtcNow || token.IsRevoked) { 
-            throw new Exception("Invalid refresh token");
+        if (token == null || token.Expires < DateTime.UtcNow || token.IsRevoked) 
+        { 
+            throw new UnauthorizedAccessException("Invalid or expired refresh token");
         }
+
+        await _tokenRepository.RevokeAsync(token);
 
         return await GenerateAuthResponseAsync(token.User);
     }
@@ -64,7 +72,7 @@ public class TokenService : ITokenService
 
         if (token == null)
         {
-            throw new Exception("Refresh token not found");
+            throw new KeyNotFoundException("Refresh token not found");
         }
 
         if (token.UserId != userId)

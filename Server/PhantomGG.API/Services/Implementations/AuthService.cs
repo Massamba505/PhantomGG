@@ -24,7 +24,7 @@ public class AuthService : IAuthService
         bool isEmailDuplicate = await _userRepository.EmailExistsAsync(request.Email);
         if (isEmailDuplicate)
         {
-            throw new Exception("Email already exists");
+            throw new InvalidOperationException("Email already exists");
         }
             
         PasswordHashResult passwordHash = _passwordHasher.CreatePasswordHash(request.Password);
@@ -52,14 +52,19 @@ public class AuthService : IAuthService
         var user = await _userRepository.GetByEmailAsync(request.Email);
         if (user == null)
         {
-            throw new Exception("Invalid credentials");
+            throw new UnauthorizedAccessException("Invalid credentials");
         }
 
         bool isValidPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt);
 
         if (!isValidPassword)
         {
-            throw new Exception("Invalid credentials");
+            throw new UnauthorizedAccessException("Invalid credentials");
+        }
+
+        if (!user.IsActive)
+        {
+            throw new UnauthorizedAccessException("Account is deactivated");
         }
 
         return user;

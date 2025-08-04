@@ -5,7 +5,7 @@ namespace PhantomGG.API.Services.Interfaces;
 
 public interface ITokenService
 {
-    Task<TokenPair> GenerateAuthResponseAsync(User user);
-    Task<TokenPair> RefreshTokenAsync(string refreshToken);
+    Task<AuthResult> GenerateAuthResponseAsync(User user);
+    Task<AuthResult> RefreshTokenAsync(string refreshToken);
     Task RevokeRefreshTokenAsync(Guid userId, string refreshToken);
 }

@@ -7,44 +7,47 @@ namespace PhantomGG.API.Services.Implementations;
 public class CookieService : ICookieService
 {
     private readonly JwtConfig _config;
+    
     public CookieService(JwtConfig config)
     {
         _config = config;
     }
 
-    public void SetAuthCookies(HttpResponse response, TokenPair tokens)
+    public void SetAuthCookies(HttpResponse response, AuthResult authResult)
     {
-        /*response.Cookies.Append("accessToken", tokens.AccessToken, new CookieOptions
+        // Set access token cookie
+        response.Cookies.Append("accessToken", authResult.AccessToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = false, // Set to true in production with HTTPS
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddMinutes(_config.AccessTokenExpiryMinutes),
-            Path = "/",
-        });*/
+            Expires = authResult.AccessTokenExpires,
+            Path = "/"
+        });
 
-        response.Cookies.Append("refreshToken", tokens.RefreshToken, new CookieOptions
+        // Set refresh token cookie
+        response.Cookies.Append("refreshToken", authResult.RefreshToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = false, // Set to true in production with HTTPS
             SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(_config.RefreshTokenExpiryDays),
-            Path = "/",
+            Expires = authResult.RefreshTokenExpires,
+            Path = "/"
         });
     }
 
     public void ClearAuthCookies(HttpResponse response)
     {
-        var options = new CookieOptions
+        var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = false, // Set to true in production with HTTPS
             SameSite = SameSiteMode.Strict,
             Path = "/",
+            Expires = DateTime.UtcNow.AddDays(-1) // Expire immediately
         };
 
-        //response.Cookies.Delete("accessToken", options);
-        response.Cookies.Delete("refreshToken", options);
-
+        response.Cookies.Delete("accessToken", cookieOptions);
+        response.Cookies.Delete("refreshToken", cookieOptions);
     }
 }

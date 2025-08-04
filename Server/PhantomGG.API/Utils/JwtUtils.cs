@@ -14,11 +14,15 @@ public class JwtUtils(JwtConfig jwtConfig)
 
     public string GenerateAccessToken(User user)
     {
+        var tokenId = Guid.NewGuid().ToString();
+        
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Role, user.Role),
+            new Claim(JwtRegisteredClaimNames.Jti, tokenId), // Token ID for blacklisting
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.Secret));
@@ -67,6 +71,20 @@ public class JwtUtils(JwtConfig jwtConfig)
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             }, out _);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public string? GetTokenId(string token)
+    {
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwt = tokenHandler.ReadJwtToken(token);
+            return jwt.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)?.Value;
         }
         catch
         {

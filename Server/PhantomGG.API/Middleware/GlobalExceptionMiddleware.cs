@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace PhantomGG.API.Middleware;
 
@@ -6,16 +7,13 @@ public class GlobalExceptionMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionMiddleware> _logger;
-    private readonly IHostEnvironment _env;
 
     public GlobalExceptionMiddleware(
         RequestDelegate next,
-        ILogger<GlobalExceptionMiddleware> logger,
-        IHostEnvironment env)
+        ILogger<GlobalExceptionMiddleware> logger)
     {
         _next = next;
         _logger = logger;
-        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -26,7 +24,7 @@ public class GlobalExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unhandled exception occurred: {Message}", ex.Message);
+            _logger.LogError(ex, "An unhandled exception occurred");
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -40,44 +38,34 @@ public class GlobalExceptionMiddleware
         }
 
         context.Response.Clear();
-        context.Response.ContentType = "application/json";
+        context.Response.ContentType = "application/problem+json";
 
-        var statusCode = exception switch
+        var (statusCode, title, detail) = exception switch
         {
-            UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-            KeyNotFoundException => StatusCodes.Status404NotFound,
-            ArgumentException => StatusCodes.Status400BadRequest,
-            InvalidOperationException => StatusCodes.Status409Conflict,
-            _ => StatusCodes.Status500InternalServerError
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized", exception.Message),
+            KeyNotFoundException => (StatusCodes.Status404NotFound, "Not Found", exception.Message),
+            ArgumentException => (StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
+            InvalidOperationException => (StatusCodes.Status409Conflict, "Conflict", exception.Message),
+            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred")
         };
 
         context.Response.StatusCode = statusCode;
 
-        var errorResponse = new
+        var problemDetails = new ProblemDetails
         {
             Status = statusCode,
-            Title = GetTitleForStatusCode(statusCode),
-            Message = _env.IsDevelopment() ? exception.Message : "An unexpected error occurred.",
-            Details = _env.IsDevelopment() ? exception.StackTrace : null,
-            TraceId = context.TraceIdentifier
+            Title = title,
+            Detail = detail
         };
 
-        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-        var json = JsonSerializer.Serialize(errorResponse, options);
+        var options = new JsonSerializerOptions 
+        { 
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true
+        };
+        
+        var json = JsonSerializer.Serialize(problemDetails, options);
 
         await context.Response.WriteAsync(json);
-    }
-
-    private static string GetTitleForStatusCode(int statusCode)
-    {
-        return statusCode switch
-        {
-            StatusCodes.Status400BadRequest => "Bad Request",
-            StatusCodes.Status401Unauthorized => "Unauthorized",
-            StatusCodes.Status404NotFound => "Not Found",
-            StatusCodes.Status409Conflict => "Conflict",
-            StatusCodes.Status500InternalServerError => "Server Error",
-            _ => "Error"
-        };
     }
 }

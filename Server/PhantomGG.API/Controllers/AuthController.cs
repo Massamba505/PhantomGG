@@ -28,43 +28,64 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequestDto)
     {
         var newUser = await _authService.RegisterAsync(registerRequestDto);
-        var authTokens = await _tokenService.GenerateAuthResponseAsync(newUser);
+        var authResult = await _tokenService.GenerateAuthResponseAsync(newUser);
 
-        _cookieService.SetAuthCookies(Response, authTokens);
+        _cookieService.SetAuthCookies(Response, authResult);
 
-        return Ok(authTokens);
+        return Ok(new AuthResponse
+        {
+            AccessToken = authResult.AccessToken,
+            RefreshToken = authResult.RefreshToken,
+            AccessTokenExpires = authResult.AccessTokenExpires,
+            RefreshTokenExpires = authResult.RefreshTokenExpires
+        });
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest loginRequestDto)
     {
         var authenticatedUser = await _authService.LoginAsync(loginRequestDto);
-        var authTokens = await _tokenService.GenerateAuthResponseAsync(authenticatedUser);
+        var authResult = await _tokenService.GenerateAuthResponseAsync(authenticatedUser);
 
-        _cookieService.SetAuthCookies(Response, authTokens);
+        _cookieService.SetAuthCookies(Response, authResult);
 
         return Ok(new AuthResponse
         {
-            AccessToken = authTokens.AccessToken
+            AccessToken = authResult.AccessToken,
+            RefreshToken = authResult.RefreshToken,
+            AccessTokenExpires = authResult.AccessTokenExpires,
+            RefreshTokenExpires = authResult.RefreshTokenExpires
         });
     }
 
-    [Authorize]
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh()
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequest? request = null)
     {
-        if (!Request.Cookies.TryGetValue("refreshToken", out var storedRefreshToken))
+        if (!ModelState.IsValid)
         {
-            return Unauthorized("No refresh token found");
+            return BadRequest(new { message = "Refresh token is required" });
         }
 
-        var refreshedTokens = await _tokenService.RefreshTokenAsync(storedRefreshToken);
+        if (!Request.Cookies.TryGetValue("refreshToken", out var cookieRefreshToken))
+        {
+            return Unauthorized(new { message = "No refresh token found in cookies" });
+        }
 
-        _cookieService.SetAuthCookies(Response, refreshedTokens);
+        if (request?.RefreshToken != cookieRefreshToken)
+        {
+            return Unauthorized(new { message = "Refresh token mismatch" });
+        }
+
+        var refreshedResult = await _tokenService.RefreshTokenAsync(cookieRefreshToken);
+
+        _cookieService.SetAuthCookies(Response, refreshedResult);
 
         return Ok(new AuthResponse
         {
-            AccessToken = refreshedTokens.AccessToken
+            AccessToken = refreshedResult.AccessToken,
+            RefreshToken = refreshedResult.RefreshToken,
+            AccessTokenExpires = refreshedResult.AccessTokenExpires,
+            RefreshTokenExpires = refreshedResult.RefreshTokenExpires
         });
     }
 
@@ -72,21 +93,18 @@ public class AuthController : ControllerBase
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        if (!Request.Cookies.TryGetValue("refreshToken", out var storedRefreshToken))
-        {
-            return BadRequest("No refresh token found");
-        }
-
-        var authenticatedUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (authenticatedUserId == null)
-        {
-            return Unauthorized("Invalid user");
-        }
-
-        await _tokenService.RevokeRefreshTokenAsync(Guid.Parse(authenticatedUserId), storedRefreshToken);
         _cookieService.ClearAuthCookies(Response);
 
-        return Ok(new { message = "Logged out" });
+        if (Request.Cookies.TryGetValue("refreshToken", out var storedRefreshToken))
+        {
+            var authenticatedUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (authenticatedUserId != null)
+            {
+                await _tokenService.RevokeRefreshTokenAsync(Guid.Parse(authenticatedUserId), storedRefreshToken);
+            }
+        }
+
+        return Ok(new { message = "Logged out successfully" });
     }
 
     [Authorize]
