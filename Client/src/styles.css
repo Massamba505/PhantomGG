@@ -1,124 +1,143 @@
 @import "tailwindcss";
 @plugin "tailwindcss-primeui";
 
-@theme {
-  --color-background: hsl(210 20% 98%);
-  --color-foreground: hsl(215 20% 15%);
-
-  --color-card: hsl(210 20% 100%);
-  --color-card-foreground: hsl(215 20% 20%);
-
-  --color-popover: hsl(210 20% 100%);
-  --color-popover-foreground: hsl(215 20% 15%);
-
-  --color-primary: hsl(200 100% 40%);
-  --color-primary-foreground: hsl(0 0% 100%);
-  --color-primary-glow: hsl(200 100% 50%);
-
-  --color-secondary: hsl(210 20% 92%);
-  --color-secondary-foreground: hsl(215 15% 35%);
-
-  --color-muted: hsl(210 20% 96%);
-  --color-muted-foreground: hsl(215 15% 55%);
-
-  --color-accent: hsl(200 80% 45%);
-  --color-accent-foreground: hsl(0 0% 100%);
-
-  --color-destructive: hsl(0 75% 50%);
-  --color-destructive-foreground: hsl(0 0% 100%);
-
-  --color-success: hsl(142 70% 35%);
-  --color-success-foreground: hsl(0 0% 100%);
-
-  --color-border: hsl(210 20% 85%);
-  --color-input: hsl(210 20% 95%);
-  --color-ring: hsl(200 100% 40%);
-
-  --color-sidebar-bg: hsl(210 25% 96%);
-  --color-sidebar-border: hsl(210 20% 88%);
-
-  --gradient-primary: linear-gradient(
-    135deg,
-    hsl(var(--color-primary)),
-    hsl(var(--color-primary-glow))
-  );
-
-  --gradient-dark: linear-gradient(
-    180deg,
-    hsl(var(--color-background)),
-    hsl(210 20% 94%)
-  );
-
-  --gradient-card: linear-gradient(
-    145deg,
-    hsl(var(--color-card)),
-    hsl(210 20% 98%)
-  );
-
-  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-  --shadow-glow: 0 0 30px hsl(var(--color-primary) / 0.15);
-
-  --radius-md: 0.75rem;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--color-foreground);
+  background-color: var(--color-background);
 }
 
-@theme .dark {
-  --color-background: hsl(213 27% 8%);
-  --color-foreground: hsl(210 40% 98%);
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
 
-  --color-card: hsl(214 25% 12%);
-  --color-card-foreground: hsl(210 40% 95%);
+.theme-transition * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
 
-  --color-popover: hsl(214 27% 10%);
-  --color-popover-foreground: hsl(210 40% 98%);
+@layer base {
+  :root {
+    --color-background: hsl(210 36% 98%);
+    --color-foreground: hsl(215 28% 17%);
 
-  --color-primary: hsl(200 100% 45%);
-  --color-primary-foreground: hsl(210 40% 98%);
-  --color-primary-glow: hsl(200 100% 55%);
+    --color-card: hsl(0 0% 100%);
+    --color-card-foreground: hsl(215 25% 27%);
 
-  --color-secondary: hsl(215 25% 20%);
-  --color-secondary-foreground: hsl(210 40% 90%);
+    --color-popover: hsl(0 0% 100%);
+    --color-popover-foreground: hsl(215 25% 27%);
 
-  --color-muted: hsl(215 27% 15%);
-  --color-muted-foreground: hsl(215 15% 65%);
+    --color-primary: hsl(220 100% 50%);
+    --color-primary-foreground: hsl(0 0% 100%);
+    --color-primary-glow: hsl(220 100% 60%);
 
-  --color-accent: hsl(200 80% 35%);
-  --color-accent-foreground: hsl(210 40% 98%);
+    --color-secondary: hsl(210 36% 96%);
+    --color-secondary-foreground: hsl(215 25% 27%);
 
-  --color-destructive: hsl(0 84% 55%);
-  --color-destructive-foreground: hsl(210 40% 98%);
+    --color-muted: hsl(210 36% 96%);
+    --color-muted-foreground: hsl(215 25% 40%);
 
-  --color-success: hsl(142 76% 36%);
-  --color-success-foreground: hsl(210 40% 98%);
+    --color-accent: hsl(220 100% 50%);
+    --color-accent-foreground: hsl(0 0% 100%);
 
-  --color-border: hsl(215 25% 20%);
-  --color-input: hsl(215 25% 18%);
-  --color-ring: hsl(200 100% 45%);
+    --color-destructive: hsl(0 84% 60%);
+    --color-destructive-foreground: hsl(0 0% 100%);
 
-  --color-sidebar-bg: hsl(213 30% 6%);
-  --color-sidebar-border: hsl(215 25% 15%);
+    --color-success: hsl(142 76% 36%);
+    --color-success-foreground: hsl(0 0% 100%);
 
-  --gradient-primary: linear-gradient(
-    135deg,
-    hsl(var(--color-primary)),
-    hsl(var(--color-primary-glow))
-  );
+    --color-border: hsl(210 36% 90%);
+    --color-input: hsl(210 36% 97%);
+    --color-ring: hsl(220 100% 50%);
 
-  --gradient-dark: linear-gradient(
-    180deg,
-    hsl(var(--color-background)),
-    hsl(215 30% 5%)
-  );
+    --color-sidebar-bg: hsl(210 36% 99%);
+    --color-sidebar-border: hsl(210 36% 90%);
 
-  --gradient-card: linear-gradient(
-    145deg,
-    hsl(var(--color-card)),
-    hsl(215 25% 14%)
-  );
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(220 100% 50%),
+      hsl(220 100% 60%)
+    );
 
-  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 30px hsl(var(--color-primary) / 0.2);
+    --gradient-dark: linear-gradient(
+      180deg,
+      var(--color-background),
+      hsl(210 36% 96%)
+    );
 
-  --radius-md: 0.75rem;
+    --gradient-card: linear-gradient(
+      145deg,
+      var(--color-card),
+      hsl(210 36% 98%)
+    );
+
+    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+    --shadow-glow: 0 0 30px hsla(220, 100%, 50%, 0.25);
+
+    --radius-md: 0.75rem;
+  }
+
+  .dark {
+    /* Dark Mode - Deep Space Theme */
+    --color-background: hsl(220 26% 9%);
+    --color-foreground: hsl(210 40% 98%);
+
+    --color-card: hsl(222 25% 12%);
+    --color-card-foreground: hsl(210 40% 98%);
+
+    --color-popover: hsl(222 25% 12%);
+    --color-popover-foreground: hsl(210 40% 98%);
+
+    --color-primary: hsl(220 100% 60%);
+    --color-primary-foreground: hsl(210 40% 98%);
+    --color-primary-glow: hsl(220 100% 70%);
+
+    --color-secondary: hsl(222 25% 18%);
+    --color-secondary-foreground: hsl(210 40% 90%);
+
+    --color-muted: hsl(222 25% 16%);
+    --color-muted-foreground: hsl(210 34% 80%);
+
+    --color-accent: hsl(220 100% 60%);
+    --color-accent-foreground: hsl(210 40% 98%);
+
+    --color-destructive: hsl(0 84% 60%);
+    --color-destructive-foreground: hsl(210 40% 98%);
+
+    --color-success: hsl(142 72% 42%);
+    --color-success-foreground: hsl(210 40% 98%);
+
+    --color-border: hsl(222 25% 16%);
+    --color-input: hsl(222 25% 14%);
+    --color-ring: hsl(220 100% 60%);
+
+    --color-sidebar-bg: hsl(220 26% 7%);
+    --color-sidebar-border: hsl(222 25% 14%);
+
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(220 100% 60%),
+      hsl(220 100% 70%)
+    );
+
+    --gradient-dark: linear-gradient(
+      180deg,
+      var(--color-background),
+      hsl(222 26% 7%)
+    );
+
+    --gradient-card: linear-gradient(
+      145deg,
+      var(--color-card),
+      hsl(222 25% 14%)
+    );
+
+    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 30px hsla(220, 100%, 60%, 0.25);
+
+    --radius-md: 0.75rem;
+  }
 }
 
 @layer components {
