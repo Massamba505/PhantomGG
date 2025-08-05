@@ -1,0 +1,10 @@
+<button
+    class="btn btn-primary"
+    (click)="toggleTheme()"
+    [attr.aria-label]="buttonLabel()"
+    [title]="buttonLabel()"
+>
+      <span *ngIf="currentIcon() === 'light'">🌞</span>
+      <span *ngIf="currentIcon() === 'dark'">🌜</span>
+      <span *ngIf="currentIcon() === 'system'">🖥️</span>
+</button>

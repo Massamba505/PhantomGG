@@ -15,12 +15,12 @@ export class ThemeService {
   
   constructor() {
     // Apply theme on initialization
-    this.applyTheme(this.themeMode());
+    this.applyTheme();
     
     // Listen for system preference changes when in 'system' mode
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
       if (this.themeMode() === 'system') {
-        this.applyTheme('system');
+        this.applyTheme();
       }
     });
     
@@ -28,7 +28,7 @@ export class ThemeService {
     effect(() => {
       const theme = this.themeMode();
       this.saveTheme(theme);
-      this.applyTheme(theme);
+      this.applyTheme();
     });
   }
   
@@ -47,10 +47,8 @@ export class ThemeService {
     localStorage.setItem(this.THEME_KEY, theme);
   }
   
-  private applyTheme(theme: ThemeMode): void {
-    const isDarkMode = 
-      theme === 'dark' || 
-      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  private applyTheme(): void {
+    const isDarkMode = this.isDarkMode();
     
     // Apply transition class before changing theme
     this.addTransitionClass();

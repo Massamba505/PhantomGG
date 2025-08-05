@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ThemeService } from '../../services/theme.service';
 import { CommonModule } from '@angular/common';
 
@@ -6,32 +6,10 @@ import { CommonModule } from '@angular/common';
   selector: 'app-theme-toggle',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <button 
-      class="theme-toggle"
-      (click)="toggleTheme()"
-      [attr.aria-label]="buttonLabel()"
-      [title]="buttonLabel()"
-    >
-      <span *ngIf="currentIcon() === 'light'">🌞</span>
-      <span *ngIf="currentIcon() === 'dark'">🌜</span>
-      <span *ngIf="currentIcon() === 'system'">🖥️</span>
-    </button>
-  `,
-  styles: [`
-    .theme-toggle {
-      background: none;
-      border-radius: 6px;
-      padding: 8px 12px;
-      font-size: 18px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-  `]
+  templateUrl: "./theme-toggle.html",
 })
 export class ThemeToggleComponent {
-  constructor(private themeService: ThemeService) {}
-
+  themeService = inject(ThemeService);
   currentIcon = computed(() => this.themeService.currentTheme());
 
   buttonLabel = computed(() => {
