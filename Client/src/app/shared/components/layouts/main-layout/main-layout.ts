@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { ɵEmptyOutletComponent } from '@angular/router';
+import { ThemeToggleComponent } from '../../theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-main-layout',
   templateUrl: './main-layout.html',
-  styleUrl: './main-layout.css',
+  imports: [ThemeToggleComponent],
+  standalone: true
 })
 export class MainLayout {}
