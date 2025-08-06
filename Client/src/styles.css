@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@plugin "tailwindcss-primeui";
+/* @plugin "tailwindcss-primeui"; */
 
 @layer base {
   :root {
@@ -188,6 +188,14 @@
     padding: 1.5rem;
     transition: transform 0.15s ease;
   }
+
+  .card {
+    background: var(--gradient-card);
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) + 4px);
+    padding: 1.5rem;
+    transition: transform 0.15s ease;
+  }
   
   .card-tournament:hover {
     transform: translateY(-2px);
@@ -220,6 +228,10 @@
   .input-field:focus {
     outline: none;
     border-color: hsl(var(--ring));
+  }
+
+  .input-field:placeholder-shown{
+    color: hsl(var(--muted-foreground));
   }
 }
 

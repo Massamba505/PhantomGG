@@ -1,0 +1,66 @@
+<div class="auth-form">
+  <div class="text-center mb-8">
+    <h1 class="text-2xl font-bold mb-2">Welcome Back, Phantom! 👻</h1>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="space-y-6">
+    <div>
+      <label class="block text-sm font-medium mb-2">Email</label>
+      <input 
+        class="input-field w-full" 
+        type="email" 
+        placeholder="phantomplayer@tournament.com"
+        required
+      />
+    </div>
+
+<div>
+  <label class="block text-sm font-medium mb-2">Password</label>
+  <div class="relative">
+    <input 
+      class="input-field w-full pr-12" 
+      [type]="showPassword() ? 'text' : 'password'" 
+      placeholder="Enter your tactical password... 👻"
+      required
+    />
+    <button 
+      (click)="togglePassword()" 
+      type="button" 
+      class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+    >
+      {{ showPassword() ? '🐵' : '🙈' }}
+    </button>
+  </div>
+</div>
+
+
+    <button type="submit" class="btn-primary w-full text-lg">
+      <span>👻</span>
+      <span>Enter the Tournament!</span>
+      <span>👻</span>
+    </button>
+  </form>
+
+  <div class="flex items-center my-6">
+    <div class="border-t border-border flex-1"></div>
+    <span class="px-4 text-muted-foreground text-sm">OR</span>
+    <div class="border-t border-border flex-1"></div>
+  </div>
+
+  <div class="w-full-4 mb-6">
+    <button class="btn-secondary w-full gap-2">
+      <span>Google</span>
+    </button>
+  </div>
+
+  <div class="text-center">
+    <span class="text-muted-foreground">New to phantomgg? </span>
+    <a
+      href="/auth/signup"
+      class="text-primary hover:underline font-medium"
+    >
+      Join the PhantomGG!
+  </a>
+    <span>👻👻</span>
+  </div>
+</div>
