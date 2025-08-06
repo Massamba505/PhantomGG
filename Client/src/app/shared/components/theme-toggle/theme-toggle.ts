@@ -16,8 +16,7 @@ export class ThemeToggleComponent {
     const theme = this.themeService.currentTheme();
     switch (theme) {
       case 'light': return 'Switch to dark mode';
-      case 'dark': return 'Switch to system mode';
-      case 'system': return 'Switch to light mode';
+      case 'dark': return 'Switch to light mode';
       default: return 'Toggle theme';
     }
   });
