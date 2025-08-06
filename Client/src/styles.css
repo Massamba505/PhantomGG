@@ -205,6 +205,7 @@
     transform: translateY(-1px);
   }
 
+  /* === Inputs === */
   .input-field {
     background-color: hsl(var(--input));
     border: 1px solid hsl(var(--border));
