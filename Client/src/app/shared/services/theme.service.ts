@@ -1,6 +1,6 @@
 import { Injectable, signal, effect, computed } from '@angular/core';
 
-export type ThemeMode = 'light' | 'dark' | 'system';
+export type ThemeMode = 'light' | 'dark';
 
 @Injectable({
   providedIn: 'root'
@@ -17,13 +17,6 @@ export class ThemeService {
     // Apply theme on initialization
     this.applyTheme();
     
-    // Listen for system preference changes when in 'system' mode
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (this.themeMode() === 'system') {
-        this.applyTheme();
-      }
-    });
-    
     // Create an effect to handle theme changes
     effect(() => {
       const theme = this.themeMode();
@@ -35,12 +28,11 @@ export class ThemeService {
   private getInitialTheme(): ThemeMode {
     // Try to get saved preference
     const savedTheme = localStorage.getItem(this.THEME_KEY) as ThemeMode;
-    if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+    if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
       return savedTheme;
     }
     
-    // Default to system
-    return 'system';
+    return 'dark';
   }
   
   private saveTheme(theme: ThemeMode): void {
@@ -85,16 +77,12 @@ export class ThemeService {
     const currentTheme = this.themeMode();
     if (currentTheme === 'light') {
       this.setTheme('dark');
-    } else if (currentTheme === 'dark') {
-      this.setTheme('system');
     } else {
       this.setTheme('light');
     }
   }
   
   public isDarkMode(): boolean {
-    const theme = this.themeMode();
-    return theme === 'dark' || 
-      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    return this.themeMode() === 'dark';
   }
 }

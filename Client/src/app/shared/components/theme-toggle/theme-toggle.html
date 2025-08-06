@@ -1,10 +1,9 @@
 <button
-    class="btn btn-primary"
+    class="btn-ghost p-3 rounded-full hover:bg-muted transition-all duration-300"
     (click)="toggleTheme()"
     [attr.aria-label]="buttonLabel()"
     [title]="buttonLabel()"
 >
-      <span *ngIf="currentIcon() === 'light'">🌞</span>
-      <span *ngIf="currentIcon() === 'dark'">🌜</span>
-      <span *ngIf="currentIcon() === 'system'">🖥️</span>
+      <span *ngIf="currentIcon() === 'light'" class="text-xl">🌞</span>
+      <span *ngIf="currentIcon() === 'dark'" class="text-xl">🌜</span>
 </button>
