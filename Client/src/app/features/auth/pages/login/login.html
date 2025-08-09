@@ -6,35 +6,34 @@
   <form (ngSubmit)="onSubmit()" class="space-y-6">
     <div>
       <label class="block text-sm font-medium mb-2">Email</label>
-      <input 
-        class="input-field w-full" 
-        type="email" 
+      <input
+        class="input-field w-full"
+        type="email"
         placeholder="phantomplayer@tournament.com"
         required
       />
     </div>
 
-<div>
-  <label class="block text-sm font-medium mb-2">Password</label>
-  <div class="relative">
-    <input 
-      class="input-field w-full pr-12" 
-      [type]="showPassword() ? 'text' : 'password'" 
-      placeholder="Enter your tactical password... 👻"
-      required
-    />
-    <button 
-      (click)="togglePassword()" 
-      type="button" 
-      class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-    >
-      {{ showPassword() ? '🐵' : '🙈' }}
-    </button>
-  </div>
-</div>
+    <div>
+      <label class="block text-sm font-medium mb-2">Password</label>
+      <div class="relative">
+        <input
+          class="input-field w-full pr-12"
+          [type]="showPassword() ? 'text' : 'password'"
+          placeholder="Enter your tactical password... 👻"
+          required
+        />
+        <button
+          (click)="togglePassword()"
+          type="button"
+          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        >
+          {{ showPassword() ? "🐵" : "🙈" }}
+        </button>
+      </div>
+    </div>
 
-
-    <button type="submit" class="btn-primary w-full text-lg">
+    <button type="submit" class="primary-button w-full">
       <span>👻</span>
       <span>Enter the Tournament!</span>
       <span>👻</span>
@@ -48,19 +47,16 @@
   </div>
 
   <div class="w-full-4 mb-6">
-    <button class="btn-secondary w-full gap-2">
+    <button class="secondary-button button-base w-full gap-2">
       <span>Google</span>
     </button>
   </div>
 
   <div class="text-center">
     <span class="text-muted-foreground">New to phantomgg? </span>
-    <a
-      href="/auth/signup"
-      class="text-primary hover:underline font-medium"
-    >
+    <a href="/auth/signup" class="text-primary hover:underline font-medium">
       Join the PhantomGG!
-  </a>
+    </a>
     <span>👻👻</span>
   </div>
 </div>

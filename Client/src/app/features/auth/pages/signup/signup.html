@@ -2,22 +2,22 @@
   <div class="text-center mb-8">
     <h1 class="text-2xl font-bold mb-2">Become a Phantom! 👻👻</h1>
   </div>
-    <form (ngSubmit)="onSubmit()" class="space-y-4">
+  <form (ngSubmit)="onSubmit()" class="space-y-4">
     <div class="grid grid-cols-2 gap-4">
       <div>
         <label class="block text-sm font-medium mb-2">First Name</label>
-        <input 
-          class="input-field w-full" 
-          type="text" 
+        <input
+          class="input-field w-full"
+          type="text"
           placeholder="Phantom"
           required
         />
       </div>
       <div>
         <label class="block text-sm font-medium mb-2">Last Name</label>
-        <input 
-          class="input-field w-full" 
-          type="text" 
+        <input
+          class="input-field w-full"
+          type="text"
           placeholder="Striker"
           required
         />
@@ -26,9 +26,9 @@
 
     <div>
       <label class="block text-sm font-medium mb-2">Email</label>
-      <input 
-        class="input-field w-full" 
-        type="email" 
+      <input
+        class="input-field w-full"
+        type="email"
         placeholder="phantomplayer@tournament.com"
         required
       />
@@ -37,18 +37,18 @@
     <div>
       <label class="block text-sm font-medium mb-2">Password</label>
       <div class="relative">
-        <input 
+        <input
           class="input-field w-full pr-12"
-          [type]="showPassword() ? 'text' : 'password'" 
+          [type]="showPassword() ? 'text' : 'password'"
           placeholder="Make it tactically strong! 👻"
           required
         />
-        <button 
-          (click)="togglePassword()" 
-          type="button" 
+        <button
+          (click)="togglePassword()"
+          type="button"
           class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
         >
-          {{ showPassword() ? '🐵' : '🙈' }}
+          {{ showPassword() ? "🐵" : "🙈" }}
         </button>
       </div>
     </div>
@@ -56,23 +56,23 @@
     <div>
       <label class="block text-sm font-medium mb-2">Confirm Password</label>
       <div class="relative">
-        <input 
-          class="input-field w-full pr-12" 
-          [type]="showPassword2() ? 'text' : 'password'" 
+        <input
+          class="input-field w-full pr-12"
+          [type]="showPassword2() ? 'text' : 'password'"
           placeholder="Same formation, secure the goal! 🥅"
           required
         />
-        <button 
-          (click)="togglePassword2()" 
-          type="button" 
+        <button
+          (click)="togglePassword2()"
+          type="button"
           class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
         >
-          {{ showPassword2() ? '🐵' : '🙈' }}
+          {{ showPassword2() ? "🐵" : "🙈" }}
         </button>
       </div>
     </div>
 
-    <button type="submit" class="btn-primary w-full text-lg">
+    <button type="submit" class="primary-button w-full mt-5">
       <span>👻</span>
       <span>Join the Phantom League!</span>
       <span>👻</span>
@@ -85,20 +85,16 @@
     <div class="border-t border-border flex-1"></div>
   </div>
 
-
   <div class="w-full-4 mb-6">
-    <button class="btn-secondary w-full gap-2">
+    <button class="secondary-button w-full gap-2">
       <span>Google</span>
     </button>
   </div>
 
   <div class="text-center">
-    <span class="text-muted-foreground">Already in the phantom? </span>
-    <a
-      href="/auth/login"
-      class="text-primary hover:underline font-medium"
-      >
-        Score your login!
+    <span class="text-muted">Already in the phantom? </span>
+    <a href="/auth/login" class="text-secondary hover:underline font-medium">
+      Score your login!
     </a>
     <span>👻</span>
   </div>

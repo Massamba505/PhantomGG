@@ -1,75 +1,83 @@
 @import "tailwindcss";
-/* @plugin "tailwindcss-primeui"; */
 
 @layer base {
   :root {
-    /* Light Mode */
     --background: 210 20% 98%;
-    --foreground: 215 20% 15%;
+    --foreground: 222 28% 18%;
 
-    --card: 210 20% 100%;
-    --card-foreground: 215 20% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 28% 20%;
 
-    --popover: 210 20% 100%;
-    --popover-foreground: 215 20% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 28% 18%;
 
-    --primary: 200 100% 40%;
+    --primary: 222 60% 42%;
+    --primary-glow: 222 60% 52%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 200 100% 50%;
 
-    --secondary: 210 20% 92%;
-    --secondary-foreground: 215 15% 35%;
+    --secondary: 210 20% 93%;
+    --secondary-foreground: 222 15% 35%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 15% 55%;
+    --muted: 210 20% 95%;
+    --muted-foreground: 222 10% 60%;
 
-    --accent: 200 80% 45%;
+    --accent: 200 85% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 75% 50%;
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
     --success: 142 70% 35%;
     --success-foreground: 0 0% 100%;
 
     --border: 210 20% 85%;
-    --input: 210 20% 95%;
-    --ring: 200 100% 40%;
+    --input: 210 20% 96%;
+    --ring: 222 60% 42%;
 
-    --sidebar-bg: 210 25% 96%;
+    --sidebar-bg: 210 25% 97%;
     --sidebar-border: 210 20% 88%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-dark: linear-gradient(180deg, hsl(var(--background)), hsl(210 20% 94%));
-    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(210 20% 98%));
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-glow))
+    );
+    --gradient-dark: linear-gradient(
+      180deg,
+      hsl(var(--background)),
+      hsl(210 20% 95%)
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(var(--card)),
+      hsl(210 20% 98%)
+    );
 
-    /* Shadows */
-    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
     --shadow-glow: 0 0 30px hsl(var(--primary) / 0.15);
 
-    --radius: 0.75rem;
+    --radius: 0.4rem;
   }
 
   .dark {
-    /* Dark Mode */
-    --background: 213 27% 8%;
+    --background: 222 47% 11%;
     --foreground: 210 40% 98%;
 
-    --card: 214 25% 12%;
+    --card: 222 44% 13%;
     --card-foreground: 210 40% 95%;
 
-    --popover: 214 27% 10%;
+    --popover: 222 46% 12%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 200 100% 45%;
-    --primary-foreground: 210 40% 98%;
-    --primary-glow: 200 100% 55%;
+    --primary: 215 20% 35%;
+    --primary-glow: 215 20% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 25% 20%;
+    --secondary: 220 15% 26%;
     --secondary-foreground: 210 40% 90%;
 
-    --muted: 215 27% 15%;
+    --muted: 220 14% 20%;
     --muted-foreground: 215 15% 65%;
 
     --accent: 200 80% 35%;
@@ -81,29 +89,37 @@
     --success: 142 76% 36%;
     --success-foreground: 210 40% 98%;
 
-    --border: 215 25% 20%;
-    --input: 215 25% 18%;
+    --border: 220 15% 22%;
+    --input: 220 15% 20%;
     --ring: 200 100% 45%;
 
-    --sidebar-bg: 213 30% 6%;
-    --sidebar-border: 215 25% 15%;
+    --sidebar-bg: 222 47% 10%;
+    --sidebar-border: 220 15% 18%;
 
-    /* Dark Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-dark: linear-gradient(180deg, hsl(var(--background)), hsl(215 30% 5%));
-    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(215 25% 14%));
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(var(--primary)),
+      hsl(var(--primary-glow))
+    );
+    --gradient-dark: linear-gradient(
+      180deg,
+      hsl(var(--background)),
+      hsl(220 40% 7%)
+    );
+    --gradient-card: linear-gradient(
+      145deg,
+      hsl(var(--card)),
+      hsl(220 15% 15%)
+    );
 
-    /* Dark Shadows */
     --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
     --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2);
   }
-}
 
-@layer base {
   * {
     border-color: hsl(var(--border));
   }
-  
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
@@ -111,131 +127,116 @@
 }
 
 @layer components {
-  .btn-primary {
-    background: var(--gradient-primary);
-    color: hsl(var(--primary-foreground));
-    padding: 0.75rem 0.75rem;
-    border-radius: var(--radius);
+  .primary-button {
+    width: 100%;
     font-weight: 600;
-    transition: transform 0.15s ease;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    gap: 0.5rem;
-  }
-  
-  .btn-primary:hover {
-    transform: scale(1.02);
-  }
-  
-  .btn-secondary {
-    background-color: hsl(var(--secondary));
-    color: hsl(var(--secondary-foreground));
-    padding: 0.75rem 0.75rem;
-    border-radius: var(--radius);
-    font-weight: 500;
-    transition: transform 0.15s ease;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    gap: 0.5rem;
-  }
-  
-  .btn-secondary:hover {
-    transform: scale(1.02);
-  }
-  
-  .btn-destructive {
-    background-color: hsl(var(--destructive));
-    color: hsl(var(--destructive-foreground));
     padding: 0.5rem 1rem;
     border-radius: var(--radius);
-    font-weight: 500;
-    transition: transform 0.15s ease;
-    border: none;
-    cursor: pointer;
+    transition: all 0.25s ease-in-out;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     text-decoration: none;
+    cursor: pointer;
+    background: var(--gradient-primary);
+    color: hsl(var(--primary-foreground));
+    box-shadow: var(--shadow-lg), 0 0 10px hsl(var(--primary) / 0.2);
+  }
+
+  .primary-button:hover {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary) / 0.9),
+      hsl(var(--primary-glow))
+    );
+  }
+
+  .secondary-button {
+    width: 100%;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    transition: all 0.25s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-lg);
+  }
+
+  .secondary-button:hover {
+    background: linear-gradient(
+      to right,
+      hsl(var(--secondary) / 0.9),
+      hsl(var(--secondary-glow))
+    );
   }
 
   .btn-success {
     background-color: hsl(var(--success));
     color: hsl(var(--success-foreground));
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius);
-    font-weight: 500;
-    transition: transform 0.15s ease;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
   }
 
-  .card-tournament {
-    background: var(--gradient-card);
-    border: 1px solid hsl(var(--border));
-    border-radius: calc(var(--radius) + 4px);
-    padding: 1.5rem;
-    transition: transform 0.15s ease;
+  .btn-success:hover {
+    background-color: hsl(142 70% 40%);
   }
 
-  .card {
-    background: var(--gradient-card);
-    border: 1px solid hsl(var(--border));
-    border-radius: calc(var(--radius) + 4px);
-    padding: 1.5rem;
-    transition: transform 0.15s ease;
+  .btn-destructive {
+    background-color: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
   }
-  
-  .card-tournament:hover {
-    transform: translateY(-2px);
+
+  .btn-destructive:hover {
+    background-color: hsl(0 75% 60%);
   }
-  
+
+  .card,
+  .card-tournament,
   .card-team {
-    background-color: hsl(var(--card));
+    background: var(--gradient-card);
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
-    padding: 1rem;
-    transition: transform 0.15s ease;
-  }
-  
-  .card-team:hover {
-    transform: translateY(-1px);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  /* === Inputs === */
-  .input-field {
-    background-color: hsl(var(--input));
-    border: 1px solid hsl(var(--border));
-    color: hsl(var(--foreground));
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius);
-    transition: border-color 0.15s ease;
-    width: 100%;
-    font-size: 1rem;
+  .card-tournament:hover,
+  .card-team:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
   }
-  
+
+  .input-field {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background-color: hsl(var(--input));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .input-field::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+
   .input-field:focus {
     outline: none;
     border-color: hsl(var(--ring));
-  }
-
-  .input-field:placeholder-shown{
-    color: hsl(var(--muted-foreground));
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.35);
   }
 }
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
   margin: 0;
