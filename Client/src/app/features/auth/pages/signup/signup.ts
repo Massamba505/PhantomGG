@@ -1,10 +1,10 @@
 import { Component, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-signup',
-  imports: [],
-  templateUrl: './signup.html'
+  imports: [RouterLink],
+  templateUrl: './signup.html',
 })
 export class Signup {
   constructor(private router: Router) {}
@@ -15,11 +15,11 @@ export class Signup {
     console.log('Signup submitted');
   }
 
-  togglePassword(){
-    this.showPassword.update(x=> !x);
+  togglePassword() {
+    this.showPassword.update((x) => !x);
   }
 
-  togglePassword2(){
-    this.showPassword2.update(x=> !x);
+  togglePassword2() {
+    this.showPassword2.update((x) => !x);
   }
 }
