@@ -3,28 +3,40 @@
     <h1 class="text-2xl font-bold mb-2">Welcome Back, Phantom! 👻</h1>
   </div>
 
-  <form (ngSubmit)="onSubmit($event)" class="space-y-6">
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit($event)" class="space-y-6">
     <div>
       <label class="block text-sm font-medium mb-2">Email</label>
+      @if (userForm.controls['email'].errors &&
+      userForm.controls['email'].touched) {
+      <label class="block text-xs font-medium mb-2 text-red-800"
+        >Please enter valid email</label
+      >
+      }
       <input
         class="input-field w-full"
         type="email"
         placeholder="phantomplayer@tournament.com"
-        [(ngModel)]="formData().email"
         name="email"
+        formControlName="email"
         required
       />
     </div>
 
     <div>
       <label class="block text-sm font-medium mb-2">Password</label>
+      @if (userForm.controls['password'].errors &&
+      userForm.controls['password'].touched) {
+      <label class="block text-xs font-medium mb-2 text-red-800"
+        >Please enter your password</label
+      >
+      }
       <div class="relative">
         <input
           class="input-field w-full pr-12"
           [type]="showPassword() ? 'text' : 'password'"
           placeholder="Enter your password... 👻"
-          [(ngModel)]="formData().password"
           name="password"
+          formControlName="password"
           required
         />
         <button
@@ -37,7 +49,13 @@
       </div>
     </div>
 
-    <button type="submit" class="primary-button w-full">Login</button>
+    <button
+      [disabled]="isLoading() || userForm.invalid"
+      type="submit"
+      class="primary-button w-full"
+    >
+      {{ isLoading() ? "Loading.." : "Login" }}
+    </button>
   </form>
 
   <div class="flex items-center my-6">
