@@ -37,7 +37,7 @@ public class UserManager : IUserManager
             Email = request.Email,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            ProfilePictureUrl = request.ProfilePicture,
+            ProfilePictureUrl = $"https://eu.ui-avatars.com/api/?name={request.FirstName}+{request.LastName}&size=250",
             CreatedAt = DateTime.UtcNow,
             EmailConfirmed = true // For simplicity, auto-confirm email
         };

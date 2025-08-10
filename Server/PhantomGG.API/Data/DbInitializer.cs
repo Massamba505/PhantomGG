@@ -33,7 +33,7 @@ public static class DbInitializer
     private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
     {
         // Add roles if they don't exist
-        string[] roles = { "Admin", "Organizer", "Player" };
+        string[] roles = { "Admin", "Organizer", "User" };
 
         foreach (var role in roles)
         {
