@@ -1,49 +1,52 @@
 import { Component, inject, signal } from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LoginRequest } from '@/app/shared/models/Authentication';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { AuthStateService } from '@/app/store/AuthStateService';
+import { primengModules } from '@/app/shared/components/primeng/primeng-config';
+import { ToastService } from '@/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterLink, ReactiveFormsModule],
+  standalone: true,
+  imports: [RouterLink, ReactiveFormsModule, ...primengModules],
   templateUrl: './login.html',
 })
 export class Login {
+  private fb = inject(FormBuilder);
   private authState = inject(AuthStateService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   showPassword = signal(false);
-  userForm = new FormGroup({
-    email: new FormControl('', [
-      Validators.required,
-      Validators.email,
-      strictEmailValidator,
-    ]),
-    password: new FormControl('', [Validators.required]),
-  });
+  submitted = signal(false);
 
   loading = this.authState.loading;
   error = this.authState.error;
 
+  userForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email, strictEmailValidator]],
+    password: ['', Validators.required],
+  });
+
   onSubmit(event: Event) {
     event.preventDefault();
+    this.submitted.set(true);
+
     if (this.userForm.invalid) {
       return;
     }
+
     const credentials = this.userForm.value as LoginRequest;
     this.authState.login(credentials).subscribe({
       next: () => {
         if (this.authState.isAuthenticated()) {
           this.router.navigate(['/dashboard']);
         }
+      },
+      error: (error) => {
+        this.toastService.error(error.message);
       },
     });
   }

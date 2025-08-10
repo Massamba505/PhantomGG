@@ -1,13 +1,13 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import {
-  User,
   AuthResponse,
   LoginRequest,
   SignUpRequest,
 } from '@/app/shared/models/Authentication';
-import { tap } from 'rxjs';
-import { AuthService } from '../features/auth/services/authService';
+import { catchError, tap, throwError } from 'rxjs';
+import { AuthService } from '../core/services/authService';
 import { TokenStorage } from '../shared/utils/tokenStorage';
+import { User } from '../shared/models/User';
 
 @Injectable({
   providedIn: 'root',
@@ -31,13 +31,6 @@ export class AuthStateService {
     }
   }
 
-  private globalErrorSignal = signal<string | null>(null);
-  readonly globalError = this.globalErrorSignal.asReadonly();
-
-  setError(message: string) {
-    this.errorSignal.set(message);
-  }
-
   login(credentials: LoginRequest) {
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
@@ -51,6 +44,11 @@ export class AuthStateService {
         } else {
           this.errorSignal.set(res.message ?? 'Login failed');
         }
+      }),
+      catchError((error) => {
+        this.loadingSignal.set(false);
+        this.errorSignal.set('Login failed');
+        return throwError(() => error);
       })
     );
   }
@@ -68,6 +66,11 @@ export class AuthStateService {
         } else {
           this.errorSignal.set(res.message ?? 'Signup failed');
         }
+      }),
+      catchError((error) => {
+        this.loadingSignal.set(false);
+        this.errorSignal.set('Signup failed');
+        return throwError(() => error);
       })
     );
   }
@@ -86,6 +89,11 @@ export class AuthStateService {
         } else {
           this.logout();
         }
+      }),
+      catchError((error) => {
+        this.loadingSignal.set(false);
+        this.errorSignal.set('Refresh failed');
+        return throwError(() => error);
       })
     );
   }

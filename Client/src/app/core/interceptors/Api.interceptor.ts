@@ -1,4 +1,3 @@
-// src/app/shared/interceptors/api.interceptor.ts
 import { AuthStateService } from '@/app/store/AuthStateService';
 import {
   HttpErrorResponse,
@@ -8,7 +7,7 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Observable, catchError, switchMap, throwError } from 'rxjs';
-import { TokenStorage } from '../utils/tokenStorage';
+import { TokenStorage } from '../../shared/utils/tokenStorage';
 
 export function apiInterceptor(
   req: HttpRequest<any>,
@@ -41,14 +40,6 @@ export function apiInterceptor(
           })
         );
       }
-
-      let message = 'Something went wrong';
-      if (error.error?.message) {
-        message = error.error.message;
-      } else if (error.status === 0) {
-        message = 'Cannot connect to server';
-      }
-      authState.setError(message);
 
       return throwError(() => error);
     })

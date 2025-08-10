@@ -12,7 +12,8 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { ThemeService } from './shared/services/theme.service';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { apiInterceptor } from './shared/interceptors/Api.interceptor';
+import { apiInterceptor } from './core/interceptors/Api.interceptor';
+import { MessageService } from 'primeng/api';
 
 // Factory function to initialize theme on app startup
 function initializeTheme(themeService: ThemeService) {
@@ -24,6 +25,7 @@ function initializeTheme(themeService: ThemeService) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    MessageService,
     provideHttpClient(withInterceptors([apiInterceptor])),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),

@@ -16,9 +16,10 @@ export class AuthService {
   private readonly env = environment;
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${this.env.apiUrl}/auth/login`, credentials)
-      .pipe();
+    return this.http.post<AuthResponse>(
+      `${this.env.apiUrl}/auth/login`,
+      credentials
+    );
   }
 
   signup(credentials: SignUpRequest): Observable<AuthResponse> {

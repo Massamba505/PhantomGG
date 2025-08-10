@@ -1,3 +1,5 @@
+import { User } from './User';
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -15,13 +17,4 @@ export interface AuthResponse {
   message?: string;
   accessToken?: string;
   user?: User;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  profilePicture: string;
-  role: string;
 }
