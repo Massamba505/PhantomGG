@@ -1,32 +1,35 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PhantomGG.API.Config;
 using PhantomGG.API.Data;
 using PhantomGG.API.Middleware;
+using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Implementations;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Implementations;
 using PhantomGG.API.Services.Interfaces;
-using PhantomGG.API.Utils;
+using PhantomGG.API.Services.Managers.Implementations;
+using PhantomGG.API.Services.Managers.Interfaces;
 using System.Text;
-using System.Text.Json;
 
 namespace PhantomGG.API;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers();
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddAuthorization();
+        
         AddSwagger(builder.Services);
         AddCors(builder.Services);
         ConfigureDatabase(builder.Services, builder.Configuration);
+        ConfigureIdentity(builder.Services);
         ConfigureJwt(builder.Services, builder.Configuration);
         ConfigureServices(builder.Services);
 
@@ -45,10 +48,15 @@ public class Program
         app.UseHttpsRedirection();
         app.UseCors("CorsPolicy");
         app.UseMiddleware<GlobalExceptionMiddleware>();
-        app.UseMiddleware<JwtMiddleware>();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+
+        // Initialize the database
+        if (app.Environment.IsDevelopment())
+        {
+            await DbInitializer.InitializeAsync(app.Services);
+        }
 
         app.Run();
     }
@@ -110,10 +118,35 @@ public class Program
             });
         });
     }
+
     private static void ConfigureDatabase(IServiceCollection services, IConfiguration config)
     {
-        services.AddDbContext<PhantomGGContext>(options =>
+        services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(config.GetConnectionString("PhantomDb")));
+    }
+
+    private static void ConfigureIdentity(IServiceCollection services)
+    {
+        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        {
+            // Password settings
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequiredLength = 8;
+
+            // Lockout settings
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.AllowedForNewUsers = true;
+
+            // User settings
+            options.User.RequireUniqueEmail = true;
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
     }
 
     private static void ConfigureJwt(IServiceCollection services, ConfigurationManager configuration)
@@ -130,6 +163,7 @@ public class Program
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         })
         .AddJwtBearer(options =>
         {
@@ -145,22 +179,29 @@ public class Program
                 ClockSkew = TimeSpan.Zero
             };
         });
+
+        services.AddAuthorization();
     }
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        // Repositories
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-
-        // Services
-        services.AddScoped<JwtUtils>();
-        services.AddScoped<IAuthService, AuthService>();
+        // Register managers
+        services.AddScoped<IUserManager, UserManager>();
+        services.AddScoped<ITokenManager, TokenManager>();
+        services.AddScoped<IRoleManager, RoleManager>();
+        
+        // Consolidated authentication service
+        services.AddScoped<IIdentityAuthentication, IdentityAuthentication>();
+        
+        // User services
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IPasswordService, PasswordService>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        
+        // Cookie service
         services.AddScoped<ICookieService, CookieService>();
+        
+        // Repositories
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
     }
 }

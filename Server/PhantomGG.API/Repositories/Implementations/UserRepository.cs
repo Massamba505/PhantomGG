@@ -1,43 +1,57 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PhantomGG.API.Data;
 using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
 
 namespace PhantomGG.API.Repositories.Implementations;
 
-public class UserRepository(PhantomGGContext context) : IUserRepository
+/// <summary>
+/// Implementation of the user repository
+/// </summary>
+public class UserRepository : IUserRepository
 {
-    private readonly PhantomGGContext _context = context;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ApplicationDbContext _context;
 
-    public async Task<User?> GetByEmailAsync(string email)
+    /// <summary>
+    /// Initializes a new instance of the UserRepository
+    /// </summary>
+    /// <param name="userManager">User manager</param>
+    /// <param name="context">Database context</param>
+    public UserRepository(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
     {
-        return await _context.Users
-            .Include(u => u.RefreshTokens)
-            .FirstOrDefaultAsync(u => u.Email == email);
+        _userManager = userManager;
+        _context = context;
     }
 
-    public async Task<User?> GetByIdAsync(Guid id)
+    /// <inheritdoc />
+    public async Task<ApplicationUser?> GetByEmailAsync(string email)
     {
-        return await _context.Users
-            .Include(u => u.RefreshTokens)
-            .FirstOrDefaultAsync(u => u.Id == id);
+        return await _userManager.FindByEmailAsync(email);
     }
 
-    public async Task AddAsync(User user)
+    /// <inheritdoc />
+    public async Task<ApplicationUser?> GetByIdAsync(string id)
     {
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        return await _userManager.FindByIdAsync(id);
     }
 
-    public async Task UpdateAsync(User user)
+    /// <inheritdoc />
+    public async Task AddAsync(ApplicationUser user)
     {
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
+        await _userManager.CreateAsync(user);
     }
 
+    /// <inheritdoc />
+    public async Task UpdateAsync(ApplicationUser user)
+    {
+        await _userManager.UpdateAsync(user);
+    }
 
+    /// <inheritdoc />
     public async Task<bool> EmailExistsAsync(string email)
     {
-        return await _context.Users.AnyAsync(u => u.Email == email);
+        return await _userManager.FindByEmailAsync(email) != null;
     }
 }

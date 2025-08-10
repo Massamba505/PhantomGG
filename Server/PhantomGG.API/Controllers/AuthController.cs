@@ -1,124 +1,240 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhantomGG.API.DTOs.Auth;
-using PhantomGG.API.Models;
+using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Services.Interfaces;
+using System.Net;
 using System.Security.Claims;
 
 namespace PhantomGG.API.Controllers;
 
+/// <summary>
+/// Controller for authentication-related endpoints
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService;
+    private readonly IIdentityAuthentication _identityAuth;
     private readonly ICookieService _cookieService;
-    private readonly IUserService _userService;
-    private readonly ITokenService _tokenService;
 
-    public AuthController(IAuthService authService, ICookieService cookieService, IUserService userService, ITokenService tokenService)
+    /// <summary>
+    /// Initializes a new instance of the AuthController
+    /// </summary>
+    /// <param name="identityAuth">Identity authentication service</param>
+    /// <param name="cookieService">Cookie service</param>
+    public AuthController(
+        IIdentityAuthentication identityAuth,
+        ICookieService cookieService)
     {
-        _authService = authService;
+        _identityAuth = identityAuth;
         _cookieService = cookieService;
-        _userService = userService;
-        _tokenService = tokenService;
     }
 
+    /// <summary>
+    /// Registers a new user
+    /// </summary>
+    /// <param name="request">Registration details</param>
+    /// <returns>Authentication result with tokens</returns>
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequestDto)
+    [ProducesResponseType(typeof(AuthResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var newUser = await _authService.RegisterAsync(registerRequestDto);
-        var authResult = await _tokenService.GenerateAuthResponseAsync(newUser);
-
-        _cookieService.SetAuthCookies(Response, authResult);
-
-        return Ok(new AuthResponse
-        {
-            AccessToken = authResult.AccessToken,
-            RefreshToken = authResult.RefreshToken,
-            AccessTokenExpires = authResult.AccessTokenExpires,
-            RefreshTokenExpires = authResult.RefreshTokenExpires
-        });
-    }
-
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest loginRequestDto)
-    {
-        var authenticatedUser = await _authService.LoginAsync(loginRequestDto);
-        var authResult = await _tokenService.GenerateAuthResponseAsync(authenticatedUser);
-
-        _cookieService.SetAuthCookies(Response, authResult);
-
-        return Ok(new AuthResponse
-        {
-            AccessToken = authResult.AccessToken,
-            RefreshToken = authResult.RefreshToken,
-            AccessTokenExpires = authResult.AccessTokenExpires,
-            RefreshTokenExpires = authResult.RefreshTokenExpires
-        });
-    }
-
-    [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] RefreshRequest? request = null)
-    {
+        // Validate request
         if (!ModelState.IsValid)
         {
-            return BadRequest(new { message = "Refresh token is required" });
+            return ValidationProblem(ModelState);
         }
 
-        if (!Request.Cookies.TryGetValue("refreshToken", out var cookieRefreshToken))
+        // Register the user using the identity authentication service
+        var ipAddress = GetIpAddress();
+        var result = await _identityAuth.RegisterAsync(request, ipAddress);
+
+        if (!result.Success)
         {
-            return Unauthorized(new { message = "No refresh token found in cookies" });
+            return BadRequest(new { message = result.Message });
         }
 
-        if (request?.RefreshToken != cookieRefreshToken)
+        // Set cookies
+        _cookieService.SetAuthCookies(Response, new TokenResponse
         {
-            return Unauthorized(new { message = "Refresh token mismatch" });
-        }
-
-        var refreshedResult = await _tokenService.RefreshTokenAsync(cookieRefreshToken);
-
-        _cookieService.SetAuthCookies(Response, refreshedResult);
-
-        return Ok(new AuthResponse
-        {
-            AccessToken = refreshedResult.AccessToken,
-            RefreshToken = refreshedResult.RefreshToken,
-            AccessTokenExpires = refreshedResult.AccessTokenExpires,
-            RefreshTokenExpires = refreshedResult.RefreshTokenExpires
+            AccessToken = result.AccessToken ?? string.Empty,
+            RefreshToken = result.RefreshToken ?? string.Empty,
+            AccessTokenExpires = result.AccessTokenExpires ?? DateTime.UtcNow,
+            RefreshTokenExpires = result.RefreshTokenExpires ?? DateTime.UtcNow
         });
+
+        // Return response
+        return Ok(result);
     }
 
+    /// <summary>
+    /// Authenticates a user
+    /// </summary>
+    /// <param name="request">Login credentials</param>
+    /// <returns>Authentication result with tokens</returns>
+    [HttpPost("login")]
+    [ProducesResponseType(typeof(AuthResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        // Validate request
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        // Login the user using the identity authentication service
+        var ipAddress = GetIpAddress();
+        var result = await _identityAuth.LoginAsync(request, ipAddress);
+
+        if (!result.Success)
+        {
+            return Unauthorized(new { message = result.Message });
+        }
+
+        // Set cookies
+        _cookieService.SetAuthCookies(Response, new TokenResponse
+        {
+            AccessToken = result.AccessToken ?? string.Empty,
+            RefreshToken = result.RefreshToken ?? string.Empty,
+            AccessTokenExpires = result.AccessTokenExpires ?? DateTime.UtcNow,
+            RefreshTokenExpires = result.RefreshTokenExpires ?? DateTime.UtcNow
+        });
+
+        // Return response
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Refreshes an expired access token
+    /// </summary>
+    /// <param name="request">Optional refresh token request</param>
+    /// <returns>New authentication tokens</returns>
+    [HttpPost("refresh")]
+    [ProducesResponseType(typeof(AuthResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequest? request = null)
+    {
+        // Get refresh token from cookie or request body
+        var refreshToken = "";
+        
+        if (Request.Cookies.TryGetValue("refreshToken", out var cookieToken))
+        {
+            refreshToken = cookieToken;
+        }
+        
+        // If refresh token is also in request body, it must match the cookie
+        if (request?.RefreshToken != null)
+        {
+            if (refreshToken != "" && refreshToken != request.RefreshToken)
+            {
+                return Unauthorized(new { message = "Refresh token mismatch" });
+            }
+            
+            refreshToken = request.RefreshToken;
+        }
+        
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return Unauthorized(new { message = "Refresh token is required" });
+        }
+
+        try
+        {
+            // Refresh the token using the identity authentication service
+            var ipAddress = GetIpAddress();
+            var result = await _identityAuth.RefreshTokenAsync(refreshToken, ipAddress);
+
+            if (!result.Success)
+            {
+                return Unauthorized(new { message = result.Message });
+            }
+
+            // Set cookies
+            _cookieService.SetAuthCookies(Response, new TokenResponse
+            {
+                AccessToken = result.AccessToken ?? string.Empty,
+                RefreshToken = result.RefreshToken ?? string.Empty,
+                AccessTokenExpires = result.AccessTokenExpires ?? DateTime.UtcNow,
+                RefreshTokenExpires = result.RefreshTokenExpires ?? DateTime.UtcNow
+            });
+
+            // Return response
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return Unauthorized(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Logs out the current user
+    /// </summary>
+    /// <returns>Success message</returns>
     [Authorize]
     [HttpPost("logout")]
+    [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> Logout()
     {
-        _cookieService.ClearAuthCookies(Response);
-
-        if (Request.Cookies.TryGetValue("refreshToken", out var storedRefreshToken))
+        // Get refresh token from cookie
+        if (Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
         {
-            var authenticatedUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (authenticatedUserId != null)
-            {
-                await _tokenService.RevokeRefreshTokenAsync(Guid.Parse(authenticatedUserId), storedRefreshToken);
-            }
+            // Revoke the token using the identity authentication service
+            var ipAddress = GetIpAddress();
+            await _identityAuth.LogoutAsync(refreshToken, ipAddress);
         }
+
+        // Clear auth cookies
+        _cookieService.ClearAuthCookies(Response);
 
         return Ok(new { message = "Logged out successfully" });
     }
 
+    /// <summary>
+    /// Gets the current user's profile
+    /// </summary>
+    /// <returns>User profile</returns>
     [Authorize]
     [HttpGet("me")]
-    public async Task<IActionResult> Me()
+    [ProducesResponseType(typeof(UserProfileDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> GetCurrentUser()
     {
-        var currentUser = HttpContext.Items["User"] as User;
-        if (currentUser == null)
+        // Get user ID from claims
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
         {
-            return Unauthorized("User not found");
+            return Unauthorized(new { message = "Invalid user" });
         }
 
-        var userProfile = await _userService.GetUserProfileAsync(currentUser.Id);
+        // Get user profile using the identity authentication service
+        var userProfile = await _identityAuth.GetCurrentUserAsync(userId);
+        if (userProfile == null)
+        {
+            return Unauthorized(new { message = "User not found" });
+        }
 
         return Ok(userProfile);
     }
+
+    #region Helper Methods
+
+    private string? GetIpAddress()
+    {
+        // Get client IP address from the request
+        if (Request.Headers.ContainsKey("X-Forwarded-For"))
+        {
+            return Request.Headers["X-Forwarded-For"].ToString().Split(',')[0].Trim();
+        }
+        else
+        {
+            return HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+        }
+    }
+
+    #endregion
 }

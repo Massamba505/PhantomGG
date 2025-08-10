@@ -1,85 +1,185 @@
-﻿using PhantomGG.API.Config;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using PhantomGG.API.Config;
+using PhantomGG.API.Data;
 using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.Models;
-using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
-using PhantomGG.API.Utils;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace PhantomGG.API.Services.Implementations;
 
+/// <summary>
+/// Implementation of the token service
+/// </summary>
 public class TokenService : ITokenService
 {
-    private readonly JwtUtils _jwtUtils;
     private readonly JwtConfig _jwtConfig;
-    private readonly IRefreshTokenRepository _tokenRepository;
+    private readonly ApplicationDbContext _context;
 
-    public TokenService(JwtConfig jwtConfig,
-           JwtUtils jwtUtils,
-           IRefreshTokenRepository tokenRepository)
+    /// <summary>
+    /// Initializes a new instance of the TokenService
+    /// </summary>
+    /// <param name="jwtConfig">JWT configuration</param>
+    /// <param name="context">Database context</param>
+    public TokenService(JwtConfig jwtConfig, ApplicationDbContext context)
     {
         _jwtConfig = jwtConfig;
-        _jwtUtils = jwtUtils;
-        _tokenRepository = tokenRepository;
+        _context = context;
     }
 
-    public async Task<AuthResult> GenerateAuthResponseAsync(User user)
+    /// <inheritdoc />
+    public string GenerateAccessToken(ApplicationUser user)
     {
-        var accessToken = _jwtUtils.GenerateAccessToken(user);
-        var refreshTokenRaw = _jwtUtils.GenerateRefreshToken();
-        var refreshTokenHash = _jwtUtils.HashRefreshToken(refreshTokenRaw);
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+        
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+            new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+        };
 
-        var refreshTokenExpires = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpiryDays);
-        var accessTokenExpires = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpiryMinutes);
+        // Add roles as claims
+        var userRoles = _context.UserRoles
+            .Where(ur => ur.UserId == user.Id)
+            .Join(_context.Roles,
+                ur => ur.RoleId,
+                r => r.Id,
+                (ur, r) => r.Name)
+            .ToList();
 
-        var refreshToken = new RefreshToken
+        foreach (var role in userRoles)
+        {
+            if (!string.IsNullOrEmpty(role))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+        }
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpiryMinutes),
+            Issuer = _jwtConfig.Issuer,
+            Audience = _jwtConfig.Audience,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key), 
+                SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
+    /// <inheritdoc />
+    public RefreshToken GenerateRefreshToken(ApplicationUser user, string? ipAddress = null)
+    {
+        // Generate a secure random token
+        var randomBytes = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomBytes);
+        var refreshToken = Convert.ToBase64String(randomBytes);
+        
+        // Create the refresh token entity
+        var refreshTokenEntity = new RefreshToken
         {
             UserId = user.Id,
-            TokenHash = refreshTokenHash,
+            Token = refreshToken,
+            ExpiresAt = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpiryDays),
             CreatedAt = DateTime.UtcNow,
-            Expires = refreshTokenExpires
+            CreatedByIp = ipAddress
         };
 
-        await _tokenRepository.AddAsync(refreshToken);
+        return refreshTokenEntity;
+    }
 
-        return new AuthResult
+    /// <inheritdoc />
+    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user, string? ipAddress = null)
+    {
+        // Generate access token
+        var accessToken = GenerateAccessToken(user);
+        
+        // Generate refresh token
+        var refreshToken = GenerateRefreshToken(user, ipAddress);
+        
+        // Save refresh token to database
+        _context.RefreshTokens.Add(refreshToken);
+        await _context.SaveChangesAsync();
+        
+        return new TokenResponse
         {
             AccessToken = accessToken,
-            RefreshToken = refreshTokenRaw,
-            AccessTokenExpires = accessTokenExpires,
-            RefreshTokenExpires = refreshTokenExpires
+            RefreshToken = refreshToken.Token,
+            AccessTokenExpires = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpiryMinutes),
+            RefreshTokenExpires = refreshToken.ExpiresAt
         };
     }
-    
-    public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
+
+    /// <inheritdoc />
+    public async Task<TokenResponse> RefreshTokenAsync(string refreshToken, string? ipAddress = null)
     {
-        var tokenHash = _jwtUtils.HashRefreshToken(refreshToken);
-        var token = await _tokenRepository.GetByTokenHashAsync(tokenHash);
-
-        if (token == null || token.Expires < DateTime.UtcNow || token.IsRevoked) 
-        { 
-            throw new UnauthorizedAccessException("Invalid or expired refresh token");
+        // Validate the refresh token
+        var storedToken = await ValidateRefreshTokenAsync(refreshToken);
+        if (storedToken == null)
+        {
+            throw new SecurityTokenException("Invalid refresh token");
         }
-
-        await _tokenRepository.RevokeAsync(token);
-
-        return await GenerateAuthResponseAsync(token.User);
+        
+        // Get user from the token
+        var user = await _context.Users.FindAsync(storedToken.UserId);
+        if (user == null)
+        {
+            throw new SecurityTokenException("User not found");
+        }
+        
+        // Revoke the current refresh token
+        await RevokeTokenAsync(refreshToken, ipAddress, "Replaced by new token");
+        
+        // Generate new tokens
+        return await GenerateTokensAsync(user, ipAddress);
     }
 
-    public async Task RevokeRefreshTokenAsync(Guid userId, string refreshToken)
+    /// <inheritdoc />
+    public async Task<bool> RevokeTokenAsync(string token, string? ipAddress = null, string? reason = null, string? replacedByToken = null)
     {
-        var tokenHash = _jwtUtils.HashRefreshToken(refreshToken);
-        var token = await _tokenRepository.GetByTokenHashAsync(tokenHash);
-
-        if (token == null)
+        var storedToken = await _context.RefreshTokens
+            .SingleOrDefaultAsync(t => t.Token == token);
+            
+        if (storedToken == null)
         {
-            throw new KeyNotFoundException("Refresh token not found");
+            return false;
         }
+        
+        // Revoke token
+        storedToken.RevokedAt = DateTime.UtcNow;
+        storedToken.RevokedByIp = ipAddress;
+        storedToken.ReasonRevoked = reason;
+        storedToken.ReplacedByToken = replacedByToken;
+        
+        _context.RefreshTokens.Update(storedToken);
+        await _context.SaveChangesAsync();
+        
+        return true;
+    }
 
-        if (token.UserId != userId)
+    /// <inheritdoc />
+    public async Task<RefreshToken?> ValidateRefreshTokenAsync(string token)
+    {
+        var storedToken = await _context.RefreshTokens
+            .SingleOrDefaultAsync(t => t.Token == token);
+            
+        if (storedToken == null || !storedToken.IsActive)
         {
-            throw new UnauthorizedAccessException("Not authorized to revoke this token");
+            return null;
         }
-
-        await _tokenRepository.RevokeAsync(token);
+        
+        return storedToken;
     }
 }

@@ -1,42 +1,65 @@
-﻿using PhantomGG.API.DTOs.User;
+﻿using Microsoft.AspNetCore.Identity;
+using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Models;
-using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
 
 namespace PhantomGG.API.Services.Implementations;
 
+/// <summary>
+/// Implementation of the user service
+/// </summary>
 public class UserService : IUserService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly ICurrentUserService _currentUser;
 
+    /// <summary>
+    /// Initializes a new instance of the UserService
+    /// </summary>
+    /// <param name="userManager">User manager</param>
+    /// <param name="currentUser">Current user service</param>
     public UserService(
-        IUserRepository userRepo,
+        UserManager<ApplicationUser> userManager,
         ICurrentUserService currentUser)
     {
-        _userRepository = userRepo;
+        _userManager = userManager;
         _currentUser = currentUser;
     }
 
-    public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
+    /// <inheritdoc />
+    public async Task<UserProfileDto> GetUserProfileAsync(string userId)
     {
         if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
             throw new UnauthorizedAccessException("Access denied");
 
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId);
         if(user == null)
             throw new KeyNotFoundException("User not found");
-        return ToProfileDto(user);
+        
+        // Get user roles
+        var roles = await _userManager.GetRolesAsync(user);
+        
+        return new UserProfileDto
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email!,
+            ProfilePictureUrl = user.ProfilePictureUrl,
+            Role = roles.FirstOrDefault() ?? "User",
+            CreatedAt = user.CreatedAt
+        };
     }
 
-    public async Task UpdateUserProfileAsync(Guid userId, UpdateUserRequest request)
+    /// <inheritdoc />
+    public async Task UpdateUserProfileAsync(string userId, UpdateUserRequest request)
     {
         if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
         {
             throw new UnauthorizedAccessException("Access denied");
         }
 
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
             throw new KeyNotFoundException("User not found");
@@ -50,31 +73,19 @@ public class UserService : IUserService
 
         if (!string.IsNullOrEmpty(request.Email) && request.Email != user.Email)
         {
-            if (await _userRepository.EmailExistsAsync(request.Email))
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            if (existingUser != null && existingUser.Id != userId)
             {
                 throw new ArgumentException("Email already in use");
             }
 
             user.Email = request.Email;
+            user.UserName = request.Email; // Username is the same as email
         }
 
         if (!string.IsNullOrEmpty(request.ProfilePictureUrl))
             user.ProfilePictureUrl = request.ProfilePictureUrl;
 
-        await _userRepository.UpdateAsync(user);
-    }
-    
-    public UserProfileDto ToProfileDto(User user)
-    {
-        return new UserProfileDto
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email,
-            ProfilePictureUrl = user.ProfilePictureUrl,
-            Role = user.Role,
-            CreatedAt = user.CreatedAt
-        };
+        await _userManager.UpdateAsync(user);
     }
 }

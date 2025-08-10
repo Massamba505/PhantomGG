@@ -2,8 +2,14 @@
 
 namespace PhantomGG.API.DTOs.Auth;
 
+/// <summary>
+/// Request model for token refresh
+/// </summary>
 public class RefreshRequest
 {
+    /// <summary>
+    /// Refresh token
+    /// </summary>
     [Required]
-    public string RefreshToken { get; set; } = null!;
+    public string RefreshToken { get; set; } = string.Empty;
 }
