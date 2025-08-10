@@ -11,6 +11,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { ThemeService } from './shared/services/theme.service';
+import { provideHttpClient } from '@angular/common/http';
 
 // Factory function to initialize theme on app startup
 function initializeTheme(themeService: ThemeService) {
@@ -22,6 +23,7 @@ function initializeTheme(themeService: ThemeService) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
@@ -38,7 +40,7 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: initializeTheme,
       deps: [ThemeService],
-      multi: true
-    }
+      multi: true,
+    },
   ],
 };
