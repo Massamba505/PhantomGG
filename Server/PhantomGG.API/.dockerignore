@@ -1,10 +1,8 @@
-node_modules/
-dist/
-tmp/
+bin/
+obj/
 .vscode/
 .idea/
-*.log
 .git/
 .gitignore
-npm-debug.log
+*.log
 .env

@@ -3,7 +3,6 @@ dist/
 tmp/
 .vscode/
 .idea/
-*.log
 .git/
 .gitignore
 npm-debug.log
