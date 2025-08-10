@@ -142,33 +142,26 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Refresh token is required" });
         }
 
-        try
+        // Refresh the token using the identity authentication service
+        var ipAddress = GetIpAddress();
+        var result = await _identityAuth.RefreshTokenAsync(refreshToken, ipAddress);
+
+        if (!result.Success)
         {
-            // Refresh the token using the identity authentication service
-            var ipAddress = GetIpAddress();
-            var result = await _identityAuth.RefreshTokenAsync(refreshToken, ipAddress);
-
-            if (!result.Success)
-            {
-                return Unauthorized(new { message = result.Message });
-            }
-
-            // Set cookies
-            _cookieService.SetAuthCookies(Response, new TokenResponse
-            {
-                AccessToken = result.AccessToken ?? string.Empty,
-                RefreshToken = result.RefreshToken ?? string.Empty,
-                AccessTokenExpires = result.AccessTokenExpires ?? DateTime.UtcNow,
-                RefreshTokenExpires = result.RefreshTokenExpires ?? DateTime.UtcNow
-            });
-
-            // Return response
-            return Ok(result);
+            return Unauthorized(new { message = result.Message });
         }
-        catch (Exception ex)
+
+        // Set cookies
+        _cookieService.SetAuthCookies(Response, new TokenResponse
         {
-            return Unauthorized(new { message = ex.Message });
-        }
+            AccessToken = result.AccessToken ?? string.Empty,
+            RefreshToken = result.RefreshToken ?? string.Empty,
+            AccessTokenExpires = result.AccessTokenExpires ?? DateTime.UtcNow,
+            RefreshTokenExpires = result.RefreshTokenExpires ?? DateTime.UtcNow
+        });
+
+        // Return response
+        return Ok(result);
     }
 
     /// <summary>

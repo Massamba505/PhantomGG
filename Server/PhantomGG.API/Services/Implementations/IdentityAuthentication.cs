@@ -45,33 +45,22 @@ public class IdentityAuthentication : IIdentityAuthentication
             };
         }
 
-        try
+        // Create user
+        var newUser = await _userManager.CreateUserAsync(request);
+        
+        // Generate tokens
+        var tokenResponse = await _tokenManager.GenerateTokensAsync(newUser, ipAddress);
+        
+        // Return response
+        return new AuthResponse
         {
-            // Create user
-            var newUser = await _userManager.CreateUserAsync(request);
-            
-            // Generate tokens
-            var tokenResponse = await _tokenManager.GenerateTokensAsync(newUser, ipAddress);
-            
-            // Return response
-            return new AuthResponse
-            {
-                Success = true,
-                AccessToken = tokenResponse.AccessToken,
-                RefreshToken = tokenResponse.RefreshToken,
-                AccessTokenExpires = tokenResponse.AccessTokenExpires,
-                RefreshTokenExpires = tokenResponse.RefreshTokenExpires,
-                User = _userManager.MapToUserDto(newUser)
-            };
-        }
-        catch (InvalidOperationException ex)
-        {
-            return new AuthResponse
-            {
-                Success = false,
-                Message = ex.Message
-            };
-        }
+            Success = true,
+            AccessToken = tokenResponse.AccessToken,
+            RefreshToken = tokenResponse.RefreshToken,
+            AccessTokenExpires = tokenResponse.AccessTokenExpires,
+            RefreshTokenExpires = tokenResponse.RefreshTokenExpires,
+            User = _userManager.MapToUserDto(newUser)
+        };
     }
 
     /// <inheritdoc />

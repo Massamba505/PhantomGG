@@ -1,5 +1,8 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Net.Http;
 
 namespace PhantomGG.API.Middleware;
 
@@ -43,8 +46,10 @@ public class GlobalExceptionMiddleware
         var (statusCode, title, detail) = exception switch
         {
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized", exception.Message),
+            SecurityTokenException => (StatusCodes.Status401Unauthorized, "Invalid Token", exception.Message),
             KeyNotFoundException => (StatusCodes.Status404NotFound, "Not Found", exception.Message),
             ArgumentException => (StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
+            FormatException => (StatusCodes.Status400BadRequest, "Invalid Format", exception.Message),
             InvalidOperationException => (StatusCodes.Status409Conflict, "Conflict", exception.Message),
             _ => (StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred")
         };
