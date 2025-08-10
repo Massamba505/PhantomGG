@@ -14,11 +14,14 @@ export interface AuthResponse {
   success: boolean;
   message?: string;
   accessToken?: string;
-  user?: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    profilePicture: string;
-  };
+  user?: User;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  profilePicture: string;
+  role: string;
 }

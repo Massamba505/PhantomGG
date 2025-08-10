@@ -16,16 +16,26 @@ export class AuthService {
   private readonly env = environment;
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(
-      `${this.env.apiUrl}/auth/login`,
-      credentials
-    );
+    return this.http
+      .post<AuthResponse>(`${this.env.apiUrl}/auth/login`, credentials)
+      .pipe();
   }
 
   signup(credentials: SignUpRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(
       `${this.env.apiUrl}/auth/signup`,
       credentials
+    );
+  }
+
+  logout(): Observable<AuthResponse> {
+    return this.http.get<AuthResponse>(`${this.env.apiUrl}/auth/logout`);
+  }
+
+  refresh(): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(
+      `${this.env.apiUrl}/auth/refresh`,
+      null
     );
   }
 

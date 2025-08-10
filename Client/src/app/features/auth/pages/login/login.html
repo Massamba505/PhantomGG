@@ -23,13 +23,23 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-2">Password</label>
-      @if (userForm.controls['password'].errors &&
-      userForm.controls['password'].touched) {
-      <label class="block text-xs font-medium mb-2 text-red-800"
-        >Please enter your password</label
-      >
-      }
+      <div class="flex justify-between items-center mb-2">
+        <div class="password-section">
+          <label class="block text-sm font-medium mb-2">Password</label>
+          @if (userForm.controls['password'].errors &&
+          userForm.controls['password'].touched) {
+          <label class="block text-xs font-medium mb-2 text-red-800"
+            >Please enter your password</label
+          >
+          }
+        </div>
+        <a
+          routerLink="/auth/forgot-password"
+          class="text-sm font-medium hover:underline"
+        >
+          Forgot Password?
+        </a>
+      </div>
       <div class="relative">
         <input
           class="input-field w-full pr-12"
@@ -48,7 +58,6 @@
         </button>
       </div>
     </div>
-
     <button
       [disabled]="isLoading() || userForm.invalid"
       type="submit"
