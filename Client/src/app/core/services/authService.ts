@@ -24,7 +24,7 @@ export class AuthService {
 
   signup(credentials: SignUpRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(
-      `${this.env.apiUrl}/auth/signup`,
+      `${this.env.apiUrl}/auth/register`,
       credentials
     );
   }

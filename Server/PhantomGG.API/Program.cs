@@ -25,6 +25,7 @@ public class Program
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddAuthorization();
         AddSwagger(builder.Services);
+        AddCors(builder.Services);
         ConfigureDatabase(builder.Services, builder.Configuration);
         ConfigureJwt(builder.Services, builder.Configuration);
         ConfigureServices(builder.Services);
@@ -42,6 +43,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseCors("CorsPolicy");
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseMiddleware<JwtMiddleware>();
         app.UseAuthentication();
@@ -95,6 +97,19 @@ public class Program
         });
     }
 
+    private static void AddCors(IServiceCollection services)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy", policy =>
+            {
+                policy.WithOrigins("http://localhost:4200")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials();
+            });
+        });
+    }
     private static void ConfigureDatabase(IServiceCollection services, IConfiguration config)
     {
         services.AddDbContext<PhantomGGContext>(options =>
