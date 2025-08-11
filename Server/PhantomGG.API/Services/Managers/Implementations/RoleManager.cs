@@ -12,9 +12,9 @@ public class RoleManager(
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager = roleManager;
 
-    public async Task<bool> AddUserToRoleAsync(string userId, string roleName)
+    public async Task<bool> AddUserToRoleAsync(Guid userId, string roleName)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
             return false;
@@ -26,9 +26,9 @@ public class RoleManager(
         return result.Succeeded;
     }
 
-    public async Task<bool> RemoveUserFromRoleAsync(string userId, string roleName)
+    public async Task<bool> RemoveUserFromRoleAsync(Guid userId, string roleName)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
             return false;
@@ -38,9 +38,9 @@ public class RoleManager(
         return result.Succeeded;
     }
 
-    public async Task<IList<string>> GetUserRolesAsync(string userId)
+    public async Task<IList<string>> GetUserRolesAsync(Guid userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
             return new List<string>();
@@ -49,9 +49,9 @@ public class RoleManager(
         return await _userManager.GetRolesAsync(user);
     }
 
-    public async Task<bool> IsUserInRoleAsync(string userId, string roleName)
+    public async Task<bool> IsUserInRoleAsync(Guid userId, string roleName)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
             return false;

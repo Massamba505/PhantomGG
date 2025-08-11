@@ -22,11 +22,11 @@ public class TokenManager(
     private readonly JwtConfig _jwtConfig = jwtConfig;
     private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager = userManager;
 
-    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user, string? ipAddress = null)
+    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user)
     {
         var accessToken = GenerateAccessToken(user);
         
-        var refreshToken = GenerateRefreshToken(user, ipAddress);
+        var refreshToken = GenerateRefreshToken(user);
         
         _context.RefreshTokens.Add(refreshToken);
         await _context.SaveChangesAsync();
@@ -53,7 +53,7 @@ public class TokenManager(
         return storedToken;
     }
 
-    public async Task<bool> RevokeTokenAsync(string token, string? ipAddress = null, string? reason = null, string? replacedByToken = null)
+    public async Task<bool> RevokeTokenAsync(string token)
     {
         var storedToken = await _context.RefreshTokens
             .SingleOrDefaultAsync(t => t.Token == token);
@@ -106,7 +106,7 @@ public class TokenManager(
         return tokenHandler.WriteToken(token);
     }
 
-    private RefreshToken GenerateRefreshToken(ApplicationUser user, string? ipAddress = null)
+    private RefreshToken GenerateRefreshToken(ApplicationUser user)
     {
         var randomBytes = new byte[64];
         using var rng = RandomNumberGenerator.Create();

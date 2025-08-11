@@ -32,7 +32,7 @@ public interface IIdentityAuthentication
     
     Task<TokenResponse> GenerateTokensAsync(ApplicationUser user);
     
-    Task<bool> RevokeTokenAsync(string token, string? reason = null, string? replacedByToken = null);
+    Task<bool> RevokeTokenAsync(string token);
     
     Task<RefreshToken?> ValidateRefreshTokenAsync(string token);
 }

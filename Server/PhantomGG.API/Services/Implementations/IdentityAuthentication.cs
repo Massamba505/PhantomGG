@@ -135,7 +135,7 @@ public class IdentityAuthentication(
             };
         }
         
-        await _tokenManager.RevokeTokenAsync(refreshToken, "Replaced by new token");
+        await _tokenManager.RevokeTokenAsync(refreshToken);
         
         var tokenResponse = await _tokenManager.GenerateTokensAsync(user);
         
@@ -157,7 +157,7 @@ public class IdentityAuthentication(
             return false;
         }
         
-        var result = await _tokenManager.RevokeTokenAsync(refreshToken, "User logout");
+        var result = await _tokenManager.RevokeTokenAsync(refreshToken);
         
         await _userManager.SignOutAsync();
         
@@ -186,22 +186,22 @@ public class IdentityAuthentication(
 
     public async Task<bool> AddUserToRoleAsync(Guid userId, string roleName)
     {
-        return await _roleManager.AddUserToRoleAsync(userId.ToString(), roleName);
+        return await _roleManager.AddUserToRoleAsync(userId, roleName);
     }
 
     public async Task<bool> RemoveUserFromRoleAsync(Guid userId, string roleName)
     {
-        return await _roleManager.RemoveUserFromRoleAsync(userId.ToString(), roleName);
+        return await _roleManager.RemoveUserFromRoleAsync(userId, roleName);
     }
 
     public async Task<IList<string>> GetUserRolesAsync(Guid userId)
     {
-        return await _roleManager.GetUserRolesAsync(userId.ToString());
+        return await _roleManager.GetUserRolesAsync(userId);
     }
 
     public async Task<bool> IsUserInRoleAsync(Guid userId, string roleName)
     {
-        return await _roleManager.IsUserInRoleAsync(userId.ToString(), roleName);
+        return await _roleManager.IsUserInRoleAsync(userId, roleName);
     }
 
     public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user)
@@ -209,9 +209,9 @@ public class IdentityAuthentication(
         return await _tokenManager.GenerateTokensAsync(user);
     }
 
-    public async Task<bool> RevokeTokenAsync(string token, string? reason = null, string? replacedByToken = null)
+    public async Task<bool> RevokeTokenAsync(string token)
     {
-        return await _tokenManager.RevokeTokenAsync(token, reason, replacedByToken);
+        return await _tokenManager.RevokeTokenAsync(token);
     }
 
     public async Task<RefreshToken?> ValidateRefreshTokenAsync(string token)
