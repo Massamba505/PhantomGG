@@ -12,26 +12,13 @@ using System.Text;
 
 namespace PhantomGG.API.Services.Implementations;
 
-/// <summary>
-/// Implementation of the token service
-/// </summary>
-public class TokenService : ITokenService
+public class TokenService(
+    JwtConfig jwtConfig, ApplicationDbContext context
+    ) : ITokenService
 {
-    private readonly JwtConfig _jwtConfig;
-    private readonly ApplicationDbContext _context;
+    private readonly JwtConfig _jwtConfig = jwtConfig;
+    private readonly ApplicationDbContext _context = context;
 
-    /// <summary>
-    /// Initializes a new instance of the TokenService
-    /// </summary>
-    /// <param name="jwtConfig">JWT configuration</param>
-    /// <param name="context">Database context</param>
-    public TokenService(JwtConfig jwtConfig, ApplicationDbContext context)
-    {
-        _jwtConfig = jwtConfig;
-        _context = context;
-    }
-
-    /// <inheritdoc />
     public string GenerateAccessToken(ApplicationUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -46,7 +33,6 @@ public class TokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
         };
 
-        // Add roles as claims
         var userRoles = _context.UserRoles
             .Where(ur => ur.UserId == user.Id)
             .Join(_context.Roles,
@@ -78,38 +64,30 @@ public class TokenService : ITokenService
         return tokenHandler.WriteToken(token);
     }
 
-    /// <inheritdoc />
-    public RefreshToken GenerateRefreshToken(ApplicationUser user, string? ipAddress = null)
+    public RefreshToken GenerateRefreshToken(ApplicationUser user)
     {
-        // Generate a secure random token
         var randomBytes = new byte[64];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomBytes);
         var refreshToken = Convert.ToBase64String(randomBytes);
         
-        // Create the refresh token entity
         var refreshTokenEntity = new RefreshToken
         {
             UserId = user.Id,
             Token = refreshToken,
             ExpiresAt = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpiryDays),
             CreatedAt = DateTime.UtcNow,
-            CreatedByIp = ipAddress
         };
 
         return refreshTokenEntity;
     }
 
-    /// <inheritdoc />
-    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user, string? ipAddress = null)
+    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user)
     {
-        // Generate access token
         var accessToken = GenerateAccessToken(user);
         
-        // Generate refresh token
-        var refreshToken = GenerateRefreshToken(user, ipAddress);
+        var refreshToken = GenerateRefreshToken(user);
         
-        // Save refresh token to database
         _context.RefreshTokens.Add(refreshToken);
         await _context.SaveChangesAsync();
         
@@ -122,32 +100,26 @@ public class TokenService : ITokenService
         };
     }
 
-    /// <inheritdoc />
-    public async Task<TokenResponse> RefreshTokenAsync(string refreshToken, string? ipAddress = null)
+    public async Task<TokenResponse> RefreshTokenAsync(string refreshToken)
     {
-        // Validate the refresh token
         var storedToken = await ValidateRefreshTokenAsync(refreshToken);
         if (storedToken == null)
         {
             throw new SecurityTokenException("Invalid refresh token");
         }
         
-        // Get user from the token
         var user = await _context.Users.FindAsync(storedToken.UserId);
         if (user == null)
         {
             throw new SecurityTokenException("User not found");
         }
         
-        // Revoke the current refresh token
-        await RevokeTokenAsync(refreshToken, ipAddress, "Replaced by new token");
+        await RevokeTokenAsync(refreshToken);
         
-        // Generate new tokens
-        return await GenerateTokensAsync(user, ipAddress);
+        return await GenerateTokensAsync(user);
     }
 
-    /// <inheritdoc />
-    public async Task<bool> RevokeTokenAsync(string token, string? ipAddress = null, string? reason = null, string? replacedByToken = null)
+    public async Task<bool> RevokeTokenAsync(string token)
     {
         var storedToken = await _context.RefreshTokens
             .SingleOrDefaultAsync(t => t.Token == token);
@@ -157,11 +129,7 @@ public class TokenService : ITokenService
             return false;
         }
         
-        // Revoke token
         storedToken.RevokedAt = DateTime.UtcNow;
-        storedToken.RevokedByIp = ipAddress;
-        storedToken.ReasonRevoked = reason;
-        storedToken.ReplacedByToken = replacedByToken;
         
         _context.RefreshTokens.Update(storedToken);
         await _context.SaveChangesAsync();
@@ -169,7 +137,6 @@ public class TokenService : ITokenService
         return true;
     }
 
-    /// <inheritdoc />
     public async Task<RefreshToken?> ValidateRefreshTokenAsync(string token)
     {
         var storedToken = await _context.RefreshTokens

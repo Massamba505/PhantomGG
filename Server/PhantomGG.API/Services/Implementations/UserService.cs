@@ -1,44 +1,30 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Models;
 using PhantomGG.API.Services.Interfaces;
 
 namespace PhantomGG.API.Services.Implementations;
 
-/// <summary>
-/// Implementation of the user service
-/// </summary>
-public class UserService : IUserService
+public class UserService(
+    UserManager<ApplicationUser> userManager,
+    ICurrentUserService currentUser
+    ) : IUserService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ICurrentUserService _currentUser;
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly ICurrentUserService _currentUser = currentUser;
 
-    /// <summary>
-    /// Initializes a new instance of the UserService
-    /// </summary>
-    /// <param name="userManager">User manager</param>
-    /// <param name="currentUser">Current user service</param>
-    public UserService(
-        UserManager<ApplicationUser> userManager,
-        ICurrentUserService currentUser)
-    {
-        _userManager = userManager;
-        _currentUser = currentUser;
-    }
-
-    /// <inheritdoc />
     public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
     {
-        if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
+        if (_currentUser.UserId != userId && _currentUser.Role != UserRoles.Admin.ToString())
             throw new UnauthorizedAccessException("Access denied");
 
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if(user == null)
+        if (user == null)
             throw new KeyNotFoundException("User not found");
-        
-        // Get user roles
+
         var roles = await _userManager.GetRolesAsync(user);
-        
+
         return new UserProfileDto
         {
             Id = user.Id,
@@ -51,10 +37,9 @@ public class UserService : IUserService
         };
     }
 
-    /// <inheritdoc />
     public async Task UpdateUserProfileAsync(Guid userId, UpdateUserRequest request)
     {
-        if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
+        if (_currentUser.UserId != userId && _currentUser.Role != UserRoles.Admin.ToString())
         {
             throw new UnauthorizedAccessException("Access denied");
         }
@@ -80,7 +65,7 @@ public class UserService : IUserService
             }
 
             user.Email = request.Email;
-            user.UserName = request.Email; // Username is the same as email
+            user.UserName = request.Email;
         }
 
         if (!string.IsNullOrEmpty(request.ProfilePictureUrl))
@@ -88,4 +73,5 @@ public class UserService : IUserService
 
         await _userManager.UpdateAsync(user);
     }
+    
 }

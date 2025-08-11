@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Models;
@@ -7,35 +6,18 @@ using PhantomGG.API.Services.Managers.Interfaces;
 
 namespace PhantomGG.API.Services.Implementations;
 
-/// <summary>
-/// Implementation of the identity authentication service using manager delegation
-/// </summary>
-public class IdentityAuthentication : IIdentityAuthentication
+public class IdentityAuthentication(
+    IUserManager userManager,
+    ITokenManager tokenManager,
+    IRoleManager roleManager
+    ) : IIdentityAuthentication
 {
-    private readonly IUserManager _userManager;
-    private readonly ITokenManager _tokenManager;
-    private readonly IRoleManager _roleManager;
+    private readonly IUserManager _userManager = userManager;
+    private readonly ITokenManager _tokenManager = tokenManager;
+    private readonly IRoleManager _roleManager = roleManager;
 
-    /// <summary>
-    /// Initializes a new instance of the IdentityAuthentication service
-    /// </summary>
-    /// <param name="userManager">User manager</param>
-    /// <param name="tokenManager">Token manager</param>
-    /// <param name="roleManager">Role manager</param>
-    public IdentityAuthentication(
-        IUserManager userManager,
-        ITokenManager tokenManager,
-        IRoleManager roleManager)
+    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
-        _userManager = userManager;
-        _tokenManager = tokenManager;
-        _roleManager = roleManager;
-    }
-
-    /// <inheritdoc />
-    public async Task<AuthResponse> RegisterAsync(RegisterRequest request, string? ipAddress = null)
-    {
-        // Check if email already exists
         if (await _userManager.UserExistsAsync(request.Email))
         {
             return new AuthResponse
@@ -45,13 +27,10 @@ public class IdentityAuthentication : IIdentityAuthentication
             };
         }
 
-        // Create user
         var newUser = await _userManager.CreateUserAsync(request);
         
-        // Generate tokens
-        var tokenResponse = await _tokenManager.GenerateTokensAsync(newUser, ipAddress);
+        var tokenResponse = await _tokenManager.GenerateTokensAsync(newUser);
         
-        // Return response
         return new AuthResponse
         {
             Success = true,
@@ -63,10 +42,8 @@ public class IdentityAuthentication : IIdentityAuthentication
         };
     }
 
-    /// <inheritdoc />
-    public async Task<AuthResponse> LoginAsync(LoginRequest request, string? ipAddress = null)
+    public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
-        // Find user by email
         var user = await _userManager.GetUserByEmailAsync(request.Email);
         if (user == null)
         {
@@ -77,7 +54,6 @@ public class IdentityAuthentication : IIdentityAuthentication
             };
         }
 
-        // Check if user is active
         if (!user.IsActive)
         {
             return new AuthResponse
@@ -87,7 +63,6 @@ public class IdentityAuthentication : IIdentityAuthentication
             };
         }
 
-        // Verify password
         var result = await _userManager.ValidateCredentialsAsync(request.Email, request.Password);
         if (!result.Succeeded)
         {
@@ -100,7 +75,6 @@ public class IdentityAuthentication : IIdentityAuthentication
                 };
             }
             
-            // Handle other failure types
             if (result.IsNotAllowed)
             {
                 return new AuthResponse
@@ -119,7 +93,6 @@ public class IdentityAuthentication : IIdentityAuthentication
                 };
             }
             
-            // Default error
             return new AuthResponse
             {
                 Success = false,
@@ -127,10 +100,8 @@ public class IdentityAuthentication : IIdentityAuthentication
             };
         }
 
-        // Generate tokens
-        var tokenResponse = await _tokenManager.GenerateTokensAsync(user, ipAddress);
+        var tokenResponse = await _tokenManager.GenerateTokensAsync(user);
 
-        // Return response
         return new AuthResponse
         {
             Success = true,
@@ -142,10 +113,8 @@ public class IdentityAuthentication : IIdentityAuthentication
         };
     }
 
-    /// <inheritdoc />
-    public async Task<AuthResponse> RefreshTokenAsync(string refreshToken, string? ipAddress = null)
+    public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
     {
-        // Validate the refresh token
         var storedToken = await _tokenManager.ValidateRefreshTokenAsync(refreshToken);
         if (storedToken == null)
         {
@@ -156,7 +125,6 @@ public class IdentityAuthentication : IIdentityAuthentication
             };
         }
         
-        // Get user from the token
         var user = await _userManager.GetUserByIdAsync(storedToken.UserId);
         if (user == null)
         {
@@ -167,13 +135,10 @@ public class IdentityAuthentication : IIdentityAuthentication
             };
         }
         
-        // Revoke the current refresh token
-        await _tokenManager.RevokeTokenAsync(refreshToken, ipAddress, "Replaced by new token");
+        await _tokenManager.RevokeTokenAsync(refreshToken, "Replaced by new token");
         
-        // Generate new tokens
-        var tokenResponse = await _tokenManager.GenerateTokensAsync(user, ipAddress);
+        var tokenResponse = await _tokenManager.GenerateTokensAsync(user);
         
-        // Return response
         return new AuthResponse
         {
             Success = true,
@@ -185,84 +150,70 @@ public class IdentityAuthentication : IIdentityAuthentication
         };
     }
 
-    /// <inheritdoc />
-    public async Task<bool> LogoutAsync(string refreshToken, string? ipAddress = null)
+    public async Task<bool> LogoutAsync(string refreshToken)
     {
         if (string.IsNullOrEmpty(refreshToken))
         {
             return false;
         }
         
-        // Revoke the token
-        var result = await _tokenManager.RevokeTokenAsync(refreshToken, ipAddress, "User logout");
+        var result = await _tokenManager.RevokeTokenAsync(refreshToken, "User logout");
         
-        // Sign out from identity
         await _userManager.SignOutAsync();
         
         return result;
     }
 
-    /// <inheritdoc />
     public async Task<UserProfileDto?> GetCurrentUserAsync(Guid userId)
     {
         return await _userManager.GetUserProfileAsync(userId);
     }
 
-    /// <inheritdoc />
     public async Task<ApplicationUser?> GetUserByIdAsync(Guid userId)
     {
         return await _userManager.GetUserByIdAsync(userId);
     }
 
-    /// <inheritdoc />
     public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
     {
         return await _userManager.GetUserByEmailAsync(email);
     }
 
-    /// <inheritdoc />
     public async Task<bool> UserExistsAsync(string email)
     {
         return await _userManager.UserExistsAsync(email);
     }
 
-    /// <inheritdoc />
     public async Task<bool> AddUserToRoleAsync(Guid userId, string roleName)
     {
         return await _roleManager.AddUserToRoleAsync(userId.ToString(), roleName);
     }
 
-    /// <inheritdoc />
     public async Task<bool> RemoveUserFromRoleAsync(Guid userId, string roleName)
     {
         return await _roleManager.RemoveUserFromRoleAsync(userId.ToString(), roleName);
     }
 
-    /// <inheritdoc />
     public async Task<IList<string>> GetUserRolesAsync(Guid userId)
     {
         return await _roleManager.GetUserRolesAsync(userId.ToString());
     }
 
-    /// <inheritdoc />
     public async Task<bool> IsUserInRoleAsync(Guid userId, string roleName)
     {
         return await _roleManager.IsUserInRoleAsync(userId.ToString(), roleName);
     }
 
-    /// <inheritdoc />
-    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user, string? ipAddress = null)
+    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user)
     {
-        return await _tokenManager.GenerateTokensAsync(user, ipAddress);
+        return await _tokenManager.GenerateTokensAsync(user);
     }
 
-    /// <inheritdoc />
-    public async Task<bool> RevokeTokenAsync(string token, string? ipAddress = null, string? reason = null, string? replacedByToken = null)
+    public async Task<bool> RevokeTokenAsync(string token, string? reason = null, string? replacedByToken = null)
     {
-        return await _tokenManager.RevokeTokenAsync(token, ipAddress, reason, replacedByToken);
+        return await _tokenManager.RevokeTokenAsync(token, reason, replacedByToken);
     }
 
-    /// <inheritdoc />
     public async Task<RefreshToken?> ValidateRefreshTokenAsync(string token)
     {
         return await _tokenManager.ValidateRefreshTokenAsync(token);

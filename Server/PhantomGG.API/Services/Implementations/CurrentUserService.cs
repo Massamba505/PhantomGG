@@ -3,24 +3,12 @@ using System.Security.Claims;
 
 namespace PhantomGG.API.Services.Implementations;
 
-/// <summary>
-/// Implementation of the current user service
-/// </summary>
-public class CurrentUserService : ICurrentUserService
+public class CurrentUserService(
+    IHttpContextAccessor httpContextAccessor
+    ) : ICurrentUserService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    /// <summary>
-    /// Initializes a new instance of the CurrentUserService
-    /// </summary>
-    /// <param name="httpContextAccessor">HTTP context accessor</param>
-    public CurrentUserService(
-        IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-    /// <inheritdoc />
     public Guid? UserId 
     { 
         get 
@@ -36,13 +24,10 @@ public class CurrentUserService : ICurrentUserService
         } 
     }
 
-    /// <inheritdoc />
     public string? Email => GetClaimValue(ClaimTypes.Email);
     
-    /// <inheritdoc />
     public string? Role => GetClaimValue(ClaimTypes.Role);
     
-    /// <inheritdoc />
     public bool IsAuthenticated => UserId.HasValue;
 
     private string? GetClaimValue(string claimType)
