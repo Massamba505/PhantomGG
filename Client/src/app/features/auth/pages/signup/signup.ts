@@ -8,7 +8,6 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { primengModules } from '@/app/shared/components/primeng/primeng-config';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { passwordStrengthValidator } from '@/app/shared/validators/password.validator';
 import { matchPasswordsValidator } from '@/app/shared/validators/match-passwords.validator';
@@ -18,7 +17,7 @@ import { getPasswordScore } from '@/app/shared/utils/PasswordScore';
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [RouterLink, NgClass, ReactiveFormsModule, ...primengModules],
+  imports: [RouterLink, NgClass, ReactiveFormsModule],
   templateUrl: './signup.html',
 })
 export class Signup {
@@ -68,11 +67,11 @@ export class Signup {
     this.authState.signup({ firstName, lastName, email, password }).subscribe({
       next: () => {
         if (this.authState.isAuthenticated()) {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/profile']);
         }
       },
       error: (err) => {
-        this.toast.error(err.message || 'Signup failed.');
+        this.toast.error(err.error.message || 'Signup failed.');
       },
     });
   }

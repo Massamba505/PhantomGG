@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
 import { authRoutes } from './features/auth/auth.routes';
-import { authGuard, adminGuard } from './core/guards/auth.guard';
+import { authGuard } from './core/guards/auth.guard';
 import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
+import { authenticatedGuard } from './core/guards/authenticated.guard';
 
 export const routes: Routes = [
   {
@@ -13,6 +14,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
+    canActivate: [authenticatedGuard],
     loadComponent: () => import('./features/auth/auth').then((m) => m.Auth),
     children: authRoutes,
   },
@@ -27,7 +29,8 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [adminGuard],
+    canActivate: [authGuard],
+    data: { roles: ['Admin'] },
     loadComponent: () =>
       import('./features/admin/admin.component').then((m) => m.AdminComponent),
     title: 'Admin Dashboard - PhantomGG',

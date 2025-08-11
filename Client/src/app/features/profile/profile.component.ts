@@ -1,43 +1,34 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
 import { AuthStateService } from '@/app/store/AuthStateService';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, CardModule, ButtonModule],
+  imports: [CommonModule],
   template: `
-    <div class="flex justify-center p-4">
-      <p-card
-        *ngIf="authState.user()"
-        header="My Profile"
-        styleClass="w-full max-w-xl"
-      >
-        <div class="p-4">
-          <div class="mb-4">
-            <h3 class="text-lg font-medium">Personal Information</h3>
-            <div class="flex flex-col gap-2 mt-2">
-              <div class="flex justify-between">
-                <span class="font-semibold">Name:</span>
-                <span
-                  >{{ authState.user()?.firstName }}
-                  {{ authState.user()?.lastName }}</span
-                >
-              </div>
-              <div class="flex justify-between">
-                <span class="font-semibold">Email:</span>
-                <span>{{ authState.user()?.email }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="font-semibold">Role:</span>
-                <span>{{ authState.user()?.role }}</span>
-              </div>
-            </div>
+    <div class="card p-4 max-w-xl mx-auto">
+      @if (user) {
+      <div header="My Profile">
+        <div class="space-y-4">
+          <h3 class="text-lg font-medium">Personal Information</h3>
+
+          <div class="flex justify-between">
+            <span class="font-semibold">Name:</span>
+            <span>{{ user.firstName }} {{ user.lastName }}</span>
           </div>
 
-          <div class="flex justify-end mt-4">
+          <div class="flex justify-between">
+            <span class="font-semibold">Email:</span>
+            <span>{{ user.email }}</span>
+          </div>
+
+          <div class="flex justify-between">
+            <span class="font-semibold">Role:</span>
+            <span>{{ user.role }}</span>
+          </div>
+
+          <div class="text-right">
             <button
               pButton
               label="Edit Profile"
@@ -45,12 +36,14 @@ import { AuthStateService } from '@/app/store/AuthStateService';
             ></button>
           </div>
         </div>
-      </p-card>
+      </div>
+      }
     </div>
   `,
 })
 export class ProfileComponent implements OnInit {
   authState = inject(AuthStateService);
+  user = this.authState.user();
 
   ngOnInit() {
     console.log('Profile component initialized');

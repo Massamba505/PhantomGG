@@ -11,10 +11,12 @@ import {
   catchError,
   switchMap,
   throwError,
-  of,
-  lastValueFrom,
+  BehaviorSubject,
 } from 'rxjs';
-import { TokenStorage } from '../../shared/utils/tokenStorage';
+import { TokenStorage } from '@/app/shared/utils/tokenStorage';
+
+const refreshTokenInProgress = new BehaviorSubject<boolean>(false);
+const refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
 export function apiInterceptor(
   req: HttpRequest<any>,
@@ -26,32 +28,27 @@ export function apiInterceptor(
     withCredentials: true,
   });
 
-  // Skip adding token for auth endpoints that don't need it
   const isAuthEndpoint =
     req.url.includes('/auth/login') ||
     req.url.includes('/auth/register') ||
     req.url.includes('/auth/refresh');
 
-  // For non-auth endpoints, add the token if available
   if (!isAuthEndpoint) {
     const token = TokenStorage.getAccessToken();
 
-    // Check if token exists and is not expired
     if (token && !TokenStorage.isTokenExpired()) {
       req = req.clone({
         setHeaders: { Authorization: `Bearer ${token}` },
       });
     } else if (token && TokenStorage.isTokenExpired()) {
-      // Token exists but is expired, try to refresh it first
-      return refreshTokenAndRetry(authState, req, next);
+      return handleExpiredToken(authState, req, next);
     }
   }
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // If we get a 401 Unauthorized error and we're not already trying to refresh
-      if (error.status === 401 && !req.url.includes('/auth/refresh')) {
-        return refreshTokenAndRetry(authState, req, next);
+      if (error.status === 401 && !isAuthEndpoint) {
+        return handleExpiredToken(authState, req, next);
       }
 
       return throwError(() => error);
@@ -59,30 +56,43 @@ export function apiInterceptor(
   );
 }
 
-function refreshTokenAndRetry(
+function handleExpiredToken(
   authState: AuthStateService,
   req: HttpRequest<any>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<any>> {
-  console.log('Token expired or invalid, attempting to refresh...');
+  if (refreshTokenInProgress.value) {
+    return refreshTokenSubject.pipe(
+      switchMap((token) => {
+        if (token) {
+          req = req.clone({
+            setHeaders: { Authorization: `Bearer ${token}` },
+          });
+        }
+        return next(req);
+      })
+    );
+  }
+
+  refreshTokenInProgress.next(true);
+  refreshTokenSubject.next(null);
 
   return authState.refreshToken().pipe(
-    switchMap((response) => {
-      console.log('Token refreshed successfully');
+    switchMap(() => {
+      refreshTokenInProgress.next(false);
+      const newToken = TokenStorage.getAccessToken();
+      refreshTokenSubject.next(newToken);
 
-      // Clone the request with the new token
-      const token = TokenStorage.getAccessToken();
-      if (token) {
+      if (newToken) {
         req = req.clone({
-          setHeaders: { Authorization: `Bearer ${token}` },
+          setHeaders: { Authorization: `Bearer ${newToken}` },
         });
       }
-
-      // Retry the request with the new token
       return next(req);
     }),
     catchError((refreshError) => {
-      console.error('Token refresh failed, logging out:', refreshError);
+      refreshTokenInProgress.next(false);
+      refreshTokenSubject.next(null);
       authState.logout();
       return throwError(() => refreshError);
     })

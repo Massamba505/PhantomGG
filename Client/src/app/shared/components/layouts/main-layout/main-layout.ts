@@ -5,6 +5,6 @@ import { ThemeToggleComponent } from '../../theme-toggle/theme-toggle';
   selector: 'app-main-layout',
   templateUrl: './main-layout.html',
   imports: [ThemeToggleComponent],
-  standalone: true
+  standalone: true,
 })
 export class MainLayout {}

@@ -32,7 +32,7 @@ public class AuthController(
 
         if (!result.Success)
         {
-            return BadRequest(new { message = result.Message });
+            return BadRequest(new { success = false, message = result.Message });
         }
 
         _cookieService.SetAuthCookies(Response, new TokenResponse
@@ -67,7 +67,7 @@ public class AuthController(
 
         if (!result.Success)
         {
-            return Unauthorized(new { message = result.Message });
+            return Unauthorized(new { success = false, message = result.Message });
         }
 
         _cookieService.SetAuthCookies(Response, new TokenResponse
@@ -81,6 +81,7 @@ public class AuthController(
         return Ok(new
         {
             success = true,
+            message = "Login Successfully",
             accessToken = result.AccessToken,
             user = result.User,
             accessTokenExpires = result.AccessTokenExpires
@@ -91,35 +92,26 @@ public class AuthController(
     /// Refreshes an expired access token
     /// </summary>
     [HttpPost("refresh")]
+    [Authorize]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest? request = null)
     {
         var refreshToken = "";
-        
+
         if (Request.Cookies.TryGetValue("refreshToken", out var cookieToken))
         {
             refreshToken = cookieToken;
         }
-        
-        if (request?.RefreshToken != null)
-        {
-            if (refreshToken != "" && refreshToken != request.RefreshToken)
-            {
-                return Unauthorized(new { message = "Refresh token mismatch" });
-            }
-            
-            refreshToken = request.RefreshToken;
-        }
-        
+
         if (string.IsNullOrEmpty(refreshToken))
         {
-            return Unauthorized(new { message = "Refresh token is required" });
+            return Unauthorized(new { success = false, message = "Refresh token is required" });
         }
 
         var result = await _identityAuth.RefreshTokenAsync(refreshToken);
 
         if (!result.Success)
         {
-            return Unauthorized(new { message = result.Message });
+            return Unauthorized(new { success = false, message = result.Message });
         }
 
         bool persistCookie = request?.PersistCookie ?? true;
@@ -135,6 +127,7 @@ public class AuthController(
         return Ok(new
         {
             success = true,
+            message = "Refreshed Successfully",
             accessToken = result.AccessToken,
             accessTokenExpires = result.AccessTokenExpires
         });
@@ -154,7 +147,11 @@ public class AuthController(
 
         _cookieService.ClearAuthCookies(Response);
 
-        return Ok(new { message = "Logged out successfully" });
+        return Ok(new
+        {
+            success = true,
+            message = "Logged out successfully"
+        });
     }
 
     /// <summary>
@@ -167,15 +164,20 @@ public class AuthController(
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
         {
-            return Unauthorized(new { message = "Invalid user" });
+            return Unauthorized(new { success = false, message = "Invalid user" });
         }
 
         var userProfile = await _identityAuth.GetCurrentUserAsync(userId);
         if (userProfile == null)
         {
-            return Unauthorized(new { message = "User not found" });
+            return Unauthorized(new { success = false, message = "User not found" });
         }
 
-        return Ok(userProfile);
+        return Ok(new
+        {
+            success = true,
+            message = "Login Successfully",
+            user = userProfile
+        });
     }
 }

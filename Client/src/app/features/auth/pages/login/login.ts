@@ -4,13 +4,12 @@ import { Router, RouterLink } from '@angular/router';
 import { LoginRequest } from '@/app/shared/models/Authentication';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { AuthStateService } from '@/app/store/AuthStateService';
-import { primengModules } from '@/app/shared/components/primeng/primeng-config';
 import { ToastService } from '@/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, ...primengModules],
+  imports: [RouterLink, ReactiveFormsModule],
   templateUrl: './login.html',
 })
 export class Login {

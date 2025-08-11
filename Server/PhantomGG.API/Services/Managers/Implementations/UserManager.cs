@@ -8,10 +8,12 @@ namespace PhantomGG.API.Services.Managers.Implementations;
 
 public class UserManager(
     UserManager<ApplicationUser> userManager,
+    IRoleManager roleManager,
     SignInManager<ApplicationUser> signInManager
     ) : IUserManager
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly IRoleManager _roleManager = roleManager;
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
 
     public async Task<ApplicationUser> CreateUserAsync(RegisterRequest request)
@@ -34,7 +36,7 @@ public class UserManager(
                 string.Join(", ", result.Errors.Select(e => e.Description)));
         }
 
-        await _userManager.AddToRoleAsync(newUser, "User");
+        await _roleManager.AddUserToRoleAsync(newUser.Id, "User");
         
         return newUser;
     }

@@ -14,12 +14,17 @@ import { ThemeService } from './shared/services/theme.service';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { apiInterceptor } from './core/interceptors/Api.interceptor';
 import { MessageService } from 'primeng/api';
+import { AuthStateService } from './store/AuthStateService';
 
-// Factory function to initialize theme on app startup
 function initializeTheme(themeService: ThemeService) {
   return () => {
-    // ThemeService constructor will handle initial theme setup
     return Promise.resolve();
+  };
+}
+
+function initializeAuthState(authStateService: AuthStateService) {
+  return () => {
+    return authStateService.initAuthState();
   };
 }
 
@@ -43,6 +48,12 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: initializeTheme,
       deps: [ThemeService],
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeAuthState,
+      deps: [AuthStateService],
       multi: true,
     },
   ],
