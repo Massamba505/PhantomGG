@@ -3,7 +3,6 @@ import {
   LoginRequest,
   SignUpRequest,
 } from '@/app/shared/models/Authentication';
-import { User } from '@/app/shared/models/User';
 import { environment } from '@/environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
@@ -38,7 +37,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.env.apiUrl}/auth/refresh`, {});
   }
 
-  getMe(): Observable<User> {
-    return this.http.get<User>(`${this.env.apiUrl}/auth/me`);
+  getMe(): Observable<AuthResponse> {
+    return this.http.get<AuthResponse>(`${this.env.apiUrl}/auth/me`);
   }
 }

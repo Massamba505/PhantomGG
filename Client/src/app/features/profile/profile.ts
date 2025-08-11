@@ -1,6 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@/app/store/AuthStateService';
+import { ToastService } from '@/app/shared/services/toast.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -36,16 +38,23 @@ import { AuthStateService } from '@/app/store/AuthStateService';
             ></button>
           </div>
         </div>
+        <button (click)="logout()" class="btn btn-destructive" type="button">
+          Logout
+        </button>
       </div>
       }
     </div>
   `,
 })
-export class ProfileComponent implements OnInit {
-  authState = inject(AuthStateService);
-  user = this.authState.user();
+export class Profile {
+  private authState = inject(AuthStateService);
+  private toast = inject(ToastService);
+  private router = inject(Router);
 
-  ngOnInit() {
-    console.log('Profile component initialized');
+  user = this.authState.user();
+  logout() {
+    this.authState.logout();
+    this.router.navigate(['/']);
+    this.toast.success('Logout Successfully.');
   }
 }

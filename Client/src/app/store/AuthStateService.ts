@@ -1,11 +1,12 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import {
+  AuthResponse,
   LoginRequest,
   SignUpRequest,
 } from '@/app/shared/models/Authentication';
 import { catchError, tap, throwError } from 'rxjs';
-import { AuthService } from '../core/services/authService';
-import { TokenStorage } from '../shared/utils/tokenStorage';
+import { AuthService } from '../core/services/auth.service';
+import { TokenRefreshService } from '../core/services/tokenRefresh.service';
 import { User } from '../shared/models/User';
 
 @Injectable({
@@ -13,6 +14,7 @@ import { User } from '../shared/models/User';
 })
 export class AuthStateService {
   private authService = inject(AuthService);
+  private tokenService = inject(TokenRefreshService);
 
   private userSignal = signal<User | null>(null);
   private loadingSignal = signal<boolean>(false);
@@ -28,8 +30,8 @@ export class AuthStateService {
   }
 
   initAuthState(): Promise<boolean> {
-    const token = TokenStorage.getAccessToken();
-    if (token && !TokenStorage.isTokenExpired() && this.userSignal() == null) {
+    const token = this.tokenService.getToken();
+    if (token && !this.tokenService.isTokenExpired()) {
       return new Promise<boolean>((resolve) => {
         this.loadUser().subscribe({
           next: () => resolve(true),
@@ -49,10 +51,10 @@ export class AuthStateService {
         this.loadingSignal.set(false);
 
         if (res.success && res.accessToken) {
-          TokenStorage.setAccessToken(res.accessToken);
+          this.tokenService.setToken(res.accessToken);
 
           if (res.accessTokenExpires) {
-            TokenStorage.setTokenExpiry(res.accessTokenExpires);
+            this.tokenService.setTokenExpiry(res.accessTokenExpires);
           }
 
           if (res.user) {
@@ -66,17 +68,7 @@ export class AuthStateService {
       }),
       catchError((error) => {
         this.loadingSignal.set(false);
-
-        let errorMsg = 'Login failed';
-        if (error.error && error.error.message) {
-          errorMsg = error.error.message;
-        } else if (error.status === 0) {
-          errorMsg = 'Cannot connect to server';
-        } else if (error.status === 401) {
-          errorMsg = 'Invalid email or password';
-        }
-
-        this.errorSignal.set(errorMsg);
+        this.errorSignal.set(error.error.message ?? 'Login failed');
         return throwError(() => error);
       })
     );
@@ -91,10 +83,10 @@ export class AuthStateService {
         this.loadingSignal.set(false);
 
         if (res.success && res.accessToken) {
-          TokenStorage.setAccessToken(res.accessToken);
+          this.tokenService.setToken(res.accessToken);
 
           if (res.accessTokenExpires) {
-            TokenStorage.setTokenExpiry(res.accessTokenExpires);
+            this.tokenService.setTokenExpiry(res.accessTokenExpires);
           }
 
           if (res.user) {
@@ -126,12 +118,12 @@ export class AuthStateService {
     this.authService.logout().subscribe({
       next: () => {
         this.loadingSignal.set(false);
-        TokenStorage.clear();
+        this.tokenService.clearTokens();
         this.userSignal.set(null);
       },
       error: (err) => {
         this.loadingSignal.set(false);
-        TokenStorage.clear();
+        this.tokenService.clearTokens();
         this.userSignal.set(null);
       },
     });
@@ -145,10 +137,10 @@ export class AuthStateService {
         this.loadingSignal.set(false);
 
         if (res.success && res.accessToken) {
-          TokenStorage.setAccessToken(res.accessToken);
+          this.tokenService.setToken(res.accessToken);
 
           if (res.accessTokenExpires) {
-            TokenStorage.setTokenExpiry(res.accessTokenExpires);
+            this.tokenService.setTokenExpiry(res.accessTokenExpires);
           }
         } else {
           this.logout();
@@ -165,9 +157,9 @@ export class AuthStateService {
   loadUser() {
     this.loadingSignal.set(true);
     return this.authService.getMe().pipe(
-      tap((user: User) => {
+      tap((response: AuthResponse) => {
         this.loadingSignal.set(false);
-        this.userSignal.set(user);
+        this.userSignal.set(response.user || null);
       }),
       catchError((err) => {
         this.loadingSignal.set(false);

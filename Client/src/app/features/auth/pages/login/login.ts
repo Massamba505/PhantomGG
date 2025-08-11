@@ -43,7 +43,6 @@ export class Login {
       next: () => {
         if (this.authState.isAuthenticated()) {
           this.router.navigate(['/profile']);
-          console.log('User is authenticated', this.authState.user());
         }
       },
       error: (error) => {

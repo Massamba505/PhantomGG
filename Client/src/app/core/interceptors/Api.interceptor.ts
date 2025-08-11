@@ -1,4 +1,3 @@
-import { AuthStateService } from '@/app/store/AuthStateService';
 import {
   HttpErrorResponse,
   HttpEvent,
@@ -13,7 +12,7 @@ import {
   throwError,
   BehaviorSubject,
 } from 'rxjs';
-import { TokenStorage } from '@/app/shared/utils/tokenStorage';
+import { TokenRefreshService } from '@/app/core/services/tokenRefresh.service';
 
 const refreshTokenInProgress = new BehaviorSubject<boolean>(false);
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
@@ -22,7 +21,7 @@ export function apiInterceptor(
   req: HttpRequest<any>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<any>> {
-  const authState = inject(AuthStateService);
+  const tokenService = inject(TokenRefreshService);
 
   req = req.clone({
     withCredentials: true,
@@ -34,21 +33,21 @@ export function apiInterceptor(
     req.url.includes('/auth/refresh');
 
   if (!isAuthEndpoint) {
-    const token = TokenStorage.getAccessToken();
+    const token = tokenService.getToken();
 
-    if (token && !TokenStorage.isTokenExpired()) {
+    if (token && !tokenService.isTokenExpired()) {
       req = req.clone({
         setHeaders: { Authorization: `Bearer ${token}` },
       });
-    } else if (token && TokenStorage.isTokenExpired()) {
-      return handleExpiredToken(authState, req, next);
+    } else if (token && tokenService.isTokenExpired()) {
+      return handleExpiredToken(tokenService, req, next);
     }
   }
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && !isAuthEndpoint) {
-        return handleExpiredToken(authState, req, next);
+        return handleExpiredToken(tokenService, req, next);
       }
 
       return throwError(() => error);
@@ -57,7 +56,7 @@ export function apiInterceptor(
 }
 
 function handleExpiredToken(
-  authState: AuthStateService,
+  tokenService: TokenRefreshService,
   req: HttpRequest<any>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<any>> {
@@ -77,15 +76,21 @@ function handleExpiredToken(
   refreshTokenInProgress.next(true);
   refreshTokenSubject.next(null);
 
-  return authState.refreshToken().pipe(
-    switchMap(() => {
+  return tokenService.refreshToken().pipe(
+    switchMap((response: any) => {
       refreshTokenInProgress.next(false);
-      const newToken = TokenStorage.getAccessToken();
-      refreshTokenSubject.next(newToken);
 
-      if (newToken) {
+      if (response.success && response.accessToken) {
+        tokenService.setToken(response.accessToken);
+
+        if (response.accessTokenExpires) {
+          tokenService.setTokenExpiry(response.accessTokenExpires);
+        }
+
+        refreshTokenSubject.next(response.accessToken);
+
         req = req.clone({
-          setHeaders: { Authorization: `Bearer ${newToken}` },
+          setHeaders: { Authorization: `Bearer ${response.accessToken}` },
         });
       }
       return next(req);
@@ -93,7 +98,7 @@ function handleExpiredToken(
     catchError((refreshError) => {
       refreshTokenInProgress.next(false);
       refreshTokenSubject.next(null);
-      authState.logout();
+      tokenService.clearTokens();
       return throwError(() => refreshError);
     })
   );

@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { authRoutes } from './features/auth/auth.routes';
 import { authGuard } from './core/guards/auth.guard';
-import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized.component';
 import { authenticatedGuard } from './core/guards/authenticated.guard';
+import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized';
 
 export const routes: Routes = [
   {
@@ -22,17 +22,14 @@ export const routes: Routes = [
     path: 'profile',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/profile/profile.component').then(
-        (m) => m.ProfileComponent
-      ),
+      import('./features/profile/profile').then((m) => m.Profile),
     title: 'My Profile - PhantomGG',
   },
   {
     path: 'admin',
     canActivate: [authGuard],
     data: { roles: ['Admin'] },
-    loadComponent: () =>
-      import('./features/admin/admin.component').then((m) => m.AdminComponent),
+    loadComponent: () => import('./features/admin/admin').then((m) => m.Admin),
     title: 'Admin Dashboard - PhantomGG',
   },
   {
