@@ -42,11 +42,12 @@ export class Login {
     this.authState.login(credentials).subscribe({
       next: () => {
         if (this.authState.isAuthenticated()) {
-          this.router.navigate(['/dashboard']);
+          //this.router.navigate(['/dashboard']);
+          console.log('User is authenticated', this.authState.user());
         }
       },
       error: (error) => {
-        this.toastService.error(error.message);
+        this.toastService.error(error.error.message);
       },
     });
   }

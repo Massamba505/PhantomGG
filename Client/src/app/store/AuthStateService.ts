@@ -40,14 +40,18 @@ export class AuthStateService {
         this.loadingSignal.set(false);
         if (res.success && res.accessToken) {
           TokenStorage.setAccessToken(res.accessToken);
-          if (res.user) this.userSignal.set(res.user);
+          if (res.user) {
+            this.userSignal.set(res.user);
+          } else {
+            this.loadUser();
+          }
         } else {
           this.errorSignal.set(res.message ?? 'Login failed');
         }
       }),
       catchError((error) => {
         this.loadingSignal.set(false);
-        this.errorSignal.set('Login failed');
+        this.errorSignal.set(error.error.message ?? 'Login failed');
         return throwError(() => error);
       })
     );
@@ -99,15 +103,20 @@ export class AuthStateService {
   }
 
   loadUser() {
+    this.loadingSignal.set(true);
     this.authService.getMe().subscribe({
-      next: (res) => {
-        if (res.success && res.user) {
-          this.userSignal.set(res.user);
+      next: (res: any) => {
+        this.loadingSignal.set(false);
+        if (res && res.id) {
+          this.userSignal.set(res);
         } else {
           this.logout();
         }
       },
-      error: () => this.logout(),
+      error: (err) => {
+        this.loadingSignal.set(false);
+        this.logout();
+      },
     });
   }
 }
