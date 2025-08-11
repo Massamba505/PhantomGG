@@ -12,4 +12,9 @@ public class RefreshRequest
     /// </summary>
     [Required]
     public string RefreshToken { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Whether the refresh token should be persisted
+    /// </summary>
+    public bool PersistCookie { get; set; } = true;
 }

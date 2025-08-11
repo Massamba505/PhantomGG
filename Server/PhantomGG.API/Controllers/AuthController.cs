@@ -56,17 +56,23 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = result.Message });
         }
 
-        // Set cookies
+        // Set HTTP-only cookie for refresh token with rememberMe=true for new registrations
         _cookieService.SetAuthCookies(Response, new TokenResponse
         {
             AccessToken = result.AccessToken ?? string.Empty,
             RefreshToken = result.RefreshToken ?? string.Empty,
             AccessTokenExpires = result.AccessTokenExpires ?? DateTime.UtcNow,
             RefreshTokenExpires = result.RefreshTokenExpires ?? DateTime.UtcNow
-        });
+        }, true);
 
-        // Return response
-        return Ok(result);
+        // Return access token in the response body for the client to use
+        return Ok(new
+        {
+            success = true,
+            accessToken = result.AccessToken,
+            user = result.User,
+            accessTokenExpires = result.AccessTokenExpires
+        });
     }
 
     /// <summary>
@@ -95,17 +101,23 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = result.Message });
         }
 
-        // Set cookies
+        // Set HTTP-only cookie for refresh token
         _cookieService.SetAuthCookies(Response, new TokenResponse
         {
             AccessToken = result.AccessToken ?? string.Empty,
             RefreshToken = result.RefreshToken ?? string.Empty,
             AccessTokenExpires = result.AccessTokenExpires ?? DateTime.UtcNow,
             RefreshTokenExpires = result.RefreshTokenExpires ?? DateTime.UtcNow
-        });
+        }, request.RememberMe);
 
-        // Return response
-        return Ok(result);
+        // Return access token in the response body for the client to use
+        return Ok(new
+        {
+            success = true,
+            accessToken = result.AccessToken,
+            user = result.User,
+            accessTokenExpires = result.AccessTokenExpires
+        });
     }
 
     /// <summary>
@@ -118,7 +130,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.Unauthorized)]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest? request = null)
     {
-        // Get refresh token from cookie or request body
+        // Get refresh token from cookie (preferred) or request body
         var refreshToken = "";
         
         if (Request.Cookies.TryGetValue("refreshToken", out var cookieToken))
@@ -151,17 +163,25 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = result.Message });
         }
 
-        // Set cookies
+        // Determine if we should persist the cookie based on request
+        bool persistCookie = request?.PersistCookie ?? true;
+
+        // Set HTTP-only cookie for refresh token
         _cookieService.SetAuthCookies(Response, new TokenResponse
         {
             AccessToken = result.AccessToken ?? string.Empty,
             RefreshToken = result.RefreshToken ?? string.Empty,
             AccessTokenExpires = result.AccessTokenExpires ?? DateTime.UtcNow,
             RefreshTokenExpires = result.RefreshTokenExpires ?? DateTime.UtcNow
-        });
+        }, persistCookie);
 
-        // Return response
-        return Ok(result);
+        // Return access token in the response body for the client to use
+        return Ok(new
+        {
+            success = true,
+            accessToken = result.AccessToken,
+            accessTokenExpires = result.AccessTokenExpires
+        });
     }
 
     /// <summary>

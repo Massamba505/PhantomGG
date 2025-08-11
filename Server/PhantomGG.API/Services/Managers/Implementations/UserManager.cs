@@ -112,13 +112,17 @@ public class UserManager : IUserManager
     /// <inheritdoc />
     public UserDto MapToUserDto(ApplicationUser user)
     {
+        // Get user roles asynchronously and wait for the result
+        var roles = _userManager.GetRolesAsync(user).GetAwaiter().GetResult();
+        
         return new UserDto
         {
             Id = user.Id,
             Email = user.Email!,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            ProfilePicture = user.ProfilePictureUrl
+            ProfilePicture = user.ProfilePictureUrl,
+            Role = roles.FirstOrDefault() ?? "User"
         };
     }
 

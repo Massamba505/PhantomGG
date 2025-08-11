@@ -96,10 +96,30 @@ public class IdentityAuthentication : IIdentityAuthentication
                 return new AuthResponse
                 {
                     Success = false,
-                    Message = "Account is locked. Try again later."
+                    Message = "Account is locked due to too many failed attempts. Try again later or reset your password."
                 };
             }
             
+            // Handle other failure types
+            if (result.IsNotAllowed)
+            {
+                return new AuthResponse
+                {
+                    Success = false,
+                    Message = "Login not allowed. Email verification may be required."
+                };
+            }
+            
+            if (result.RequiresTwoFactor)
+            {
+                return new AuthResponse
+                {
+                    Success = false,
+                    Message = "Two-factor authentication required"
+                };
+            }
+            
+            // Default error
             return new AuthResponse
             {
                 Success = false,

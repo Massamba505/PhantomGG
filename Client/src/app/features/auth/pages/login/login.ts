@@ -28,6 +28,7 @@ export class Login {
   userForm = this.fb.group({
     email: ['', [Validators.required, Validators.email, strictEmailValidator]],
     password: ['', Validators.required],
+    rememberMe: [false],
   });
 
   onSubmit(event: Event) {
@@ -42,7 +43,7 @@ export class Login {
     this.authState.login(credentials).subscribe({
       next: () => {
         if (this.authState.isAuthenticated()) {
-          //this.router.navigate(['/dashboard']);
+          this.router.navigate(['/profile']);
           console.log('User is authenticated', this.authState.user());
         }
       },

@@ -18,4 +18,9 @@ public class LoginRequest
     /// </summary>
     [Required]
     public string Password { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Whether to remember the user's login across sessions
+    /// </summary>
+    public bool RememberMe { get; set; } = false;
 }

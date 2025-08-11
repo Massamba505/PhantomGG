@@ -3,6 +3,7 @@ import { User } from './User';
 export interface LoginRequest {
   email: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 export interface SignUpRequest {

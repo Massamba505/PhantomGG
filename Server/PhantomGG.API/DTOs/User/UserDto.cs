@@ -29,4 +29,9 @@ public class UserDto
     /// URL to profile picture
     /// </summary>
     public string? ProfilePicture { get; set; }
+    
+    /// <summary>
+    /// User role
+    /// </summary>
+    public string Role { get; set; } = string.Empty;
 }

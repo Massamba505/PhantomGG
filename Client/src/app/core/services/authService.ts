@@ -19,29 +19,38 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(
       `${this.env.apiUrl}/auth/login`,
-      credentials
+      credentials,
+      { withCredentials: true } // This is important for receiving and sending cookies
     );
   }
 
   signup(credentials: SignUpRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(
       `${this.env.apiUrl}/auth/register`,
-      credentials
+      credentials,
+      { withCredentials: true }
     );
   }
 
-  logout(): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.env.apiUrl}/auth/logout`, {});
+  logout(): Observable<any> {
+    return this.http.post<any>(
+      `${this.env.apiUrl}/auth/logout`,
+      {},
+      { withCredentials: true }
+    );
   }
 
   refresh(): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(
       `${this.env.apiUrl}/auth/refresh`,
-      null
+      {},
+      { withCredentials: true }
     );
   }
 
   getMe(): Observable<User> {
-    return this.http.get<User>(`${this.env.apiUrl}/auth/me`);
+    return this.http.get<User>(`${this.env.apiUrl}/auth/me`, {
+      withCredentials: true,
+    });
   }
 }

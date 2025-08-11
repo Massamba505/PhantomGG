@@ -12,7 +12,8 @@ public interface ICookieService
     /// </summary>
     /// <param name="response">HTTP response</param>
     /// <param name="tokenResponse">Token response</param>
-    void SetAuthCookies(HttpResponse response, TokenResponse tokenResponse);
+    /// <param name="rememberMe">Whether to set persistent cookies</param>
+    void SetAuthCookies(HttpResponse response, TokenResponse tokenResponse, bool rememberMe = false);
     
     /// <summary>
     /// Clears authentication cookies from the HTTP response
