@@ -1,8 +1,5 @@
 ﻿namespace PhantomGG.API.Config;
 
-/// <summary>
-/// Configuration for JWT authentication
-/// </summary>
 public class JwtConfig
 {
     /// <summary>

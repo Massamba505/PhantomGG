@@ -10,7 +10,7 @@ namespace PhantomGG.API.Services.Managers.Implementations;
 public class RoleManager : IRoleManager
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
     /// <summary>
     /// Initializes a new instance of the RoleManager
@@ -19,7 +19,7 @@ public class RoleManager : IRoleManager
     /// <param name="roleManager">Identity role manager</param>
     public RoleManager(
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole<Guid>> roleManager)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -86,7 +86,7 @@ public class RoleManager : IRoleManager
         if (!await _roleManager.RoleExistsAsync(roleName))
         {
             // Create role if it doesn't exist
-            var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
+            var result = await _roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
             return result.Succeeded;
         }
         

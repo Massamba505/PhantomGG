@@ -203,13 +203,13 @@ public class IdentityAuthentication : IIdentityAuthentication
     }
 
     /// <inheritdoc />
-    public async Task<UserProfileDto?> GetCurrentUserAsync(string userId)
+    public async Task<UserProfileDto?> GetCurrentUserAsync(Guid userId)
     {
         return await _userManager.GetUserProfileAsync(userId);
     }
 
     /// <inheritdoc />
-    public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+    public async Task<ApplicationUser?> GetUserByIdAsync(Guid userId)
     {
         return await _userManager.GetUserByIdAsync(userId);
     }
@@ -227,27 +227,27 @@ public class IdentityAuthentication : IIdentityAuthentication
     }
 
     /// <inheritdoc />
-    public async Task<bool> AddUserToRoleAsync(string userId, string roleName)
+    public async Task<bool> AddUserToRoleAsync(Guid userId, string roleName)
     {
-        return await _roleManager.AddUserToRoleAsync(userId, roleName);
+        return await _roleManager.AddUserToRoleAsync(userId.ToString(), roleName);
     }
 
     /// <inheritdoc />
-    public async Task<bool> RemoveUserFromRoleAsync(string userId, string roleName)
+    public async Task<bool> RemoveUserFromRoleAsync(Guid userId, string roleName)
     {
-        return await _roleManager.RemoveUserFromRoleAsync(userId, roleName);
+        return await _roleManager.RemoveUserFromRoleAsync(userId.ToString(), roleName);
     }
 
     /// <inheritdoc />
-    public async Task<IList<string>> GetUserRolesAsync(string userId)
+    public async Task<IList<string>> GetUserRolesAsync(Guid userId)
     {
-        return await _roleManager.GetUserRolesAsync(userId);
+        return await _roleManager.GetUserRolesAsync(userId.ToString());
     }
 
     /// <inheritdoc />
-    public async Task<bool> IsUserInRoleAsync(string userId, string roleName)
+    public async Task<bool> IsUserInRoleAsync(Guid userId, string roleName)
     {
-        return await _roleManager.IsUserInRoleAsync(userId, roleName);
+        return await _roleManager.IsUserInRoleAsync(userId.ToString(), roleName);
     }
 
     /// <inheritdoc />

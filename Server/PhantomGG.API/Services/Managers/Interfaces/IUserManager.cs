@@ -22,7 +22,7 @@ public interface IUserManager
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <returns>Application user</returns>
-    Task<ApplicationUser?> GetUserByIdAsync(string userId);
+    Task<ApplicationUser?> GetUserByIdAsync(Guid userId);
     
     /// <summary>
     /// Gets a user by email
@@ -52,7 +52,7 @@ public interface IUserManager
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <returns>User profile DTO</returns>
-    Task<UserProfileDto?> GetUserProfileAsync(string userId);
+    Task<UserProfileDto?> GetUserProfileAsync(Guid userId);
     
     /// <summary>
     /// Maps an ApplicationUser to a UserDto

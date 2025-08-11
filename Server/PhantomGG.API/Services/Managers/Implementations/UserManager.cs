@@ -57,9 +57,9 @@ public class UserManager : IUserManager
     }
 
     /// <inheritdoc />
-    public async Task<ApplicationUser?> GetUserByIdAsync(string userId)
+    public async Task<ApplicationUser?> GetUserByIdAsync(Guid userId)
     {
-        return await _userManager.FindByIdAsync(userId);
+        return await _userManager.FindByIdAsync(userId.ToString());
     }
 
     /// <inheritdoc />
@@ -87,9 +87,9 @@ public class UserManager : IUserManager
     }
 
     /// <inheritdoc />
-    public async Task<UserProfileDto?> GetUserProfileAsync(string userId)
+    public async Task<UserProfileDto?> GetUserProfileAsync(Guid userId)
     {
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
             return null;

@@ -27,12 +27,12 @@ public class UserService : IUserService
     }
 
     /// <inheritdoc />
-    public async Task<UserProfileDto> GetUserProfileAsync(string userId)
+    public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
     {
         if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
             throw new UnauthorizedAccessException("Access denied");
 
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if(user == null)
             throw new KeyNotFoundException("User not found");
         
@@ -52,14 +52,14 @@ public class UserService : IUserService
     }
 
     /// <inheritdoc />
-    public async Task UpdateUserProfileAsync(string userId, UpdateUserRequest request)
+    public async Task UpdateUserProfileAsync(Guid userId, UpdateUserRequest request)
     {
         if (_currentUser.UserId != userId && _currentUser.Role != "Admin")
         {
             throw new UnauthorizedAccessException("Access denied");
         }
 
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
             throw new KeyNotFoundException("User not found");

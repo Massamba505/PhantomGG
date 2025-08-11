@@ -21,7 +21,20 @@ public class CurrentUserService : ICurrentUserService
     }
 
     /// <inheritdoc />
-    public string? UserId => GetClaimValue(ClaimTypes.NameIdentifier);
+    public Guid? UserId 
+    { 
+        get 
+        {
+            var userId = GetClaimValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return null;
+
+            if (Guid.TryParse(userId, out Guid result))
+                return result;
+                
+            return null;
+        } 
+    }
 
     /// <inheritdoc />
     public string? Email => GetClaimValue(ClaimTypes.Email);
@@ -30,7 +43,7 @@ public class CurrentUserService : ICurrentUserService
     public string? Role => GetClaimValue(ClaimTypes.Role);
     
     /// <inheritdoc />
-    public bool IsAuthenticated => !string.IsNullOrEmpty(UserId);
+    public bool IsAuthenticated => UserId.HasValue;
 
     private string? GetClaimValue(string claimType)
     {

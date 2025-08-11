@@ -19,7 +19,7 @@ namespace PhantomGG.API;
 
 public class Program
 {
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -52,10 +52,12 @@ public class Program
         app.UseAuthorization();
         app.MapControllers();
 
-        // Initialize the database
-        if (app.Environment.IsDevelopment())
+        // Apply EF Core migrations on startup to ensure identity tables are created
+        using (var scope = app.Services.CreateScope())
         {
-            await DbInitializer.InitializeAsync(app.Services);
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            dbContext.Database.Migrate();
+            Console.WriteLine("Applied Entity Framework Core migrations");
         }
 
         app.Run();
@@ -127,7 +129,7 @@ public class Program
 
     private static void ConfigureIdentity(IServiceCollection services)
     {
-        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
         {
             // Password settings
             options.Password.RequireDigit = true;

@@ -47,14 +47,14 @@ public interface IIdentityAuthentication
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <returns>User profile</returns>
-    Task<UserProfileDto?> GetCurrentUserAsync(string userId);
+    Task<UserProfileDto?> GetCurrentUserAsync(Guid userId);
     
     /// <summary>
     /// Gets a user by ID
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <returns>Application user</returns>
-    Task<ApplicationUser?> GetUserByIdAsync(string userId);
+    Task<ApplicationUser?> GetUserByIdAsync(Guid userId);
     
     /// <summary>
     /// Gets a user by email
@@ -76,7 +76,7 @@ public interface IIdentityAuthentication
     /// <param name="userId">User ID</param>
     /// <param name="roleName">Role name</param>
     /// <returns>True if successful</returns>
-    Task<bool> AddUserToRoleAsync(string userId, string roleName);
+    Task<bool> AddUserToRoleAsync(Guid userId, string roleName);
     
     /// <summary>
     /// Removes a user from a role
@@ -84,14 +84,14 @@ public interface IIdentityAuthentication
     /// <param name="userId">User ID</param>
     /// <param name="roleName">Role name</param>
     /// <returns>True if successful</returns>
-    Task<bool> RemoveUserFromRoleAsync(string userId, string roleName);
+    Task<bool> RemoveUserFromRoleAsync(Guid userId, string roleName);
     
     /// <summary>
     /// Gets the roles for a user
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <returns>List of roles</returns>
-    Task<IList<string>> GetUserRolesAsync(string userId);
+    Task<IList<string>> GetUserRolesAsync(Guid userId);
     
     /// <summary>
     /// Checks if a user is in a role
@@ -99,7 +99,7 @@ public interface IIdentityAuthentication
     /// <param name="userId">User ID</param>
     /// <param name="roleName">Role name</param>
     /// <returns>True if user is in role</returns>
-    Task<bool> IsUserInRoleAsync(string userId, string roleName);
+    Task<bool> IsUserInRoleAsync(Guid userId, string roleName);
     
     /// <summary>
     /// Generates and returns access and refresh tokens

@@ -8,7 +8,7 @@ public class UserDto
     /// <summary>
     /// User ID
     /// </summary>
-    public string Id { get; set; } = string.Empty;
+    public Guid Id { get; set; }
     
     /// <summary>
     /// Email address

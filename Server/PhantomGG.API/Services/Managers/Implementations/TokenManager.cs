@@ -108,11 +108,11 @@ public class TokenManager : ITokenManager
         
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
             new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
         };
 
         // Add roles as claims

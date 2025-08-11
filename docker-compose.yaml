@@ -35,8 +35,8 @@ services:
   flyway:
     image: flyway/flyway:9-alpine
     depends_on:
-      db-init:
-        condition: service_completed_successfully
+      api:
+        condition: service_started
     entrypoint:
       [
         "flyway",
@@ -65,7 +65,7 @@ services:
       - JwtConfig__AccessTokenExpiryMinutes=${JwtConfig__AccessTokenExpiryMinutes}
       - JwtConfig__RefreshTokenExpiryDays=${JwtConfig__RefreshTokenExpiryDays}
     depends_on:
-      flyway:
+      db-init:
         condition: service_completed_successfully
     volumes:
       - ./Server/PhantomGG.API:/app

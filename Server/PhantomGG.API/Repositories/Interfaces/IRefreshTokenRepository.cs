@@ -25,5 +25,5 @@ public interface IRefreshTokenRepository
     /// </summary>
     /// <param name="userId">The user ID</param>
     /// <returns>Collection of valid refresh tokens</returns>
-    Task<IEnumerable<RefreshToken>> GetValidTokensByUserIdAsync(string userId);
+    Task<IEnumerable<RefreshToken>> GetValidTokensByUserIdAsync(Guid userId);
 }

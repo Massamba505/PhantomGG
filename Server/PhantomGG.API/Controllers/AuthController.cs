@@ -218,8 +218,8 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> GetCurrentUser()
     {
         // Get user ID from claims
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId))
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
         {
             return Unauthorized(new { message = "Invalid user" });
         }

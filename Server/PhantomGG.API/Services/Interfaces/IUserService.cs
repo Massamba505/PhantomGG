@@ -12,12 +12,12 @@ public interface IUserService
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <returns>User profile</returns>
-    Task<UserProfileDto> GetUserProfileAsync(string userId);
+    Task<UserProfileDto> GetUserProfileAsync(Guid userId);
     
     /// <summary>
     /// Updates a user's profile
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <param name="request">Update request</param>
-    Task UpdateUserProfileAsync(string userId, UpdateUserRequest request);
+    Task UpdateUserProfileAsync(Guid userId, UpdateUserRequest request);
 }

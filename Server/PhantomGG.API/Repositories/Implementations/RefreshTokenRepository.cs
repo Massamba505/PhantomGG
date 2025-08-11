@@ -37,7 +37,7 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<RefreshToken>> GetValidTokensByUserIdAsync(string userId)
+    public async Task<IEnumerable<RefreshToken>> GetValidTokensByUserIdAsync(Guid userId)
     {
         return await _context.RefreshTokens
             .Include(rt => rt.User)
