@@ -4,7 +4,7 @@ using PhantomGG.API.Models;
 namespace PhantomGG.API.Services.Interfaces;
 public interface ITokenService
 {
-    string GenerateAccessToken(ApplicationUser user);
+    Task<string> GenerateAccessTokenAsync(ApplicationUser user);
     RefreshToken GenerateRefreshToken(ApplicationUser user);
     Task<TokenResponse> GenerateTokensAsync(ApplicationUser user);
     Task<TokenResponse> RefreshTokenAsync(string refreshToken);

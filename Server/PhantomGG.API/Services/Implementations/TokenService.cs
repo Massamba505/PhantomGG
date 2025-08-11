@@ -5,6 +5,7 @@ using PhantomGG.API.Data;
 using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.Models;
 using PhantomGG.API.Services.Interfaces;
+using PhantomGG.API.Services.Managers.Implementations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -13,17 +14,20 @@ using System.Text;
 namespace PhantomGG.API.Services.Implementations;
 
 public class TokenService(
-    JwtConfig jwtConfig, ApplicationDbContext context
+    JwtConfig jwtConfig,
+    ApplicationDbContext context,
+    RoleManager roleManager
     ) : ITokenService
 {
     private readonly JwtConfig _jwtConfig = jwtConfig;
     private readonly ApplicationDbContext _context = context;
+    private readonly RoleManager _roleManager = roleManager;
 
-    public string GenerateAccessToken(ApplicationUser user)
+    public async Task<string> GenerateAccessTokenAsync(ApplicationUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
-        
+
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -33,13 +37,7 @@ public class TokenService(
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
         };
 
-        var userRoles = _context.UserRoles
-            .Where(ur => ur.UserId == user.Id)
-            .Join(_context.Roles,
-                ur => ur.RoleId,
-                r => r.Id,
-                (ur, r) => r.Name)
-            .ToList();
+        var userRoles = await _roleManager.GetUserRolesAsync(user.Id);
 
         foreach (var role in userRoles)
         {
@@ -84,7 +82,7 @@ public class TokenService(
 
     public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user)
     {
-        var accessToken = GenerateAccessToken(user);
+        var accessToken = await GenerateAccessTokenAsync(user);
         
         var refreshToken = GenerateRefreshToken(user);
         

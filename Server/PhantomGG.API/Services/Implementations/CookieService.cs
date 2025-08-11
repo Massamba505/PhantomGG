@@ -7,6 +7,7 @@ namespace PhantomGG.API.Services.Implementations;
 public class CookieService(JwtConfig jwtConfig ) : ICookieService
 {
     private readonly JwtConfig _jwtConfig = jwtConfig;
+
     public void SetAuthCookies(HttpResponse response, TokenResponse tokenResponse, bool rememberMe = false)
     {        
         var refreshCookieOptions = new CookieOptions
@@ -25,7 +26,7 @@ public class CookieService(JwtConfig jwtConfig ) : ICookieService
         
         response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, refreshCookieOptions);
         
-        response.Cookies.Append("tokenExpires", tokenResponse.AccessTokenExpires.ToString("o"), new CookieOptions
+        response.Cookies.Append("tokenExpires", tokenResponse.AccessTokenExpires.ToString(), new CookieOptions
         {
             HttpOnly = false, 
             Secure = true,

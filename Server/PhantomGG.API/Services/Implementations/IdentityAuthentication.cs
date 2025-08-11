@@ -135,9 +135,9 @@ public class IdentityAuthentication(
             };
         }
         
-        await _tokenManager.RevokeTokenAsync(refreshToken);
-        
         var tokenResponse = await _tokenManager.GenerateTokensAsync(user);
+        
+        await _tokenManager.RevokeTokenAsync(refreshToken);
         
         return new AuthResponse
         {

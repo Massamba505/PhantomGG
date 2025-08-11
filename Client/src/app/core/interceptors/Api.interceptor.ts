@@ -22,6 +22,10 @@ export function apiInterceptor(
 ): Observable<HttpEvent<any>> {
   const authState = inject(AuthStateService);
 
+  req = req.clone({
+    withCredentials: true,
+  });
+
   // Skip adding token for auth endpoints that don't need it
   const isAuthEndpoint =
     req.url.includes('/auth/login') ||

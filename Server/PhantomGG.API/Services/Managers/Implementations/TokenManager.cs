@@ -118,7 +118,7 @@ public class TokenManager(
             UserId = user.Id,
             Token = refreshToken,
             ExpiresAt = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpiryDays),
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
         };
 
         return refreshTokenEntity;
