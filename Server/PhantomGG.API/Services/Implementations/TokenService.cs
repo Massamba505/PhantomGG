@@ -23,11 +23,8 @@ public class TokenService(
     private readonly ApplicationDbContext _context = context;
     private readonly RoleManager _roleManager = roleManager;
 
-    public async Task<string> GenerateAccessTokenAsync(ApplicationUser user)
+    private async Task<IEnumerable<Claim>> GetClaimsAsync(ApplicationUser user)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
-
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -47,6 +44,15 @@ public class TokenService(
             }
         }
 
+        return claims;
+    }
+
+    public async Task<string> GenerateAccessTokenAsync(ApplicationUser user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+        var claims = await GetClaimsAsync(user);
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
@@ -54,7 +60,7 @@ public class TokenService(
             Issuer = _jwtConfig.Issuer,
             Audience = _jwtConfig.Audience,
             SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key), 
+                new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
         };
 
@@ -68,7 +74,7 @@ public class TokenService(
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomBytes);
         var refreshToken = Convert.ToBase64String(randomBytes);
-        
+
         var refreshTokenEntity = new RefreshToken
         {
             UserId = user.Id,
@@ -83,12 +89,12 @@ public class TokenService(
     public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user)
     {
         var accessToken = await GenerateAccessTokenAsync(user);
-        
+
         var refreshToken = GenerateRefreshToken(user);
-        
+
         _context.RefreshTokens.Add(refreshToken);
         await _context.SaveChangesAsync();
-        
+
         return new TokenResponse
         {
             AccessToken = accessToken,
@@ -105,15 +111,15 @@ public class TokenService(
         {
             throw new SecurityTokenException("Invalid refresh token");
         }
-        
+
         var user = await _context.Users.FindAsync(storedToken.UserId);
         if (user == null)
         {
             throw new SecurityTokenException("User not found");
         }
-        
+
         await RevokeTokenAsync(refreshToken);
-        
+
         return await GenerateTokensAsync(user);
     }
 
@@ -121,17 +127,17 @@ public class TokenService(
     {
         var storedToken = await _context.RefreshTokens
             .SingleOrDefaultAsync(t => t.Token == token);
-            
+
         if (storedToken == null)
         {
             return false;
         }
-        
+
         storedToken.RevokedAt = DateTime.UtcNow;
-        
+
         _context.RefreshTokens.Update(storedToken);
         await _context.SaveChangesAsync();
-        
+
         return true;
     }
 
@@ -139,12 +145,12 @@ public class TokenService(
     {
         var storedToken = await _context.RefreshTokens
             .SingleOrDefaultAsync(t => t.Token == token);
-            
+
         if (storedToken == null || !storedToken.IsActive)
         {
             return null;
         }
-        
+
         return storedToken;
     }
 }
