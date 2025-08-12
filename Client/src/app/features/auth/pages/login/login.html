@@ -1,0 +1,97 @@
+<div class="auth-form">
+  <div class="text-center mb-8">
+    <h1 class="text-2xl font-bold mb-2">Welcome Back, Phantom! 👻</h1>
+  </div>
+
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit($event)" class="space-y-6">
+    <div>
+      <label class="block text-sm font-medium mb-2"
+        >Email<span class="ml-1 text-red-600">*</span></label
+      >
+      <input
+        class="input-field w-full"
+        type="email"
+        placeholder="phantomplayer@tournament.com"
+        formControlName="email"
+      />
+      @if ( (submitted() || userForm.controls['email'].touched) &&
+      userForm.controls['email'].errors ) {
+      <p class="text-xs text-red-600 mt-1">Please enter a valid email</p>
+      }
+    </div>
+
+    <div>
+      <div class="flex justify-between items-center mb-2">
+        <div class="password-section">
+          <label class="block text-sm font-medium mb-2"
+            >Password<span class="ml-1 text-red-600">*</span></label
+          >
+        </div>
+        <a
+          routerLink="/auth/forgot-password"
+          class="text-sm font-medium hover:underline"
+        >
+          Forgot Password?
+        </a>
+      </div>
+      <div class="relative">
+        <input
+          class="input-field w-full pr-12"
+          [type]="showPassword() ? 'text' : 'password'"
+          placeholder="Enter your password... 👻"
+          formControlName="password"
+        />
+        <button
+          (click)="togglePassword()"
+          type="button"
+          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+        >
+          {{ showPassword() ? "🐵" : "🙈" }}
+        </button>
+      </div>
+      @if ( (submitted() || userForm.controls['password'].touched) &&
+      userForm.controls['password'].errors ) {
+      <p class="text-xs text-red-600 mt-1">Please enter your password</p>
+      }
+    </div>
+
+    <div class="flex items-center">
+      <input
+        type="checkbox"
+        id="rememberMe"
+        formControlName="rememberMe"
+        class="mr-2"
+      />
+      <label for="rememberMe" class="text-sm">Remember me</label>
+    </div>
+
+    <button [disabled]="loading()" type="submit" class="primary-button w-full">
+      {{ loading() ? "Loading.." : "Login" }}
+    </button>
+  </form>
+
+  <div class="flex items-center my-6">
+    <div class="border-t border-border flex-1"></div>
+    <span class="px-4 text-muted-foreground text-sm">OR</span>
+    <div class="border-t border-border flex-1"></div>
+  </div>
+
+  <!-- Google Login -->
+  <div class="w-full-4 mb-6">
+    <button class="secondary-button button-base w-full gap-2">
+      <span>Google</span>
+    </button>
+  </div>
+
+  <!-- Signup Link -->
+  <div class="text-center">
+    <span class="text-muted-foreground">New to phantomgg? </span>
+    <a
+      routerLink="/auth/signup"
+      class="text-primary hover:underline font-medium"
+    >
+      Join the PhantomGG!
+    </a>
+    <span>👻👻</span>
+  </div>
+</div>

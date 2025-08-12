@@ -1,0 +1,12 @@
+<button
+  class="btn-ghost p-3 rounded-full hover:bg-muted transition-all duration-300"
+  (click)="toggleTheme()"
+  [attr.aria-label]="buttonLabel()"
+  [title]="buttonLabel()"
+>
+  @if (currentIcon() === 'light') {
+  <span class="text-xl">🌞</span>
+  } @if (currentIcon() === 'dark') {
+  <span class="text-xl">🌜</span>
+  }
+</button>

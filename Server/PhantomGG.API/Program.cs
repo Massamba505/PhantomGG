@@ -1,7 +1,19 @@
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PhantomGG.API.Config;
 using PhantomGG.API.Data;
+using PhantomGG.API.Middleware;
+using PhantomGG.API.Models;
+using PhantomGG.API.Repositories.Implementations;
+using PhantomGG.API.Repositories.Interfaces;
+using PhantomGG.API.Services.Implementations;
+using PhantomGG.API.Services.Interfaces;
+using PhantomGG.API.Services.Managers.Implementations;
+using PhantomGG.API.Services.Managers.Interfaces;
+using System.Text;
 
 namespace PhantomGG.API;
 
@@ -12,8 +24,14 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllers();
+        builder.Services.AddHttpContextAccessor();
+
         AddSwagger(builder.Services);
-        AddDatabase(builder.Services, builder.Configuration);
+        AddCors(builder.Services);
+        ConfigureDatabase(builder.Services, builder.Configuration);
+        ConfigureIdentity(builder.Services, builder.Configuration);
+        ConfigureJwt(builder.Services, builder.Configuration);
+        ConfigureServices(builder.Services);
 
         var app = builder.Build();
 
@@ -28,11 +46,19 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-
+        app.UseCors("CorsPolicy");
+        app.UseMiddleware<GlobalExceptionMiddleware>();
+        app.UseAuthentication();
         app.UseAuthorization();
-
-
         app.MapControllers();
+
+        // Apply EF Core migrations on startup to ensure identity tables are created
+        using (var scope = app.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            dbContext.Database.Migrate();
+            Console.WriteLine("Applied Entity Framework Core migrations");
+        }
 
         app.Run();
     }
@@ -81,9 +107,93 @@ public class Program
         });
     }
 
-    private static void AddDatabase(IServiceCollection services, IConfiguration config)
+    private static void AddCors(IServiceCollection services)
     {
-        services.AddDbContext<PhantomGGContext>(options =>
+        services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy", policy =>
+            {
+                policy.WithOrigins("http://localhost:4200")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials();
+            });
+        });
+    }
+
+    private static void ConfigureDatabase(IServiceCollection services, IConfiguration config)
+    {
+        services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(config.GetConnectionString("PhantomDb")));
+    }
+
+    private static void ConfigureIdentity(IServiceCollection services, ConfigurationManager configuration)
+    {
+        var identitySettings = configuration.GetSection("IdentityOptions").Get<IdentitySettings>();
+        if (identitySettings == null)
+        {
+            throw new InvalidOperationException("IdentitySettings configuration is not set");
+        }
+
+        services.AddSingleton(identitySettings);
+        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+        {
+            options.Password = identitySettings.Password;
+            options.Lockout = identitySettings.Lockout;
+            options.User = identitySettings.User;
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
+    }
+
+    private static void ConfigureJwt(IServiceCollection services, ConfigurationManager configuration)
+    {
+        var jwtConfig = configuration.GetSection("JwtConfig").Get<JwtConfig>();
+        if (jwtConfig == null)
+        {
+            throw new InvalidOperationException("JWT configuration is not set");
+        }
+
+        services.AddSingleton(jwtConfig);
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwtConfig.Issuer,
+                ValidateAudience = true,
+                ValidAudience = jwtConfig.Audience,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
+                ClockSkew = TimeSpan.Zero
+            };
+        });
+
+        services.AddAuthorization();
+    }
+
+    private static void ConfigureServices(IServiceCollection services)
+    {
+        // Managers
+        services.AddScoped<IUserManager, UserManager>();
+        services.AddScoped<ITokenManager, TokenManager>();
+        services.AddScoped<IRoleManager, RoleManager>();
+
+        // Services
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<ICookieService, CookieService>();
+        services.AddScoped<IIdentityAuthentication, IdentityAuthentication>();
+
+        // Repositories
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
     }
 }
