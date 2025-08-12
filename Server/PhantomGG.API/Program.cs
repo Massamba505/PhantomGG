@@ -25,7 +25,7 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddHttpContextAccessor();
-        
+
         AddSwagger(builder.Services);
         AddCors(builder.Services);
         ConfigureDatabase(builder.Services, builder.Configuration);
@@ -154,7 +154,7 @@ public class Program
     private static void ConfigureJwt(IServiceCollection services, ConfigurationManager configuration)
     {
         var jwtConfig = configuration.GetSection("JwtConfig").Get<JwtConfig>();
-        if(jwtConfig == null)
+        if (jwtConfig == null)
         {
             throw new InvalidOperationException("JWT configuration is not set");
         }
@@ -191,18 +191,17 @@ public class Program
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<ITokenManager, TokenManager>();
         services.AddScoped<IRoleManager, RoleManager>();
-        
+
         // Consolidated authentication service
         services.AddScoped<IIdentityAuthentication, IdentityAuthentication>();
-        
+
         // User services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        
+
         // Cookie service
         services.AddScoped<ICookieService, CookieService>();
-        
+
         // Repositories
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
     }
