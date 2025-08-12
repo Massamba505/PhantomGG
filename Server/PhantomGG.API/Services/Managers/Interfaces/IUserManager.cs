@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Models;
@@ -7,7 +8,7 @@ namespace PhantomGG.API.Services.Managers.Interfaces;
 
 public interface IUserManager
 {
-    Task<ApplicationUser> CreateUserAsync(RegisterRequest request);
+    Task<ApplicationUser> CreateUserAsync(RegisterRequest request, UserRoles role);
     Task<ApplicationUser?> GetUserByIdAsync(Guid userId);
     Task<ApplicationUser?> GetUserByEmailAsync(string email);
     Task<bool> UserExistsAsync(string email);

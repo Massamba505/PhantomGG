@@ -29,7 +29,7 @@ public class Program
         AddSwagger(builder.Services);
         AddCors(builder.Services);
         ConfigureDatabase(builder.Services, builder.Configuration);
-        ConfigureIdentity(builder.Services);
+        ConfigureIdentity(builder.Services, builder.Configuration);
         ConfigureJwt(builder.Services, builder.Configuration);
         ConfigureServices(builder.Services);
 
@@ -127,25 +127,20 @@ public class Program
             options.UseSqlServer(config.GetConnectionString("PhantomDb")));
     }
 
-    private static void ConfigureIdentity(IServiceCollection services)
+    private static void ConfigureIdentity(IServiceCollection services, ConfigurationManager configuration)
     {
+        var identitySettings = configuration.GetSection("IdentityOptions").Get<IdentitySettings>();
+        if (identitySettings == null)
+        {
+            throw new InvalidOperationException("IdentitySettings configuration is not set");
+        }
+
+        services.AddSingleton(identitySettings);
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
         {
-            // Password settings
-            options.Password.RequireDigit = true;
-            options.Password.RequireLowercase = true;
-            options.Password.RequireUppercase = true;
-            options.Password.RequireNonAlphanumeric = true;
-            options.Password.RequiredLength = 8;
-
-            // Lockout settings
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
-            options.Lockout.MaxFailedAccessAttempts = 5;
-            options.Lockout.AllowedForNewUsers = true;
-
-            // User settings
-            options.User.RequireUniqueEmail = true;
-            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+            options.Password = identitySettings.Password;
+            options.Lockout = identitySettings.Lockout;
+            options.User = identitySettings.User;
         })
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
@@ -187,20 +182,16 @@ public class Program
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        // Register managers
+        // Managers
         services.AddScoped<IUserManager, UserManager>();
         services.AddScoped<ITokenManager, TokenManager>();
         services.AddScoped<IRoleManager, RoleManager>();
 
-        // Consolidated authentication service
-        services.AddScoped<IIdentityAuthentication, IdentityAuthentication>();
-
-        // User services
+        // Services
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-
-        // Cookie service
         services.AddScoped<ICookieService, CookieService>();
+        services.AddScoped<IIdentityAuthentication, IdentityAuthentication>();
 
         // Repositories
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

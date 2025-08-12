@@ -1,3 +1,4 @@
+using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Models;
@@ -27,10 +28,10 @@ public class IdentityAuthentication(
             };
         }
 
-        var newUser = await _userManager.CreateUserAsync(request);
-        
+        var newUser = await _userManager.CreateUserAsync(request, UserRoles.Organizer);
+
         var tokenResponse = await _tokenManager.GenerateTokensAsync(newUser);
-        
+
         return new AuthResponse
         {
             Success = true,
@@ -74,7 +75,7 @@ public class IdentityAuthentication(
                     Message = "Account is locked due to too many failed attempts. Try again later or reset your password."
                 };
             }
-            
+
             if (result.IsNotAllowed)
             {
                 return new AuthResponse
@@ -83,7 +84,7 @@ public class IdentityAuthentication(
                     Message = "Login not allowed. Email verification may be required."
                 };
             }
-            
+
             if (result.RequiresTwoFactor)
             {
                 return new AuthResponse
@@ -92,7 +93,7 @@ public class IdentityAuthentication(
                     Message = "Two-factor authentication required"
                 };
             }
-            
+
             return new AuthResponse
             {
                 Success = false,
@@ -124,7 +125,7 @@ public class IdentityAuthentication(
                 Message = "Invalid refresh token"
             };
         }
-        
+
         var user = await _userManager.GetUserByIdAsync(storedToken.UserId);
         if (user == null)
         {
@@ -134,11 +135,11 @@ public class IdentityAuthentication(
                 Message = "User not found"
             };
         }
-        
+
         var tokenResponse = await _tokenManager.GenerateTokensAsync(user);
-        
+
         await _tokenManager.RevokeTokenAsync(refreshToken);
-        
+
         return new AuthResponse
         {
             Success = true,
@@ -156,11 +157,11 @@ public class IdentityAuthentication(
         {
             return false;
         }
-        
+
         var result = await _tokenManager.RevokeTokenAsync(refreshToken);
-        
+
         await _userManager.SignOutAsync();
-        
+
         return result;
     }
 

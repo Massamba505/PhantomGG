@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.Auth;
 using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Models;
@@ -16,7 +17,7 @@ public class UserManager(
     private readonly IRoleManager _roleManager = roleManager;
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
 
-    public async Task<ApplicationUser> CreateUserAsync(RegisterRequest request)
+    public async Task<ApplicationUser> CreateUserAsync(RegisterRequest request, UserRoles role)
     {
         var newUser = new ApplicationUser
         {
@@ -32,12 +33,12 @@ public class UserManager(
         var result = await _userManager.CreateAsync(newUser, request.Password);
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException("Failed to create user: " + 
+            throw new InvalidOperationException("Failed to create user: " +
                 string.Join(", ", result.Errors.Select(e => e.Description)));
         }
 
-        await _roleManager.AddUserToRoleAsync(newUser.Id, "User");
-        
+        await _roleManager.AddUserToRoleAsync(newUser.Id, role.ToString());
+
         return newUser;
     }
 
@@ -63,7 +64,7 @@ public class UserManager(
         {
             return SignInResult.Failed;
         }
-        
+
         return await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure);
     }
 
@@ -74,9 +75,9 @@ public class UserManager(
         {
             return null;
         }
-        
+
         var roles = await _userManager.GetRolesAsync(user);
-        
+
         return new UserProfileDto
         {
             Id = user.Id,
@@ -92,7 +93,7 @@ public class UserManager(
     public UserDto MapToUserDto(ApplicationUser user)
     {
         var roles = _userManager.GetRolesAsync(user).GetAwaiter().GetResult();
-        
+
         return new UserDto
         {
             Id = user.Id,
