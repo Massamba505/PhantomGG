@@ -11,10 +11,9 @@ namespace PhantomGG.API.Controllers;
 [ApiController]
 public class AuthController(
     IIdentityAuthentication identityAuth,
-    ICookieService cookieService
-    ) : ControllerBase
+    ICookieService cookieService) : ControllerBase
 {
-    private readonly IIdentityAuthentication _identityAuth = identityAuth;
+    private readonly IIdentityAuthentication _identityAuthentication = identityAuth;
     private readonly ICookieService _cookieService = cookieService;
 
     /// <summary>
@@ -28,7 +27,7 @@ public class AuthController(
             return ValidationProblem(ModelState);
         }
 
-        var result = await _identityAuth.RegisterAsync(request);
+        var result = await _identityAuthentication.RegisterAsync(request);
 
         if (!result.Success)
         {
@@ -41,7 +40,7 @@ public class AuthController(
             RefreshToken = result.RefreshToken ?? string.Empty,
             AccessTokenExpires = result.AccessTokenExpires ?? DateTime.UtcNow,
             RefreshTokenExpires = result.RefreshTokenExpires ?? DateTime.UtcNow
-        }, true);
+        }, rememberMe:true);
 
         return Ok(new
         {
@@ -63,7 +62,7 @@ public class AuthController(
             return ValidationProblem(ModelState);
         }
 
-        var result = await _identityAuth.LoginAsync(request);
+        var result = await _identityAuthentication.LoginAsync(request);
 
         if (!result.Success)
         {
@@ -91,8 +90,8 @@ public class AuthController(
     /// <summary>
     /// Refreshes an expired access token
     /// </summary>
-    [HttpPost("refresh")]
     [Authorize]
+    [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest? request = null)
     {
         var refreshToken = "";
@@ -107,7 +106,7 @@ public class AuthController(
             return Unauthorized(new { success = false, message = "Refresh token is required" });
         }
 
-        var result = await _identityAuth.RefreshTokenAsync(refreshToken);
+        var result = await _identityAuthentication.RefreshTokenAsync(refreshToken);
 
         if (!result.Success)
         {
@@ -142,7 +141,7 @@ public class AuthController(
     {
         if (Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
         {
-            await _identityAuth.LogoutAsync(refreshToken);
+            await _identityAuthentication.LogoutAsync(refreshToken);
         }
 
         _cookieService.ClearAuthCookies(Response);
@@ -167,7 +166,7 @@ public class AuthController(
             return Unauthorized(new { success = false, message = "Invalid user" });
         }
 
-        var userProfile = await _identityAuth.GetCurrentUserAsync(userId);
+        var userProfile = await _identityAuthentication.GetCurrentUserAsync(userId);
         if (userProfile == null)
         {
             return Unauthorized(new { success = false, message = "User not found" });
