@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using PhantomGG.API.Models;
 
-namespace PhantomGG.API.Models;
+namespace PhantomGG.API.Data;
 
 public partial class PhantomGGContext : DbContext
 {
