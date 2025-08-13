@@ -5,11 +5,11 @@ using PhantomGG.API.Services.Managers.Interfaces;
 namespace PhantomGG.API.Services.Managers.Implementations;
 
 public class RoleManager(
-    UserManager<ApplicationUser> userManager,
+    UserManager<AspNetUser> userManager,
     RoleManager<IdentityRole<Guid>> roleManager
     ) : IRoleManager
 {
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly UserManager<AspNetUser> _userManager = userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager = roleManager;
 
     public async Task<bool> AddUserToRoleAsync(Guid userId, string roleName)
@@ -19,9 +19,9 @@ public class RoleManager(
         {
             return false;
         }
-        
+
         await EnsureRoleExistsAsync(roleName);
-        
+
         var result = await _userManager.AddToRoleAsync(user, roleName);
         return result.Succeeded;
     }
@@ -33,7 +33,7 @@ public class RoleManager(
         {
             return false;
         }
-        
+
         var result = await _userManager.RemoveFromRoleAsync(user, roleName);
         return result.Succeeded;
     }
@@ -45,7 +45,7 @@ public class RoleManager(
         {
             return new List<string>();
         }
-        
+
         return await _userManager.GetRolesAsync(user);
     }
 
@@ -56,7 +56,7 @@ public class RoleManager(
         {
             return false;
         }
-        
+
         return await _userManager.IsInRoleAsync(user, roleName);
     }
 
@@ -67,7 +67,7 @@ public class RoleManager(
             var result = await _roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
             return result.Succeeded;
         }
-        
+
         return true;
     }
 }

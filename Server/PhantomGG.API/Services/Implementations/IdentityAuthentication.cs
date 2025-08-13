@@ -170,12 +170,12 @@ public class IdentityAuthentication(
         return await _userManager.GetUserProfileAsync(userId);
     }
 
-    public async Task<ApplicationUser?> GetUserByIdAsync(Guid userId)
+    public async Task<AspNetUser?> GetUserByIdAsync(Guid userId)
     {
         return await _userManager.GetUserByIdAsync(userId);
     }
 
-    public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
+    public async Task<AspNetUser?> GetUserByEmailAsync(string email)
     {
         return await _userManager.GetUserByEmailAsync(email);
     }
@@ -205,7 +205,7 @@ public class IdentityAuthentication(
         return await _roleManager.IsUserInRoleAsync(userId, roleName);
     }
 
-    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user)
+    public async Task<TokenResponse> GenerateTokensAsync(AspNetUser user)
     {
         return await _tokenManager.GenerateTokensAsync(user);
     }

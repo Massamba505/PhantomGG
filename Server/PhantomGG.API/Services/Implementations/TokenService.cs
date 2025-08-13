@@ -23,7 +23,7 @@ public class TokenService(
     private readonly ApplicationDbContext _context = context;
     private readonly RoleManager _roleManager = roleManager;
 
-    private async Task<IEnumerable<Claim>> GetClaimsAsync(ApplicationUser user)
+    private async Task<IEnumerable<Claim>> GetClaimsAsync(AspNetUser user)
     {
         var claims = new List<Claim>
         {
@@ -47,7 +47,7 @@ public class TokenService(
         return claims;
     }
 
-    public async Task<string> GenerateAccessTokenAsync(ApplicationUser user)
+    public async Task<string> GenerateAccessTokenAsync(AspNetUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
@@ -68,7 +68,7 @@ public class TokenService(
         return tokenHandler.WriteToken(token);
     }
 
-    public RefreshToken GenerateRefreshToken(ApplicationUser user)
+    public RefreshToken GenerateRefreshToken(AspNetUser user)
     {
         var randomBytes = new byte[64];
         using var rng = RandomNumberGenerator.Create();
@@ -86,7 +86,7 @@ public class TokenService(
         return refreshTokenEntity;
     }
 
-    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user)
+    public async Task<TokenResponse> GenerateTokensAsync(AspNetUser user)
     {
         var accessToken = await GenerateAccessTokenAsync(user);
 

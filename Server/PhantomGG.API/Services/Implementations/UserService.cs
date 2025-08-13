@@ -7,11 +7,11 @@ using PhantomGG.API.Services.Interfaces;
 namespace PhantomGG.API.Services.Implementations;
 
 public class UserService(
-    UserManager<ApplicationUser> userManager,
+    UserManager<AspNetUser> userManager,
     ICurrentUserService currentUser
     ) : IUserService
 {
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly UserManager<AspNetUser> _userManager = userManager;
     private readonly ICurrentUserService _currentUser = currentUser;
 
     public async Task<UserProfileDto> GetUserProfileAsync(Guid userId)
@@ -73,5 +73,5 @@ public class UserService(
 
         await _userManager.UpdateAsync(user);
     }
-    
+
 }

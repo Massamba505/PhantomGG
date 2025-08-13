@@ -7,32 +7,32 @@ namespace PhantomGG.API.Services.Interfaces;
 public interface IIdentityAuthentication
 {
     Task<AuthResponse> RegisterAsync(RegisterRequest request);
-    
+
     Task<AuthResponse> LoginAsync(LoginRequest request);
-    
+
     Task<AuthResponse> RefreshTokenAsync(string refreshToken);
-    
+
     Task<bool> LogoutAsync(string refreshToken);
-    
+
     Task<UserProfileDto?> GetCurrentUserAsync(Guid userId);
-    
-    Task<ApplicationUser?> GetUserByIdAsync(Guid userId);
-    
-    Task<ApplicationUser?> GetUserByEmailAsync(string email);
-    
+
+    Task<AspNetUser?> GetUserByIdAsync(Guid userId);
+
+    Task<AspNetUser?> GetUserByEmailAsync(string email);
+
     Task<bool> UserExistsAsync(string email);
-    
+
     Task<bool> AddUserToRoleAsync(Guid userId, string roleName);
-    
+
     Task<bool> RemoveUserFromRoleAsync(Guid userId, string roleName);
-    
+
     Task<IList<string>> GetUserRolesAsync(Guid userId);
-    
+
     Task<bool> IsUserInRoleAsync(Guid userId, string roleName);
-    
-    Task<TokenResponse> GenerateTokensAsync(ApplicationUser user);
-    
+
+    Task<TokenResponse> GenerateTokensAsync(AspNetUser user);
+
     Task<bool> RevokeTokenAsync(string token);
-    
+
     Task<RefreshToken?> ValidateRefreshTokenAsync(string token);
 }

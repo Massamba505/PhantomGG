@@ -5,7 +5,7 @@ namespace PhantomGG.API.Services.Managers.Interfaces;
 
 public interface ITokenManager
 {
-    Task<TokenResponse> GenerateTokensAsync(ApplicationUser user);
+    Task<TokenResponse> GenerateTokensAsync(AspNetUser user);
     Task<RefreshToken?> ValidateRefreshTokenAsync(string token);
     Task<bool> RevokeTokenAsync(string token);
 }

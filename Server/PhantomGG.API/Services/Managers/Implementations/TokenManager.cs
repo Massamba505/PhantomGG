@@ -15,22 +15,22 @@ namespace PhantomGG.API.Services.Managers.Implementations;
 public class TokenManager(
     ApplicationDbContext context,
     JwtConfig jwtConfig,
-    Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager
+    Microsoft.AspNetCore.Identity.UserManager<AspNetUser> userManager
     ) : ITokenManager
 {
     private readonly ApplicationDbContext _context = context;
     private readonly JwtConfig _jwtConfig = jwtConfig;
-    private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager = userManager;
+    private readonly Microsoft.AspNetCore.Identity.UserManager<AspNetUser> _userManager = userManager;
 
-    public async Task<TokenResponse> GenerateTokensAsync(ApplicationUser user)
+    public async Task<TokenResponse> GenerateTokensAsync(AspNetUser user)
     {
         var accessToken = GenerateAccessToken(user);
-        
+
         var refreshToken = GenerateRefreshToken(user);
-        
+
         _context.RefreshTokens.Add(refreshToken);
         await _context.SaveChangesAsync();
-        
+
         return new TokenResponse
         {
             AccessToken = accessToken,
@@ -44,12 +44,12 @@ public class TokenManager(
     {
         var storedToken = await _context.RefreshTokens
             .SingleOrDefaultAsync(t => t.Token == token);
-            
+
         if (storedToken == null || !storedToken.IsActive)
         {
             return null;
         }
-        
+
         return storedToken;
     }
 
@@ -57,25 +57,25 @@ public class TokenManager(
     {
         var storedToken = await _context.RefreshTokens
             .SingleOrDefaultAsync(t => t.Token == token);
-            
+
         if (storedToken == null)
         {
             return false;
         }
-        
+
         storedToken.RevokedAt = DateTime.UtcNow;
-        
+
         _context.RefreshTokens.Update(storedToken);
         await _context.SaveChangesAsync();
-        
+
         return true;
     }
 
-    private string GenerateAccessToken(ApplicationUser user)
+    private string GenerateAccessToken(AspNetUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
-        
+
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -98,7 +98,7 @@ public class TokenManager(
             Issuer = _jwtConfig.Issuer,
             Audience = _jwtConfig.Audience,
             SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key), 
+                new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
         };
 
@@ -106,13 +106,13 @@ public class TokenManager(
         return tokenHandler.WriteToken(token);
     }
 
-    private RefreshToken GenerateRefreshToken(ApplicationUser user)
+    private RefreshToken GenerateRefreshToken(AspNetUser user)
     {
         var randomBytes = new byte[64];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomBytes);
         var refreshToken = Convert.ToBase64String(randomBytes);
-        
+
         var refreshTokenEntity = new RefreshToken
         {
             UserId = user.Id,

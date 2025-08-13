@@ -136,7 +136,7 @@ public class Program
         }
 
         services.AddSingleton(identitySettings);
-        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+        services.AddIdentity<AspNetUser, IdentityRole<Guid>>(options =>
         {
             options.Password = identitySettings.Password;
             options.Lockout = identitySettings.Lockout;

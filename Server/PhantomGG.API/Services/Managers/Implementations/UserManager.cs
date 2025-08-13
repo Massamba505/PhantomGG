@@ -8,18 +8,18 @@ using PhantomGG.API.Services.Managers.Interfaces;
 namespace PhantomGG.API.Services.Managers.Implementations;
 
 public class UserManager(
-    UserManager<ApplicationUser> userManager,
+    UserManager<AspNetUser> userManager,
     IRoleManager roleManager,
-    SignInManager<ApplicationUser> signInManager
+    SignInManager<AspNetUser> signInManager
     ) : IUserManager
 {
-    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly UserManager<AspNetUser> _userManager = userManager;
     private readonly IRoleManager _roleManager = roleManager;
-    private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+    private readonly SignInManager<AspNetUser> _signInManager = signInManager;
 
-    public async Task<ApplicationUser> CreateUserAsync(RegisterRequest request, UserRoles role)
+    public async Task<AspNetUser> CreateUserAsync(RegisterRequest request, UserRoles role)
     {
-        var newUser = new ApplicationUser
+        var newUser = new AspNetUser
         {
             UserName = request.Email,
             Email = request.Email,
@@ -42,12 +42,12 @@ public class UserManager(
         return newUser;
     }
 
-    public async Task<ApplicationUser?> GetUserByIdAsync(Guid userId)
+    public async Task<AspNetUser?> GetUserByIdAsync(Guid userId)
     {
         return await _userManager.FindByIdAsync(userId.ToString());
     }
 
-    public async Task<ApplicationUser?> GetUserByEmailAsync(string email)
+    public async Task<AspNetUser?> GetUserByEmailAsync(string email)
     {
         return await _userManager.FindByEmailAsync(email);
     }
@@ -90,7 +90,7 @@ public class UserManager(
         };
     }
 
-    public UserDto MapToUserDto(ApplicationUser user)
+    public UserDto MapToUserDto(AspNetUser user)
     {
         var roles = _userManager.GetRolesAsync(user).GetAwaiter().GetResult();
 

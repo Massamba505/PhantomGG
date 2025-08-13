@@ -8,12 +8,12 @@ namespace PhantomGG.API.Services.Managers.Interfaces;
 
 public interface IUserManager
 {
-    Task<ApplicationUser> CreateUserAsync(RegisterRequest request, UserRoles role);
-    Task<ApplicationUser?> GetUserByIdAsync(Guid userId);
-    Task<ApplicationUser?> GetUserByEmailAsync(string email);
+    Task<AspNetUser> CreateUserAsync(RegisterRequest request, UserRoles role);
+    Task<AspNetUser?> GetUserByIdAsync(Guid userId);
+    Task<AspNetUser?> GetUserByEmailAsync(string email);
     Task<bool> UserExistsAsync(string email);
     Task<SignInResult> ValidateCredentialsAsync(string email, string password, bool lockoutOnFailure = true);
     Task<UserProfileDto?> GetUserProfileAsync(Guid userId);
-    UserDto MapToUserDto(ApplicationUser user);
+    UserDto MapToUserDto(AspNetUser user);
     Task SignOutAsync();
 }
