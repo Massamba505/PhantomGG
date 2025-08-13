@@ -8,8 +8,7 @@ namespace PhantomGG.API.Services.Implementations;
 
 public class UserService(
     UserManager<AspNetUser> userManager,
-    ICurrentUserService currentUser
-    ) : IUserService
+    ICurrentUserService currentUser) : IUserService
 {
     private readonly UserManager<AspNetUser> _userManager = userManager;
     private readonly ICurrentUserService _currentUser = currentUser;

@@ -4,9 +4,9 @@ using PhantomGG.API.Services.Interfaces;
 
 namespace PhantomGG.API.Services.Implementations;
 
-public class CookieService(JwtConfig jwtConfig ) : ICookieService
+public class CookieService(JwtSettings JwtSettings ) : ICookieService
 {
-    private readonly JwtConfig _jwtConfig = jwtConfig;
+    private readonly JwtSettings _JwtSettings = JwtSettings;
 
     public void SetAuthCookies(HttpResponse response, TokenResponse tokenResponse, bool rememberMe = false)
     {        
@@ -21,7 +21,7 @@ public class CookieService(JwtConfig jwtConfig ) : ICookieService
         if (rememberMe)
         {
             refreshCookieOptions.Expires = tokenResponse.RefreshTokenExpires;
-            refreshCookieOptions.MaxAge = TimeSpan.FromDays(_jwtConfig.RefreshTokenExpiryDays);
+            refreshCookieOptions.MaxAge = TimeSpan.FromDays(_JwtSettings.RefreshTokenExpiryDays);
         }
         
         response.Cookies.Append("refreshToken", tokenResponse.RefreshToken, refreshCookieOptions);

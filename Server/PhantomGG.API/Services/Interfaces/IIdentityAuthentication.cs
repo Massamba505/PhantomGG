@@ -26,7 +26,7 @@ public interface IIdentityAuthentication
 
     Task<bool> RemoveUserFromRoleAsync(Guid userId, string roleName);
 
-    Task<IList<string>> GetUserRolesAsync(Guid userId);
+    Task<IEnumerable<string>> GetUserRolesAsync(Guid userId);
 
     Task<bool> IsUserInRoleAsync(Guid userId, string roleName);
 

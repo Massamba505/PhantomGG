@@ -6,6 +6,7 @@ BEGIN
         Token NVARCHAR(100) NOT NULL,
         ExpiresAt DATETIME2 NOT NULL,
         CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+        IsActive BIT NOT NULL DEFAULT 1
         
         CONSTRAINT FK_RefreshTokens_AspNetUsers FOREIGN KEY (UserId) 
             REFERENCES AspNetUsers(Id) ON DELETE CASCADE

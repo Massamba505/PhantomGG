@@ -14,13 +14,13 @@ using System.Text;
 namespace PhantomGG.API.Services.Implementations;
 
 public class TokenService(
-    JwtConfig jwtConfig,
-    ApplicationDbContext context,
+    JwtSettings jwtSettings,
+    PhantomGGContext context,
     RoleManager roleManager
     ) : ITokenService
 {
-    private readonly JwtConfig _jwtConfig = jwtConfig;
-    private readonly ApplicationDbContext _context = context;
+    private readonly JwtSettings _jwtSettings = jwtSettings;
+    private readonly PhantomGGContext _context = context;
     private readonly RoleManager _roleManager = roleManager;
 
     private async Task<IEnumerable<Claim>> GetClaimsAsync(AspNetUser user)
@@ -50,15 +50,15 @@ public class TokenService(
     public async Task<string> GenerateAccessTokenAsync(AspNetUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+        var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
         var claims = await GetClaimsAsync(user);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpiryMinutes),
-            Issuer = _jwtConfig.Issuer,
-            Audience = _jwtConfig.Audience,
+            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
+            Issuer = _jwtSettings.Issuer,
+            Audience = _jwtSettings.Audience,
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
@@ -79,7 +79,7 @@ public class TokenService(
         {
             UserId = user.Id,
             Token = refreshToken,
-            ExpiresAt = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpiryDays),
+            ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryDays),
             CreatedAt = DateTime.UtcNow,
         };
 
@@ -99,7 +99,7 @@ public class TokenService(
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
-            AccessTokenExpires = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpiryMinutes),
+            AccessTokenExpires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
             RefreshTokenExpires = refreshToken.ExpiresAt
         };
     }
@@ -112,7 +112,7 @@ public class TokenService(
             throw new SecurityTokenException("Invalid refresh token");
         }
 
-        var user = await _context.Users.FindAsync(storedToken.UserId);
+        var user = await _context.AspNetUsers.FindAsync(storedToken.UserId);
         if (user == null)
         {
             throw new SecurityTokenException("User not found");
@@ -133,7 +133,7 @@ public class TokenService(
             return false;
         }
 
-        storedToken.RevokedAt = DateTime.UtcNow;
+        storedToken.IsActive = false;
 
         _context.RefreshTokens.Update(storedToken);
         await _context.SaveChangesAsync();

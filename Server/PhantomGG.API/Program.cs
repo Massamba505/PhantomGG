@@ -52,14 +52,6 @@ public class Program
         app.UseAuthorization();
         app.MapControllers();
 
-        // Apply EF Core migrations on startup to ensure identity tables are created
-        using (var scope = app.Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            dbContext.Database.Migrate();
-            Console.WriteLine("Applied Entity Framework Core migrations");
-        }
-
         app.Run();
     }
 
@@ -123,7 +115,7 @@ public class Program
 
     private static void ConfigureDatabase(IServiceCollection services, IConfiguration config)
     {
-        services.AddDbContext<ApplicationDbContext>(options =>
+        services.AddDbContext<PhantomGGContext>(options =>
             options.UseSqlServer(config.GetConnectionString("PhantomDb")));
     }
 
@@ -142,13 +134,13 @@ public class Program
             options.Lockout = identitySettings.Lockout;
             options.User = identitySettings.User;
         })
-        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddEntityFrameworkStores<PhantomGGContext>()
         .AddDefaultTokenProviders();
     }
 
     private static void ConfigureJwt(IServiceCollection services, ConfigurationManager configuration)
     {
-        var jwtConfig = configuration.GetSection("JwtConfig").Get<JwtConfig>();
+        var jwtConfig = configuration.GetSection("JwtSettings").Get<JwtSettings>();
         if (jwtConfig == null)
         {
             throw new InvalidOperationException("JWT configuration is not set");

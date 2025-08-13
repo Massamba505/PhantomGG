@@ -28,6 +28,8 @@ public partial class PhantomGGContext : DbContext
 
     public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
 
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AspNetRole>(entity =>
@@ -103,10 +105,11 @@ public partial class PhantomGGContext : DbContext
 
         modelBuilder.Entity<RefreshToken>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__RefreshT__3214EC0705FFB969");
+            entity.HasKey(e => e.Id).HasName("PK__RefreshT__3214EC074D24CA7D");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Token).HasMaxLength(100);
 
             entity.HasOne(d => d.User).WithMany(p => p.RefreshTokens)

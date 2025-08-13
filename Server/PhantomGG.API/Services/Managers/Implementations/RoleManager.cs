@@ -6,8 +6,7 @@ namespace PhantomGG.API.Services.Managers.Implementations;
 
 public class RoleManager(
     UserManager<AspNetUser> userManager,
-    RoleManager<IdentityRole<Guid>> roleManager
-    ) : IRoleManager
+    RoleManager<IdentityRole<Guid>> roleManager) : IRoleManager
 {
     private readonly UserManager<AspNetUser> _userManager = userManager;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager = roleManager;
@@ -38,7 +37,7 @@ public class RoleManager(
         return result.Succeeded;
     }
 
-    public async Task<IList<string>> GetUserRolesAsync(Guid userId)
+    public async Task<IEnumerable<string>> GetUserRolesAsync(Guid userId)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)

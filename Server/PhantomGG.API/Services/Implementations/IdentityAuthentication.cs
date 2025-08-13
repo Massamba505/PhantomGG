@@ -195,7 +195,7 @@ public class IdentityAuthentication(
         return await _roleManager.RemoveUserFromRoleAsync(userId, roleName);
     }
 
-    public async Task<IList<string>> GetUserRolesAsync(Guid userId)
+    public async Task<IEnumerable<string>> GetUserRolesAsync(Guid userId)
     {
         return await _roleManager.GetUserRolesAsync(userId);
     }

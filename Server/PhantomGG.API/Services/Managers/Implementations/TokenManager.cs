@@ -13,13 +13,13 @@ using System.Text;
 namespace PhantomGG.API.Services.Managers.Implementations;
 
 public class TokenManager(
-    ApplicationDbContext context,
-    JwtConfig jwtConfig,
+    PhantomGGContext context,
+    JwtSettings jwtSettings,
     Microsoft.AspNetCore.Identity.UserManager<AspNetUser> userManager
     ) : ITokenManager
 {
-    private readonly ApplicationDbContext _context = context;
-    private readonly JwtConfig _jwtConfig = jwtConfig;
+    private readonly PhantomGGContext _context = context;
+    private readonly JwtSettings _jwtSettings = jwtSettings;
     private readonly Microsoft.AspNetCore.Identity.UserManager<AspNetUser> _userManager = userManager;
 
     public async Task<TokenResponse> GenerateTokensAsync(AspNetUser user)
@@ -35,7 +35,7 @@ public class TokenManager(
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken.Token,
-            AccessTokenExpires = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpiryMinutes),
+            AccessTokenExpires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
             RefreshTokenExpires = refreshToken.ExpiresAt
         };
     }
@@ -63,7 +63,7 @@ public class TokenManager(
             return false;
         }
 
-        storedToken.RevokedAt = DateTime.UtcNow;
+        storedToken.IsActive = false;
 
         _context.RefreshTokens.Update(storedToken);
         await _context.SaveChangesAsync();
@@ -74,7 +74,7 @@ public class TokenManager(
     private string GenerateAccessToken(AspNetUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
+        var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
 
         var claims = new List<Claim>
         {
@@ -94,9 +94,9 @@ public class TokenManager(
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(_jwtConfig.AccessTokenExpiryMinutes),
-            Issuer = _jwtConfig.Issuer,
-            Audience = _jwtConfig.Audience,
+            Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
+            Issuer = _jwtSettings.Issuer,
+            Audience = _jwtSettings.Audience,
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
@@ -117,7 +117,7 @@ public class TokenManager(
         {
             UserId = user.Id,
             Token = refreshToken,
-            ExpiresAt = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenExpiryDays),
+            ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryDays),
             CreatedAt = DateTime.UtcNow
         };
 

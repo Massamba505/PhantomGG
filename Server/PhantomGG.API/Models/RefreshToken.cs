@@ -15,5 +15,7 @@ public partial class RefreshToken
 
     public DateTime CreatedAt { get; set; }
 
+    public bool IsActive { get; set; }
+
     public virtual AspNetUser User { get; set; } = null!;
 }
