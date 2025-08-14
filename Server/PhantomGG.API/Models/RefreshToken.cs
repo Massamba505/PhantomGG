@@ -22,11 +22,8 @@ public partial class RefreshToken
 
     // Helper properties
     [NotMapped]
-    public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
+    public bool IsActive => RevokedAt == null && ExpiresAt > DateTime.UtcNow;
 
     [NotMapped]
-    public bool IsRevoked => RevokedAt.HasValue;
-
-    [NotMapped]
-    public bool IsActive => !IsRevoked && !IsExpired;
+    public bool IsExpired => ExpiresAt <= DateTime.UtcNow;
 }

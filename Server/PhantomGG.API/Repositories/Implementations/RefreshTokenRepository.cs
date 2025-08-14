@@ -21,7 +21,21 @@ public class RefreshTokenRepository : IRefreshTokenRepository
             .FirstOrDefaultAsync(rt => rt.Token == token);
     }
 
-    public async Task<IEnumerable<RefreshToken>> GetActiveTokensByUserAsync(Guid userId)
+    public async Task<RefreshToken?> GetByIdAsync(Guid id)
+    {
+        return await _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.Id == id);
+    }
+
+    public async Task<IEnumerable<RefreshToken>> GetByUserIdAsync(Guid userId)
+    {
+        return await _context.RefreshTokens
+            .Where(rt => rt.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<RefreshToken>> GetActiveByUserIdAsync(Guid userId)
     {
         return await _context.RefreshTokens
             .Where(rt => rt.UserId == userId && rt.RevokedAt == null && rt.ExpiresAt > DateTime.UtcNow)
@@ -43,7 +57,17 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         return refreshToken;
     }
 
-    public async Task RevokeTokenAsync(string token)
+    public async Task DeleteAsync(Guid id)
+    {
+        var refreshToken = await _context.RefreshTokens.FindAsync(id);
+        if (refreshToken != null)
+        {
+            _context.RefreshTokens.Remove(refreshToken);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task RevokeAsync(string token)
     {
         var refreshToken = await _context.RefreshTokens
             .FirstOrDefaultAsync(rt => rt.Token == token);
@@ -69,7 +93,7 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteExpiredTokensAsync()
+    public async Task CleanupExpiredTokensAsync()
     {
         var expiredTokens = await _context.RefreshTokens
             .Where(rt => rt.ExpiresAt <= DateTime.UtcNow)
@@ -77,65 +101,5 @@ public class RefreshTokenRepository : IRefreshTokenRepository
 
         _context.RefreshTokens.RemoveRange(expiredTokens);
         await _context.SaveChangesAsync();
-    }
-}
-
-public class RoleRepository : IRoleRepository
-{
-    private readonly ApplicationDbContext _context;
-
-    public RoleRepository(ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task<Role?> GetByIdAsync(Guid id)
-    {
-        return await _context.Roles.FindAsync(id);
-    }
-
-    public async Task<Role?> GetByNameAsync(string name)
-    {
-        return await _context.Roles
-            .FirstOrDefaultAsync(r => r.Name.ToLower() == name.ToLower());
-    }
-
-    public async Task<IEnumerable<Role>> GetAllAsync()
-    {
-        return await _context.Roles.ToListAsync();
-    }
-
-    public async Task<Role> CreateAsync(Role role)
-    {
-        _context.Roles.Add(role);
-        await _context.SaveChangesAsync();
-        return role;
-    }
-
-    public async Task<Role> UpdateAsync(Role role)
-    {
-        _context.Roles.Update(role);
-        await _context.SaveChangesAsync();
-        return role;
-    }
-
-    public async Task DeleteAsync(Guid id)
-    {
-        var role = await _context.Roles.FindAsync(id);
-        if (role != null)
-        {
-            _context.Roles.Remove(role);
-            await _context.SaveChangesAsync();
-        }
-    }
-
-    public async Task<bool> ExistsAsync(Guid id)
-    {
-        return await _context.Roles.AnyAsync(r => r.Id == id);
-    }
-
-    public async Task<bool> NameExistsAsync(string name)
-    {
-        return await _context.Roles.AnyAsync(r => r.Name.ToLower() == name.ToLower());
     }
 }

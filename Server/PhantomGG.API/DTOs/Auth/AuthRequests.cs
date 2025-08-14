@@ -40,7 +40,7 @@ public class RegisterRequest
     public string ConfirmPassword { get; set; } = string.Empty;
 }
 
-public class RefreshTokenRequest
+public class RefreshRequest
 {
     [Required]
     public string RefreshToken { get; set; } = string.Empty;

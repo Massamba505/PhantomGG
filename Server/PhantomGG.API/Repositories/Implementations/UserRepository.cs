@@ -39,6 +39,13 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
     }
 
+    public async Task<User?> GetByNameAsync(string firstName, string lastName)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.FirstName.ToLower() == firstName.ToLower()
+                                   && u.LastName.ToLower() == lastName.ToLower());
+    }
+
     public async Task<User> CreateAsync(User user)
     {
         user.CreatedAt = DateTime.UtcNow;
@@ -75,6 +82,12 @@ public class UserRepository : IUserRepository
     public async Task<bool> EmailExistsAsync(string email)
     {
         return await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower());
+    }
+
+    public async Task<bool> NameExistsAsync(string firstName, string lastName)
+    {
+        return await _context.Users.AnyAsync(u => u.FirstName.ToLower() == firstName.ToLower()
+                                               && u.LastName.ToLower() == lastName.ToLower());
     }
 
     public async Task IncrementFailedLoginAttemptsAsync(Guid userId)
