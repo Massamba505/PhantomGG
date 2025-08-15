@@ -19,11 +19,4 @@ public partial class RefreshToken
     public DateTime? RevokedAt { get; set; }
 
     public virtual User User { get; set; } = null!;
-
-    // Helper properties
-    [NotMapped]
-    public bool IsActive => RevokedAt == null && ExpiresAt > DateTime.UtcNow;
-
-    [NotMapped]
-    public bool IsExpired => ExpiresAt <= DateTime.UtcNow;
 }

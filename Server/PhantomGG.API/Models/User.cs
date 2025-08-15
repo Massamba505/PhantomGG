@@ -35,11 +35,4 @@ public partial class User
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
     public virtual Role Role { get; set; } = null!;
-
-    // Helper properties
-    [NotMapped]
-    public string FullName => $"{FirstName} {LastName}";
-
-    [NotMapped]
-    public bool IsLockedOut => LockoutEnd.HasValue && LockoutEnd > DateTime.UtcNow;
 }
