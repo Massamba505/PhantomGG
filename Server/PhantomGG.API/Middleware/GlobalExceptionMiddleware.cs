@@ -35,7 +35,7 @@ public class GlobalExceptionMiddleware
         if (context.Response.HasStarted)
         {
             _logger.LogWarning("The response has already started, the global exception middleware will not be executed.");
-            return; 
+            return;
         }
 
         context.Response.Clear();
@@ -61,12 +61,12 @@ public class GlobalExceptionMiddleware
             Detail = detail
         };
 
-        var options = new JsonSerializerOptions 
-        { 
+        var options = new JsonSerializerOptions
+        {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
         };
-        
+
         var json = JsonSerializer.Serialize(problemDetails, options);
 
         await context.Response.WriteAsync(json);

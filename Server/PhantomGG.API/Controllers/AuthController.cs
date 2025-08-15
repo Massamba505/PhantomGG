@@ -1,14 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PhantomGG.API.DTOs.Auth;
+using PhantomGG.API.DTOs.Auth.Requests;
+using PhantomGG.API.DTOs.Auth.Responses;
 using PhantomGG.API.Services.Interfaces;
-using System.Security.Claims;
 
 namespace PhantomGG.API.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController : BaseController
 {
     private readonly IAuthService _authService;
 
@@ -20,169 +18,86 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Register a new user
     /// </summary>
-    /// <param name="request">Registration details</param>
-    /// <returns>Authentication response with tokens</returns>
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
     {
-        try
-        {
-            var response = await _authService.RegisterAsync(request);
-            return Ok(response);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "An error occurred during registration" });
-        }
+        var response = await _authService.RegisterAsync(request);
+        return Ok(response);
     }
 
     /// <summary>
     /// Login user
     /// </summary>
-    /// <param name="request">Login credentials</param>
-    /// <returns>Authentication response with tokens</returns>
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
-        try
-        {
-            var response = await _authService.LoginAsync(request);
-            return Ok(response);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "An error occurred during login" });
-        }
+        var response = await _authService.LoginAsync(request);
+        return Ok(response);
     }
 
     /// <summary>
     /// Refresh access token using refresh token
     /// </summary>
-    /// <param name="request">Refresh token request</param>
-    /// <returns>New token pair</returns>
     [HttpPost("refresh")]
-    public async Task<ActionResult<TokenResponse>> RefreshToken([FromBody] RefreshRequest request)
+    public async Task<ActionResult<TokenResponse>> RefreshToken()
     {
-        try
-        {
-            var response = await _authService.RefreshTokenAsync(request);
-            return Ok(response);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { message = ex.Message });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "An error occurred during token refresh" });
-        }
+        var response = await _authService.RefreshTokenAsync();
+        return Ok(response);
     }
 
     /// <summary>
     /// Revoke a refresh token
     /// </summary>
-    /// <param name="request">Token to revoke</param>
-    /// <returns>Success status</returns>
     [HttpPost("revoke")]
-    [Authorize]
-    public async Task<ActionResult> RevokeToken([FromBody] RefreshRequest request)
+    public async Task<ActionResult<LogoutResponse>> RevokeToken()
     {
-        try
+        var response = await _authService.RevokeTokenAsync();
+        if (response.Success)
         {
-            var success = await _authService.RevokeTokenAsync(request.RefreshToken);
-            if (success)
-            {
-                return Ok(new { message = "Token revoked successfully" });
-            }
-            return BadRequest(new { message = "Failed to revoke token" });
+            return Ok(response);
         }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "An error occurred during token revocation" });
-        }
+        return BadRequest(response);
     }
 
     /// <summary>
     /// Revoke all refresh tokens for the current user
     /// </summary>
-    /// <returns>Success status</returns>
     [HttpPost("revoke-all")]
     [Authorize]
-    public async Task<ActionResult> RevokeAllTokens()
+    public async Task<ActionResult<LogoutResponse>> RevokeAllTokens()
     {
-        try
+        if (CurrentUserId == null)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-            {
-                return Unauthorized(new { message = "Invalid user" });
-            }
+            throw new UnauthorizedAccessException("Invalid user");
+        }
 
-            var success = await _authService.RevokeAllUserTokensAsync(userId);
-            if (success)
-            {
-                return Ok(new { message = "All tokens revoked successfully" });
-            }
-            return BadRequest(new { message = "Failed to revoke tokens" });
-        }
-        catch (Exception)
+        var response = await _authService.RevokeAllUserTokensAsync(CurrentUserId.Value);
+        if (response.Success)
         {
-            return StatusCode(500, new { message = "An error occurred during token revocation" });
+            return Ok(response);
         }
+        return BadRequest(response);
     }
 
     /// <summary>
-    /// Get current user information (test endpoint for authentication)
+    /// Get current user information
     /// </summary>
-    /// <returns>Current user details</returns>
     [HttpGet("me")]
     [Authorize]
-    public ActionResult GetCurrentUser()
+    public async Task<ActionResult<AuthResponse>> GetCurrentUser()
     {
-        try
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            var emailClaim = User.FindFirst(ClaimTypes.Email);
-            var roleClaim = User.FindFirst(ClaimTypes.Role);
-
-            return Ok(new
-            {
-                id = userIdClaim?.Value,
-                email = emailClaim?.Value,
-                role = roleClaim?.Value,
-                isAuthenticated = User.Identity?.IsAuthenticated ?? false
-            });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "An error occurred retrieving user information" });
-        }
+        var response = await _authService.GetCurrentUserAsync();
+        return Ok(response);
     }
 
     /// <summary>
     /// Cleanup expired refresh tokens (admin only)
     /// </summary>
-    /// <returns>Success status</returns>
     [HttpPost("cleanup")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> CleanupExpiredTokens()
     {
-        try
-        {
-            await _authService.CleanupExpiredTokensAsync();
-            return Ok(new { message = "Expired tokens cleaned up successfully" });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new { message = "An error occurred during cleanup" });
-        }
+        await _authService.CleanupExpiredTokensAsync();
+        return Ok(new { message = "Expired tokens cleaned up successfully" });
     }
 }

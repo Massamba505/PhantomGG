@@ -18,49 +18,34 @@ public abstract class BaseController : ControllerBase
 
     protected string? CurrentUserEmail => User.FindFirstValue(ClaimTypes.Email);
 
-    protected IEnumerable<string> CurrentUserRoles => User.FindAll(ClaimTypes.Role).Select(c => c.Value);
+    protected string? CurrentUserRole => User.FindFirstValue(ClaimTypes.Role);
 
     protected bool IsInRole(string role) => User.IsInRole(role);
 
-    protected IActionResult Success<T>(T data, string message = "Success")
+    protected bool IsAdmin => IsInRole("Admin");
+
+    protected ActionResult Created<T>(string routeName, object routeValues, T resource)
     {
-        return Ok(new
-        {
-            success = true,
-            message,
-            data
-        });
+        return CreatedAtRoute(routeName, routeValues, resource);
     }
 
-    protected IActionResult Success(string message = "Success")
+    protected ActionResult NotFound(string message)
     {
-        return Ok(new
-        {
-            success = true,
-            message
-        });
+        return NotFound(new { message });
     }
 
-    protected IActionResult Error(string message, int statusCode = 400)
+    protected ActionResult BadRequest(string message)
     {
-        return StatusCode(statusCode, new
-        {
-            success = false,
-            message
-        });
+        return BadRequest(new { message });
     }
 
-    protected IActionResult ValidationError(string message = "Validation failed")
+    protected ActionResult Forbidden(string message = "You don't have permission to access this resource")
     {
-        return BadRequest(new
-        {
-            success = false,
-            message,
-            errors = ModelState.Where(x => x.Value?.Errors.Count > 0)
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.Value?.Errors.Select(e => e.ErrorMessage).ToArray()
-                )
-        });
+        return StatusCode(403, new { message });
+    }
+
+    protected ActionResult Conflict(string message)
+    {
+        return StatusCode(409, new { message });
     }
 }

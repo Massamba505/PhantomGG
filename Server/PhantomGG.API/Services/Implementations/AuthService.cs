@@ -1,5 +1,9 @@
 using BCrypt.Net;
+using Microsoft.AspNetCore.Http;
 using PhantomGG.API.DTOs.Auth;
+using PhantomGG.API.DTOs.Auth.Requests;
+using PhantomGG.API.DTOs.Auth.Responses;
+using PhantomGG.API.DTOs.User.Responses;
 using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
@@ -12,20 +16,26 @@ public class AuthService : IAuthService
     private readonly IRoleRepository _roleRepository;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly ITokenService _tokenService;
+    private readonly ICookieService _cookieService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public AuthService(
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IRefreshTokenRepository refreshTokenRepository,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        ICookieService cookieService,
+        IHttpContextAccessor httpContextAccessor)
     {
         _userRepository = userRepository;
         _roleRepository = roleRepository;
         _refreshTokenRepository = refreshTokenRepository;
         _tokenService = tokenService;
+        _cookieService = cookieService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
+    public async Task<DTOs.Auth.Responses.AuthResponse> RegisterAsync(DTOs.Auth.Requests.RegisterRequest request)
     {
         // Check if user already exists
         var existingUser = await _userRepository.GetByEmailAsync(request.Email);
@@ -82,16 +92,26 @@ public class AuthService : IAuthService
 
         await _refreshTokenRepository.CreateAsync(refreshTokenEntity);
 
-        return new AuthResponse
+        // Create token response
+        var tokenResponse = new DTOs.Auth.Responses.TokenResponse
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
-            User = new DTOs.User.UserDto
+            AccessTokenExpires = DateTime.UtcNow.AddMinutes(15),
+            RefreshTokenExpires = refreshTokenEntity.ExpiresAt
+        };
+
+        _cookieService.SetAuthCookies(_httpContextAccessor.HttpContext!.Response, tokenResponse, false);
+
+        return new AuthResponse
+        {
+            AccessToken = accessToken,
+            User = new UserDto
             {
                 Id = createdUser.Id,
                 FirstName = createdUser.FirstName,
                 LastName = createdUser.LastName,
-                FullName = createdUser.FullName,
+                FullName = $"{createdUser.FirstName} {createdUser.LastName}",
                 Email = createdUser.Email,
                 Role = userRole.Name,
                 CreatedAt = createdUser.CreatedAt
@@ -99,27 +119,53 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<AuthResponse> LoginAsync(LoginRequest request)
+    public async Task<DTOs.Auth.Responses.AuthResponse> LoginAsync(DTOs.Auth.Requests.LoginRequest request)
     {
         // Find user by email
-        var user = await _userRepository.GetByEmailAsync(request.Email);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        var user = await _userRepository.GetByEmailWithRoleAsync(request.Email);
+        if (user == null)
         {
             throw new UnauthorizedAccessException("Invalid email or password");
         }
 
-        // Get user role
-        var role = await _roleRepository.GetByIdAsync(user.RoleId);
-        if (role == null)
+        // Check if user is locked out
+        if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow)
         {
-            throw new InvalidOperationException("User role not found");
+            throw new InvalidOperationException("Account is temporarily locked. Please try again later.");
         }
 
-        // Revoke existing refresh tokens (optional - for single session)
-        // await _refreshTokenRepository.RevokeAllUserTokensAsync(user.Id);
+        // Verify password
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        {
+            // Increment failed login attempts
+            await _userRepository.IncrementFailedLoginAttemptsAsync(user.Id);
+
+            // Check if we should lock the account (after 5 failed attempts)
+            if (user.FailedLoginAttempts >= 4) // It will become 5 after the increment
+            {
+                await _userRepository.SetLockoutAsync(user.Id, DateTime.UtcNow.AddMinutes(15));
+            }
+
+            throw new UnauthorizedAccessException("Invalid email or password");
+        }
+
+        // Reset failed login attempts
+        await _userRepository.ResetFailedLoginAttemptsAsync(user.Id);
+
+        // Revoke any existing tokens if not remembered
+        var existingTokens = await _refreshTokenRepository.GetActiveByUserIdAsync(user.Id);
+        foreach (var token in existingTokens)
+        {
+            // Only revoke tokens that weren't created with RememberMe
+            if (token.ExpiresAt < DateTime.UtcNow.AddDays(7))
+            {
+                token.RevokedAt = DateTime.UtcNow;
+                await _refreshTokenRepository.UpdateAsync(token);
+            }
+        }
 
         // Generate new tokens
-        var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Email, role.Name);
+        var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Email, user.Role.Name);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
         // Save refresh token
@@ -128,107 +174,173 @@ public class AuthService : IAuthService
             Id = Guid.NewGuid(),
             Token = refreshToken,
             UserId = user.Id,
-            ExpiresAt = DateTime.UtcNow.AddDays(7), // 7 days
+            ExpiresAt = request.RememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddHours(24),
             CreatedAt = DateTime.UtcNow
         };
 
         await _refreshTokenRepository.CreateAsync(refreshTokenEntity);
 
-        return new AuthResponse
+        // Create token response
+        var tokenResponse = new DTOs.Auth.Responses.TokenResponse
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
-            User = new DTOs.User.UserDto
+            AccessTokenExpires = DateTime.UtcNow.AddMinutes(15),
+            RefreshTokenExpires = refreshTokenEntity.ExpiresAt
+        };
+
+        _cookieService.SetAuthCookies(_httpContextAccessor.HttpContext!.Response, tokenResponse, request.RememberMe);
+
+        return new AuthResponse
+        {
+            AccessToken = accessToken,
+            User = new UserDto
             {
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                FullName = user.FullName,
+                FullName = $"{user.FirstName} {user.LastName}",
                 Email = user.Email,
-                Role = role.Name,
+                Role = user.Role.Name,
                 CreatedAt = user.CreatedAt
             }
         };
     }
 
-    public async Task<TokenResponse> RefreshTokenAsync(RefreshRequest request)
+    public async Task<DTOs.Auth.Responses.TokenResponse> RefreshTokenAsync()
     {
-        // Find refresh token
-        var refreshToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken);
-        if (refreshToken == null || !refreshToken.IsActive)
+        // Get token from cookie
+        var refreshToken = _httpContextAccessor.HttpContext!.Request.Cookies["refreshToken"];
+        if (string.IsNullOrEmpty(refreshToken))
         {
-            throw new UnauthorizedAccessException("Invalid or expired refresh token");
+            throw new InvalidOperationException("Invalid or missing refresh token.");
         }
 
-        // Get user and role
-        var user = refreshToken.User;
+        // Validate refresh token
+        var token = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
+        if (token == null || token.RevokedAt != null || token.ExpiresAt < DateTime.UtcNow)
+        {
+            _cookieService.ClearAuthCookies(_httpContextAccessor.HttpContext!.Response);
+            throw new InvalidOperationException("Invalid or expired refresh token.");
+        }
+
+        // Get user with role
+        var user = await _userRepository.GetByIdWithRoleAsync(token.UserId);
         if (user == null)
         {
-            throw new InvalidOperationException("User not found");
+            _cookieService.ClearAuthCookies(_httpContextAccessor.HttpContext!.Response);
+            throw new InvalidOperationException("User not found.");
         }
 
-        var role = await _roleRepository.GetByIdAsync(user.RoleId);
-        if (role == null)
-        {
-            throw new InvalidOperationException("User role not found");
-        }
+        // Determine if this was a "remember me" token by looking at expiration date
+        // If it expires more than 2 days from creation, it was a "remember me" token
+        bool rememberMe = (token.ExpiresAt - token.CreatedAt).TotalDays > 2;
 
-        // Generate new access token
-        var newAccessToken = _tokenService.GenerateAccessToken(user.Id, user.Email, role.Name);
-
-        // Optionally generate new refresh token and revoke old one
+        // Generate new tokens
+        var accessToken = _tokenService.GenerateAccessToken(user.Id, user.Email, user.Role.Name);
         var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-        // Revoke old refresh token
-        await _refreshTokenRepository.RevokeAsync(request.RefreshToken);
+        // Revoke old token
+        token.RevokedAt = DateTime.UtcNow;
+        await _refreshTokenRepository.UpdateAsync(token);
 
         // Save new refresh token
-        var newRefreshTokenEntity = new RefreshToken
+        var refreshTokenEntity = new RefreshToken
         {
             Id = Guid.NewGuid(),
             Token = newRefreshToken,
             UserId = user.Id,
-            ExpiresAt = DateTime.UtcNow.AddDays(7), // 7 days
+            ExpiresAt = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddHours(24),
             CreatedAt = DateTime.UtcNow
         };
 
-        await _refreshTokenRepository.CreateAsync(newRefreshTokenEntity);
+        await _refreshTokenRepository.CreateAsync(refreshTokenEntity);
 
-        return new TokenResponse
+        // Create token response
+        var tokenResponse = new DTOs.Auth.Responses.TokenResponse
         {
-            AccessToken = newAccessToken,
-            RefreshToken = newRefreshToken
+            AccessToken = accessToken,
+            RefreshToken = newRefreshToken,
+            AccessTokenExpires = DateTime.UtcNow.AddMinutes(15),
+            RefreshTokenExpires = refreshTokenEntity.ExpiresAt
         };
+
+        // Set refresh token in cookie
+        _cookieService.SetAuthCookies(_httpContextAccessor.HttpContext!.Response, tokenResponse, rememberMe);
+
+        return tokenResponse;
     }
 
-    public async Task<bool> RevokeTokenAsync(string token)
+    public async Task<LogoutResponse> RevokeTokenAsync()
     {
-        try
+        // Get token from cookie
+        var refreshToken = _httpContextAccessor.HttpContext!.Request.Cookies["refreshToken"];
+        if (string.IsNullOrEmpty(refreshToken))
         {
-            await _refreshTokenRepository.RevokeAsync(token);
-            return true;
+            return new LogoutResponse { Success = false, Message = "No refresh token found." };
         }
-        catch
-        {
-            return false;
-        }
+
+        // Remove cookie
+        _cookieService.ClearAuthCookies(_httpContextAccessor.HttpContext!.Response);
+
+        // Revoke token in database
+        await _refreshTokenRepository.RevokeAsync(refreshToken);
+
+        return new LogoutResponse { Success = true, Message = "Successfully logged out." };
     }
 
-    public async Task<bool> RevokeAllUserTokensAsync(Guid userId)
+    public async Task<LogoutResponse> RevokeAllUserTokensAsync(Guid userId)
     {
-        try
-        {
-            await _refreshTokenRepository.RevokeAllUserTokensAsync(userId);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        await _refreshTokenRepository.RevokeAllUserTokensAsync(userId);
+        _cookieService.ClearAuthCookies(_httpContextAccessor.HttpContext!.Response);
+
+        return new LogoutResponse { Success = true, Message = "Successfully revoked all tokens." };
     }
 
     public async Task CleanupExpiredTokensAsync()
     {
         await _refreshTokenRepository.CleanupExpiredTokensAsync();
+    }
+
+    public async Task<AuthResponse> GetCurrentUserAsync()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+        {
+            throw new InvalidOperationException("User not authenticated.");
+        }
+
+        var user = await _userRepository.GetByIdWithRoleAsync(userId.Value);
+        if (user == null)
+        {
+            throw new InvalidOperationException("User not found.");
+        }
+
+        return new AuthResponse
+        {
+            AccessToken = "",  // Client already has this token
+            User = new UserDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                FullName = $"{user.FirstName} {user.LastName}",
+                Email = user.Email,
+                Role = user.Role.Name,
+                CreatedAt = user.CreatedAt
+            }
+        };
+    }
+
+    private Guid? GetCurrentUserId()
+    {
+        var authHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].FirstOrDefault();
+        if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+        {
+            return null;
+        }
+
+        var token = authHeader.Substring("Bearer ".Length);
+        return _tokenService.GetUserIdFromToken(token);
     }
 }

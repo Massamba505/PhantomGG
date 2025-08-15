@@ -168,6 +168,7 @@ public class Program
 
         // Register services
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ICookieService, CookieService>();
         services.AddScoped<IAuthService, AuthService>();
     }
 }

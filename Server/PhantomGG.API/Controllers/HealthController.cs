@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace PhantomGG.API.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
-public class HealthController : ControllerBase
+public class HealthController : BaseController
 {
     /// <summary>
     /// Health check endpoint
