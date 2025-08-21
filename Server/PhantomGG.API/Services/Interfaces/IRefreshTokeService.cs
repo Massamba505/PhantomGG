@@ -8,6 +8,6 @@ public interface IRefreshTokeService
     Task<RefreshToken?> GetByTokenAsync(string token);
     Task<IEnumerable<RefreshToken>> GetActiveByUserIdAsync(Guid userId);
     Task<RefreshTokenDto> AddRefreshToken(User user);
-    Task RevokeAsync(RefreshToken token);
+    Task<RefreshToken> RevokeAsync(string refreshTokenFromCookien);
     Task RevokeAllForUserAsync(Guid userId);
 }

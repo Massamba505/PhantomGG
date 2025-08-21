@@ -1,6 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import {
-  AuthResponse,
   LoginRequest,
   SignUpRequest,
 } from '@/app/shared/models/Authentication';
@@ -50,18 +49,10 @@ export class AuthStateService {
       tap((res: any) => {
         this.loadingSignal.set(false);
 
-        if (res.success && res.accessToken) {
-          this.tokenService.setToken(res.accessToken);
-
-          if (res.accessTokenExpires) {
-            this.tokenService.setTokenExpiry(res.accessTokenExpires);
-          }
-
-          if (res.user) {
-            this.userSignal.set(res.user);
-          } else {
-            this.loadUser();
-          }
+        if (res.success) {
+          this.tokenService.setToken(res.data.accessToken);
+          this.tokenService.setTokenExpiry(res.data.accessTokenExpiresAt);
+          this.userSignal.set(res.data.user);
         } else {
           this.errorSignal.set(res.message ?? 'Login failed');
         }
@@ -82,18 +73,10 @@ export class AuthStateService {
       tap((res: any) => {
         this.loadingSignal.set(false);
 
-        if (res.success && res.accessToken) {
-          this.tokenService.setToken(res.accessToken);
-
-          if (res.accessTokenExpires) {
-            this.tokenService.setTokenExpiry(res.accessTokenExpires);
-          }
-
-          if (res.user) {
-            this.userSignal.set(res.user);
-          } else {
-            this.loadUser();
-          }
+        if (res.success && res.data.accessToken) {
+          this.tokenService.setToken(res.data.accessToken);
+          this.tokenService.setTokenExpiry(res.data.accessTokenExpiresAt);
+          this.userSignal.set(res.data.user);
         } else {
           this.errorSignal.set(res.message ?? 'Signup failed');
         }
@@ -136,12 +119,9 @@ export class AuthStateService {
       tap((res: any) => {
         this.loadingSignal.set(false);
 
-        if (res.success && res.accessToken) {
-          this.tokenService.setToken(res.accessToken);
-
-          if (res.accessTokenExpires) {
-            this.tokenService.setTokenExpiry(res.accessTokenExpires);
-          }
+        if (res.success) {
+          this.tokenService.setToken(res.data.accessToken);
+          this.tokenService.setTokenExpiry(res.data.accessTokenExpiresAt);
         } else {
           this.logout();
         }
@@ -157,9 +137,9 @@ export class AuthStateService {
   loadUser() {
     this.loadingSignal.set(true);
     return this.authService.getMe().pipe(
-      tap((response: AuthResponse) => {
+      tap((res: any) => {
         this.loadingSignal.set(false);
-        this.userSignal.set(response.user || null);
+        this.userSignal.set(res.data);
       }),
       catchError((err) => {
         this.loadingSignal.set(false);

@@ -1,4 +1,5 @@
 ﻿using PhantomGG.API.DTOs.AuthToken;
+using PhantomGG.API.Exceptions;
 using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Security.Interfaces;
@@ -51,8 +52,32 @@ public class RefreshTokenService(
         await _refreshTokenRepository.RevokeAllForUserAsync(userId);
     }
 
-    public async Task RevokeAsync(RefreshToken token)
+    public async Task<RefreshToken> RevokeAsync(string refreshTokenFromCookie)
     {
-        await _refreshTokenRepository.RevokeAsync(token);
+        if (string.IsNullOrWhiteSpace(refreshTokenFromCookie))
+        {
+            throw new UnauthorizedException("Refresh token is required");
+        }
+
+        var refreshTokenEntity = await GetByTokenAsync(refreshTokenFromCookie);
+        if (refreshTokenEntity == null)
+        {
+            throw new UnauthorizedException("Invalid refresh token");
+        }
+
+        if (refreshTokenEntity.RevokedAt.HasValue)
+        {
+            await RevokeAllForUserAsync(refreshTokenEntity.UserId);
+            throw new UnauthorizedException("Token reuse detected. All tokens revoked.");
+        }
+
+        if (refreshTokenEntity.ExpiresAt <= DateTime.UtcNow)
+        {
+            throw new UnauthorizedException("Refresh token has expired");
+        }
+
+        await _refreshTokenRepository.RevokeAsync(refreshTokenEntity);
+
+        return refreshTokenEntity;
     }
 }

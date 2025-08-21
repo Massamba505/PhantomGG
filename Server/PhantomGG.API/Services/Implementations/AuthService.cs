@@ -85,36 +85,8 @@ public class AuthService(
 
     public async Task<AuthDto> RefreshAsync(string refreshTokenFromCookie)
     {
-        if (string.IsNullOrWhiteSpace(refreshTokenFromCookie))
-        {
-            throw new UnauthorizedException("Refresh token is required");
-        }
-
-        var refreshTokenEntity = await _refreshTokeService.GetByTokenAsync(refreshTokenFromCookie);
-        if (refreshTokenEntity == null)
-        {
-            throw new UnauthorizedException("Invalid refresh token");
-        }
-
-        if (refreshTokenEntity.RevokedAt.HasValue)
-        {
-            await _refreshTokeService.RevokeAllForUserAsync(refreshTokenEntity.UserId);
-            throw new UnauthorizedException("Token reuse detected. All tokens revoked.");
-        }
-
-        if (refreshTokenEntity.ExpiresAt <= DateTime.UtcNow)
-        {
-            throw new UnauthorizedException("Refresh token has expired");
-        }
-
-        var user = refreshTokenEntity.User;
-        if (user == null || !user.IsActive)
-        {
-            throw new UnauthorizedException("User account is inactive");
-        }
-
-        await _refreshTokeService.RevokeAsync(refreshTokenEntity);
-
+        var revokedRefreshToken = await _refreshTokeService.RevokeAsync(refreshTokenFromCookie);
+        var user = revokedRefreshToken.User;
         var accessToken = _tokenService.GenerateAccessToken(user);
         var refreshToken = await _refreshTokeService.AddRefreshToken(user);
 
@@ -126,6 +98,12 @@ public class AuthService(
             RefreshTokenExpiresAt = refreshToken.ExpiresAt,
             User = user.ToUserDto()
         };
+    }
+
+
+    public async Task LogoutAsync(string refreshTokenFromCookie)
+    {
+        await _refreshTokeService.RevokeAsync(refreshTokenFromCookie);
     }
 
     private static void ValidateRegisterRequest(RegisterRequestDto request)
@@ -183,5 +161,4 @@ public class AuthService(
     {
         return Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$");
     }
-
 }

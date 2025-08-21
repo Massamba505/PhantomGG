@@ -39,7 +39,12 @@ public class AuthController(
         {
             Success = true,
             Message = "Registered successfully",
-            Data = result
+            Data = new
+            {
+                user = result.User,
+                accessToken = result.AccessToken,
+                accessTokenExpiresAt = result.AccessTokenExpiresAt
+            }
         };
 
         return StatusCode(201, response);
@@ -60,7 +65,12 @@ public class AuthController(
         {
             Success = true,
             Message = "Login successful",
-            Data = result
+            Data = new
+            {
+                user = result.User,
+                accessToken = result.AccessToken,
+                accessTokenExpiresAt = result.AccessTokenExpiresAt
+            }
         };
 
         return Ok(response);
@@ -83,7 +93,11 @@ public class AuthController(
         {
             Success = true,
             Message = "Token refreshed successfully",
-            Data = result
+            Data = new
+            {
+                accessToken = result.AccessToken,
+                accessTokenExpiresAt = result.AccessTokenExpiresAt
+            }
         };
 
         return Ok(response);
@@ -104,6 +118,31 @@ public class AuthController(
             Success = true,
             Message = "User information retrieved successfully",
             Data = result
+        };
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Logout user by clearing refresh token cookie
+    /// </summary>
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse>> Logout()
+    {
+        var refreshToken = Request.Cookies[_cookieSettings.RefreshTokenCookieName];
+
+        if (!string.IsNullOrEmpty(refreshToken))
+        {
+            await _authService.LogoutAsync(refreshToken);
+        }
+
+        _cookieService.ClearRefreshToken(Response);
+
+        var response = new ApiResponse
+        {
+            Success = true,
+            Message = "Logout successful"
         };
 
         return Ok(response);

@@ -19,12 +19,10 @@ public class TokenService(
     private readonly JwtSettings _jwtSettings = jwtSettings.Value;
     private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
 
-    private string GenerateAccessTokenString(User user, DateTime dateTime)
+    private string GenerateAccessTokenString(User user, DateTime expiresAt)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var expiryUtc = GetAccessTokenExpiry(dateTime);
 
         var claims = new[]
         {
@@ -40,8 +38,7 @@ public class TokenService(
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
             claims: claims,
-            notBefore: dateTime,
-            expires: expiryUtc,
+            expires: expiresAt,
             signingCredentials: credentials
         );
 
@@ -50,12 +47,12 @@ public class TokenService(
 
     public AccessTokenDto GenerateAccessToken(User user)
     {
-        var dateTime = DateTime.UtcNow;
+        var expiresAt = GetAccessTokenExpiry(DateTime.UtcNow);
 
         return new AccessTokenDto
         {
-            Token = GenerateAccessTokenString(user, dateTime),
-            ExpiresAt = dateTime,
+            Token = GenerateAccessTokenString(user, expiresAt),
+            ExpiresAt = expiresAt,
         };
     }
 
