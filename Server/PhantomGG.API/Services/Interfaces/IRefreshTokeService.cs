@@ -1,12 +1,13 @@
+﻿using PhantomGG.API.DTOs.AuthToken;
 using PhantomGG.API.Models;
 
-namespace PhantomGG.API.Repositories.Interfaces;
+namespace PhantomGG.API.Services.Interfaces;
 
-public interface IRefreshTokenRepository
+public interface IRefreshTokeService
 {
     Task<RefreshToken?> GetByTokenAsync(string token);
     Task<IEnumerable<RefreshToken>> GetActiveByUserIdAsync(Guid userId);
-    Task CreateAsync(RefreshToken token);
+    Task<RefreshTokenDto> AddRefreshToken(User user);
     Task RevokeAsync(RefreshToken token);
     Task RevokeAllForUserAsync(Guid userId);
 }

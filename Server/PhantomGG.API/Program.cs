@@ -6,13 +6,12 @@ using Microsoft.OpenApi.Models;
 using PhantomGG.API.Config;
 using PhantomGG.API.Data;
 using PhantomGG.API.Middleware;
-using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Implementations;
 using PhantomGG.API.Repositories.Interfaces;
+using PhantomGG.API.Security.Implementations;
+using PhantomGG.API.Security.Interfaces;
 using PhantomGG.API.Services.Implementations;
 using PhantomGG.API.Services.Interfaces;
-using PhantomGG.API.Services.Managers.Implementations;
-using PhantomGG.API.Services.Managers.Interfaces;
 using System.Text;
 
 namespace PhantomGG.API;
@@ -26,10 +25,10 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddHttpContextAccessor();
 
+        SetSettings(builder.Services, builder.Configuration);
         AddSwagger(builder.Services);
         AddCors(builder.Services);
         ConfigureDatabase(builder.Services, builder.Configuration);
-        ConfigureIdentity(builder.Services, builder.Configuration);
         ConfigureJwt(builder.Services, builder.Configuration);
         ConfigureServices(builder.Services);
 
@@ -52,15 +51,13 @@ public class Program
         app.UseAuthorization();
         app.MapControllers();
 
-        // Apply EF Core migrations on startup to ensure identity tables are created
-        using (var scope = app.Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            dbContext.Database.Migrate();
-            Console.WriteLine("Applied Entity Framework Core migrations");
-        }
-
         app.Run();
+    }
+
+    private static void SetSettings(IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.Configure<CookieSettings>(configuration.GetSection("CookieSettings"));
     }
 
     private static void AddSwagger(IServiceCollection services)
@@ -123,56 +120,31 @@ public class Program
 
     private static void ConfigureDatabase(IServiceCollection services, IConfiguration config)
     {
-        services.AddDbContext<ApplicationDbContext>(options =>
+        services.AddDbContext<PhantomContext>(options =>
             options.UseSqlServer(config.GetConnectionString("PhantomDb")));
-    }
-
-    private static void ConfigureIdentity(IServiceCollection services, ConfigurationManager configuration)
-    {
-        var identitySettings = configuration.GetSection("IdentityOptions").Get<IdentitySettings>();
-        if (identitySettings == null)
-        {
-            throw new InvalidOperationException("IdentitySettings configuration is not set");
-        }
-
-        services.AddSingleton(identitySettings);
-        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
-        {
-            options.Password = identitySettings.Password;
-            options.Lockout = identitySettings.Lockout;
-            options.User = identitySettings.User;
-        })
-        .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddDefaultTokenProviders();
     }
 
     private static void ConfigureJwt(IServiceCollection services, ConfigurationManager configuration)
     {
-        var jwtConfig = configuration.GetSection("JwtConfig").Get<JwtConfig>();
-        if (jwtConfig == null)
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
+        if (jwtSettings == null)
         {
-            throw new InvalidOperationException("JWT configuration is not set");
+            throw new InvalidOperationException("JWT settings not found in configuration");
         }
 
-        services.AddSingleton(jwtConfig);
-
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true,
-                ValidIssuer = jwtConfig.Issuer,
-                ValidateAudience = true,
-                ValidAudience = jwtConfig.Audience,
-                ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                ValidateIssuer = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidateAudience = true,
+                ValidAudience = jwtSettings.Audience,
+                ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             };
         });
@@ -182,18 +154,16 @@ public class Program
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        // Managers
-        services.AddScoped<IUserManager, UserManager>();
-        services.AddScoped<ITokenManager, TokenManager>();
-        services.AddScoped<IRoleManager, RoleManager>();
-
-        // Services
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<ICookieService, CookieService>();
-        services.AddScoped<IIdentityAuthentication, IdentityAuthentication>();
-
-        // Repositories
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUserService, UserService>();
+
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+        services.AddScoped<ICookieService, CookieService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IRefreshTokeService, RefreshTokenService>();
     }
 }
