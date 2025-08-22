@@ -1,21 +1,14 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+using PhantomGG.API.DTOs;
+using PhantomGG.API.Exceptions;
+using System.Net;
+using System.Text.Json;
 
 namespace PhantomGG.API.Middleware;
 
-public class GlobalExceptionMiddleware
+public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<GlobalExceptionMiddleware> _logger;
-
-    public GlobalExceptionMiddleware(
-        RequestDelegate next,
-        ILogger<GlobalExceptionMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
+    private readonly RequestDelegate _next = next;
+    private readonly ILogger<GlobalExceptionMiddleware> _logger = logger;
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -32,43 +25,38 @@ public class GlobalExceptionMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        if (context.Response.HasStarted)
+        var response = context.Response;
+        response.ContentType = "application/json";
+        var statusCode = exception switch
         {
-            _logger.LogWarning("The response has already started, the global exception middleware will not be executed.");
-            return; 
+            ValidationException => HttpStatusCode.BadRequest,
+            UnauthorizedException => HttpStatusCode.Unauthorized,
+            ForbiddenException => HttpStatusCode.Forbidden,
+            NotFoundException => HttpStatusCode.NotFound,
+            ConflictException => HttpStatusCode.Conflict,
+            _ => HttpStatusCode.InternalServerError
+        };
+
+        var message = exception.Message;
+        if (statusCode == HttpStatusCode.InternalServerError)
+        {
+            message = "An internal server error occurred";
         }
 
-        context.Response.Clear();
-        context.Response.ContentType = "application/problem+json";
-
-        var (statusCode, title, detail) = exception switch
+        var apiResponse = new ApiResponse
         {
-            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized", exception.Message),
-            SecurityTokenException => (StatusCodes.Status401Unauthorized, "Invalid Token", exception.Message),
-            KeyNotFoundException => (StatusCodes.Status404NotFound, "Not Found", exception.Message),
-            ArgumentException => (StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
-            FormatException => (StatusCodes.Status400BadRequest, "Invalid Format", exception.Message),
-            InvalidOperationException => (StatusCodes.Status409Conflict, "Conflict", exception.Message),
-            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred")
+            Success = false,
+            Message = message
         };
 
-        context.Response.StatusCode = statusCode;
+        response.StatusCode = (int)statusCode;
 
-        var problemDetails = new ProblemDetails
+        var jsonResponse = JsonSerializer.Serialize(apiResponse, new JsonSerializerOptions
         {
-            Status = statusCode,
-            Title = title,
-            Detail = detail
-        };
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
 
-        var options = new JsonSerializerOptions 
-        { 
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
-        
-        var json = JsonSerializer.Serialize(problemDetails, options);
-
-        await context.Response.WriteAsync(json);
+        await response.WriteAsync(jsonResponse);
     }
+
 }

@@ -18,14 +18,18 @@ export class TokenStorage {
 
   static getTokenExpiry(): Date | null {
     const expiry = localStorage.getItem(this.TOKEN_EXPIRY_KEY);
-    return expiry ? new Date(expiry) : null;
+
+    if (!expiry) return null;
+
+    const date = new Date(expiry);
+    return isNaN(date.getTime()) ? null : date;
   }
 
   static isTokenExpired(): boolean {
     const expiry = this.getTokenExpiry();
     if (!expiry) return true;
 
-    return expiry.getTime() <= new Date().getTime() + 30000;
+    return expiry.getTime() <= new Date().getTime();
   }
 
   static clear(): void {
