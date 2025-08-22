@@ -35,8 +35,8 @@ services:
   flyway:
     image: flyway/flyway:9-alpine
     depends_on:
-      api:
-        condition: service_started
+      db-init:
+        condition: service_completed_successfully
     entrypoint:
       [
         "flyway",
@@ -59,13 +59,18 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ConnectionStrings__PhantomDb=Server=sqlserver;Database=PhantomGG;User=sa;Password=${SQL_PASSWORD};TrustServerCertificate=true
-      - JwtConfig__Secret=${JwtConfig__Secret}
-      - JwtConfig__Issuer=${JwtConfig__Issuer}
-      - JwtConfig__Audience=${JwtConfig__Audience}
-      - JwtConfig__AccessTokenExpiryMinutes=${JwtConfig__AccessTokenExpiryMinutes}
-      - JwtConfig__RefreshTokenExpiryDays=${JwtConfig__RefreshTokenExpiryDays}
+      - JwtSettings__Issuer=${JWT_ISSUER}
+      - JwtSettings__Audience=${JWT_AUDIENCE}
+      - JwtSettings__SecretKey=${JWT_SECRET_KEY}
+      - JwtSettings__AccessTokenLifetimeMinutes=${JWT_ACCESS_TOKEN_MINUTES}
+      - JwtSettings__RefreshTokenLifetimeDays=${JWT_REFRESH_TOKEN_DAYS}
+      - CookieSettings__RefreshTokenCookieName=${COOKIE_REFRESH_TOKEN_NAME}
+      - CookieSettings__Domain=${COOKIE_DOMAIN}
+      - CookieSettings__Path=${COOKIE_PATH}
+      - CookieSettings__Secure=${COOKIE_SECURE}
+      - CookieSettings__HttpOnly=${COOKIE_HTTP_ONLY}
     depends_on:
-      db-init:
+      flyway:
         condition: service_completed_successfully
     volumes:
       - ./Server/PhantomGG.API:/app
@@ -86,7 +91,8 @@ services:
       - ./Client:/app
       - /app/node_modules
     depends_on:
-      - api
+      api:
+        condition: service_started
     networks:
       - phantomgg-network
 
