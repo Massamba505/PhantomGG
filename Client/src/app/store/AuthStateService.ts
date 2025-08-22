@@ -3,7 +3,7 @@ import {
   LoginRequest,
   SignUpRequest,
 } from '@/app/shared/models/Authentication';
-import { catchError, tap, throwError } from 'rxjs';
+import { catchError, tap, throwError, firstValueFrom } from 'rxjs';
 import { AuthService } from '../core/services/auth.service';
 import { TokenRefreshService } from '../core/services/tokenRefresh.service';
 import { User } from '../shared/models/User';
@@ -24,21 +24,32 @@ export class AuthStateService {
   readonly error = this.errorSignal.asReadonly();
   readonly isAuthenticated = computed(() => !!this.userSignal());
 
-  constructor() {
-    this.initAuthState();
-  }
-
-  initAuthState(): Promise<boolean> {
+  async initAuthState(): Promise<boolean> {
     const token = this.tokenService.getToken();
-    if (token && !this.tokenService.isTokenExpired()) {
-      return new Promise<boolean>((resolve) => {
-        this.loadUser().subscribe({
-          next: () => resolve(true),
-          error: () => resolve(false),
-        });
-      });
+    if (!token) {
+      return true;
     }
-    return Promise.resolve(true);
+
+    try {
+      if (this.tokenService.isTokenExpired()) {
+        const refreshResponse: any = await firstValueFrom(this.authService.refresh());
+        
+        if (refreshResponse.success) {
+          this.tokenService.setToken(refreshResponse.data.accessToken);
+          this.tokenService.setTokenExpiry(refreshResponse.data.accessTokenExpiresAt);
+          await firstValueFrom(this.loadUser());
+        } else {
+          throw new Error('Refresh failed');
+        }
+      } else {
+        await firstValueFrom(this.loadUser());
+      }
+      
+      return true;
+    } catch (error) {
+      this.tokenService.clearTokens();
+      return false;
+    }
   }
 
   login(credentials: LoginRequest) {
@@ -100,41 +111,16 @@ export class AuthStateService {
 
     this.authService.logout().subscribe({
       next: () => {
-        this.loadingSignal.set(false);
-        this.tokenService.clearTokens();
-        this.userSignal.set(null);
+        this.clearAuthState();
       },
-      error: (err) => {
-        this.loadingSignal.set(false);
-        this.tokenService.clearTokens();
-        this.userSignal.set(null);
+      error: () => {
+        // Clear state even if logout request fails
+        this.clearAuthState();
       },
     });
   }
 
-  refreshToken() {
-    this.loadingSignal.set(true);
-
-    return this.authService.refresh().pipe(
-      tap((res: any) => {
-        this.loadingSignal.set(false);
-
-        if (res.success) {
-          this.tokenService.setToken(res.data.accessToken);
-          this.tokenService.setTokenExpiry(res.data.accessTokenExpiresAt);
-        } else {
-          this.logout();
-        }
-      }),
-      catchError((error) => {
-        this.loadingSignal.set(false);
-        this.logout();
-        return throwError(() => error);
-      })
-    );
-  }
-
-  loadUser() {
+  private loadUser() {
     this.loadingSignal.set(true);
     return this.authService.getMe().pipe(
       tap((res: any) => {
@@ -143,9 +129,15 @@ export class AuthStateService {
       }),
       catchError((err) => {
         this.loadingSignal.set(false);
-        this.logout();
         return throwError(() => err);
       })
     );
+  }
+
+  private clearAuthState() {
+    this.loadingSignal.set(false);
+    this.tokenService.clearTokens();
+    this.userSignal.set(null);
+    this.errorSignal.set(null);
   }
 }

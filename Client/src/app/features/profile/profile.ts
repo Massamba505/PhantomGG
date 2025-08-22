@@ -10,24 +10,24 @@ import { Router } from '@angular/router';
   imports: [CommonModule],
   template: `
     <div class="card p-4 max-w-xl mx-auto">
-      @if (user) {
+      @if (user()) {
       <div header="My Profile">
         <div class="space-y-4">
           <h3 class="text-lg font-medium">Personal Information</h3>
 
           <div class="flex justify-between">
             <span class="font-semibold">Name:</span>
-            <span>{{ user.firstName }} {{ user.lastName }}</span>
+            <span>{{ user()!.firstName }} {{ user()!.lastName }}</span>
           </div>
 
           <div class="flex justify-between">
             <span class="font-semibold">Email:</span>
-            <span>{{ user.email }}</span>
+            <span>{{ user()!.email }}</span>
           </div>
 
           <div class="flex justify-between">
             <span class="font-semibold">Role:</span>
-            <span>{{ user.role }}</span>
+            <span>{{ user()!.role }}</span>
           </div>
 
           <div class="text-right">
@@ -51,7 +51,8 @@ export class Profile {
   private toast = inject(ToastService);
   private router = inject(Router);
 
-  user = this.authState.user();
+  user = this.authState.user;
+
   logout() {
     this.authState.logout();
     this.router.navigate(['/']);
