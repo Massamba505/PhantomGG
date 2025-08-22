@@ -1,0 +1,42 @@
+<div class="relative flex-shrink-0">
+  <button
+    class="flex cursor-pointer items-center gap-2"
+    (click)="toggleDropdown()"
+  >
+    <img
+      src="PhantomGG_LOGO.png"
+      alt="Profile"
+      class="w-10 h-10 rounded-full border-2 border-gray-300 object-cover"
+    />
+  </button>
+
+  @if (open()) {
+  <div
+    class="absolute bottom-10 left-0 mt-2 w-36 bg-white rounded-lg shadow-lg z-50"
+  >
+    <button
+      (click)="navigateTo('/profile')"
+      class="w-full text-left px-4 py-2 text-sm text-gray-700 rounded-lg flex justify-between items-center hover:bg-gray-100"
+    >
+      Profile
+      <lucide-angular [img]="icon[0].UserCircle2"></lucide-angular>
+    </button>
+
+    <button
+      (click)="navigateTo('/settings')"
+      class="w-full text-left px-4 py-2 text-sm text-gray-700 rounded-lg flex justify-between items-center hover:bg-gray-100"
+    >
+      Settings
+      <lucide-angular [img]="icon[1].Settings"></lucide-angular>
+    </button>
+
+    <button
+      (click)="logout()"
+      class="w-full text-left px-4 py-2 text-sm text-gray-700 rounded-lg flex justify-between items-center hover:bg-gray-100"
+    >
+      Logout
+      <lucide-angular [img]="icon[2].LogOut"></lucide-angular>
+    </button>
+  </div>
+  }
+</div>

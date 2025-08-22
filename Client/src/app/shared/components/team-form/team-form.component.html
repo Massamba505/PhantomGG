@@ -1,0 +1,63 @@
+<form (ngSubmit)="onSubmit()" class="space-y-4">
+  <div>
+    <label class="block text-sm font-medium text-card-foreground mb-2">
+      Team Name
+    </label>
+    <input
+      type="text"
+      name="name"
+      class="input-field w-full"
+      placeholder="Enter team name"
+      required
+    />
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-card-foreground mb-2">
+      City
+    </label>
+    <input
+      type="text"
+      name="city"
+      class="input-field w-full"
+      placeholder="Enter city"
+      required
+    />
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-card-foreground mb-2">
+      Coach Name
+    </label>
+    <input
+      type="text"
+      name="coach"
+      class="input-field w-full"
+      placeholder="Enter coach name"
+      required
+    />
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-card-foreground mb-2">
+      Number of Players
+    </label>
+    <input
+      type="number"
+      name="players"
+      class="input-field w-full"
+      min="11"
+      max="30"
+      required
+    />
+  </div>
+
+  <div class="flex space-x-3 pt-4">
+    <button type="submit" class="btn-primary flex-1">
+      {{ team ? "Update Team" : "Add Team" }}
+    </button>
+    <button type="button" (click)="onCancel()" class="btn-secondary flex-1">
+      Cancel
+    </button>
+  </div>
+</form>

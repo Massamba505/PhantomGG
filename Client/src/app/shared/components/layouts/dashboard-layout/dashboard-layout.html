@@ -1,0 +1,14 @@
+<div class="flex h-full">
+  <app-sidebar
+    [isOpen]="sidebarOpen()"
+    [userRole]="userRole"
+    (toggle)="toggleSidebar()"
+  ></app-sidebar>
+
+  <main
+    class="flex-1 h-full transition-all duration-300 p-6"
+    [ngClass]="sidebarOpen() ? 'ml-64' : 'ml-16'"
+  >
+    <ng-content></ng-content>
+  </main>
+</div>

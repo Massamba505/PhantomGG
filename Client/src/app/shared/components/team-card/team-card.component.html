@@ -1,0 +1,47 @@
+<div class="card-team group">
+  <div class="flex justify-between items-start mb-3">
+    <div class="flex-1">
+      <h3
+        class="text-lg font-semibold text-card-foreground mb-1 group-hover:text-primary transition-colors"
+      >
+        {{ team.name }}
+      </h3>
+      <div class="flex items-center space-x-3 text-sm text-muted-foreground">
+        <div class="flex items-center space-x-1">
+          <!-- <lucide-map-pin size="12" /> -->
+          <span>{{ team.city }}</span>
+        </div>
+        <div class="flex items-center space-x-1">
+          <!-- <lucide-user size="12" /> -->
+          <span>{{ team.coach }}</span>
+        </div>
+      </div>
+    </div>
+    <div
+      class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity"
+    >
+      <button
+        (click)="edit.emit(team)"
+        class="p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-all"
+      >
+        <!-- <lucide-edit size="14" /> -->
+      </button>
+      <button
+        (click)="delete.emit(team.id)"
+        class="p-2 text-muted-foreground hover:text-destructive hover:bg-muted rounded-lg transition-all"
+      >
+        <!-- <lucide-trash-2 size="14" /> -->
+      </button>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between pt-3 border-t border-border">
+    <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+      <!-- <lucide-users size="14" /> -->
+      <span>{{ team.players }} players</span>
+    </div>
+    <span class="text-xs text-muted-foreground">
+      Added {{ team.createdAt }}
+    </span>
+  </div>
+</div>

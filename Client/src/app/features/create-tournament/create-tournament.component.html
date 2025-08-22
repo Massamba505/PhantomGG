@@ -1,0 +1,204 @@
+<app-dashboard-layout>
+  <div class="flex">
+    <div class="flex-1 lg:ml-0">
+      <!-- Header -->
+      <header class="border-b border-slate-600/50 px-6 py-4 backdrop-blur-sm">
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+              <div class="text-slate-400 text-3xl animate-bounce">👻</div>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold text-white">
+                Create Phantom Tournament 👻⚽
+              </h1>
+              <p class="text-slate-400">
+                Summon a new spooky soccer tournament
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Form -->
+      <main class="p-6">
+        <div class="max-w-3xl mx-auto">
+          <div
+            class="border border-slate-600/50 backdrop-blur-sm shadow-2xl shadow-slate-900/50 rounded-xl"
+          >
+            <div class="p-6 border-b border-slate-600/50 text-center">
+              <h2
+                class="text-xl font-semibold text-white flex items-center justify-center gap-2"
+              >
+                <div class="text-2xl">⚽</div>
+                Tournament Summoning Spell
+                <div class="text-2xl">👻</div>
+              </h2>
+              <p class="text-slate-300">
+                Cast your tournament into existence with these mystical details
+              </p>
+            </div>
+
+            <div class="p-6">
+              <form (ngSubmit)="onSubmit()" class="space-y-6">
+                <!-- Tournament Name -->
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-2">
+                    Tournament Name (Your Phantom Legacy) *
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="name"
+                    placeholder="Phantom Premier League ⚽👻"
+                    class="w-full bg-slate-700/50 border border-slate-600/50 text-white placeholder:text-slate-400/70 focus:border-slate-500 rounded-lg p-3"
+                  />
+                </div>
+
+                <!-- Description -->
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-2">
+                    Tournament Description (Your Haunting Story) *
+                  </label>
+                  <textarea
+                    formControlName="description"
+                    placeholder="A spine-chilling soccer tournament where phantom players compete for the ultimate ghostly glory! ⚽💀"
+                    class="w-full bg-slate-700/50 border border-slate-600/50 text-white placeholder:text-slate-400/70 focus:border-slate-500 rounded-lg p-3 h-32 resize-none"
+                  ></textarea>
+                </div>
+
+                <!-- Location -->
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-2">
+                    Location (Haunted Grounds) *
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="location"
+                    placeholder="Phantom Stadium, Ghostly City 👻"
+                    class="w-full bg-slate-700/50 border border-slate-600/50 text-white placeholder:text-slate-400/70 focus:border-slate-500 rounded-lg p-3"
+                  />
+                </div>
+
+                <!-- Date Range -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-slate-300 mb-2"
+                    >
+                      Start Date (Awakening) *
+                    </label>
+                    <input
+                      type="date"
+                      formControlName="startDate"
+                      class="w-full bg-slate-700/50 border border-slate-600/50 text-white placeholder:text-slate-400/70 focus:border-slate-500 rounded-lg p-3"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-slate-300 mb-2"
+                    >
+                      End Date (Final Rest) *
+                    </label>
+                    <input
+                      type="date"
+                      formControlName="endDate"
+                      class="w-full bg-slate-700/50 border border-slate-600/50 text-white placeholder:text-slate-400/70 focus:border-slate-500 rounded-lg p-3"
+                    />
+                  </div>
+                </div>
+
+                <!-- Max Teams and Contact Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-slate-300 mb-2"
+                    >
+                      Maximum Teams (Phantom Squad Size) *
+                    </label>
+                    <select
+                      formControlName="maxTeams"
+                      class="w-full bg-slate-700/50 border border-slate-600/50 text-white rounded-lg p-3"
+                    >
+                      <option value="4">4 Teams (Mini Haunting)</option>
+                      <option value="8">8 Teams (Standard Spook)</option>
+                      <option value="16">16 Teams (Major Mayhem)</option>
+                      <option value="32">32 Teams (Epic Ectoplasm)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-slate-300 mb-2"
+                    >
+                      Contact Email (Spirit Communication) *
+                    </label>
+                    <input
+                      type="email"
+                      formControlName="contactEmail"
+                      placeholder="phantomhost@tournament.com"
+                      class="w-full bg-slate-700/50 border border-slate-600/50 text-white placeholder:text-slate-400/70 focus:border-slate-500 rounded-lg p-3"
+                    />
+                  </div>
+                </div>
+
+                <!-- Entry Fee and Prize Pool -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-slate-300 mb-2"
+                    >
+                      Entry Fee (Phantom Payment) $
+                    </label>
+                    <input
+                      type="number"
+                      formControlName="entryFee"
+                      placeholder="50"
+                      class="w-full bg-slate-700/50 border border-slate-600/50 text-white placeholder:text-slate-400/70 focus:border-slate-500 rounded-lg p-3"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-slate-300 mb-2"
+                    >
+                      Prize Pool (Ghostly Treasure) $
+                    </label>
+                    <input
+                      type="number"
+                      formControlName="prizePool"
+                      placeholder="1000"
+                      class="w-full bg-slate-700/50 border border-slate-600/50 text-white placeholder:text-slate-400/70 focus:border-slate-500 rounded-lg p-3"
+                    />
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex space-x-3 pt-6">
+                  <button
+                    type="submit"
+                    [disabled]="isSubmitting"
+                    class="flex-1 bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 text-white font-semibold rounded-lg p-3 transition-all"
+                  >
+                    <div class="flex items-center justify-center">
+                      <!-- <lucide-plus class="w-4 h-4 mr-2" /> -->
+                      {{
+                        isSubmitting
+                          ? "Summoning..."
+                          : "Summon Tournament! 👻⚽"
+                      }}
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    [disabled]="isSubmitting"
+                    class="flex-1 bg-slate-700/50 border border-slate-600/50 text-slate-300 hover:bg-slate-600/50 hover:text-white rounded-lg p-3 transition-all"
+                  >
+                    Cancel Spell
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</app-dashboard-layout>

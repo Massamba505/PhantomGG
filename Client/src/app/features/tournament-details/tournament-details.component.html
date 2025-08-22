@@ -1,0 +1,135 @@
+<app-dashboard-layout>
+  <div class="flex">
+    <div class="flex-1">
+      <!-- Header -->
+      <header class="pb-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-white mb-2">About Tournament</h1>
+            <p class="text-slate-400">
+              All you need to know about the tournament
+            </p>
+          </div>
+
+          <button
+            (click)="isAddTeamModalOpen = true"
+            class="primary-button max-w-3xs flex items-center space-x-2"
+          >
+            <span>Add Team</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Tournament Details -->
+      <div class="p-6 space-y-8">
+        <!-- Tournament Header -->
+        <div class="card-tournament">
+          <div
+            class="flex flex-col lg:flex-row lg:items-start lg:justify-between space-y-4 lg:space-y-0"
+          >
+            <div class="flex-1">
+              <div class="flex items-center space-x-3 mb-3">
+                <h1 class="text-3xl font-bold text-card-foreground">
+                  <!-- {{ tournament.name }} -->
+                </h1>
+                <span class="px-3 py-1 rounded-full text-sm font-medium">
+                  <!-- {{
+                    tournament.status.charAt(0).toUpperCase() +
+                      tournament.status.slice(1)
+                  }} -->
+                </span>
+              </div>
+              <p class="text-muted-foreground mb-6 max-w-3xl">
+                <!-- {{ tournament.description }} -->
+              </p>
+
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="flex items-center space-x-3">
+                  <div class="p-2 bg-primary/20 rounded-lg"></div>
+                  <div>
+                    <p class="text-sm text-muted-foreground">Start Date</p>
+                    <p class="font-semibold text-card-foreground">
+                      <!-- {{ tournament.startDate | date }} -->
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                  <div class="p-2 bg-primary/20 rounded-lg"></div>
+                  <div>
+                    <p class="text-sm text-muted-foreground">Duration</p>
+                    <p class="font-semibold text-card-foreground">
+                      <!-- {{
+                        getTournamentDuration(
+                          tournament.startDate,
+                          tournament.endDate
+                        )
+                      }} -->
+                      days
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                  <div class="p-2 bg-primary/20 rounded-lg"></div>
+                  <div>
+                    <p class="text-sm text-muted-foreground">Teams</p>
+                    <p class="font-semibold text-card-foreground">
+                      <!-- {{ tournament.teams.length }}/{{ tournament.maxTeams }} -->
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                  <div class="p-2 bg-primary/20 rounded-lg"></div>
+                  <div>
+                    <p class="text-sm text-muted-foreground">Status</p>
+                    <p class="font-semibold text-card-foreground capitalize">
+                      <!-- {{ tournament.status }} -->
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teams Section -->
+        <div class="card-tournament">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-semibold text-card-foreground">
+              Registered Teams
+            </h2>
+            <div
+              class="flex items-center space-x-2 text-sm text-muted-foreground"
+            >
+              <!-- <span
+                >{{ tournament.teams.length }} of
+                {{ tournament.maxTeams }} teams</span
+              > -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-modal
+    [isOpen]="isAddTeamModalOpen"
+    (close)="isAddTeamModalOpen = false"
+    title="Add New Team"
+  >
+    <app-team-form (cancel)="isAddTeamModalOpen = false" />
+  </app-modal>
+
+  <!-- Edit Team Modal -->
+  <app-modal
+    [isOpen]="isEditTeamModalOpen"
+    (close)="isEditTeamModalOpen = false; editingTeam = null"
+    title="Edit Team"
+  >
+    @if (editingTeam) {
+    <app-team-form (cancel)="isEditTeamModalOpen = false; editingTeam = null" />
+    }
+  </app-modal>
+</app-dashboard-layout>

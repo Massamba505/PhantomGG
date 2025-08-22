@@ -1,0 +1,103 @@
+<app-dashboard-layout>
+  <div class="flex">
+    <div class="flex-1">
+      <header class="px-- pb-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div>
+              <h1 class="text-2xl font-bold text-card-foreground mb-2">
+                My Tournaments
+              </h1>
+              <p class="text-muted-foreground">
+                Manage your tournament portfolio
+              </p>
+            </div>
+          </div>
+          <button
+            (click)="createNewTournament()"
+            class="primary-button max-w-3xs flex items-center space-x-2"
+          >
+            <span>New Tournament</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="p-6 border-b border-border">
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4"
+        >
+          <div class="relative flex-1 max-w-md">
+            <input
+              type="text"
+              placeholder="Search tournaments..."
+              (ngModelChange)="filterTournaments()"
+              class="input-field pl-10 w-full"
+            />
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2">
+              <select
+                (ngModelChange)="filterTournaments()"
+                class="input-field min-w-32"
+              >
+                <option value="all">All Status</option>
+                <option value="draft">Draft</option>
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <main class="p-6">
+        @if (filteredTournaments.length > 0) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (tournament of filteredTournaments; track tournament.id) {
+          <app-tournament-card
+            [tournament]="tournament"
+            (edit)="handleEditTournament(tournament)"
+            (delete)="handleDeleteTournament(tournament.id)"
+            (view)="handleViewTournament(tournament)"
+          />
+          }
+        </div>
+        } @else {
+        <div class="text-center py-16">
+          <div
+            class="bg-muted/30 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6"
+          ></div>
+          <h3 class="text-xl font-semibold text-card-foreground mb-2">
+            No tournaments found
+          </h3>
+          <p class="text-muted-foreground mb-6">
+            {{
+              searchTerm
+                ? "Try adjusting your search criteria"
+                : "Create your first tournament to get started"
+            }}
+          </p>
+          <button (click)="createNewTournament()" class="btn-primary">
+            Create Tournament
+          </button>
+        </div>
+        }
+      </main>
+    </div>
+  </div>
+
+  <app-modal
+    [isOpen]="isEditModalOpen"
+    (close)="isEditModalOpen = false; editingTournament = null"
+    title="Edit Tournament"
+  >
+    @if (editingTournament) {
+    <app-tournament-form
+      [tournament]="editingTournament"
+      (save)="handleSaveTournament($event)"
+      (cancel)="isEditModalOpen = false; editingTournament = null"
+    />
+    }
+  </app-modal>
+</app-dashboard-layout>

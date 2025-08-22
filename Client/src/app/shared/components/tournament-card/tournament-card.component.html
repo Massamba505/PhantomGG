@@ -1,0 +1,46 @@
+<div class="card-tournament group cursor-pointer" (click)="onView()">
+  <div class="flex justify-between items-start mb-4">
+    <div class="flex-1">
+      <h3
+        class="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors"
+      >
+        {{ tournament.name }}
+      </h3>
+      <p class="text-muted-foreground text-sm line-clamp-2">
+        {{ tournament.description }}
+      </p>
+    </div>
+    <div
+      class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity"
+    >
+      <button
+        (click)="onEdit($event)"
+        class="p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-all"
+      >
+        <!-- <lucide-edit size="16" /> -->
+      </button>
+      <button
+        (click)="onDelete($event)"
+        class="p-2 text-muted-foreground hover:text-destructive hover:bg-muted rounded-lg transition-all"
+      >
+        <!-- <lucide-trash-2 size="16" /> -->
+      </button>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between">
+    <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+      <div class="flex items-center space-x-1">
+        <!-- <lucide-users size="14" /> -->
+        <span>{{ tournament.teams.length }}/{{ tournament.maxTeams }}</span>
+      </div>
+      <div class="flex items-center space-x-1">
+        <!-- <lucide-calendar size="14" /> -->
+        <span>{{ tournament.startDate }}</span>
+      </div>
+    </div>
+    <span class="px-3 py-1 rounded-full text-xs font-medium">
+      {{ tournament.status }}
+    </span>
+  </div>
+</div>
