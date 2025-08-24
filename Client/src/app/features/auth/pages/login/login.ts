@@ -34,7 +34,7 @@ export class Login {
   onSubmit(event: Event) {
     event.preventDefault();
     this.submitted.set(true);
-
+    debugger;
     if (this.userForm.invalid) {
       return;
     }
@@ -48,7 +48,9 @@ export class Login {
         }
       },
       error: (error) => {
-        this.toastService.error(error.error?.message || 'Login failed. Please check your credentials.');
+        this.toastService.error(
+          error.error?.message || 'Login failed. Please check your credentials.'
+        );
       },
     });
   }

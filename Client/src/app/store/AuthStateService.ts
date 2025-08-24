@@ -32,11 +32,15 @@ export class AuthStateService {
 
     try {
       if (this.tokenService.isTokenExpired()) {
-        const refreshResponse: any = await firstValueFrom(this.authService.refresh());
-        
+        const refreshResponse: any = await firstValueFrom(
+          this.authService.refresh()
+        );
+
         if (refreshResponse.success) {
           this.tokenService.setToken(refreshResponse.data.accessToken);
-          this.tokenService.setTokenExpiry(refreshResponse.data.accessTokenExpiresAt);
+          this.tokenService.setTokenExpiry(
+            refreshResponse.data.accessTokenExpiresAt
+          );
           await firstValueFrom(this.loadUser());
         } else {
           throw new Error('Refresh failed');
@@ -44,7 +48,7 @@ export class AuthStateService {
       } else {
         await firstValueFrom(this.loadUser());
       }
-      
+
       return true;
     } catch (error) {
       this.tokenService.clearTokens();
@@ -114,7 +118,6 @@ export class AuthStateService {
         this.clearAuthState();
       },
       error: () => {
-        // Clear state even if logout request fails
         this.clearAuthState();
       },
     });

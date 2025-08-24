@@ -13,6 +13,7 @@ import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { passwordStrengthValidator } from '@/app/shared/validators/password.validator';
 import { matchPasswordsValidator } from '@/app/shared/validators/match-passwords.validator';
 import { getPasswordScore } from '@/app/shared/utils/PasswordScore';
+import { SignUpRequest } from '@/app/shared/models/Authentication';
 
 @Component({
   selector: 'app-signup',
@@ -49,12 +50,17 @@ export class Signup {
   get passwordStrength() {
     const value = this.signupForm.controls['password'].value || '';
     const score = getPasswordScore(value);
+    console.log(score);
     if (!value) return { label: '', color: '' };
     if (score >= 4)
-      return { label: 'Strong Password', color: 'text-success' };
-    if (score >= 3)
-      return { label: 'Medium Strength', color: 'text-warning' };
-    return { label: 'Weak Password', color: 'text-destructive' };
+      return { label: 'Strong Password', color: 'text-[hsl(var(--success))]' };
+    if (score >= 3) {
+      return { label: 'Medium Strength', color: 'text-[hsl(var(--warning))]' };
+    }
+    return {
+      label: 'Weak Password',
+      color: 'text-[hsl(var(--destructive))]',
+    };
   }
 
   onSubmit() {
@@ -63,8 +69,8 @@ export class Signup {
       return;
     }
 
-    const { firstName, lastName, email, password } = this.signupForm.value;
-    this.authState.signup({ firstName, lastName, email, password }).subscribe({
+    const credentials = this.signupForm.value as SignUpRequest;
+    this.authState.signup(credentials).subscribe({
       next: () => {
         this.toast.success('Account created successfully!');
         if (this.authState.isAuthenticated()) {
@@ -72,7 +78,9 @@ export class Signup {
         }
       },
       error: (err) => {
-        this.toast.error(err.error?.message || 'Registration failed. Please try again.');
+        this.toast.error(
+          err.error?.message || 'Registration failed. Please try again.'
+        );
       },
     });
   }

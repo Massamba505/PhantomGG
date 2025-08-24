@@ -16,7 +16,7 @@
   box-shadow: 0 0 0 1px rgba(var(--primary), 0.5);
 }
 
-.border-destructive {
+.input-error {
   border-color: rgb(var(--destructive)) !important;
 }
 

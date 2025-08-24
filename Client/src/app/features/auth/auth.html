@@ -1,22 +1,5 @@
-<div class="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
-  <!-- Header with theme toggle -->
-  <div class="absolute top-4 right-4 flex items-center gap-2">
-    <app-theme-toggle></app-theme-toggle>
-    <a routerLink="/" class="text-sm text-primary hover:underline">← Back to Home</a>
-  </div>
-  
-  <!-- Auth content -->
+<div class="min-h-screen flex flex-col items-center justify-center p-4">
   <div class="w-full max-w-md mx-auto">
     <router-outlet></router-outlet>
-  </div>
-  
-  <!-- Footer -->
-  <div class="mt-8 text-center text-sm text-muted-foreground">
-    <p>© 2025 PhantomGG. All rights reserved.</p>
-    <div class="mt-2 flex justify-center gap-4">
-      <a href="#" class="hover:text-primary">Terms</a>
-      <a href="#" class="hover:text-primary">Privacy</a>
-      <a href="#" class="hover:text-primary">Support</a>
-    </div>
   </div>
 </div>
