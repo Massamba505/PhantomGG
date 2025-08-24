@@ -1,14 +1,12 @@
 @if (isOpen) {
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6">
-  <!-- Backdrop -->
   <div
     class="absolute inset-0 bg-black/60 backdrop-blur-sm"
     (click)="close.emit()"
   ></div>
-  
-  <!-- Modal content -->
+
   <div
-    class="relative bg-background border border-border rounded-lg shadow-lg w-full animate-fade-in"
+    class="relative border border-border rounded-lg shadow-lg w-full animate-fade-in"
     [ngClass]="{
       'max-w-sm': size === 'sm',
       'max-w-md': size === 'md',
@@ -16,22 +14,32 @@
       'max-w-4xl': size === 'xl'
     }"
   >
-    <!-- Header -->
-    <div class="flex items-center justify-between p-4 md:p-6 border-b border-border">
+    <div
+      class="flex items-center justify-between p-4 md:p-6 border-b border-border"
+    >
       <h2 class="text-xl font-semibold text-card-foreground">{{ title }}</h2>
       <button
         (click)="close.emit()"
-        class="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-full hover:bg-muted/50"
+        class="transition-colors p-1 cursor-pointer rounded-full border"
         aria-label="Close"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 6 6 18"/>
-          <path d="m6 6 12 12"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
         </svg>
       </button>
     </div>
-    
-    <!-- Body -->
+
     <div class="p-4 md:p-6">
       <ng-content></ng-content>
     </div>
