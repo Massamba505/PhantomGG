@@ -17,7 +17,7 @@ import {
   Calendar,
   PlusCircle,
   Bell,
-  Menu,
+  MenuIcon,
 } from 'lucide-angular';
 import { Roles } from '../../constants/roles';
 import { Footer } from '../footer/footer';
@@ -40,7 +40,7 @@ export class Sidebar implements OnInit, OnDestroy {
   @Input() userRole!: Roles;
   @Output() toggle = new EventEmitter<void>();
 
-  MenuIcon = Menu;
+  readonly MenuIcon = MenuIcon;
   menuItems: MenuItem[] = [
     {
       title: 'Dashboard',
