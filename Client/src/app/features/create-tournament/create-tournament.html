@@ -1,401 +1,176 @@
 <app-dashboard-layout>
-  <div class="container mx-auto py-8 px-4 md:px-6">
-    <header class="mb-8">
-      <div class="flex items-center gap-2 mb-1">
-        <a
-          routerLink="/tournaments"
-          class="text-muted-foreground hover:text-foreground transition-colors flex items-center"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="mr-1"
-          >
-            <path d="m15 18-6-6 6-6" />
+  <div class="max-w-3xl border rounded-2xl p-6 bg-card shadow-sm">
+    <form [formGroup]="tournamentForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
+      <!-- Banner Upload -->
+      <div>
+        <label class="block text-sm font-medium mb-2">Tournament Banner</label>
+
+        <div class="relative border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer
+           hover:border-primary transition h-48 bg-muted/30" (click)="fileInput.click()"
+          (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
+          [ngClass]="{ 'border-primary bg-primary/10': isDragging }">
+          <!-- Hidden Input -->
+          <input type="file" #fileInput accept="image/*" class="hidden" (change)="onBannerChange($event)" />
+
+          @if (!bannerPreview) {
+          <div class="text-center px-4">
+            <p class="text-sm text-muted-foreground">
+              Drag & drop your banner here, or
+              <span class="text-primary font-medium underline">click to upload</span>
+            </p>
+            <p class="text-xs text-muted-foreground mt-1">
+              Recommended: 1200x400px
+            </p>
+          </div>
+          }
+
+          @if (bannerPreview) {
+          <img [src]="bannerPreview" alt="Banner Preview"
+            class="absolute inset-0 w-full h-full object-cover rounded-xl" />
+          }
+        </div>
+      </div>
+
+
+      <!-- Basic Info -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-2">
+          <label for="name" class="block text-sm font-medium mb-2">
+            Tournament Name <span class="required">*</span>
+          </label>
+          <input type="text" id="name" formControlName="name" placeholder="Enter tournament name" class="input-field"
+            [ngClass]="{
+              'border-destructive':
+                isSubmitted && tournamentForm.get('name')?.invalid
+            }" />
+          @if (isSubmitted && tournamentForm.get('name')?.invalid) {
+          <div class="text-sm error mt-1">Tournament name is required (min 3 characters)</div>
+          }
+        </div>
+
+        <div class="md:col-span-2">
+          <label for="description" class="block text-sm font-medium mb-2">
+            Tournament Description <span class="required">*</span>
+          </label>
+          <textarea id="description" formControlName="description" placeholder="Describe your tournament"
+            class="input-field h-32 resize-none" [ngClass]="{
+              'border-destructive':
+                isSubmitted && tournamentForm.get('description')?.invalid
+            }"></textarea>
+          @if (isSubmitted && tournamentForm.get('description')?.invalid) {
+          <div class="text-sm error mt-1">Description must be at least 10 characters</div>
+          }
+        </div>
+
+        <div>
+          <label for="location" class="block text-sm font-medium mb-2">
+            Location <span class="required">*</span>
+          </label>
+          <input type="text" id="location" formControlName="location" placeholder="Tournament location"
+            class="input-field" [ngClass]="{
+              'border-destructive':
+                isSubmitted && tournamentForm.get('location')?.invalid
+            }" />
+          @if (isSubmitted && tournamentForm.get('location')?.invalid) {
+          <div class="text-sm error mt-1">Location is required</div>
+          }
+        </div>
+      </div>
+
+      <!-- Dates -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label for="registrationDeadline" class="block text-sm font-medium mb-2">
+            Registration Deadline <span class="required">*</span>
+          </label>
+          <input type="date" id="registrationDeadline" formControlName="registrationDeadline" class="input-field" />
+          @if (tournamentForm.errors?.['deadlineInvalid']) {
+          <div class="text-sm error mt-1">
+            Deadline must be before tournament start
+          </div>
+          }
+        </div>
+
+        <div>
+          <label for="startDate" class="block text-sm font-medium mb-2">
+            Start Date <span class="required">*</span>
+          </label>
+          <input type="date" id="startDate" formControlName="startDate" class="input-field" />
+          @if (isSubmitted && tournamentForm.get('startDate')?.invalid) {
+          <div class="text-sm error mt-1">Start date is required</div>
+          }
+        </div>
+
+        <div>
+          <label for="endDate" class="block text-sm font-medium mb-2">
+            End Date <span class="required">*</span>
+          </label>
+          <input type="date" id="endDate" formControlName="endDate" class="input-field" />
+          @if (isSubmitted && tournamentForm.get('endDate')?.invalid) {
+          <div class="text-sm error mt-1">End date is required</div>
+          }
+          @if (tournamentForm.errors?.['dateRange']) {
+          <div class="text-sm error mt-1">End date must be after start date</div>
+          }
+        </div>
+      </div>
+
+      <!-- Numbers -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label for="maxTeams" class="block text-sm font-medium mb-2">
+            Maximum Teams <span class="required">*</span>
+          </label>
+          <select id="maxTeams" formControlName="maxTeams" class="form-select">
+            <option value="4">4 Teams</option>
+            <option value="8">8 Teams</option>
+            <option value="16">16 Teams</option>
+            <option value="32">32 Teams</option>
+            <option value="64">64 Teams</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="entryFee" class="block text-sm font-medium mb-2">Entry Fee</label>
+          <input type="number" id="entryFee" formControlName="entryFee" class="input-field" />
+        </div>
+
+        <div>
+          <label for="prizePool" class="block text-sm font-medium mb-2">Prize Pool</label>
+          <input type="number" id="prizePool" formControlName="prizePool" class="input-field" />
+        </div>
+      </div>
+
+      <!-- Contact Email -->
+      <div>
+        <label for="contactEmail" class="block text-sm font-medium mb-2">
+          Contact Email <span class="required">*</span>
+        </label>
+        <input type="email" id="contactEmail" formControlName="contactEmail" placeholder="contact@example.com"
+          class="input-field" />
+        @if (isSubmitted && tournamentForm.get('contactEmail')?.errors?.['required']) {
+        <div class="text-sm error mt-1">Contact email is required</div>
+        }
+        @if (isSubmitted && tournamentForm.get('contactEmail')?.errors?.['email']) {
+        <div class="text-sm error mt-1">Please enter a valid email</div>
+        }
+      </div>
+      <button type="submit" [disabled]="isSubmitting" class="btn btn-primary w-full">
+        <div class="flex items-center justify-center gap-2">
+          @if (isSubmitting) {
+          <svg class="animate-spin h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 
+                         0 5.373 0 12h4zm2 5.291A7.962
+                         7.962 0 014 12H0c0 3.042 1.135
+                         5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <span>Back to tournaments</span>
-        </a>
-      </div>
-      <h1 class="text-2xl font-bold text-card-foreground mb-1">
-        Create Tournament
-      </h1>
-      <p class="text-muted-foreground">
-        Set up a new tournament with all the required details
-      </p>
-    </header>
-
-    <div class="card p-6 mb-6">
-      <form
-        [formGroup]="tournamentForm"
-        (ngSubmit)="onSubmit()"
-        class="space-y-6"
-      >
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Tournament Name -->
-          <div class="md:col-span-2">
-            <label for="name" class="block text-sm font-medium mb-2">
-              Tournament Name <span class="text-destructive">*</span>
-            </label>
-            <input
-              type="text"
-              id="name"
-              formControlName="name"
-              placeholder="Enter tournament name"
-              class="form-input"
-              [ngClass]="{
-                'input-error':
-                  isSubmitted && tournamentForm.get('name')?.invalid
-              }"
-            />
-            <div
-              *ngIf="isSubmitted && tournamentForm.get('name')?.invalid"
-              class="text-sm text-destructive mt-1"
-            >
-              Tournament name is required
-            </div>
-          </div>
-
-          <!-- Tournament Description -->
-          <div class="md:col-span-2">
-            <label for="description" class="block text-sm font-medium mb-2">
-              Tournament Description <span class="text-destructive">*</span>
-            </label>
-            <textarea
-              id="description"
-              formControlName="description"
-              placeholder="Describe your tournament"
-              class="form-input h-32 resize-none"
-              [ngClass]="{
-                'input-error':
-                  isSubmitted && tournamentForm.get('description')?.invalid
-              }"
-            ></textarea>
-            <div
-              *ngIf="isSubmitted && tournamentForm.get('description')?.invalid"
-              class="text-sm text-destructive mt-1"
-            >
-              Tournament description is required
-            </div>
-          </div>
-
-          <!-- Location -->
-          <div class="md:col-span-2">
-            <label for="location" class="block text-sm font-medium mb-2">
-              Location <span class="text-destructive">*</span>
-            </label>
-            <input
-              type="text"
-              id="location"
-              formControlName="location"
-              placeholder="Tournament location"
-              class="form-input"
-              [ngClass]="{
-                'input-error':
-                  isSubmitted && tournamentForm.get('location')?.invalid
-              }"
-            />
-            <div
-              *ngIf="isSubmitted && tournamentForm.get('location')?.invalid"
-              class="text-sm text-destructive mt-1"
-            >
-              Location is required
-            </div>
-          </div>
-
-          <!-- Start Date -->
-          <div>
-            <label for="startDate" class="block text-sm font-medium mb-2">
-              Start Date <span class="text-destructive">*</span>
-            </label>
-            <input
-              type="date"
-              id="startDate"
-              formControlName="startDate"
-              class="form-input"
-              [ngClass]="{
-                'input-error':
-                  isSubmitted && tournamentForm.get('startDate')?.invalid
-              }"
-            />
-            <div
-              *ngIf="isSubmitted && tournamentForm.get('startDate')?.invalid"
-              class="text-sm text-destructive mt-1"
-            >
-              Start date is required
-            </div>
-          </div>
-
-          <!-- End Date -->
-          <div>
-            <label for="endDate" class="block text-sm font-medium mb-2">
-              End Date <span class="text-destructive">*</span>
-            </label>
-            <input
-              type="date"
-              id="endDate"
-              formControlName="endDate"
-              class="form-input"
-              [ngClass]="{
-                'input-error':
-                  isSubmitted && tournamentForm.get('endDate')?.invalid
-              }"
-            />
-            <div
-              *ngIf="isSubmitted && tournamentForm.get('endDate')?.invalid"
-              class="text-sm text-destructive mt-1"
-            >
-              End date is required
-            </div>
-            <div
-              *ngIf="tournamentForm.errors?.['dateRange']"
-              class="text-sm text-destructive mt-1"
-            >
-              End date must be after start date
-            </div>
-          </div>
-
-          <!-- Maximum Teams -->
-          <div>
-            <label for="maxTeams" class="block text-sm font-medium mb-2">
-              Maximum Teams <span class="text-destructive">*</span>
-            </label>
-            <select
-              id="maxTeams"
-              formControlName="maxTeams"
-              class="form-select"
-              [ngClass]="{
-                'input-error':
-                  isSubmitted && tournamentForm.get('maxTeams')?.invalid
-              }"
-            >
-              <option value="4">4 Teams</option>
-              <option value="8">8 Teams</option>
-              <option value="16">16 Teams</option>
-              <option value="32">32 Teams</option>
-            </select>
-            <div
-              *ngIf="isSubmitted && tournamentForm.get('maxTeams')?.invalid"
-              class="text-sm text-destructive mt-1"
-            >
-              Maximum teams is required
-            </div>
-          </div>
-
-          <!-- Contact Email -->
-          <div>
-            <label for="contactEmail" class="block text-sm font-medium mb-2">
-              Contact Email <span class="text-destructive">*</span>
-            </label>
-            <input
-              type="email"
-              id="contactEmail"
-              formControlName="contactEmail"
-              placeholder="contact@example.com"
-              class="form-input"
-              [ngClass]="{
-                'input-error':
-                  isSubmitted && tournamentForm.get('contactEmail')?.invalid
-              }"
-            />
-            <div
-              *ngIf="isSubmitted && tournamentForm.get('contactEmail')?.errors?.['required']"
-              class="text-sm text-destructive mt-1"
-            >
-              Contact email is required
-            </div>
-            <div
-              *ngIf="isSubmitted && tournamentForm.get('contactEmail')?.errors?.['email']"
-              class="text-sm text-destructive mt-1"
-            >
-              Please enter a valid email address
-            </div>
-          </div>
-
-          <!-- Entry Fee -->
-          <div>
-            <label for="entryFee" class="block text-sm font-medium mb-2">
-              Entry Fee ($)
-            </label>
-            <input
-              type="number"
-              id="entryFee"
-              formControlName="entryFee"
-              placeholder="0"
-              min="0"
-              class="form-input"
-            />
-          </div>
-
-          <!-- Prize Pool -->
-          <div>
-            <label for="prizePool" class="block text-sm font-medium mb-2">
-              Prize Pool ($)
-            </label>
-            <input
-              type="number"
-              id="prizePool"
-              formControlName="prizePool"
-              placeholder="0"
-              min="0"
-              class="form-input"
-            />
-          </div>
+          }
+          {{ isSubmitting ? "Creating..." : "Create Tournament" }}
         </div>
-
-        <div class="border-t border-border pt-6 flex justify-end gap-3">
-          <button
-            type="button"
-            routerLink="/tournaments"
-            class="btn btn-outline"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            [disabled]="isSubmitting"
-            class="btn btn-primary min-w-32"
-          >
-            <div class="flex items-center justify-center gap-2">
-              <svg
-                *ngIf="isSubmitting"
-                class="animate-spin h-4 w-4 text-current"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              {{ isSubmitting ? "Creating..." : "Create Tournament" }}
-            </div>
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <!-- Tournament Preview -->
-    <div class="card p-6">
-      <h2 class="text-xl font-semibold mb-4">Tournament Preview</h2>
-
-      <div class="bg-muted/30 p-6 rounded-lg">
-        <div *ngIf="tournamentForm.get('name')?.value" class="mb-4">
-          <h3 class="text-lg font-semibold mb-2">
-            {{ tournamentForm.get("name")?.value }}
-          </h3>
-          <p class="text-muted-foreground">
-            {{ tournamentForm.get("description")?.value }}
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div
-            *ngIf="tournamentForm.get('location')?.value"
-            class="flex items-start gap-3"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="mt-0.5 text-primary"
-            >
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-            <div>
-              <p class="text-sm text-muted-foreground">Location</p>
-              <p class="font-medium">
-                {{ tournamentForm.get("location")?.value }}
-              </p>
-            </div>
-          </div>
-
-          <div
-            *ngIf="tournamentForm.get('startDate')?.value"
-            class="flex items-start gap-3"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="mt-0.5 text-primary"
-            >
-              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-              <line x1="16" x2="16" y1="2" y2="6" />
-              <line x1="8" x2="8" y1="2" y2="6" />
-              <line x1="3" x2="21" y1="10" y2="10" />
-            </svg>
-            <div>
-              <p class="text-sm text-muted-foreground">Dates</p>
-              <p class="font-medium">
-                {{
-                  tournamentForm.get("startDate")?.value | date : "shortDate"
-                }}
-                -
-                {{ tournamentForm.get("endDate")?.value | date : "shortDate" }}
-              </p>
-            </div>
-          </div>
-
-          <div
-            *ngIf="tournamentForm.get('maxTeams')?.value"
-            class="flex items-start gap-3"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="mt-0.5 text-primary"
-            >
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-            <div>
-              <p class="text-sm text-muted-foreground">Teams</p>
-              <p class="font-medium">
-                {{ tournamentForm.get("maxTeams")?.value }} max
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      </button>
+    </form>
   </div>
 </app-dashboard-layout>
