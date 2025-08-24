@@ -1,15 +1,9 @@
-<div class="relative min-h-screen bg-background text-foreground flex flex-col">
-  <!-- Header for auth and unprotected pages could go here -->
-  
+<div class="relative min-h-screen text-foreground flex flex-col">
   <main class="flex-1 flex flex-col w-full">
-    <!-- Toast notifications -->
     <app-toast class="fixed top-4 right-4 z-50" />
-    
-    <!-- Main content -->
+
     <div class="flex-1 animate-fade-in">
       <ng-content></ng-content>
     </div>
   </main>
-
-  <!-- Footer content if needed -->
 </div>

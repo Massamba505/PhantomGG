@@ -60,11 +60,11 @@ export class Sidebar implements OnInit, OnDestroy {
       roles: [Roles.Organizer],
       badge: 'New',
     },
-    { 
-      title: 'Teams', 
-      url: '/teams', 
-      icon: Users, 
-      roles: [Roles.General] 
+    {
+      title: 'Teams',
+      url: '/teams',
+      icon: Users,
+      roles: [Roles.General],
     },
     {
       title: 'Fixtures',

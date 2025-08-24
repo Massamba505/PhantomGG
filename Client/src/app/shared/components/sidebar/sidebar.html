@@ -2,85 +2,83 @@
   class="fixed left-0 top-0 h-full sidebar-transition z-40 bg-sidebar-bg border-r border-sidebar-border"
   [ngClass]="isOpen ? 'w-64' : 'w-16'"
 >
-  <!-- Logo and Brand -->
-  <div class="h-16 flex items-center px-4">
+  <div class="h-16 flex items-center justify-between px-4">
     <div class="flex items-center gap-2 overflow-hidden">
+      @if (isOpen) {
       <img
         src="PhantomGG_LOGO.png"
         alt="PhantomGG Logo"
         class="w-8 h-8 rounded-lg shadow-sm"
       />
-      @if (isOpen) {
-        <span class="font-bold text-lg truncate transition-opacity duration-200">PhantomGG</span>
+      <span class="font-bold text-lg truncate transition-opacity duration-200"
+        >PhantomGG</span
+      >
       }
     </div>
+
+    <button (click)="toggle.emit()" class="p-2 cursor-pointer rounded-lg">
+      <lucide-angular [img]="MenuIcon" class="h-5 w-5"></lucide-angular>
+    </button>
   </div>
 
-  <!-- Navigation -->
-  <div class="p-3 pt-4">
+  <div class="p-3 pt-2">
     @if (isOpen) {
-      <div class="text-xs uppercase font-medium text-muted-foreground tracking-wider mb-3 px-2">
-        Navigation
-      </div>
+    <div
+      class="text-xs uppercase font-medium text-muted-foreground tracking-wider mb-3 px-2"
+    >
+      Navigation
+    </div>
     }
 
     <nav class="space-y-1">
       @for (item of menuItems; track item.title) {
-        @if(item.roles.includes(userRole)) {
-          <a
-            [routerLink]="item.url"
-            routerLinkActive="bg-sidebar-item-active !text-primary"
-            class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-sidebar-item"
-          >
-            <div class="flex-shrink-0 w-5 h-5">
-              <lucide-angular [img]="item.icon" class="h-5 w-5"></lucide-angular>
-            </div>
-            
-            @if (isOpen) {
-              <span class="truncate">{{ item.title }}</span>
-            }
-          </a>
+      @if(item.roles.includes(userRole)) {
+      <a
+        [routerLink]="item.url"
+        routerLinkActive="bg-gray-400/40"
+        class="flex w-full items-center gap-3 pl-2.5 pr-2 py-2 rounded-lg group text-sm font-medium hover:bg-gray-400/40"
+      >
+        <div class="flex-shrink-0 w-5 h-5">
+          <lucide-angular [img]="item.icon" class="h-5 w-5"></lucide-angular>
+        </div>
+
+        @if (isOpen) {
+        <span class="truncate">{{ item.title }}</span>
         }
-      }
+      </a>
+      } }
     </nav>
 
-    <!-- Quick Actions Section -->
     <div class="mt-6 mb-2">
       @if (isOpen) {
-        <div class="text-xs uppercase font-medium text-muted-foreground tracking-wider mb-3 px-2">
-          Quick Actions
-        </div>
+      <div
+        class="text-xs uppercase font-medium text-muted-foreground tracking-wider mb-3 px-2"
+      >
+        Quick Actions
+      </div>
       }
 
       <nav class="space-y-1">
-        @for (action of quickActions; track action.title) {
-          @if (action.roles.includes(userRole)) {
-            <a
-              [routerLink]="action.url"
-              routerLinkActive="bg-sidebar-item-active !text-primary"
-              class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-sidebar-item group"
-            >
-              <div class="flex-shrink-0 w-5 h-5 text-accent">
-                <lucide-angular [img]="action.icon" class="h-5 w-5"></lucide-angular>
-              </div>
-              
-              @if (isOpen) {
-                <span class="truncate">{{ action.title }}</span>
-              }
-            </a>
+        @for (action of quickActions; track action.title) { @if
+        (action.roles.includes(userRole)) {
+        <a
+          [routerLink]="action.url"
+          routerLinkActive="bg-gray-400/40"
+          class="flex w-full items-center gap-3 pl-2.5 pr-2 py-2 rounded-lg group text-sm font-medium hover:bg-gray-400/40"
+        >
+          <div class="flex-shrink-0 w-5 h-5 text-accent">
+            <lucide-angular
+              [img]="action.icon"
+              class="h-5 w-5"
+            ></lucide-angular>
+          </div>
+
+          @if (isOpen) {
+          <span class="truncate">{{ action.title }}</span>
           }
-        }
+        </a>
+        } }
       </nav>
     </div>
   </div>
-
-  <!-- Version Info -->
-  @if (isOpen) {
-    <div class="absolute bottom-4 left-0 w-full px-4">
-      <div class="text-xs text-muted-foreground px-2">
-        <p>Version 1.0.0</p>
-        <p>© 2025 PhantomGG</p>
-      </div>
-    </div>
-  }
 </div>
