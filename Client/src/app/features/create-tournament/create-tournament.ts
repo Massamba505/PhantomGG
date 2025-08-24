@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -16,7 +16,7 @@ import { strictEmailValidator } from '@/app/shared/validators/email.validator';
   templateUrl: './create-tournament.html',
   styleUrls: ['./create-tournament.css'],
   standalone: true,
-  imports: [DashboardLayout, CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [DashboardLayout, CommonModule, ReactiveFormsModule],
 })
 export class CreateTournament {
   isSubmitting = false;
