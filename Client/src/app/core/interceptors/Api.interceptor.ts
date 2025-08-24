@@ -13,6 +13,7 @@ import {
   BehaviorSubject,
 } from 'rxjs';
 import { TokenRefreshService } from '@/app/core/services/tokenRefresh.service';
+import { AuthService } from '@/app/core/services/auth.service';
 
 const refreshTokenInProgress = new BehaviorSubject<boolean>(false);
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
@@ -76,21 +77,19 @@ function handleExpiredToken(
   refreshTokenInProgress.next(true);
   refreshTokenSubject.next(null);
 
-  return tokenService.refreshToken().pipe(
+  const authService = inject(AuthService);
+
+  return authService.refresh().pipe(
     switchMap((response: any) => {
       refreshTokenInProgress.next(false);
 
-      if (response.success && response.accessToken) {
-        tokenService.setToken(response.accessToken);
-
-        if (response.accessTokenExpires) {
-          tokenService.setTokenExpiry(response.accessTokenExpires);
-        }
-
-        refreshTokenSubject.next(response.accessToken);
+      if (response.success) {
+        tokenService.setToken(response.data.accessToken);
+        tokenService.setTokenExpiry(response.data.accessTokenExpiresAt);
+        refreshTokenSubject.next(response.data.accessToken);
 
         req = req.clone({
-          setHeaders: { Authorization: `Bearer ${response.accessToken}` },
+          setHeaders: { Authorization: `Bearer ${response.data.accessToken}` },
         });
       }
       return next(req);

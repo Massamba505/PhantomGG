@@ -14,11 +14,7 @@ export interface SignUpRequest {
 }
 
 export interface AuthResponse {
-  success: boolean;
-  message?: string;
   accessToken?: string;
-  refreshToken?: string;
-  accessTokenExpires?: Date;
-  refreshTokenExpires?: Date;
+  accessTokenExpiresAt?: Date;
   user?: User;
 }
