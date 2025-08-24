@@ -73,21 +73,9 @@ export class Sidebar implements OnInit, OnDestroy {
       roles: [Roles.Organizer, Roles.General],
     },
     {
-      title: 'Statistics',
-      url: '/statistics',
-      icon: BarChart,
-      roles: [Roles.Organizer, Roles.General],
-    },
-    {
       title: 'Notifications',
       url: '/notifications',
       icon: Bell,
-      roles: [Roles.Organizer, Roles.General],
-    },
-    {
-      title: 'Settings',
-      url: '/settings',
-      icon: Settings,
       roles: [Roles.Organizer, Roles.General],
     },
   ];
@@ -104,12 +92,6 @@ export class Sidebar implements OnInit, OnDestroy {
       url: '/create-team',
       icon: PlusCircle,
       roles: [Roles.General],
-    },
-    {
-      title: 'Schedule Match',
-      url: '/schedule-match',
-      icon: Clock,
-      roles: [Roles.Organizer],
     },
     {
       title: 'Help & Support',
