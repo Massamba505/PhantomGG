@@ -18,21 +18,26 @@ import {
   PlusCircle,
   Bell,
   MenuIcon,
+  Settings,
+  Briefcase,
+  BarChart,
+  Clock,
+  HelpCircle,
 } from 'lucide-angular';
 import { Roles } from '../../constants/roles';
-import { Footer } from '../footer/footer';
 
 interface MenuItem {
   title: string;
   url: string;
   icon: any;
   roles: Roles[];
+  badge?: string;
 }
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, Footer],
+  imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './sidebar.html',
 })
 export class Sidebar implements OnInit, OnDestroy {
@@ -53,8 +58,14 @@ export class Sidebar implements OnInit, OnDestroy {
       url: '/tournaments',
       icon: Trophy,
       roles: [Roles.Organizer],
+      badge: 'New',
     },
-    { title: 'Teams', url: '/teams', icon: Users, roles: [Roles.General] },
+    { 
+      title: 'Teams', 
+      url: '/teams', 
+      icon: Users, 
+      roles: [Roles.General] 
+    },
     {
       title: 'Fixtures',
       url: '/fixtures',
@@ -62,9 +73,21 @@ export class Sidebar implements OnInit, OnDestroy {
       roles: [Roles.Organizer, Roles.General],
     },
     {
+      title: 'Statistics',
+      url: '/statistics',
+      icon: BarChart,
+      roles: [Roles.Organizer, Roles.General],
+    },
+    {
       title: 'Notifications',
       url: '/notifications',
       icon: Bell,
+      roles: [Roles.Organizer, Roles.General],
+    },
+    {
+      title: 'Settings',
+      url: '/settings',
+      icon: Settings,
       roles: [Roles.Organizer, Roles.General],
     },
   ];
@@ -81,6 +104,18 @@ export class Sidebar implements OnInit, OnDestroy {
       url: '/create-team',
       icon: PlusCircle,
       roles: [Roles.General],
+    },
+    {
+      title: 'Schedule Match',
+      url: '/schedule-match',
+      icon: Clock,
+      roles: [Roles.Organizer],
+    },
+    {
+      title: 'Help & Support',
+      url: '/help',
+      icon: HelpCircle,
+      roles: [Roles.Organizer, Roles.General],
     },
   ];
 

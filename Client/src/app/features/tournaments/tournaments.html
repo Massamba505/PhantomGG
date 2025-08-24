@@ -1,47 +1,54 @@
 <app-dashboard-layout>
   <div class="flex">
     <div class="flex-1">
-      <header class="px-- pb-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div>
-              <h1 class="text-2xl font-bold text-card-foreground mb-2">
-                My Tournaments
-              </h1>
-              <p class="text-muted-foreground">
-                Manage your tournament portfolio
-              </p>
-            </div>
+      <header class="px-6 py-4 border-b border-border">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-card-foreground mb-1">
+              My Tournaments
+            </h1>
+            <p class="text-muted-foreground">
+              Manage your tournament portfolio
+            </p>
           </div>
           <button
             (click)="createNewTournament()"
-            class="primary-button max-w-3xs flex items-center space-x-2"
+            class="btn btn-primary max-w-xs flex items-center justify-center gap-2"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
             <span>New Tournament</span>
           </button>
         </div>
       </header>
 
-      <div class="p-6 border-b border-border">
-        <div
-          class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4"
-        >
+      <div class="p-6 border-b border-border bg-muted/20">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div class="relative flex-1 max-w-md">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.3-4.3"/>
+              </svg>
+            </div>
             <input
               type="text"
               placeholder="Search tournaments..."
+              [(ngModel)]="searchTerm"
               (ngModelChange)="filterTournaments()"
-              class="input-field pl-10 w-full"
+              class="form-input pl-10 w-full"
             />
           </div>
 
-          <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-2">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
               <select
+                [(ngModel)]="filterStatus"
                 (ngModelChange)="filterTournaments()"
-                class="input-field min-w-32"
+                class="form-select min-w-32"
               >
-                <option value="all">All Status</option>
+                <option value="all">All Statuses</option>
                 <option value="draft">Draft</option>
                 <option value="active">Active</option>
                 <option value="completed">Completed</option>
@@ -52,22 +59,113 @@
       </div>
 
       <main class="p-6">
-        @if (filteredTournaments.length > 0) {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (tournament of filteredTournaments; track tournament.id) {
-          <app-tournament-card
-            [tournament]="tournament"
-            (edit)="handleEditTournament(tournament)"
-            (delete)="handleDeleteTournament(tournament.id)"
-            (view)="handleViewTournament(tournament)"
-          />
-          }
+        <div class="mb-4 flex justify-between items-center">
+          <p class="text-muted-foreground">
+            Showing <span class="font-medium text-foreground">{{ filteredTournaments.length }}</span> tournaments
+          </p>
+          <div class="flex gap-2">
+            <button class="btn-icon btn-ghost">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list">
+                <line x1="8" x2="21" y1="6" y2="6"/>
+                <line x1="8" x2="21" y1="12" y2="12"/>
+                <line x1="8" x2="21" y1="18" y2="18"/>
+                <line x1="3" x2="3" y1="6" y2="6"/>
+                <line x1="3" x2="3" y1="12" y2="12"/>
+                <line x1="3" x2="3" y1="18" y2="18"/>
+              </svg>
+            </button>
+            <button class="btn-icon btn-ghost">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grid">
+                <rect width="7" height="7" x="3" y="3" rx="1"/>
+                <rect width="7" height="7" x="14" y="3" rx="1"/>
+                <rect width="7" height="7" x="14" y="14" rx="1"/>
+                <rect width="7" height="7" x="3" y="14" rx="1"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        } @else {
-        <div class="text-center py-16">
+
+        <div *ngIf="filteredTournaments.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div *ngFor="let tournament of filteredTournaments" class="card overflow-hidden">
+            <div class="p-5">
+              <div class="flex justify-between items-start mb-3">
+                <h3 class="font-semibold text-lg line-clamp-1">{{ tournament.name }}</h3>
+                <span class="badge" [ngClass]="{
+                  'badge-success': tournament.status === 'active',
+                  'badge-muted': tournament.status === 'draft',
+                  'badge-completed': tournament.status === 'completed'
+                }">
+                  {{ tournament.status }}
+                </span>
+              </div>
+              <p class="text-muted-foreground text-sm mb-4 line-clamp-2">{{ tournament.description }}</p>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p class="text-xs text-muted-foreground mb-1">Start Date</p>
+                  <p class="text-sm font-medium">{{ tournament.startDate }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-muted-foreground mb-1">End Date</p>
+                  <p class="text-sm font-medium">{{ tournament.endDate }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-muted-foreground mb-1">Max Teams</p>
+                  <p class="text-sm font-medium">{{ tournament.maxTeams }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-muted-foreground mb-1">Current Teams</p>
+                  <p class="text-sm font-medium">{{ tournament.teams.length || 0 }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="border-t border-border p-4 bg-muted/10 flex justify-between items-center">
+              <button 
+                (click)="handleViewTournament(tournament)"
+                class="btn-link text-sm"
+              >
+                View details
+              </button>
+              
+              <div class="flex gap-2">
+                <button 
+                  (click)="handleEditTournament(tournament)" 
+                  class="btn-icon btn-ghost"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil">
+                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+                    <path d="m15 5 4 4"/>
+                  </svg>
+                </button>
+                <button 
+                  (click)="handleDeleteTournament(tournament.id)" 
+                  class="btn-icon btn-ghost text-destructive"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2">
+                    <path d="M3 6h18"/>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                    <line x1="10" x2="10" y1="11" y2="17"/>
+                    <line x1="14" x2="14" y1="11" y2="17"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="filteredTournaments.length === 0" class="text-center py-16">
           <div
             class="bg-muted/30 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6"
-          ></div>
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-x text-muted-foreground">
+              <path d="m13.5 8.5-5 5"/>
+              <path d="m8.5 8.5 5 5"/>
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+            </svg>
+          </div>
           <h3 class="text-xl font-semibold text-card-foreground mb-2">
             No tournaments found
           </h3>
@@ -78,26 +176,24 @@
                 : "Create your first tournament to get started"
             }}
           </p>
-          <button (click)="createNewTournament()" class="btn-primary">
+          <button (click)="createNewTournament()" class="btn btn-primary">
             Create Tournament
           </button>
         </div>
-        }
       </main>
     </div>
   </div>
 
   <app-modal
-    [isOpen]="isEditModalOpen"
-    (close)="isEditModalOpen = false; editingTournament = null"
+    [isOpen]="isEditModalOpen()"
+    (close)="isEditModalOpen.set(false); editingTournament.set(null)"
     title="Edit Tournament"
   >
-    @if (editingTournament) {
     <app-tournament-form
-      [tournament]="editingTournament"
+      *ngIf="editingTournament()"
+      [tournament]="editingTournament()!"
       (save)="handleSaveTournament($event)"
-      (cancel)="isEditModalOpen = false; editingTournament = null"
-    />
-    }
+      (cancel)="isEditModalOpen.set(false); editingTournament.set(null)"
+    ></app-tournament-form>
   </app-modal>
 </app-dashboard-layout>

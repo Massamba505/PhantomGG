@@ -1,25 +1,33 @@
 import { Tournament, TournamentFormData } from '@/app/shared/models/tournament';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Search, Plus, Menu, Filter } from 'lucide-angular';
 import { Modal } from '@/app/shared/components/modal/modal.component';
 import { TournamentFormComponent } from '@/app/shared/components/tournament-form/tournament-form';
 import { TournamentCard } from '@/app/shared/components/tournament-card/tournament-card';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ToastService } from '@/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-tournaments',
   templateUrl: './tournaments.html',
   styleUrls: ['./tournaments.css'],
   standalone: true,
-  imports: [Modal, TournamentFormComponent, TournamentCard, DashboardLayout],
+  imports: [
+    Modal, 
+    TournamentFormComponent, 
+    DashboardLayout,
+    CommonModule,
+    FormsModule
+  ],
 })
 export class Tournaments implements OnInit {
   sidebarOpen = false;
   searchTerm = '';
   filterStatus = 'all';
-  isEditModalOpen = false;
-  editingTournament: Tournament | null = null;
+  isEditModalOpen = signal(false);
+  editingTournament = signal<Tournament | null>(null);
 
   tournaments: Tournament[] = [
     {
@@ -56,11 +64,36 @@ export class Tournaments implements OnInit {
       createdAt: '2024-03-01',
       teams: [],
     },
+    {
+      id: '4',
+      name: 'Winter Invitational',
+      description: 'Exclusive winter tournament for invited teams only',
+      startDate: '2024-12-01',
+      endDate: '2024-12-20',
+      maxTeams: 10,
+      status: 'draft',
+      createdAt: '2024-05-10',
+      teams: [],
+    },
+    {
+      id: '5',
+      name: 'Regional Qualifier',
+      description: 'Tournament to determine regional representatives',
+      startDate: '2024-07-10',
+      endDate: '2024-07-25',
+      maxTeams: 16,
+      status: 'active',
+      createdAt: '2024-04-20',
+      teams: [],
+    },
   ];
 
   filteredTournaments: Tournament[] = [];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private toast: ToastService
+  ) {}
 
   ngOnInit() {
     this.filterTournaments();
@@ -69,6 +102,7 @@ export class Tournaments implements OnInit {
   filterTournaments() {
     this.filteredTournaments = this.tournaments.filter((tournament) => {
       const matchesSearch =
+        this.searchTerm === '' ||
         tournament.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         tournament.description
           .toLowerCase()
@@ -80,30 +114,33 @@ export class Tournaments implements OnInit {
   }
 
   handleEditTournament(tournament: Tournament) {
-    this.editingTournament = tournament;
-    this.isEditModalOpen = true;
+    this.editingTournament.set(tournament);
+    this.isEditModalOpen.set(true);
   }
 
   handleDeleteTournament(id: string) {
     if (confirm('Are you sure you want to delete this tournament?')) {
       this.tournaments = this.tournaments.filter((t) => t.id !== id);
       this.filterTournaments();
+      this.toast.success('Tournament deleted successfully');
     }
   }
 
   handleViewTournament(tournament: Tournament) {
-    this.router.navigate(['/tournament', tournament.id]);
+    this.router.navigate(['/tournament-details', tournament.id]);
   }
 
   handleSaveTournament(formData: TournamentFormData) {
-    if (this.editingTournament) {
+    const currentTournament = this.editingTournament();
+    if (currentTournament) {
       this.tournaments = this.tournaments.map((t) =>
-        t.id === this.editingTournament!.id ? { ...t, ...formData } : t
+        t.id === currentTournament.id ? { ...t, ...formData } : t
       );
       this.filterTournaments();
+      this.toast.success('Tournament updated successfully');
     }
-    this.isEditModalOpen = false;
-    this.editingTournament = null;
+    this.isEditModalOpen.set(false);
+    this.editingTournament.set(null);
   }
 
   createNewTournament() {

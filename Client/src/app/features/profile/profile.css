@@ -1,4 +1,4 @@
-/* Tournament details specific styles */
+/* Profile specific styles */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -9,17 +9,7 @@
   font-weight: 500;
 }
 
-.badge-draft {
-  background-color: rgb(var(--muted));
-  color: rgb(var(--muted-foreground));
-}
-
-.badge-active {
-  background-color: rgba(var(--primary), 0.2);
-  color: rgb(var(--primary));
-}
-
-.badge-completed {
+.badge-success {
   background-color: rgba(var(--success), 0.2);
   color: rgb(var(--success));
 }
@@ -32,24 +22,6 @@
 
 .btn-link:hover {
   color: rgba(var(--primary), 0.8);
-}
-
-.btn-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.btn-ghost {
-  background-color: transparent;
-}
-
-.btn-ghost:hover {
-  background-color: rgba(var(--muted), 0.5);
 }
 
 .form-input {

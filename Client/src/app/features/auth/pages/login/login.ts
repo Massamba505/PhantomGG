@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { LoginRequest } from '@/app/shared/models/Authentication';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { AuthStateService } from '@/app/store/AuthStateService';
@@ -9,7 +10,7 @@ import { ToastService } from '@/app/shared/services/toast.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
   templateUrl: './login.html',
 })
 export class Login {
@@ -42,11 +43,12 @@ export class Login {
     this.authState.login(credentials).subscribe({
       next: () => {
         if (this.authState.isAuthenticated()) {
-          this.router.navigate(['/profile']);
+          this.toastService.success('Login successful!');
+          this.router.navigate(['/dashboard']);
         }
       },
       error: (error) => {
-        this.toastService.error(error.error.message);
+        this.toastService.error(error.error?.message || 'Login failed. Please check your credentials.');
       },
     });
   }

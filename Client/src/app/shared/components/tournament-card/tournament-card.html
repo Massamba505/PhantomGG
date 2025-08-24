@@ -15,13 +15,15 @@
     >
       <button
         (click)="onEdit($event)"
-        class="p-2 text-muted-foreground hover:text-primary hover:bg-muted rounded-lg transition-all"
+        class="btn btn-sm btn-ghost"
+        aria-label="Edit tournament"
       >
         <!-- <lucide-edit size="16" /> -->
       </button>
       <button
         (click)="onDelete($event)"
-        class="p-2 text-muted-foreground hover:text-destructive hover:bg-muted rounded-lg transition-all"
+        class="btn btn-sm btn-destructive"
+        aria-label="Delete tournament"
       >
         <!-- <lucide-trash-2 size="16" /> -->
       </button>
@@ -39,7 +41,11 @@
         <span>{{ tournament.startDate }}</span>
       </div>
     </div>
-    <span class="px-3 py-1 rounded-full text-xs font-medium">
+    <span class="badge" [ngClass]="{
+      'badge-success': tournament.status === 'active',
+      'badge-secondary': tournament.status === 'draft',
+      'badge-primary': tournament.status === 'completed'
+    }">
       {{ tournament.status }}
     </span>
   </div>

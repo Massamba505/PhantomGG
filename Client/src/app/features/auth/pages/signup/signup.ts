@@ -6,18 +6,18 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { passwordStrengthValidator } from '@/app/shared/validators/password.validator';
 import { matchPasswordsValidator } from '@/app/shared/validators/match-passwords.validator';
-import { NgClass } from '@angular/common';
 import { getPasswordScore } from '@/app/shared/utils/PasswordScore';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [RouterLink, NgClass, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
   templateUrl: './signup.html',
 })
 export class Signup {
@@ -51,10 +51,10 @@ export class Signup {
     const score = getPasswordScore(value);
     if (!value) return { label: '', color: '' };
     if (score >= 4)
-      return { label: 'Strong Password 💪', color: 'text-green-600' };
+      return { label: 'Strong Password', color: 'text-success' };
     if (score >= 3)
-      return { label: 'Medium Strength ⚠️', color: 'text-yellow-600' };
-    return { label: 'Weak Password 😢', color: 'text-red-600' };
+      return { label: 'Medium Strength', color: 'text-warning' };
+    return { label: 'Weak Password', color: 'text-destructive' };
   }
 
   onSubmit() {
@@ -66,12 +66,13 @@ export class Signup {
     const { firstName, lastName, email, password } = this.signupForm.value;
     this.authState.signup({ firstName, lastName, email, password }).subscribe({
       next: () => {
+        this.toast.success('Account created successfully!');
         if (this.authState.isAuthenticated()) {
-          this.router.navigate(['/profile']);
+          this.router.navigate(['/dashboard']);
         }
       },
       error: (err) => {
-        this.toast.error(err.error.message || 'Signup failed.');
+        this.toast.error(err.error?.message || 'Registration failed. Please try again.');
       },
     });
   }

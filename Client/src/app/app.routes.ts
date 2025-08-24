@@ -18,11 +18,16 @@ export const routes: Routes = [
       import('./features/dashboard/dashboard').then((m) => m.Dashboard),
   },
   {
-    path: 'tournament/:id',
+    path: 'tournament-details/:id',
     loadComponent: () =>
       import('./features/tournament-details/tournament-details').then(
         (m) => m.TournamentDetails
       ),
+  },
+  {
+    path: 'tournament/:id',
+    redirectTo: 'tournament-details/:id',
+    pathMatch: 'full'
   },
   {
     path: 'tournaments',

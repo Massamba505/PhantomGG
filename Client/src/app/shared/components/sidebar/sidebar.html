@@ -1,80 +1,86 @@
 <div
-  class="fixed left-0 top-0 h-full transition-all duration-300 z-40 border-r"
+  class="fixed left-0 top-0 h-full sidebar-transition z-40 bg-sidebar-bg border-r border-sidebar-border"
   [ngClass]="isOpen ? 'w-64' : 'w-16'"
 >
-  <div class="px-4 pt-4">
-    <div class="flex justify-between items-center gap-2">
+  <!-- Logo and Brand -->
+  <div class="h-16 flex items-center px-4">
+    <div class="flex items-center gap-2 overflow-hidden">
+      <img
+        src="PhantomGG_LOGO.png"
+        alt="PhantomGG Logo"
+        class="w-8 h-8 rounded-lg shadow-sm"
+      />
       @if (isOpen) {
-      <header>
-        <a routerLink="/" class="flex gap-2 items-center">
-          <img
-            src="PhantomGG_LOGO.png"
-            alt="Logo"
-            class="w-10 h-10 rounded-2xl"
-          />
-          <span class="font-bold text-lg">PhantomGG</span>
-        </a>
-      </header>
+        <span class="font-bold text-lg truncate transition-opacity duration-200">PhantomGG</span>
       }
-
-      <button (click)="toggle.emit()" class="p-2 cursor-pointer rounded-lg">
-        <lucide-angular [img]="MenuIcon" class="h-5 w-5"></lucide-angular>
-      </button>
     </div>
   </div>
 
-  <div class="p-4">
-    <div class="mb-6">
+  <!-- Navigation -->
+  <div class="p-3 pt-4">
+    @if (isOpen) {
+      <div class="text-xs uppercase font-medium text-muted-foreground tracking-wider mb-3 px-2">
+        Navigation
+      </div>
+    }
+
+    <nav class="space-y-1">
+      @for (item of menuItems; track item.title) {
+        @if(item.roles.includes(userRole)) {
+          <a
+            [routerLink]="item.url"
+            routerLinkActive="bg-sidebar-item-active !text-primary"
+            class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-sidebar-item"
+          >
+            <div class="flex-shrink-0 w-5 h-5">
+              <lucide-angular [img]="item.icon" class="h-5 w-5"></lucide-angular>
+            </div>
+            
+            @if (isOpen) {
+              <span class="truncate">{{ item.title }}</span>
+            }
+          </a>
+        }
+      }
+    </nav>
+
+    <!-- Quick Actions Section -->
+    <div class="mt-6 mb-2">
       @if (isOpen) {
-      <h3 class="text-sm font-medium mb-3">Navigation</h3>
+        <div class="text-xs uppercase font-medium text-muted-foreground tracking-wider mb-3 px-2">
+          Quick Actions
+        </div>
       }
 
       <nav class="space-y-1">
-        @for (menu of menuItems; track menu.title) {
-        @if(menu.roles.includes(userRole)) {
-        <a
-          [routerLink]="menu.url"
-          routerLinkActive="bg-gray-400/40"
-          class="flex w-full items-center gap-3 pl-1.5 pr-2 py-2 rounded-lg group text-sm font-medium hover:bg-gray-400/40"
-        >
-          <lucide-angular [img]="menu.icon" class="h-5 w-5"></lucide-angular>
-
-          @if (isOpen) {
-          <span>{{ menu.title }}</span>
+        @for (action of quickActions; track action.title) {
+          @if (action.roles.includes(userRole)) {
+            <a
+              [routerLink]="action.url"
+              routerLinkActive="bg-sidebar-item-active !text-primary"
+              class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-sidebar-item group"
+            >
+              <div class="flex-shrink-0 w-5 h-5 text-accent">
+                <lucide-angular [img]="action.icon" class="h-5 w-5"></lucide-angular>
+              </div>
+              
+              @if (isOpen) {
+                <span class="truncate">{{ action.title }}</span>
+              }
+            </a>
           }
-        </a>
-        } }
-      </nav>
-    </div>
-
-    <div class="mb-6">
-      @if (isOpen) {
-      <h3 class="text-sm font-medium mb-3">Quick Actions</h3>
-      }
-
-      <nav class="space-y-1">
-        @for (quickAction of quickActions; track quickAction.title) { @if
-        (quickAction.roles.includes(userRole)) {
-        <a
-          [routerLink]="quickAction.url"
-          routerLinkActive="bg-gray-400/40"
-          class="flex items-center gap-3 pl-1.5 pr-2 py-2 rounded-lg group text-sm font-medium hover:bg-gray-400/40"
-        >
-          <lucide-angular
-            [img]="quickAction.icon"
-            class="h-5 w-5"
-          ></lucide-angular>
-
-          @if (isOpen) {
-          <span>{{ quickAction.title }}</span>
-          }
-        </a>
-        } }
+        }
       </nav>
     </div>
   </div>
 
-  <div class="absolute bottom-0 w-full p-4">
-    <app-footer [isOpen]="isOpen"></app-footer>
-  </div>
+  <!-- Version Info -->
+  @if (isOpen) {
+    <div class="absolute bottom-4 left-0 w-full px-4">
+      <div class="text-xs text-muted-foreground px-2">
+        <p>Version 1.0.0</p>
+        <p>© 2025 PhantomGG</p>
+      </div>
+    </div>
+  }
 </div>

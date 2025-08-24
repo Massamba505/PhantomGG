@@ -1,63 +1,92 @@
-<form (ngSubmit)="onSubmit()" class="space-y-4">
+<form (ngSubmit)="onSubmit()" #teamForm="ngForm" class="space-y-4">
   <div>
-    <label class="block text-sm font-medium text-card-foreground mb-2">
-      Team Name
+    <label for="name" class="block text-sm font-medium text-card-foreground mb-2">
+      Team Name <span class="text-destructive">*</span>
     </label>
     <input
       type="text"
+      id="name"
       name="name"
-      class="input-field w-full"
+      [(ngModel)]="formData.name"
+      #nameInput="ngModel"
+      class="form-input w-full"
+      [ngClass]="{'border-destructive focus:ring-destructive': nameInput.invalid && (nameInput.dirty || nameInput.touched || submitted)}"
       placeholder="Enter team name"
       required
     />
+    <div *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched || submitted)" class="mt-1 text-sm text-destructive">
+      Team name is required
+    </div>
   </div>
 
   <div>
-    <label class="block text-sm font-medium text-card-foreground mb-2">
-      City
+    <label for="city" class="block text-sm font-medium text-card-foreground mb-2">
+      City <span class="text-destructive">*</span>
     </label>
     <input
       type="text"
+      id="city"
       name="city"
-      class="input-field w-full"
+      [(ngModel)]="formData.city"
+      #cityInput="ngModel"
+      class="form-input w-full"
+      [ngClass]="{'border-destructive focus:ring-destructive': cityInput.invalid && (cityInput.dirty || cityInput.touched || submitted)}"
       placeholder="Enter city"
       required
     />
+    <div *ngIf="cityInput.invalid && (cityInput.dirty || cityInput.touched || submitted)" class="mt-1 text-sm text-destructive">
+      City is required
+    </div>
   </div>
 
   <div>
-    <label class="block text-sm font-medium text-card-foreground mb-2">
-      Coach Name
+    <label for="coach" class="block text-sm font-medium text-card-foreground mb-2">
+      Coach Name <span class="text-destructive">*</span>
     </label>
     <input
       type="text"
+      id="coach"
       name="coach"
-      class="input-field w-full"
+      [(ngModel)]="formData.coach"
+      #coachInput="ngModel"
+      class="form-input w-full"
+      [ngClass]="{'border-destructive focus:ring-destructive': coachInput.invalid && (coachInput.dirty || coachInput.touched || submitted)}"
       placeholder="Enter coach name"
       required
     />
+    <div *ngIf="coachInput.invalid && (coachInput.dirty || coachInput.touched || submitted)" class="mt-1 text-sm text-destructive">
+      Coach name is required
+    </div>
   </div>
 
   <div>
-    <label class="block text-sm font-medium text-card-foreground mb-2">
-      Number of Players
+    <label for="players" class="block text-sm font-medium text-card-foreground mb-2">
+      Number of Players <span class="text-destructive">*</span>
     </label>
     <input
       type="number"
+      id="players"
       name="players"
-      class="input-field w-full"
-      min="11"
+      [(ngModel)]="formData.players"
+      #playersInput="ngModel"
+      class="form-input w-full"
+      [ngClass]="{'border-destructive focus:ring-destructive': playersInput.invalid && (playersInput.dirty || playersInput.touched || submitted)}"
+      min="1"
       max="30"
       required
     />
+    <div *ngIf="playersInput.invalid && (playersInput.dirty || playersInput.touched || submitted)" class="mt-1 text-sm text-destructive">
+      <div *ngIf="playersInput.errors?.['required']">Number of players is required</div>
+      <div *ngIf="playersInput.errors?.['min'] || playersInput.errors?.['max']">Number of players must be between 1 and 30</div>
+    </div>
   </div>
 
   <div class="flex space-x-3 pt-4">
-    <button type="submit" class="btn-primary flex-1">
-      {{ team ? "Update Team" : "Add Team" }}
-    </button>
-    <button type="button" (click)="onCancel()" class="btn-secondary flex-1">
+    <button type="button" (click)="onCancel()" class="btn btn-secondary flex-1">
       Cancel
+    </button>
+    <button type="submit" class="btn btn-primary flex-1" [disabled]="submitted && teamForm.invalid">
+      {{ team ? "Update Team" : "Add Team" }}
     </button>
   </div>
 </form>

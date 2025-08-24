@@ -1,14 +1,57 @@
-<div class="flex h-full">
+<div class="flex h-screen bg-background text-foreground overflow-hidden">
+  <!-- Sidebar component -->
   <app-sidebar
     [isOpen]="sidebarOpen()"
     [userRole]="userRole"
     (toggle)="toggleSidebar()"
   ></app-sidebar>
 
-  <main
-    class="flex-1 h-full transition-all duration-300 p-6"
+  <!-- Main content area -->
+  <div 
+    class="flex flex-col flex-1 h-full transition-all duration-300 overflow-hidden"
     [ngClass]="sidebarOpen() ? 'ml-64' : 'ml-16'"
   >
-    <ng-content></ng-content>
-  </main>
+    <!-- Header/Topbar -->
+    <header class="h-16 border-b border-sidebar-border flex items-center justify-between px-6 bg-card shadow-sm">
+      <div class="flex items-center">
+        <button 
+          (click)="toggleSidebar()" 
+          class="p-2 rounded-full hover:bg-muted transition-colors mr-2 lg:hidden"
+          aria-label="Toggle sidebar"
+        >
+          <span class="block w-5 h-0.5 bg-foreground mb-1"></span>
+          <span class="block w-5 h-0.5 bg-foreground mb-1"></span>
+          <span class="block w-5 h-0.5 bg-foreground"></span>
+        </button>
+        <h1 class="text-xl font-semibold">{{ pageTitle() }}</h1>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <!-- Notifications -->
+        <button class="p-2 rounded-full hover:bg-muted transition-colors relative">
+          <span class="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        </button>
+        
+        <!-- Theme toggle -->
+        <app-theme-toggle></app-theme-toggle>
+        
+        <!-- User profile -->
+        <div class="flex items-center gap-2 cursor-pointer p-1 rounded-full hover:bg-muted transition-colors">
+          <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium">
+            {{ userInitials() }}
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Main content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <div class="page-transition">
+        <ng-content></ng-content>
+      </div>
+    </main>
+  </div>
 </div>

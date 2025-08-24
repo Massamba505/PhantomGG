@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Edit, Trash2, Users, Calendar } from 'lucide-angular';
 import { Tournament } from '../../models/tournament';
 
@@ -7,7 +8,7 @@ import { Tournament } from '../../models/tournament';
   templateUrl: './tournament-card.html',
   styleUrls: ['./tournament-card.css'],
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
 })
 export class TournamentCard {
   @Input() tournament!: Tournament;

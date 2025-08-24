@@ -1,0 +1,84 @@
+.input-field {
+  padding: 0.625rem 0.75rem;
+  border: 1px solid;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  background-color: var(--background);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.3);
+}
+
+.input-field:disabled {
+  background-color: var(--muted-background);
+  border-color: var(--muted-border);
+  cursor: not-allowed;
+}
+
+.border-red-500 {
+  border-color: var(--destructive) !important;
+}
+
+.text-red-500 {
+  color: var(--destructive);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: var(--primary);
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: var(--muted);
+}
+
+.btn-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--ring-rgb), 0.4);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
