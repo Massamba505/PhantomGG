@@ -19,30 +19,29 @@ import { TeamCard } from '@/app/shared/components/team-card/team-card';
     TeamModal,
     TeamCard,
     ConfirmationDialog,
-    DashboardLayout,
     DatePipe,
-    TitleCasePipe
+    TitleCasePipe,
   ],
-  providers: [ToastService]
+  providers: [ToastService],
 })
 export class TournamentDetails implements OnInit {
   // Modal states
   isAddTeamModalOpen = false;
   isEditTeamModalOpen = false;
   isDeleteTeamConfirmOpen = false;
-  
+
   // Team management
   editingTeam: Team | null = null;
   teamToDelete: string | null = null;
-  
+
   // Active tab
   activeTab: 'teams' | 'schedule' | 'bracket' | 'results' = 'teams';
-  
+
   // Tournament data
   tournament: Tournament | null = null;
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private router: Router,
     private toast: ToastService
   ) {}
@@ -102,7 +101,7 @@ export class TournamentDetails implements OnInit {
     const end = new Date(endDate);
     return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   }
-  
+
   getTeamRegistrationProgress(): number {
     if (!this.tournament || !this.tournament.teams) return 0;
     return (this.tournament.teams.length / this.tournament.maxTeams) * 100;
@@ -112,11 +111,11 @@ export class TournamentDetails implements OnInit {
   openAddTeamModal() {
     this.isAddTeamModalOpen = true;
   }
-  
+
   closeAddTeamModal() {
     this.isAddTeamModalOpen = false;
   }
-  
+
   handleAddTeam(team: Team) {
     if (!this.tournament) return;
 
@@ -131,7 +130,7 @@ export class TournamentDetails implements OnInit {
     this.editingTeam = team;
     this.isEditTeamModalOpen = true;
   }
-  
+
   closeEditTeamModal() {
     this.isEditTeamModalOpen = false;
     this.editingTeam = null;
@@ -142,9 +141,7 @@ export class TournamentDetails implements OnInit {
 
     this.tournament = {
       ...this.tournament,
-      teams: this.tournament.teams.map((t) =>
-        t.id === team.id ? team : t
-      ),
+      teams: this.tournament.teams.map((t) => (t.id === team.id ? team : t)),
     };
     this.toast.success('Team updated successfully');
   }
@@ -153,7 +150,7 @@ export class TournamentDetails implements OnInit {
     this.teamToDelete = teamId;
     this.isDeleteTeamConfirmOpen = true;
   }
-  
+
   closeDeleteConfirmation() {
     this.isDeleteTeamConfirmOpen = false;
     this.teamToDelete = null;
@@ -164,21 +161,23 @@ export class TournamentDetails implements OnInit {
 
     this.tournament = {
       ...this.tournament,
-      teams: this.tournament.teams.filter((team) => team.id !== this.teamToDelete),
+      teams: this.tournament.teams.filter(
+        (team) => team.id !== this.teamToDelete
+      ),
     };
     this.toast.success('Team removed from tournament');
     this.closeDeleteConfirmation();
   }
-  
+
   // Tournament actions
   generateSchedule() {
     this.toast.info('Schedule generation is not implemented yet');
   }
-  
+
   createBracket() {
     this.toast.info('Bracket creation is not implemented yet');
   }
-  
+
   cancelTournament() {
     // Would open a confirmation dialog in a real app
     this.toast.warn('Tournament cancellation is not implemented yet');
