@@ -4,12 +4,12 @@ import { Tournament } from '../../models/tournament';
 
 @Component({
   selector: 'app-tournament-card',
-  templateUrl: './tournament-card.component.html',
-  styleUrls: ['./tournament-card.component.css'],
+  templateUrl: './tournament-card.html',
+  styleUrls: ['./tournament-card.css'],
   standalone: true,
   imports: [],
 })
-export class TournamentCardComponent {
+export class TournamentCard {
   @Input() tournament!: Tournament;
   @Output() edit = new EventEmitter<Tournament>();
   @Output() delete = new EventEmitter<string>();

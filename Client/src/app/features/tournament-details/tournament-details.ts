@@ -1,18 +1,18 @@
 import { Team, TeamFormData, Tournament } from '@/app/shared/models/tournament';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModalComponent } from '@/app/shared/components/modal/modal.component';
-import { TeamFormComponent } from '@/app/shared/components/team-form/team-form.component';
+import { Modal } from '@/app/shared/components/modal/modal.component';
+import { TeamForm } from '@/app/shared/components/team-form/team-form';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 
 @Component({
   selector: 'app-tournament-details',
-  templateUrl: './tournament-details.component.html',
-  styleUrls: ['./tournament-details.component.css'],
+  templateUrl: './tournament-details.html',
+  styleUrls: ['./tournament-details.css'],
   standalone: true,
-  imports: [ModalComponent, TeamFormComponent, DashboardLayout],
+  imports: [Modal, TeamForm, DashboardLayout],
 })
-export class TournamentDetailsComponent implements OnInit {
+export class TournamentDetails implements OnInit {
   sidebarOpen = false;
   isAddTeamModalOpen = false;
   isEditTeamModalOpen = false;

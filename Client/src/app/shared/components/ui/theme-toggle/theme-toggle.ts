@@ -8,7 +8,7 @@ import { ThemeService } from '@/app/shared/services/theme.service';
   imports: [CommonModule],
   templateUrl: './theme-toggle.html',
 })
-export class ThemeToggleComponent {
+export class ThemeToggle {
   themeService = inject(ThemeService);
   currentIcon = computed(() => this.themeService.currentTheme());
 

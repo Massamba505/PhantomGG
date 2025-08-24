@@ -34,7 +34,7 @@ import { Router } from '@angular/router';
     </div>
   `,
 })
-export class UnauthorizedComponent {
+export class Unauthorized {
   constructor(private router: Router) {}
 
   navigateTo(path: string): void {

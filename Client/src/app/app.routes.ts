@@ -2,9 +2,7 @@ import { Routes } from '@angular/router';
 import { authRoutes } from './features/auth/auth.routes';
 import { authGuard } from './core/guards/auth.guard';
 import { authenticatedGuard } from './core/guards/authenticated.guard';
-import { UnauthorizedComponent } from './shared/components/unauthorized/unauthorized';
-import { DashboardComponent } from './features/dashboard/dashboard';
-import { TournamentDetailsComponent } from './features/tournament-details/tournament-details.component';
+import { Unauthorized } from './shared/components/unauthorized/unauthorized';
 
 export const routes: Routes = [
   {
@@ -17,23 +15,25 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () =>
-      import('./features/dashboard/dashboard').then(
-        (m) => m.DashboardComponent
+      import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+  },
+  {
+    path: 'tournament/:id',
+    loadComponent: () =>
+      import('./features/tournament-details/tournament-details').then(
+        (m) => m.TournamentDetails
       ),
   },
-  { path: 'tournament/:id', component: TournamentDetailsComponent },
   {
     path: 'tournaments',
     loadComponent: () =>
-      import('./features/tournaments/tournaments').then(
-        (m) => m.TournamentsComponent
-      ),
+      import('./features/tournaments/tournaments').then((m) => m.Tournaments),
   },
   {
     path: 'create-tournament',
     loadComponent: () =>
-      import('./features/create-tournament/create-tournament.component').then(
-        (m) => m.CreateTournamentComponent
+      import('./features/create-tournament/create-tournament').then(
+        (m) => m.CreateTournament
       ),
   },
   {
@@ -58,7 +58,7 @@ export const routes: Routes = [
   },
   {
     path: 'unauthorized',
-    component: UnauthorizedComponent,
+    component: Unauthorized,
     title: 'Unauthorized - PhantomGG',
   },
   {

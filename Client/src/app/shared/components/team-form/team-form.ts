@@ -3,11 +3,11 @@ import { Team, TeamFormData } from '../../models/tournament';
 
 @Component({
   selector: 'app-team-form',
-  templateUrl: './team-form.component.html',
-  styleUrls: ['./team-form.component.css'],
+  templateUrl: './team-form.html',
+  styleUrls: ['./team-form.css'],
   standalone: true,
 })
-export class TeamFormComponent {
+export class TeamForm {
   @Input() team: Team | null = null;
   @Output() save = new EventEmitter<TeamFormData>();
   @Output() cancel = new EventEmitter<void>();

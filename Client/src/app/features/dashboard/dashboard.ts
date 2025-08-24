@@ -7,4 +7,4 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
   styleUrls: ['./dashboard.css'],
   imports: [DashboardLayout],
 })
-export class DashboardComponent {}
+export class Dashboard {}

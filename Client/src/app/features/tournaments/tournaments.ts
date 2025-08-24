@@ -2,9 +2,9 @@ import { Tournament, TournamentFormData } from '@/app/shared/models/tournament';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Search, Plus, Menu, Filter } from 'lucide-angular';
-import { ModalComponent } from '@/app/shared/components/modal/modal.component';
-import { TournamentFormComponent } from '@/app/shared/components/tournament-form/tournament-form.component';
-import { TournamentCardComponent } from '@/app/shared/components/tournament-card/tournament-card.component';
+import { Modal } from '@/app/shared/components/modal/modal.component';
+import { TournamentFormComponent } from '@/app/shared/components/tournament-form/tournament-form';
+import { TournamentCard } from '@/app/shared/components/tournament-card/tournament-card';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 
 @Component({
@@ -12,14 +12,9 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
   templateUrl: './tournaments.html',
   styleUrls: ['./tournaments.css'],
   standalone: true,
-  imports: [
-    ModalComponent,
-    TournamentFormComponent,
-    TournamentCardComponent,
-    DashboardLayout,
-  ],
+  imports: [Modal, TournamentFormComponent, TournamentCard, DashboardLayout],
 })
-export class TournamentsComponent implements OnInit {
+export class Tournaments implements OnInit {
   sidebarOpen = false;
   searchTerm = '';
   filterStatus = 'all';

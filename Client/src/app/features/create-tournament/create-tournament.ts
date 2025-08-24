@@ -6,12 +6,12 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
 
 @Component({
   selector: 'app-create-tournament',
-  templateUrl: './create-tournament.component.html',
-  styleUrls: ['./create-tournament.component.css'],
+  templateUrl: './create-tournament.html',
+  styleUrls: ['./create-tournament.css'],
   standalone: true,
   imports: [DashboardLayout],
 })
-export class CreateTournamentComponent {
+export class CreateTournament {
   isSubmitting = false;
   tournamentForm: FormGroup;
 

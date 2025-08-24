@@ -7,7 +7,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   standalone: true,
   imports: [],
 })
-export class ModalComponent {
+export class Modal {
   @Input() isOpen = false;
   @Input() title = '';
   @Output() close = new EventEmitter<void>();

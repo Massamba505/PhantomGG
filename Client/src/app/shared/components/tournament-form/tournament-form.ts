@@ -3,8 +3,8 @@ import { Tournament, TournamentFormData } from '../../models/tournament';
 
 @Component({
   selector: 'app-tournament-form',
-  templateUrl: './tournament-form.component.html',
-  styleUrls: ['./tournament-form.component.css'],
+  templateUrl: './tournament-form.html',
+  styleUrls: ['./tournament-form.css'],
   standalone: true,
 })
 export class TournamentFormComponent {

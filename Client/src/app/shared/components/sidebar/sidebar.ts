@@ -20,7 +20,7 @@ import {
   Menu,
 } from 'lucide-angular';
 import { Roles } from '../../constants/roles';
-import { FooterComponent } from '../footer/footer';
+import { Footer } from '../footer/footer';
 
 interface MenuItem {
   title: string;
@@ -32,7 +32,7 @@ interface MenuItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule, LucideAngularModule, FooterComponent],
+  imports: [CommonModule, RouterModule, LucideAngularModule, Footer],
   templateUrl: './sidebar.html',
 })
 export class Sidebar implements OnInit, OnDestroy {
