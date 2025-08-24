@@ -15,11 +15,11 @@ import { ToastService } from '@/app/shared/services/toast.service';
   styleUrls: ['./tournaments.css'],
   standalone: true,
   imports: [
-    Modal, 
-    TournamentFormComponent, 
+    Modal,
+    TournamentFormComponent,
     DashboardLayout,
     CommonModule,
-    FormsModule
+    FormsModule,
   ],
 })
 export class Tournaments implements OnInit {
@@ -90,10 +90,7 @@ export class Tournaments implements OnInit {
 
   filteredTournaments: Tournament[] = [];
 
-  constructor(
-    private router: Router,
-    private toast: ToastService
-  ) {}
+  constructor(private router: Router, private toast: ToastService) {}
 
   ngOnInit() {
     this.filterTournaments();
