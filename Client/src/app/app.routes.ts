@@ -3,6 +3,7 @@ import { authRoutes } from './features/auth/auth.routes';
 import { authGuard } from './core/guards/auth.guard';
 import { authenticatedGuard } from './core/guards/authenticated.guard';
 import { Unauthorized } from './shared/components/unauthorized/unauthorized';
+import { NotFoundComponent } from './features/not-found/not-found';
 
 export const routes: Routes = [
   {
@@ -27,7 +28,7 @@ export const routes: Routes = [
   {
     path: 'tournament/:id',
     redirectTo: 'tournament-details/:id',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'tournaments',
@@ -68,6 +69,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '',
+    component: NotFoundComponent,
   },
 ];
