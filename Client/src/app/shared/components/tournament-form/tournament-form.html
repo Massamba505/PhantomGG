@@ -1,44 +1,248 @@
-<form (ngSubmit)="onSubmit()" class="space-y-4">
+<form [formGroup]="tournamentForm" (ngSubmit)="onSubmit()" class="space-y-6">
   <div>
-    <label class="block text-sm font-medium mb-2">
-      Tournament Name
-    </label>
-    <input type="text" name="name" class="input-field w-full" required />
-  </div>
+    <label class="block text-sm font-medium mb-2">Tournament Banner</label>
 
-  <div>
-    <label class="block text-sm font-medium mb-2">
-      Description
-    </label>
-    <textarea name="description" class="input-field w-full h-24 resize-none" required></textarea>
-  </div>
+    <div
+      class="relative border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer hover:border-primary transition h-48 bg-muted/30"
+      (click)="fileInput.click()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      [ngClass]="{ 'border-primary bg-primary/10': isDragging }"
+    >
+      <input
+        type="file"
+        #fileInput
+        accept="image/*"
+        class="hidden"
+        (change)="onBannerChange($event)"
+      />
 
-  <div class="grid grid-cols-2 gap-4">
-    <div>
-      <label class="block text-sm font-medium mb-2">
-        Start Date
-      </label>
-      <input type="date" name="startDate" class="input-field w-full" required />
+      @if (!bannerPreview) {
+      <div class="text-center px-4">
+        <p class="text-sm text-muted-foreground">
+          Drag & drop your banner here, or
+          <span class="text-primary font-medium underline"
+            >click to upload</span
+          >
+        </p>
+        <p class="text-xs text-muted-foreground mt-1">
+          Recommended: 1200x400px
+        </p>
+      </div>
+      } @if (bannerPreview) {
+      <img
+        [src]="bannerPreview"
+        alt="Banner Preview"
+        class="absolute inset-0 w-full h-full object-cover rounded-xl"
+      />
+      }
     </div>
-    <div>
-      <label class="block text-sm font-medium mb-2">
-        End Date
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="md:col-span-2">
+      <label for="name" class="block text-sm font-medium mb-2">
+        Tournament Name <span class="required">*</span>
       </label>
-      <input type="date" name="endDate" class="input-field w-full" required />
+      <input
+        type="text"
+        id="name"
+        formControlName="name"
+        placeholder="Enter tournament name"
+        class="input-field"
+        [ngClass]="{
+          'border-destructive':
+            isSubmitted && tournamentForm.get('name')?.invalid
+        }"
+      />
+      @if (isSubmitted && tournamentForm.get('name')?.invalid) {
+      <div class="text-sm error mt-1">
+        Tournament name is required (min 3 characters)
+      </div>
+      }
+    </div>
+
+    <div class="md:col-span-2">
+      <label for="description" class="block text-sm font-medium mb-2">
+        Tournament Description <span class="required">*</span>
+      </label>
+      <textarea
+        id="description"
+        formControlName="description"
+        placeholder="Describe your tournament"
+        class="input-field h-32 resize-none"
+        [ngClass]="{
+          'border-destructive':
+            isSubmitted && tournamentForm.get('description')?.invalid
+        }"
+      ></textarea>
+      @if (isSubmitted && tournamentForm.get('description')?.invalid) {
+      <div class="text-sm error mt-1">
+        Description must be at least 10 characters
+      </div>
+      }
+    </div>
+
+    <div>
+      <label for="location" class="block text-sm font-medium mb-2">
+        Location <span class="required">*</span>
+      </label>
+      <input
+        type="text"
+        id="location"
+        formControlName="location"
+        placeholder="Tournament location"
+        class="input-field"
+        [ngClass]="{
+          'border-destructive':
+            isSubmitted && tournamentForm.get('location')?.invalid
+        }"
+      />
+      @if (isSubmitted && tournamentForm.get('location')?.invalid) {
+      <div class="text-sm error mt-1">Location is required</div>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div>
+      <label for="registrationDeadline" class="block text-sm font-medium mb-2">
+        Registration Deadline <span class="required">*</span>
+      </label>
+      <input
+        type="date"
+        id="registrationDeadline"
+        formControlName="registrationDeadline"
+        class="input-field"
+      />
+      @if (tournamentForm.errors?.['deadlineInvalid']) {
+      <div class="text-sm error mt-1">
+        Deadline must be before tournament start
+      </div>
+      }
+    </div>
+
+    <div>
+      <label for="startDate" class="block text-sm font-medium mb-2">
+        Start Date <span class="required">*</span>
+      </label>
+      <input
+        type="date"
+        id="startDate"
+        formControlName="startDate"
+        class="input-field"
+      />
+      @if (isSubmitted && tournamentForm.get('startDate')?.invalid) {
+      <div class="text-sm error mt-1">Start date is required</div>
+      }
+    </div>
+
+    <div>
+      <label for="endDate" class="block text-sm font-medium mb-2">
+        End Date <span class="required">*</span>
+      </label>
+      <input
+        type="date"
+        id="endDate"
+        formControlName="endDate"
+        class="input-field"
+      />
+      @if (isSubmitted && tournamentForm.get('endDate')?.invalid) {
+      <div class="text-sm error mt-1">End date is required</div>
+      } @if (tournamentForm.errors?.['dateRange']) {
+      <div class="text-sm error mt-1">End date must be after start date</div>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div>
+      <label for="maxTeams" class="block text-sm font-medium mb-2">
+        Maximum Teams <span class="required">*</span>
+      </label>
+      <select id="maxTeams" formControlName="maxTeams" class="form-select">
+        <option value="4">4 Teams</option>
+        <option value="8">8 Teams</option>
+        <option value="16">16 Teams</option>
+        <option value="32">32 Teams</option>
+        <option value="64">64 Teams</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="entryFee" class="block text-sm font-medium mb-2"
+        >Entry Fee</label
+      >
+      <input
+        type="number"
+        id="entryFee"
+        formControlName="entryFee"
+        class="input-field"
+      />
+    </div>
+
+    <div>
+      <label for="prizePool" class="block text-sm font-medium mb-2"
+        >Prize Pool</label
+      >
+      <input
+        type="number"
+        id="prizePool"
+        formControlName="prizePool"
+        class="input-field"
+      />
     </div>
   </div>
 
   <div>
-    <label class="block text-sm font-medium mb-2">
-      Maximum Teams
+    <label for="contactEmail" class="block text-sm font-medium mb-2">
+      Contact Email <span class="required">*</span>
     </label>
-    <input type="number" name="maxTeams" class="input-field w-full" min="2" max="64" required />
+    <input
+      type="email"
+      id="contactEmail"
+      formControlName="contactEmail"
+      placeholder="contact@example.com"
+      class="input-field"
+    />
+    @if (isSubmitted &&
+    tournamentForm.get('contactEmail')?.errors?.['required']) {
+    <div class="text-sm error mt-1">Contact email is required</div>
+    } @if (isSubmitted && tournamentForm.get('contactEmail')?.errors?.['email'])
+    {
+    <div class="text-sm error mt-1">Please enter a valid email</div>
+    }
   </div>
 
-  <div class="flex space-x-3 pt-4">
-    <button type="submit" class="btn btn-primary flex-1">Save Changes</button>
-    <button type="button" (click)="onCancel()" class="btn btn-secondary flex-1">
+  <div class="flex gap-4">
+    @if (isEditMode) {
+    <button
+      type="button"
+      (click)="onCancel()"
+      class="btn btn-outline flex-1"
+      [disabled]="isSubmitting"
+    >
       Cancel
+    </button>
+    }
+    <button
+      type="submit"
+      [disabled]="isSubmitting"
+      class="btn btn-primary"
+      [class.w-full]="!isEditMode"
+      [class.flex-1]="isEditMode"
+    >
+      <div class="flex items-center justify-center gap-2">
+        @if (isSubmitting) {
+        <lucide-angular
+          [img]="icons.Loader2"
+          size="16"
+          class="animate-spin"
+        ></lucide-angular>
+        }
+        {{ submitButtonText }}
+      </div>
     </button>
   </div>
 </form>

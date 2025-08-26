@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { Tournament, TournamentFormData } from '@/app/shared/models/tournament';
-import { TournamentForm } from "../create-tournament-form/create-tournament-form";
+import { TournamentForm } from '@/app/shared/components/tournament-form/tournament-form';
 
 @Component({
   selector: 'app-edit-tournament',

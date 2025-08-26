@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { TournamentForm } from './components/create-tournament-form/create-tournament-form';
 import { TournamentFormData } from '@/app/shared/models/tournament';
+import { TournamentForm } from '@/app/shared/components/tournament-form/tournament-form';
 
 @Component({
   selector: 'app-create-tournament',
@@ -20,10 +20,8 @@ export class CreateTournament {
   ) {}
 
   onTournamentSaved(tournamentData: TournamentFormData) {
-    // Here you would typically call your API service
     console.log('Tournament data received:', tournamentData);
     
-    // Simulate API call
     setTimeout(() => {
       this.toast.success('Tournament created successfully!');
       this.router.navigate(['/tournaments']);
