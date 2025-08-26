@@ -30,7 +30,8 @@ import {
   Home,
   Eye,
   EyeOff,
-  Loader2
+  Loader2,
+  AlertTriangle
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -65,5 +66,6 @@ export const LucideIcons = {
   Home,
   Eye,
   EyeOff,
-  Loader2
+  Loader2,
+  AlertTriangle
 };

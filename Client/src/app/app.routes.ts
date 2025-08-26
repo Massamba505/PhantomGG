@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { authRoutes } from './features/auth/auth.routes';
 import { authGuard } from './core/guards/auth.guard';
 import { authenticatedGuard } from './core/guards/authenticated.guard';
-import { Unauthorized } from './shared/components/unauthorized/unauthorized';
 import { NotFoundComponent } from './features/not-found/not-found';
 
 export const routes: Routes = [
@@ -64,7 +63,8 @@ export const routes: Routes = [
   },
   {
     path: 'unauthorized',
-    component: Unauthorized,
+    loadComponent: () =>
+      import('./features/unauthorized/unauthorized').then((m) => m.Unauthorized),
     title: 'Unauthorized - PhantomGG',
   },
   {

@@ -5,14 +5,15 @@ import { ToastService } from '@/app/shared/services/toast.service';
 import { Router, RouterLink } from '@angular/router';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Modal } from '@/app/shared/components/modal/modal';
+
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { Modal } from "@/app/shared/components/ui/modal/modal";
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, DashboardLayout, RouterLink, ReactiveFormsModule, Modal, LucideAngularModule],
+  imports: [CommonModule, DashboardLayout, RouterLink, ReactiveFormsModule, LucideAngularModule, Modal],
   templateUrl: './profile.html',
   styleUrls: ['./profile.css']
 })

@@ -1,13 +1,13 @@
 import { Team, Tournament } from '@/app/shared/models/tournament';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { TeamModal } from '@/app/shared/components/team-modal/team-modal';
+import { TeamModal } from './components/modals/team-modal';
 import { TeamCard } from '@/app/shared/components/team-card/team-card';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LucideAngularModule } from "lucide-angular";
-import { ConfirmDeleteModal } from "@/app/shared/components/ConfirmDeleteModal/ConfirmDeleteModal";
+import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
 
 @Component({
   selector: 'app-tournament-details',
@@ -27,22 +27,45 @@ import { ConfirmDeleteModal } from "@/app/shared/components/ConfirmDeleteModal/C
   providers: [ToastService],
 })
 export class TournamentDetails implements OnInit {
-  // Modal states
-  isAddTeamModalOpen = false;
-  isEditTeamModalOpen = false;
-  isDeleteTeamConfirmOpen = false;
+  // Modal states - converted to signals
+  isAddTeamModalOpen = signal(false);
+  isEditTeamModalOpen = signal(false);
+  isDeleteTeamConfirmOpen = signal(false);
 
   readonly icons = LucideIcons;
 
-  // Team management
-  editingTeam: Team | null = null;
-  teamToDelete: string | null = null;
+  // Team management - converted to signals
+  editingTeam = signal<Team | null>(null);
+  teamToDelete = signal<Team | null>(null);
 
-  // Active tab
-  activeTab: 'teams' | 'schedule' | 'bracket' | 'results' = 'teams';
+  // Active tab - converted to signal
+  activeTab = signal<'teams' | 'schedule' | 'bracket' | 'results'>('teams');
 
-  // Tournament data
-  tournament: Tournament | null = null;
+  // Tournament data - converted to signal
+  tournament = signal<Tournament | null>(null);
+
+  // Computed signals for derived values
+  tournamentDuration = computed(() => {
+    const t = this.tournament();
+    if (!t) return 0;
+    return this.calculateDuration(t.startDate, t.endDate);
+  });
+
+  teamRegistrationProgress = computed(() => {
+    const t = this.tournament();
+    if (!t || !t.teams) return 0;
+    return (t.teams.length / t.maxTeams) * 100;
+  });
+
+  teamsCount = computed(() => {
+    const t = this.tournament();
+    return t?.teams?.length || 0;
+  });
+
+  maxTeams = computed(() => {
+    const t = this.tournament();
+    return t?.maxTeams || 0;
+  });
 
   constructor(
     private route: ActivatedRoute,
@@ -52,7 +75,7 @@ export class TournamentDetails implements OnInit {
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    this.tournament = {
+    this.tournament.set({
       id: id || '1',
       name: 'Summer League 2024',
       description:
@@ -91,84 +114,96 @@ export class TournamentDetails implements OnInit {
           createdAt: '2024-05-17',
         },
       ],
-    };
+    });
   }
 
   // Tab management
   setActiveTab(tab: 'teams' | 'schedule' | 'bracket' | 'results') {
-    this.activeTab = tab;
+    this.activeTab.set(tab);
   }
 
   // Tournament utils
-  getTournamentDuration(startDate: string, endDate: string): number {
+  private calculateDuration(startDate: string, endDate: string): number {
     const start = new Date(startDate);
     const end = new Date(endDate);
     return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   }
 
+  getTournamentDuration(startDate: string, endDate: string): number {
+    return this.calculateDuration(startDate, endDate);
+  }
+
   getTeamRegistrationProgress(): number {
-    if (!this.tournament || !this.tournament.teams) return 0;
-    return (this.tournament.teams.length / this.tournament.maxTeams) * 100;
+    return this.teamRegistrationProgress();
   }
 
   // Team management methods
   openAddTeamModal() {
-    this.isAddTeamModalOpen = true;
+    this.isAddTeamModalOpen.set(true);
   }
 
   closeAddTeamModal() {
-    this.isAddTeamModalOpen = false;
+    this.isAddTeamModalOpen.set(false);
   }
 
   handleAddTeam(team: Team) {
-    if (!this.tournament) return;
+    const currentTournament = this.tournament();
+    if (!currentTournament) return;
 
-    this.tournament = {
-      ...this.tournament,
-      teams: [...this.tournament.teams, team],
-    };
+    this.tournament.update(t => t ? {
+      ...t,
+      teams: [...t.teams, team],
+    } : null);
     this.toast.success('Team added successfully');
+    this.closeAddTeamModal();
   }
 
   handleEditTeam(team: Team) {
-    this.editingTeam = team;
-    this.isEditTeamModalOpen = true;
+    this.editingTeam.set(team);
+    console.log(this.editingTeam());
+    this.isEditTeamModalOpen.set(true);
   }
 
   closeEditTeamModal() {
-    this.isEditTeamModalOpen = false;
-    this.editingTeam = null;
+    this.isEditTeamModalOpen.set(false);
+    this.editingTeam.set(null);
   }
 
   handleUpdateTeam(team: Team) {
-    if (!this.tournament) return;
+    const currentTournament = this.tournament();
+    if (!currentTournament) return;
 
-    this.tournament = {
-      ...this.tournament,
-      teams: this.tournament.teams.map((t) => (t.id === team.id ? team : t)),
-    };
+    this.tournament.update(t => t ? {
+      ...t,
+      teams: t.teams.map((existingTeam: Team) => 
+        existingTeam.id === team.id ? team : existingTeam
+      ),
+    } : null);
     this.toast.success('Team updated successfully');
+    this.closeEditTeamModal();
   }
 
   openDeleteConfirmation(teamId: string) {
-    this.teamToDelete = teamId;
-    this.isDeleteTeamConfirmOpen = true;
+    const currentTournament = this.tournament();
+    const team = currentTournament?.teams.find((t: Team) => t.id === teamId);
+    this.teamToDelete.set(team || null);
+    this.isDeleteTeamConfirmOpen.set(true);
   }
 
   closeDeleteConfirmation() {
-    this.isDeleteTeamConfirmOpen = false;
-    this.teamToDelete = null;
+    this.isDeleteTeamConfirmOpen.set(false);
+    this.teamToDelete.set(null);
   }
 
   confirmDeleteTeam() {
-    if (!this.tournament || !this.teamToDelete) return;
+    const currentTournament = this.tournament();
+    const teamToDelete = this.teamToDelete();
+    if (!currentTournament || !teamToDelete) return;
 
-    this.tournament = {
-      ...this.tournament,
-      teams: this.tournament.teams.filter(
-        (team) => team.id !== this.teamToDelete
-      ),
-    };
+    this.tournament.update(t => t ? {
+      ...t,
+      teams: t.teams.filter((team: Team) => team.id !== teamToDelete.id),
+    } : null);
     this.toast.success('Team removed from tournament');
     this.closeDeleteConfirmation();
   }

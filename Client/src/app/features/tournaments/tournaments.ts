@@ -1,8 +1,6 @@
-import { Tournament, TournamentFormData } from '@/app/shared/models/tournament';
+import { Tournament } from '@/app/shared/models/tournament';
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Modal } from '@/app/shared/components/modal/modal';
-import { TournamentFormComponent } from '@/app/shared/components/tournament-form/tournament-form';
 import { TournamentCard } from '@/app/shared/components/tournament-card/tournament-card';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { CommonModule } from '@angular/common';
@@ -10,21 +8,21 @@ import { FormsModule } from '@angular/forms';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LucideAngularModule } from "lucide-angular";
-import { ConfirmDeleteModal } from "@/app/shared/components/ConfirmDeleteModal/ConfirmDeleteModal";
+import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
+import { EditTournamentModal } from './components/modals/edit-tournament-modal';
 
 @Component({
   selector: 'app-tournaments',
   templateUrl: './tournaments.html',
   styleUrls: ['./tournaments.css'],
   imports: [
-    Modal,
-    TournamentFormComponent,
     DashboardLayout,
     CommonModule,
     FormsModule,
     LucideAngularModule,
     TournamentCard,
-    ConfirmDeleteModal
+    ConfirmDeleteModal,
+    EditTournamentModal
 ],
 })
 
@@ -146,11 +144,11 @@ export class Tournaments implements OnInit {
     this.router.navigate(['/tournament-details', tournament.id]);
   }
 
-  handleSaveTournament(formData: TournamentFormData) {
+  handleSaveTournament(updatedTournament: Tournament) {
     const currentTournament = this.editingTournament();
     if (currentTournament) {
       this.tournaments = this.tournaments.map((t) =>
-        t.id === currentTournament.id ? { ...t, ...formData } : t
+        t.id === currentTournament.id ? updatedTournament : t
       );
       this.filterTournaments();
       this.toast.success('Tournament updated successfully');

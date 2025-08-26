@@ -16,7 +16,7 @@
       </div>
 
       <div class="flex gap-3">
-        @if (tournament?.status === 'draft') {
+        @if (tournament()?.status === 'draft') {
         <button class="btn btn-outline">
           <lucide-angular [img]="icons.SquarePen"></lucide-angular>
           Edit Tournament
@@ -33,20 +33,20 @@
       <div class="flex flex-col lg:flex-row gap-6">
         <div class="flex-1">
           <div class="flex items-center gap-3 mb-3">
-            <h2 class="text-2xl font-bold">{{ tournament?.name }}</h2>
+            <h2 class="text-2xl font-bold">{{ tournament()?.name }}</h2>
             <span
               class="badge"
               [ngClass]="{
-                'badge-draft': tournament?.status === 'draft',
-                'badge-active': tournament?.status === 'active',
-                'badge-completed': tournament?.status === 'completed'
+                'badge-draft': tournament()?.status === 'draft',
+                'badge-active': tournament()?.status === 'active',
+                'badge-completed': tournament()?.status === 'completed'
               }"
             >
-              {{ tournament?.status | titlecase }}
+              {{ tournament()?.status | titlecase }}
             </span>
           </div>
           <p class="text-muted-foreground mb-6 max-w-3xl">
-            {{ tournament?.description }}
+            {{ tournament()?.description }}
           </p>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -59,7 +59,7 @@
                 <h3 class="text-sm font-medium">Start Date</h3>
               </div>
               <p class="text-foreground font-medium">
-                {{ tournament?.startDate | date : "mediumDate" }}
+                {{ tournament()?.startDate | date : "mediumDate" }}
               </p>
             </div>
 
@@ -72,7 +72,7 @@
                 <h3 class="text-sm font-medium">End Date</h3>
               </div>
               <p class="text-foreground font-medium">
-                {{ tournament?.endDate | date : "mediumDate" }}
+                {{ tournament()?.endDate | date : "mediumDate" }}
               </p>
             </div>
 
@@ -82,16 +82,14 @@
                 <h3 class="text-sm font-medium">Teams</h3>
               </div>
               <p class="text-foreground font-medium">
-                {{ tournament?.teams?.length || 0 }}/{{
-                  tournament?.maxTeams || 0
-                }}
+                {{ teamsCount() }}/{{ maxTeams() }}
               </p>
               <div
                 class="w-full h-1.5 bg-muted mt-2 rounded-full overflow-hidden"
               >
                 <div
                   class="h-full bg-primary rounded-full"
-                  [style.width.%]="getTeamRegistrationProgress()"
+                  [style.width.%]="teamRegistrationProgress()"
                 ></div>
               </div>
             </div>
@@ -102,13 +100,7 @@
                 <h3 class="text-sm font-medium">Duration</h3>
               </div>
               <p class="text-foreground font-medium">
-                {{
-                  getTournamentDuration(
-                    tournament?.startDate || "",
-                    tournament?.endDate || ""
-                  )
-                }}
-                days
+                {{ tournamentDuration() }} days
               </p>
             </div>
           </div>
@@ -123,11 +115,11 @@
             (click)="setActiveTab('teams')"
             class="px-4 py-2 font-medium border-b-2"
             [ngClass]="
-              activeTab === 'teams'
+              activeTab() === 'teams'
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             "
-            aria-selected="activeTab === 'teams'"
+            aria-selected="activeTab() === 'teams'"
           >
             Teams
           </button>
@@ -135,11 +127,11 @@
             (click)="setActiveTab('schedule')"
             class="px-4 py-2 font-medium border-b-2"
             [ngClass]="
-              activeTab === 'schedule'
+              activeTab() === 'schedule'
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             "
-            aria-selected="activeTab === 'schedule'"
+            aria-selected="activeTab() === 'schedule'"
           >
             Schedule
           </button>
@@ -147,11 +139,11 @@
             (click)="setActiveTab('bracket')"
             class="px-4 py-2 font-medium border-b-2"
             [ngClass]="
-              activeTab === 'bracket'
+              activeTab() === 'bracket'
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             "
-            aria-selected="activeTab === 'bracket'"
+            aria-selected="activeTab() === 'bracket'"
           >
             Bracket
           </button>
@@ -159,11 +151,11 @@
             (click)="setActiveTab('results')"
             class="px-4 py-2 font-medium border-b-2"
             [ngClass]="
-              activeTab === 'results'
+              activeTab() === 'results'
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             "
-            aria-selected="activeTab === 'results'"
+            aria-selected="activeTab() === 'results'"
           >
             Results
           </button>
@@ -172,13 +164,13 @@
     </div>
 
     <!-- Teams Section -->
-    @if (activeTab === 'teams') {
+    @if (activeTab() === 'teams') {
     <div class="mb-6">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Registered Teams</h2>
         <div class="text-sm text-muted-foreground">
-          {{ tournament?.teams?.length || 0 }} of
-          {{ tournament?.maxTeams || 0 }} teams
+          {{ tournament()?.teams?.length || 0 }} of
+          {{ tournament()?.maxTeams || 0 }} teams
         </div>
       </div>
 
@@ -186,7 +178,7 @@
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
       >
-        @for (team of tournament?.teams; track team.id) {
+        @for (team of tournament()?.teams; track team.id) {
         <div>
           <app-team-card
             [team]="team"
@@ -195,8 +187,8 @@
             (delete)="openDeleteConfirmation(team.id)"
           ></app-team-card>
         </div>
-        } @if ( tournament && tournament.teams && tournament.teams.length <
-        tournament.maxTeams ) {
+        } @if ( tournament() && tournament()?.teams &&
+        tournament()?.teams!.length < tournament()!.maxTeams ) {
         <div
           class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer hover:border-primary transition-colors"
           (click)="openAddTeamModal()"
@@ -215,7 +207,7 @@
       </div>
 
       <!-- Empty state for no teams -->
-      @if (tournament?.teams?.length === 0) {
+      @if (tournament()?.teams?.length === 0) {
       <div
         class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer hover:border-primary transition-colors"
       >
@@ -237,7 +229,7 @@
     }
 
     <!-- Schedule Tab (Placeholder) -->
-    @if (activeTab === 'schedule') {
+    @if (activeTab() === 'schedule') {
     <div class="card p-8 text-center">
       <div
         class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
@@ -259,7 +251,7 @@
     }
 
     <!-- Bracket Tab (Placeholder) -->
-    @if (activeTab === 'bracket') {
+    @if (activeTab() === 'bracket') {
     <div class="card p-8 text-center">
       <div
         class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
@@ -281,7 +273,7 @@
     }
 
     <!-- Results Tab (Placeholder) -->
-    @if (activeTab === 'results') {
+    @if (activeTab() === 'results') {
     <div class="card p-8 text-center">
       <div
         class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
@@ -305,22 +297,22 @@
 
   <!-- Team Management Modals -->
   <app-team-modal
-    [isOpen]="isAddTeamModalOpen"
-    [tournamentId]="tournament?.id || ''"
+    [isOpen]="isAddTeamModalOpen()"
+    [tournamentId]="tournament()?.id || ''"
     (save)="handleAddTeam($event)"
     (close)="closeAddTeamModal()"
   ></app-team-modal>
 
   <app-team-modal
-    [isOpen]="isEditTeamModalOpen"
-    [team]="editingTeam"
-    [tournamentId]="tournament?.id || ''"
+    [isOpen]="isEditTeamModalOpen()"
+    [team]="editingTeam()"
+    [tournamentId]="tournament()?.id || ''"
     (save)="handleUpdateTeam($event)"
     (close)="closeEditTeamModal()"
   ></app-team-modal>
 
   <app-confirm-delete-modal
-    [isOpen]="isDeleteTeamConfirmOpen"
+    [isOpen]="isDeleteTeamConfirmOpen()"
     [title]="'Delete Team'"
     [entityName]="'team'"
     (close)="closeDeleteConfirmation()"

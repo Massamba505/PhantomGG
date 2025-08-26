@@ -3,6 +3,7 @@ export interface TeamFormData {
   city: string;
   coach: string;
   players: number;
+  logoUrl?: string
 }
 
 export interface Team extends TeamFormData {

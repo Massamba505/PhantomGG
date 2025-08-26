@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Modal } from "../modal/modal";
 import { LucideAngularModule } from "lucide-angular";
-import { LucideIcons } from '../ui/icons/lucide-icons';
+import { LucideIcons } from '../icons/lucide-icons';
 
 @Component({
   selector: 'app-confirm-delete-modal',

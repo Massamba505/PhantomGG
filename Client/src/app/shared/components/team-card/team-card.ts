@@ -18,6 +18,7 @@ export class TeamCard {
   @Output() delete = new EventEmitter<string>();
   readonly icons = LucideIcons;
   
+  
   getFormattedDate(dateString: string): string {
     if (!dateString) return '';
     

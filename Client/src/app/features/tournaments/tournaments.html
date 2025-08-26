@@ -111,19 +111,12 @@
     }
   </section>
 
-  <app-modal
+  <app-edit-tournament-modal
     [isOpen]="isEditModalOpen()"
+    [tournament]="editingTournament()"
     (close)="isEditModalOpen.set(false); editingTournament.set(null)"
-    title="Edit Tournament"
-  >
-    @if (editingTournament()) {
-    <app-tournament-form
-      [tournament]="editingTournament()!"
-      (save)="handleSaveTournament($event)"
-      (cancel)="isEditModalOpen.set(false); editingTournament.set(null)"
-    ></app-tournament-form>
-    }
-  </app-modal>
+    (save)="handleSaveTournament($event)"
+  ></app-edit-tournament-modal>
 
   <app-confirm-delete-modal
     [isOpen]="isDeleteModalOpen()"

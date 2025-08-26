@@ -1,16 +1,20 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Team, TeamFormData } from '../../models/tournament';
-import { TeamForm } from '../team-form/team-form';
-import { ToastService } from '../../services/toast.service';
-import { Modal } from '../modal/modal';
+import { Team, TeamFormData } from '@/app/shared/models/tournament';
+import { TeamForm } from '@/app/shared/components/team-form/team-form';
+import { ToastService } from '@/app/shared/services/toast.service';
+import { Modal } from '@/app/shared/components/ui/modal/modal';
 
 @Component({
   selector: 'app-team-modal',
   standalone: true,
   imports: [CommonModule, TeamForm, Modal],
   template: `
-    <app-modal [isOpen]="isOpen" (close)="close.emit()" title="Team">
+    <app-modal 
+      [isOpen]="isOpen" 
+      (close)="close.emit()" 
+      [title]="team ? 'Edit Team' : 'Add Team'"
+    >
       <app-team-form
         [team]="team"
         (save)="onSaveTeam($event)"
@@ -19,7 +23,7 @@ import { Modal } from '../modal/modal';
     </app-modal>
   `,
 })
-export class TeamModal implements OnInit {
+export class TeamModal implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Input() team: Team | null = null;
   @Input() tournamentId: string | null = null;
@@ -30,7 +34,13 @@ export class TeamModal implements OnInit {
   constructor(private toastService: ToastService) {}
 
   ngOnInit() {
-    // Add any initialization logic here
+    console.log('TeamModal initialized with team:', this.team);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['team']) {
+      console.log('Team changed in modal:', changes['team'].currentValue);
+    }
   }
 
   onSaveTeam(formData: TeamFormData) {

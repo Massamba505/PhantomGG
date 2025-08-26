@@ -15,7 +15,11 @@
             <div
               class="w-32 h-32 bg-primary/20 rounded-full flex items-center justify-center mb-4"
             >
-              <lucide-angular [img]="icons.User" size="48" class="text-primary"></lucide-angular>
+              <lucide-angular
+                [img]="icons.User"
+                size="48"
+                class="text-primary"
+              ></lucide-angular>
             </div>
             <h2 class="text-xl font-bold mb-1">
               {{ user()?.firstName }} {{ user()?.lastName }}
@@ -48,21 +52,33 @@
               class="btn btn-outline w-full justify-start"
               (click)="isEditProfileModalOpen.set(true)"
             >
-              <lucide-angular [img]="icons.Edit" size="18" class="mr-2"></lucide-angular>
+              <lucide-angular
+                [img]="icons.Edit"
+                size="18"
+                class="mr-2"
+              ></lucide-angular>
               Edit Profile
             </button>
             <button
               class="btn btn-outline w-full justify-start"
               (click)="isChangePasswordModalOpen.set(true)"
             >
-              <lucide-angular [img]="icons.Lock" size="18" class="mr-2"></lucide-angular>
+              <lucide-angular
+                [img]="icons.Lock"
+                size="18"
+                class="mr-2"
+              ></lucide-angular>
               Change Password
             </button>
             <button
               class="btn btn-destructive w-full justify-start"
               (click)="confirmLogout()"
             >
-              <lucide-angular [img]="icons.LogOut" size="18" class="mr-2"></lucide-angular>
+              <lucide-angular
+                [img]="icons.LogOut"
+                size="18"
+                class="mr-2"
+              ></lucide-angular>
               Logout
             </button>
           </div>
@@ -109,13 +125,23 @@
                   class="bg-primary/20 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                 >
                   @if (activity.type === 'tournament') {
-                    <lucide-angular [img]="icons.Trophy" size="16" class="text-primary"></lucide-angular>
-                  }
-                  @if (activity.type === 'team') {
-                    <lucide-angular [img]="icons.Users" size="16" class="text-primary"></lucide-angular>
-                  }
-                  @if (activity.type === 'account') {
-                    <lucide-angular [img]="icons.User" size="16" class="text-primary"></lucide-angular>
+                  <lucide-angular
+                    [img]="icons.Trophy"
+                    size="16"
+                    class="text-primary"
+                  ></lucide-angular>
+                  } @if (activity.type === 'team') {
+                  <lucide-angular
+                    [img]="icons.Users"
+                    size="16"
+                    class="text-primary"
+                  ></lucide-angular>
+                  } @if (activity.type === 'account') {
+                  <lucide-angular
+                    [img]="icons.User"
+                    size="16"
+                    class="text-primary"
+                  ></lucide-angular>
                   }
                 </div>
                 <div class="flex-1">
