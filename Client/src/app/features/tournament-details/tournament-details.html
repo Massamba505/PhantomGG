@@ -1,13 +1,27 @@
 <div class="flex h-screen">
   <div class="container mx-auto py-8 px-4 md:px-6">
     <!-- Header -->
-    <header class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <header
+      class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+    >
       <div>
         <div class="flex items-center gap-2 mb-1">
-          <a routerLink="/tournaments"
-            class="text-muted-foreground hover:text-foreground transition-colors flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+          <a
+            routerLink="/tournaments"
+            class="text-muted-foreground hover:text-foreground transition-colors flex items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="mr-1"
+            >
               <path d="m15 18-6-6 6-6" />
             </svg>
             <span>Back to tournaments</span>
@@ -17,16 +31,36 @@
 
       <div class="flex gap-3">
         <button *ngIf="tournament?.status === 'draft'" class="btn btn-outline">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="mr-2"
+          >
             <path d="M12 20h9" />
             <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
           </svg>
           Edit Tournament
         </button>
         <button (click)="openAddTeamModal()" class="btn btn-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="mr-2"
+          >
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <line x1="19" x2="19" y1="8" y2="14" />
@@ -43,11 +77,14 @@
         <div class="flex-1">
           <div class="flex items-center gap-3 mb-3">
             <h2 class="text-2xl font-bold">{{ tournament?.name }}</h2>
-            <span class="badge" [ngClass]="{
-              'badge-draft': tournament?.status === 'draft',
-              'badge-active': tournament?.status === 'active',
-              'badge-completed': tournament?.status === 'completed'
-            }">
+            <span
+              class="badge"
+              [ngClass]="{
+                'badge-draft': tournament?.status === 'draft',
+                'badge-active': tournament?.status === 'active',
+                'badge-completed': tournament?.status === 'completed'
+              }"
+            >
               {{ tournament?.status | titlecase }}
             </span>
           </div>
@@ -59,9 +96,18 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="p-4 bg-muted/30 rounded-lg">
               <div class="flex items-center gap-3 mb-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  class="text-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-primary"
+                >
                   <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
                   <line x1="16" x2="16" y1="2" y2="6" />
                   <line x1="8" x2="8" y1="2" y2="6" />
@@ -70,15 +116,24 @@
                 <h3 class="text-sm font-medium">Start Date</h3>
               </div>
               <p class="text-foreground font-medium">
-                {{ tournament?.startDate | date:'mediumDate' }}
+                {{ tournament?.startDate | date : "mediumDate" }}
               </p>
             </div>
 
             <div class="p-4 bg-muted/30 rounded-lg">
               <div class="flex items-center gap-3 mb-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  class="text-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-primary"
+                >
                   <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
                   <line x1="16" x2="16" y1="2" y2="6" />
                   <line x1="8" x2="8" y1="2" y2="6" />
@@ -87,15 +142,24 @@
                 <h3 class="text-sm font-medium">End Date</h3>
               </div>
               <p class="text-foreground font-medium">
-                {{ tournament?.endDate | date:'mediumDate' }}
+                {{ tournament?.endDate | date : "mediumDate" }}
               </p>
             </div>
 
             <div class="p-4 bg-muted/30 rounded-lg">
               <div class="flex items-center gap-3 mb-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  class="text-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-primary"
+                >
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                   <circle cx="9" cy="7" r="4" />
                   <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -104,21 +168,38 @@
                 <h3 class="text-sm font-medium">Teams</h3>
               </div>
               <p class="text-foreground font-medium">
-                {{ tournament?.teams?.length || 0 }}/{{ tournament?.maxTeams || 0 }}
+                {{ tournament?.teams?.length || 0 }}/{{
+                  tournament?.maxTeams || 0
+                }}
               </p>
               <!-- Team registration progress bar -->
-              <div class="w-full h-1.5 bg-muted mt-2 rounded-full overflow-hidden">
-                <div class="h-full bg-primary rounded-full" [style.width.%]="getTeamRegistrationProgress()"></div>
+              <div
+                class="w-full h-1.5 bg-muted mt-2 rounded-full overflow-hidden"
+              >
+                <div
+                  class="h-full bg-primary rounded-full"
+                  [style.width.%]="getTeamRegistrationProgress()"
+                ></div>
               </div>
             </div>
 
             <div class="p-4 bg-muted/30 rounded-lg">
               <div class="flex items-center gap-3 mb-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  class="text-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-primary"
+                >
                   <path
-                    d="M12 8c-2.8 0-5 2.2-5 5 0 1.8.9 3.4 2.3 4.3.7.5 1.2.5 1.7.6.1 0 .3 0 .5.1.2 0 .4 0 .5-.1.5-.1 1-.1 1.7-.6 1.4-.9 2.3-2.5 2.3-4.3 0-2.8-2.2-5-5-5Z" />
+                    d="M12 8c-2.8 0-5 2.2-5 5 0 1.8.9 3.4 2.3 4.3.7.5 1.2.5 1.7.6.1 0 .3 0 .5.1.2 0 .4 0 .5-.1.5-.1 1-.1 1.7-.6 1.4-.9 2.3-2.5 2.3-4.3 0-2.8-2.2-5-5-5Z"
+                  />
                   <path d="M12 8V3" />
                   <path d="m9 10 3-2 3 2" />
                   <path d="M18 12h1.5a2.5 2.5 0 1 0 0-5" />
@@ -131,7 +212,13 @@
                 <h3 class="text-sm font-medium">Duration</h3>
               </div>
               <p class="text-foreground font-medium">
-                {{ getTournamentDuration(tournament?.startDate || '', tournament?.endDate || '') }} days
+                {{
+                  getTournamentDuration(
+                    tournament?.startDate || "",
+                    tournament?.endDate || ""
+                  )
+                }}
+                days
               </p>
             </div>
           </div>
@@ -143,24 +230,52 @@
     <div class="mb-6">
       <div class="border-b border-border">
         <div class="flex overflow-x-auto">
-          <button (click)="setActiveTab('teams')" class="px-4 py-2 font-medium border-b-2"
-            [ngClass]="activeTab === 'teams' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
-            aria-selected="activeTab === 'teams'">
+          <button
+            (click)="setActiveTab('teams')"
+            class="px-4 py-2 font-medium border-b-2"
+            [ngClass]="
+              activeTab === 'teams'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            "
+            aria-selected="activeTab === 'teams'"
+          >
             Teams
           </button>
-          <button (click)="setActiveTab('schedule')" class="px-4 py-2 font-medium border-b-2"
-            [ngClass]="activeTab === 'schedule' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
-            aria-selected="activeTab === 'schedule'">
+          <button
+            (click)="setActiveTab('schedule')"
+            class="px-4 py-2 font-medium border-b-2"
+            [ngClass]="
+              activeTab === 'schedule'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            "
+            aria-selected="activeTab === 'schedule'"
+          >
             Schedule
           </button>
-          <button (click)="setActiveTab('bracket')" class="px-4 py-2 font-medium border-b-2"
-            [ngClass]="activeTab === 'bracket' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
-            aria-selected="activeTab === 'bracket'">
+          <button
+            (click)="setActiveTab('bracket')"
+            class="px-4 py-2 font-medium border-b-2"
+            [ngClass]="
+              activeTab === 'bracket'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            "
+            aria-selected="activeTab === 'bracket'"
+          >
             Bracket
           </button>
-          <button (click)="setActiveTab('results')" class="px-4 py-2 font-medium border-b-2"
-            [ngClass]="activeTab === 'results' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
-            aria-selected="activeTab === 'results'">
+          <button
+            (click)="setActiveTab('results')"
+            class="px-4 py-2 font-medium border-b-2"
+            [ngClass]="
+              activeTab === 'results'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            "
+            aria-selected="activeTab === 'results'"
+          >
             Results
           </button>
         </div>
@@ -172,29 +287,41 @@
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Registered Teams</h2>
         <div class="text-sm text-muted-foreground">
-          {{ tournament?.teams?.length || 0 }} of {{ tournament?.maxTeams || 0 }} teams
+          {{ tournament?.teams?.length || 0 }} of
+          {{ tournament?.maxTeams || 0 }} teams
         </div>
       </div>
 
       <!-- Teams Grid Display -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div *ngFor="let team of tournament?.teams" class="card overflow-hidden h-full">
-          <app-team-card [team]="team" [showActions]="true" (edit)="handleEditTeam($event)"
-            (delete)="openDeleteConfirmation(team.id)"></app-team-card>
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      >
+        <div
+          *ngFor="let team of tournament?.teams"
+          class="card overflow-hidden h-full"
+        >
+          <app-team-card
+            [team]="team"
+            [showActions]="true"
+            (edit)="handleEditTeam($event)"
+            (delete)="openDeleteConfirmation(team.id)"
+          ></app-team-card>
         </div>
 
         <!-- Add Team Card -->
-        <div *ngIf="tournament && tournament.teams && tournament.teams.length < tournament.maxTeams"
+        <div
+          *ngIf="
+            tournament &&
+            tournament.teams &&
+            tournament.teams.length < tournament.maxTeams
+          "
           class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer hover:border-primary transition-colors"
-          (click)="openAddTeamModal()">
-          <div class="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <line x1="19" x2="19" y1="8" y2="14" />
-              <line x1="22" x2="16" y1="11" y2="11" />
-            </svg>
+          (click)="openAddTeamModal()"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4"
+          >
+            <lucide-angular [img]="icons.UserPlus" size="50"></lucide-angular>
           </div>
           <h3 class="font-medium mb-1">Add New Team</h3>
           <p class="text-sm text-muted-foreground text-center">
@@ -204,11 +331,25 @@
       </div>
 
       <!-- Empty state for no teams -->
-      <div *ngIf="tournament?.teams?.length === 0" class="card py-12 text-center">
-        <div class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="text-muted-foreground">
+      <div
+        *ngIf="tournament?.teams?.length === 0"
+        class="card py-12 text-center"
+      >
+        <div
+          class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-muted-foreground"
+          >
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -216,7 +357,9 @@
           </svg>
         </div>
         <h3 class="text-lg font-semibold mb-2">No teams registered yet</h3>
-        <p class="text-muted-foreground mb-6">Add teams to get started with your tournament</p>
+        <p class="text-muted-foreground mb-6">
+          Add teams to get started with your tournament
+        </p>
         <button (click)="openAddTeamModal()" class="btn btn-primary">
           Add First Team
         </button>
@@ -225,10 +368,21 @@
 
     <!-- Schedule Tab (Placeholder) -->
     <div *ngIf="activeTab === 'schedule'" class="card p-8 text-center">
-      <div class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="text-muted-foreground">
+      <div
+        class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-muted-foreground"
+        >
           <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
           <line x1="16" x2="16" y1="2" y2="6" />
           <line x1="8" x2="8" y1="2" y2="6" />
@@ -236,7 +390,9 @@
         </svg>
       </div>
       <h3 class="text-lg font-semibold mb-2">Schedule Not Generated</h3>
-      <p class="text-muted-foreground mb-6">Generate a schedule to start planning matches</p>
+      <p class="text-muted-foreground mb-6">
+        Generate a schedule to start planning matches
+      </p>
       <button (click)="generateSchedule()" class="btn btn-primary">
         Generate Schedule
       </button>
@@ -244,10 +400,21 @@
 
     <!-- Bracket Tab (Placeholder) -->
     <div *ngIf="activeTab === 'bracket'" class="card p-8 text-center">
-      <div class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="text-muted-foreground">
+      <div
+        class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-muted-foreground"
+        >
           <path d="M8 20V8c0-2.2 1.8-4 4-4h8" />
           <path d="M6 12h4" />
           <path d="M14 12h4" />
@@ -258,7 +425,9 @@
         </svg>
       </div>
       <h3 class="text-lg font-semibold mb-2">Tournament Bracket Not Created</h3>
-      <p class="text-muted-foreground mb-6">Create a bracket to visualize the tournament progression</p>
+      <p class="text-muted-foreground mb-6">
+        Create a bracket to visualize the tournament progression
+      </p>
       <button (click)="createBracket()" class="btn btn-primary">
         Create Bracket
       </button>
@@ -266,37 +435,66 @@
 
     <!-- Results Tab (Placeholder) -->
     <div *ngIf="activeTab === 'results'" class="card p-8 text-center">
-      <div class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="text-muted-foreground">
+      <div
+        class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-muted-foreground"
+        >
           <path d="M7 22a5 5 0 0 1-2-4" />
           <path d="M7 16.93c.96.43 1.96.74 2.99.91" />
-          <path d="M3.34 14A6.8 6.8 0 0 1 2 10c0-4.42 4.48-8 10-8s10 3.58 10 8a7.19 7.19 0 0 1-.33 2" />
+          <path
+            d="M3.34 14A6.8 6.8 0 0 1 2 10c0-4.42 4.48-8 10-8s10 3.58 10 8a7.19 7.19 0 0 1-.33 2"
+          />
           <path d="M5 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
           <path
-            d="M14.33 22h-.09a.35.35 0 0 1-.24-.32v-10a.34.34 0 0 1 .33-.34c.08 0 .15.03.21.08l7.34 6a.33.33 0 0 1-.21.59h-4.49l-2.57 3.85a.35.35 0 0 1-.28.14v0z" />
+            d="M14.33 22h-.09a.35.35 0 0 1-.24-.32v-10a.34.34 0 0 1 .33-.34c.08 0 .15.03.21.08l7.34 6a.33.33 0 0 1-.21.59h-4.49l-2.57 3.85a.35.35 0 0 1-.28.14v0z"
+          />
         </svg>
       </div>
       <h3 class="text-lg font-semibold mb-2">No Results Available</h3>
-      <p class="text-muted-foreground mb-6">Match results will appear here once games begin</p>
+      <p class="text-muted-foreground mb-6">
+        Match results will appear here once games begin
+      </p>
       <button disabled class="btn btn-outline cursor-not-allowed opacity-60">
         View Results
       </button>
     </div>
-
   </div>
 
   <!-- Team Management Modals -->
-  <app-team-modal [isOpen]="isAddTeamModalOpen" [tournamentId]="tournament?.id || ''" (save)="handleAddTeam($event)"
-    (close)="closeAddTeamModal()"></app-team-modal>
+  <app-team-modal
+    [isOpen]="isAddTeamModalOpen"
+    [tournamentId]="tournament?.id || ''"
+    (save)="handleAddTeam($event)"
+    (close)="closeAddTeamModal()"
+  ></app-team-modal>
 
-  <app-team-modal [isOpen]="isEditTeamModalOpen" [team]="editingTeam" [tournamentId]="tournament?.id || ''"
-    (save)="handleUpdateTeam($event)" (close)="closeEditTeamModal()"></app-team-modal>
+  <app-team-modal
+    [isOpen]="isEditTeamModalOpen"
+    [team]="editingTeam"
+    [tournamentId]="tournament?.id || ''"
+    (save)="handleUpdateTeam($event)"
+    (close)="closeEditTeamModal()"
+  ></app-team-modal>
 
   <!-- Delete Confirmation Dialog -->
-  <app-confirmation-dialog [isOpen]="isDeleteTeamConfirmOpen" title="Remove Team"
+  <app-confirmation-dialog
+    [isOpen]="isDeleteTeamConfirmOpen"
+    title="Remove Team"
     message="Are you sure you want to remove this team from the tournament? This action cannot be undone."
-    confirmText="Remove Team" cancelText="Cancel" (confirm)="confirmDeleteTeam()"
-    (cancel)="closeDeleteConfirmation()"></app-confirmation-dialog>
+    confirmText="Remove Team"
+    cancelText="Cancel"
+    (confirm)="confirmDeleteTeam()"
+    (cancel)="closeDeleteConfirmation()"
+  ></app-confirmation-dialog>
 </div>

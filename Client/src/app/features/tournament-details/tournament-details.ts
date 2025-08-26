@@ -7,6 +7,8 @@ import { ToastService } from '@/app/shared/services/toast.service';
 import { TeamModal } from '@/app/shared/components/team-modal/team-modal';
 import { ConfirmationDialog } from '@/app/shared/components/confirmation-dialog/confirmation-dialog';
 import { TeamCard } from '@/app/shared/components/team-card/team-card';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { LucideAngularModule } from "lucide-angular";
 
 @Component({
   selector: 'app-tournament-details',
@@ -21,7 +23,8 @@ import { TeamCard } from '@/app/shared/components/team-card/team-card';
     ConfirmationDialog,
     DatePipe,
     TitleCasePipe,
-  ],
+    LucideAngularModule
+],
   providers: [ToastService],
 })
 export class TournamentDetails implements OnInit {
@@ -29,6 +32,8 @@ export class TournamentDetails implements OnInit {
   isAddTeamModalOpen = false;
   isEditTeamModalOpen = false;
   isDeleteTeamConfirmOpen = false;
+
+  readonly icons = LucideIcons;
 
   // Team management
   editingTeam: Team | null = null;

@@ -42,23 +42,10 @@
     <div class="flex justify-end">
       <button
         (click)="createNewTournament()"
-        class="btn btn-primary flex items-center gap-2 whitespace-nowrap"
+        class="btn btn-primary flex items-center justify-center gap-2"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="lucide lucide-plus"
-        >
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-        <span>New Tournament</span>
+        <lucide-angular [img]="icons.CirclePlus" [size]="20"></lucide-angular>
+        <span>Create Tournament</span>
       </button>
     </div>
   </div>
@@ -109,41 +96,16 @@
       </div>
     </div>
 
-    <div *ngIf="filteredTournaments.length === 0" class="text-center py-16">
-      <div
-        class="bg-muted/30 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="32"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="lucide lucide-search-x"
-        >
-          <path d="m13.5 8.5-5 5" />
-          <path d="m8.5 8.5 5 5" />
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.3-4.3" />
-        </svg>
-      </div>
-      <h3 class="text-xl font-semibold text-card-foreground mb-2">
-        No tournaments found
-      </h3>
-      <p class="mb-6">
-        {{
-          searchTerm
-            ? "Try adjusting your search criteria"
-            : "Create your first tournament to get started"
-        }}
-      </p>
-      <button (click)="createNewTournament()" class="btn btn-primary">
-        Create Tournament
-      </button>
+    <div
+      *ngIf="filteredTournaments.length === 0"
+      class="border-2 max-w-md border-dashed rounded-lg flex flex-col items-center justify-center p-8 text-center h-full cursor-pointer"
+      (click)="createNewTournament()"
+    >
+      <lucide-angular [img]="icons.Trophy" size="50"></lucide-angular>
+
+      <h3 class="text-lg font-medium mb-1 mt-5">No Tournaments Found</h3>
+      <p class="text-sm mb-4 max-w-xs">Try adjusting your search criteria</p>
+      <button class="btn btn-primary">Create Tournament</button>
     </div>
   </section>
 
@@ -158,5 +120,34 @@
       (save)="handleSaveTournament($event)"
       (cancel)="isEditModalOpen.set(false); editingTournament.set(null)"
     ></app-tournament-form>
+  </app-modal>
+
+  <app-modal
+    [isOpen]="isDeleteModalOpen()"
+    (close)="isDeleteModalOpen.set(false)"
+    title="Delete Tournament"
+  >
+    <div class="flex flex-col gap-4 text-center p-4">
+      <div class="mx-auto flex items-center justify-center">
+        <lucide-angular [img]="icons.Trash2" size="28"></lucide-angular>
+      </div>
+
+      <h3 class="text-lg font-semibold text-destructive">
+        Are you absolutely sure?
+      </h3>
+      <p class="text-sm text-justify">
+        This action cannot be undone. This will permanently delete the
+        tournament and all its associated data.
+      </p>
+
+      <div class="flex justify-center gap-3 mt-6">
+        <button class="btn btn-outline" (click)="isDeleteModalOpen.set(false)">
+          Cancel
+        </button>
+        <button class="btn btn-destructive" (click)="confirmDelete()">
+          Delete Tournament
+        </button>
+      </div>
+    </div>
   </app-modal>
 </app-dashboard-layout>

@@ -31,7 +31,9 @@ export class Tournaments implements OnInit {
   searchTerm = '';
   filterStatus = 'all';
   isEditModalOpen = signal(false);
+  isDeleteModalOpen = signal(false);
   editingTournament = signal<Tournament | null>(null);
+  deletingTournament = signal<string | null>(null);
   readonly icons = LucideIcons;
   gridLayout = signal<boolean>(true);
 
@@ -126,11 +128,16 @@ export class Tournaments implements OnInit {
   }
 
   handleDeleteTournament(id: string) {
-    if (confirm('Are you sure you want to delete this tournament?')) {
-      this.tournaments = this.tournaments.filter((t) => t.id !== id);
-      this.filterTournaments();
-      this.toast.success('Tournament deleted successfully');
-    }
+    this.deletingTournament.set(id);
+    this.isDeleteModalOpen.set(true);
+  }
+
+  confirmDelete(){
+    this.tournaments = this.tournaments.filter((t) => t.id !== this.deletingTournament());
+    this.filterTournaments();
+    this.toast.success('Tournament deleted successfully');
+    this.isDeleteModalOpen.set(false);
+    this.deletingTournament.set(null);
   }
 
   handleViewTournament(tournament: Tournament) {
