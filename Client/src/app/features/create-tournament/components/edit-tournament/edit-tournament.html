@@ -1,9 +1,11 @@
 <app-dashboard-layout>
   <div class="max-w-3xl border rounded-2xl p-6 bg-card shadow-sm">
-    <h1 class="text-2xl font-bold text-foreground mb-6">Create Tournament</h1>
+    <h1 class="text-2xl font-bold text-foreground mb-6">Edit Tournament</h1>
     <app-tournament-form
-      mode="create"
+      mode="edit"
+      [tournament]="tournament"
       (tournamentSaved)="onTournamentSaved($event)"
+      (cancelled)="onCancel()"
     >
     </app-tournament-form>
   </div>

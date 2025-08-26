@@ -19,6 +19,7 @@ export interface TournamentFormData {
   endDate: string;
   maxTeams: number;
   location?: string;
+  registrationDeadline?: string;
   entryFee?: number;
   prizePool?: number;
   contactEmail?: string;
@@ -29,4 +30,5 @@ export interface Tournament extends TournamentFormData {
   status: 'draft' | 'active' | 'completed';
   createdAt: string;
   teams: Team[];
+  bannerUrl?: string;
 }
