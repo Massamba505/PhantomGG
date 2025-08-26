@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { Tournament, TournamentFormData } from '@/app/shared/models/tournament';
+import { Tournament, CreateTournamentRequest, UpdateTournamentRequest } from '@/app/shared/models/tournament';
 
 @Component({
   selector: 'app-tournament-form',
@@ -15,7 +15,7 @@ import { Tournament, TournamentFormData } from '@/app/shared/models/tournament';
 export class TournamentForm implements OnInit, OnChanges {
   @Input() tournament: Tournament | null = null;
   @Input() mode: 'create' | 'edit' = 'create';
-  @Output() tournamentSaved = new EventEmitter<TournamentFormData>();
+  @Output() tournamentSaved = new EventEmitter<CreateTournamentRequest | UpdateTournamentRequest>();
   @Output() cancelled = new EventEmitter<void>();
 
   private fb = inject(FormBuilder);
@@ -47,7 +47,7 @@ export class TournamentForm implements OnInit, OnChanges {
       endDate: [this.tournament?.endDate || '', [Validators.required]],
       maxTeams: [this.tournament?.maxTeams || 16, [Validators.required]],
       entryFee: [this.tournament?.entryFee || 0],
-      prizePool: [this.tournament?.prizePool || 0],
+      prize: [this.tournament?.prize || 0],
       contactEmail: [this.tournament?.contactEmail || '', [Validators.required, Validators.email]],
     }, { validators: [this.dateRangeValidator, this.deadlineValidator] });
 
@@ -138,7 +138,7 @@ export class TournamentForm implements OnInit, OnChanges {
 
     this.isSubmitting = true;
 
-    const tournamentData: TournamentFormData = {
+    const tournamentData: CreateTournamentRequest | UpdateTournamentRequest = {
       name: this.tournamentForm.value.name,
       description: this.tournamentForm.value.description,
       location: this.tournamentForm.value.location,
@@ -147,8 +147,9 @@ export class TournamentForm implements OnInit, OnChanges {
       endDate: this.tournamentForm.value.endDate,
       maxTeams: parseInt(this.tournamentForm.value.maxTeams, 10),
       entryFee: this.tournamentForm.value.entryFee || 0,
-      prizePool: this.tournamentForm.value.prizePool || 0,
+      prize: this.tournamentForm.value.prize || 0,
       contactEmail: this.tournamentForm.value.contactEmail,
+      bannerUrl: this.bannerPreview || undefined,
     };
 
     this.tournamentSaved.emit(tournamentData);
@@ -170,7 +171,7 @@ export class TournamentForm implements OnInit, OnChanges {
     this.tournamentForm.reset({
       maxTeams: 16,
       entryFee: 0,
-      prizePool: 0
+      prize: 0
     });
   }
 }

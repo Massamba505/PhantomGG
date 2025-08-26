@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Team, TeamFormData } from '@/app/shared/models/tournament';
+import { Team, CreateTeamRequest, UpdateTeamRequest } from '@/app/shared/models/tournament';
 import { TeamForm } from '@/app/shared/components/team-form/team-form';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
@@ -43,7 +43,7 @@ export class TeamModal implements OnInit, OnChanges {
     }
   }
 
-  onSaveTeam(formData: TeamFormData) {
+  onSaveTeam(formData: CreateTeamRequest | UpdateTeamRequest) {
     if (!this.tournamentId) {
       this.toastService.error('Tournament ID is required');
       return;
@@ -52,9 +52,14 @@ export class TeamModal implements OnInit, OnChanges {
     // Create a new team object with the form data
     const teamData: Team = {
       id: this.team?.id || crypto.randomUUID(),
+      name: formData.name,
+      manager: formData.manager,
+      numberOfPlayers: formData.numberOfPlayers,
+      logoUrl: formData.logoUrl,
       tournamentId: this.tournamentId,
+      tournamentName: '', // This will be populated by the API
       createdAt: this.team?.createdAt || new Date().toISOString(),
-      ...formData,
+      updatedAt: new Date().toISOString(),
     };
 
     this.save.emit(teamData);

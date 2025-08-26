@@ -35,9 +35,7 @@ public class UpdateTournamentDto
     [EmailAddress]
     public string? ContactEmail { get; set; }
 
-    [Url]
     public string? BannerUrl { get; set; }
 
-    [Required]
     public string Status { get; set; } = string.Empty;
 }

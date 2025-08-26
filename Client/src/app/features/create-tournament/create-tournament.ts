@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { TournamentFormData } from '@/app/shared/models/tournament';
+import { TournamentService } from '@/app/core/services/tournament.service';
+import { CreateTournamentRequest } from '@/app/shared/models/tournament';
 import { TournamentForm } from '@/app/shared/components/tournament-form/tournament-form';
 
 @Component({
@@ -16,13 +17,23 @@ import { TournamentForm } from '@/app/shared/components/tournament-form/tourname
 export class CreateTournament {
   private router = inject(Router);
   private toast = inject(ToastService);
+  private tournamentService = inject(TournamentService);
 
-  onTournamentSaved(tournamentData: TournamentFormData) {
-    console.log('Tournament data received:', tournamentData);
-    
-    setTimeout(() => {
-      this.toast.success('Tournament created successfully!');
-      this.router.navigate(['/tournaments']);
-    }, 1500);
+  async onTournamentSaved(tournamentData: CreateTournamentRequest) {
+    try {
+      console.log('Creating tournament:', tournamentData);
+      
+      const response = await this.tournamentService.createTournament(tournamentData).toPromise();
+      
+      if (response?.success) {
+        this.toast.success('Tournament created successfully!');
+        this.router.navigate(['/tournaments']);
+      } else {
+        this.toast.error('Failed to create tournament');
+      }
+    } catch (error) {
+      console.error('Failed to create tournament:', error);
+      this.toast.error('Failed to create tournament');
+    }
   }
 }

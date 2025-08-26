@@ -54,7 +54,7 @@ public class TournamentsController(
     }
 
     [HttpGet("my-tournaments")]
-    [Authorize]
+    // [Authorize]
     public async Task<ActionResult<ApiResponse>> GetMyTournaments()
     {
         var user = _currentUserService.GetCurrentUser();

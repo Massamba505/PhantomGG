@@ -90,24 +90,3 @@ export interface Tournament {
   createdAt: string;
   teamCount: number;
 }
-
-export interface TeamFormData {
-  name: string;
-  city: string;
-  coach: string;
-  players: number;
-  logoUrl?: string;
-}
-
-export interface TournamentFormData {
-  name: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  maxTeams: number;
-  location?: string;
-  registrationDeadline?: string;
-  entryFee?: number;
-  prizePool?: number;
-  contactEmail?: string;
-}

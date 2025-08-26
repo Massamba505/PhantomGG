@@ -169,8 +169,7 @@
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Registered Teams</h2>
         <div class="text-sm text-muted-foreground">
-          {{ tournament()?.teams?.length || 0 }} of
-          {{ tournament()?.maxTeams || 0 }} teams
+          {{ teams().length || 0 }} of {{ tournament()?.maxTeams || 0 }} teams
         </div>
       </div>
 
@@ -178,7 +177,7 @@
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
       >
-        @for (team of tournament()?.teams; track team.id) {
+        @for (team of teams(); track team.id) {
         <div>
           <app-team-card
             [team]="team"
@@ -187,8 +186,7 @@
             (delete)="openDeleteConfirmation(team.id)"
           ></app-team-card>
         </div>
-        } @if ( tournament() && tournament()?.teams &&
-        tournament()?.teams!.length < tournament()!.maxTeams ) {
+        } @if ( tournament() && teams().length < tournament()!.maxTeams ) {
         <div
           class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer hover:border-primary transition-colors"
           (click)="openAddTeamModal()"
@@ -207,7 +205,7 @@
       </div>
 
       <!-- Empty state for no teams -->
-      @if (tournament()?.teams?.length === 0) {
+      @if (teams().length === 0) {
       <div
         class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer hover:border-primary transition-colors"
       >

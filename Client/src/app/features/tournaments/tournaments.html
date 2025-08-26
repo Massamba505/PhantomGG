@@ -15,7 +15,7 @@
           type="text"
           placeholder="Search tournaments..."
           [(ngModel)]="searchTerm"
-          (ngModelChange)="filterTournaments()"
+          (ngModelChange)="onSearchChange()"
           class="input-field pl-10 w-full"
         />
       </div>
@@ -28,13 +28,13 @@
         </div>
         <select
           [(ngModel)]="filterStatus"
-          (ngModelChange)="filterTournaments()"
+          (ngModelChange)="onFilterChange()"
           class="form-select appearance-none w-full pr-10"
         >
-          <option value="all">All Statuses</option>
-          <option value="draft">Draft</option>
-          <option value="active">Active</option>
-          <option value="completed">Completed</option>
+          <option value="All">All Statuses</option>
+          <option value="Draft">Draft</option>
+          <option value="Active">Active</option>
+          <option value="Completed">Completed</option>
         </select>
       </div>
     </div>
@@ -51,10 +51,17 @@
   </div>
 
   <section class="p-6">
+    @if (loading()) {
+    <div class="flex justify-center items-center py-12">
+      <div
+        class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"
+      ></div>
+    </div>
+    } @else {
     <div class="mb-4 flex justify-between items-center">
       <p>
         Showing
-        <span>{{ filteredTournaments.length }}</span>
+        <span>{{ filteredTournaments().length }}</span>
         tournaments
       </p>
       <div class="flex gap-2">
@@ -78,7 +85,7 @@
       </div>
     </div>
 
-    @if (filteredTournaments.length > 0) {
+    @if (filteredTournaments().length > 0) {
     <div
       [class]="
         gridLayout()
@@ -86,7 +93,7 @@
           : 'flex flex-col gap-3'
       "
     >
-      @for (tournament of filteredTournaments; track tournament.id) {
+      @for (tournament of filteredTournaments(); track tournament.id) {
       <div>
         <app-tournament-card
           [tournament]="tournament"
@@ -97,7 +104,7 @@
       </div>
       }
     </div>
-    } @if (filteredTournaments.length === 0) {
+    } @if (filteredTournaments().length === 0) {
     <div
       class="border-2 max-w-md border-dashed rounded-lg flex flex-col items-center justify-center p-8 text-center h-full cursor-pointer"
       (click)="createNewTournament()"
@@ -108,7 +115,7 @@
       <p class="text-sm mb-4 max-w-xs">Try adjusting your search criteria</p>
       <button class="btn btn-primary">Create Tournament</button>
     </div>
-    }
+    } }
   </section>
 
   <app-confirm-delete-modal

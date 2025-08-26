@@ -35,6 +35,5 @@ public class CreateTournamentDto
     [EmailAddress]
     public string? ContactEmail { get; set; }
 
-    [Url]
     public string? BannerUrl { get; set; }
 }

@@ -1,8 +1,10 @@
 import { Team, Tournament } from '@/app/shared/models/tournament';
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
 import { ToastService } from '@/app/shared/services/toast.service';
+import { TournamentService } from '@/app/core/services/tournament.service';
+import { TeamService } from '@/app/core/services/team.service';
 import { TeamModal } from './components/modals/team-modal';
 import { TeamCard } from '@/app/shared/components/team-card/team-card';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
@@ -27,6 +29,12 @@ import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModa
   providers: [ToastService],
 })
 export class TournamentDetails implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private toast = inject(ToastService);
+  private tournamentService = inject(TournamentService);
+  private teamService = inject(TeamService);
+
   // Modal states - converted to signals
   isAddTeamModalOpen = signal(false);
   isEditTeamModalOpen = signal(false);
@@ -41,8 +49,10 @@ export class TournamentDetails implements OnInit {
   // Active tab - converted to signal
   activeTab = signal<'teams' | 'schedule' | 'bracket' | 'results'>('teams');
 
-  // Tournament data - converted to signal
+  // Data signals
   tournament = signal<Tournament | null>(null);
+  teams = signal<Team[]>([]);
+  loading = signal<boolean>(false);
 
   // Computed signals for derived values
   tournamentDuration = computed(() => {
@@ -53,13 +63,13 @@ export class TournamentDetails implements OnInit {
 
   teamRegistrationProgress = computed(() => {
     const t = this.tournament();
-    if (!t || !t.teams) return 0;
-    return (t.teams.length / t.maxTeams) * 100;
+    const teamsCount = this.teams().length;
+    if (!t || teamsCount === 0) return 0;
+    return (teamsCount / t.maxTeams) * 100;
   });
 
   teamsCount = computed(() => {
-    const t = this.tournament();
-    return t?.teams?.length || 0;
+    return this.teams().length;
   });
 
   maxTeams = computed(() => {
@@ -67,54 +77,38 @@ export class TournamentDetails implements OnInit {
     return t?.maxTeams || 0;
   });
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private toast: ToastService
-  ) {}
-
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    this.tournament.set({
-      id: id || '1',
-      name: 'Summer League 2024',
-      description:
-        'Annual summer soccer tournament for youth teams across the region. This prestigious competition brings together the best young talent from across the country to compete in a month-long championship.',
-      startDate: '2024-06-15',
-      endDate: '2024-07-30',
-      maxTeams: 16,
-      status: 'active',
-      createdAt: '2024-05-01',
-      teams: [
-        {
-          id: '1',
-          name: 'FC Barcelona Academy',
-          city: 'Barcelona',
-          coach: 'Carlos Rodriguez',
-          players: 22,
-          tournamentId: id || '1',
-          createdAt: '2024-05-15',
-        },
-        {
-          id: '2',
-          name: 'Real Madrid Youth',
-          city: 'Madrid',
-          coach: 'Miguel Santos',
-          players: 20,
-          tournamentId: id || '1',
-          createdAt: '2024-05-16',
-        },
-        {
-          id: '3',
-          name: 'Manchester City U18',
-          city: 'Manchester',
-          coach: 'James Wilson',
-          players: 21,
-          tournamentId: id || '1',
-          createdAt: '2024-05-17',
-        },
-      ],
-    });
+    if (id) {
+      this.loadTournamentData(id);
+    }
+  }
+
+  private async loadTournamentData(tournamentId: string) {
+    try {
+      this.loading.set(true);
+      
+      // Load tournament details and teams in parallel
+      const [tournamentResponse, teamsResponse] = await Promise.all([
+        this.tournamentService.getTournamentById(tournamentId).toPromise(),
+        this.teamService.searchTeams({ tournamentId }).toPromise()
+      ]);
+      
+      if (tournamentResponse?.success && tournamentResponse.data) {
+        this.tournament.set(tournamentResponse.data);
+      }
+      
+      if (teamsResponse?.success && teamsResponse.data) {
+        this.teams.set(teamsResponse.data);
+      }
+      
+    } catch (error) {
+      console.error('Failed to load tournament data:', error);
+      this.toast.error('Failed to load tournament details');
+      this.router.navigate(['/tournaments']);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   // Tab management
@@ -146,15 +140,33 @@ export class TournamentDetails implements OnInit {
     this.isAddTeamModalOpen.set(false);
   }
 
-  handleAddTeam(team: Team) {
-    const currentTournament = this.tournament();
-    if (!currentTournament) return;
+  async handleAddTeam(team: Team) {
+    try {
+      const tournamentId = this.tournament()?.id;
+      if (!tournamentId) return;
 
-    this.tournament.update(t => t ? {
-      ...t,
-      teams: [...t.teams, team],
-    } : null);
-    this.toast.success('Team added successfully');
+      const createRequest = {
+        name: team.name,
+        manager: team.manager,
+        numberOfPlayers: team.numberOfPlayers,
+        logoUrl: team.logoUrl,
+        tournamentId: tournamentId
+      };
+
+      const response = await this.teamService.createTeam(createRequest).toPromise();
+      
+      if (response?.success && response.data) {
+        const currentTeams = this.teams();
+        this.teams.set([...currentTeams, response.data]);
+        this.toast.success('Team added successfully');
+      } else {
+        this.toast.error('Failed to add team');
+      }
+    } catch (error) {
+      console.error('Failed to add team:', error);
+      this.toast.error('Failed to add team');
+    }
+    
     this.closeAddTeamModal();
   }
 
@@ -169,23 +181,38 @@ export class TournamentDetails implements OnInit {
     this.editingTeam.set(null);
   }
 
-  handleUpdateTeam(team: Team) {
-    const currentTournament = this.tournament();
-    if (!currentTournament) return;
+  async handleUpdateTeam(team: Team) {
+    try {
+      const updateRequest = {
+        name: team.name,
+        manager: team.manager,
+        numberOfPlayers: team.numberOfPlayers,
+        logoUrl: team.logoUrl
+      };
 
-    this.tournament.update(t => t ? {
-      ...t,
-      teams: t.teams.map((existingTeam: Team) => 
-        existingTeam.id === team.id ? team : existingTeam
-      ),
-    } : null);
-    this.toast.success('Team updated successfully');
+      const response = await this.teamService.updateTeam(team.id, updateRequest).toPromise();
+      
+      if (response?.success && response.data) {
+        const currentTeams = this.teams();
+        const updatedTeams = currentTeams.map((existingTeam: Team) => 
+          existingTeam.id === team.id ? response.data! : existingTeam
+        );
+        this.teams.set(updatedTeams);
+        this.toast.success('Team updated successfully');
+      } else {
+        this.toast.error('Failed to update team');
+      }
+    } catch (error) {
+      console.error('Failed to update team:', error);
+      this.toast.error('Failed to update team');
+    }
+
     this.closeEditTeamModal();
   }
 
   openDeleteConfirmation(teamId: string) {
-    const currentTournament = this.tournament();
-    const team = currentTournament?.teams.find((t: Team) => t.id === teamId);
+    const teams = this.teams();
+    const team = teams.find((t: Team) => t.id === teamId);
     this.teamToDelete.set(team || null);
     this.isDeleteTeamConfirmOpen.set(true);
   }
@@ -195,16 +222,26 @@ export class TournamentDetails implements OnInit {
     this.teamToDelete.set(null);
   }
 
-  confirmDeleteTeam() {
-    const currentTournament = this.tournament();
+  async confirmDeleteTeam() {
     const teamToDelete = this.teamToDelete();
-    if (!currentTournament || !teamToDelete) return;
+    if (!teamToDelete) return;
 
-    this.tournament.update(t => t ? {
-      ...t,
-      teams: t.teams.filter((team: Team) => team.id !== teamToDelete.id),
-    } : null);
-    this.toast.success('Team removed from tournament');
+    try {
+      const response = await this.teamService.deleteTeam(teamToDelete.id).toPromise();
+      
+      if (response?.success) {
+        const currentTeams = this.teams();
+        const updatedTeams = currentTeams.filter((team: Team) => team.id !== teamToDelete.id);
+        this.teams.set(updatedTeams);
+        this.toast.success('Team removed from tournament');
+      } else {
+        this.toast.error('Failed to remove team');
+      }
+    } catch (error) {
+      console.error('Failed to delete team:', error);
+      this.toast.error('Failed to remove team');
+    }
+
     this.closeDeleteConfirmation();
   }
 

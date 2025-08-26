@@ -15,7 +15,6 @@ public class CreateTeamDto
     [Range(1, 50)]
     public int NumberOfPlayers { get; set; } = 1;
 
-    [Url]
     public string? LogoUrl { get; set; }
 
     [Required]

@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Team } from '../../models/tournament';
+import { Team, CreateTeamRequest, UpdateTeamRequest } from '../../models/tournament';
 
 @Component({
   selector: 'app-team-form',
@@ -16,7 +16,8 @@ import { Team } from '../../models/tournament';
 })
 export class TeamForm implements OnInit, OnChanges {
   @Input() team: Team | null = null;
-  @Output() save = new EventEmitter<any>();
+  @Input() tournamentId: string | null = null;
+  @Output() save = new EventEmitter<CreateTeamRequest | UpdateTeamRequest>();
   @Output() cancel = new EventEmitter<void>();
 
   teamForm!: FormGroup;
@@ -47,16 +48,12 @@ export class TeamForm implements OnInit, OnChanges {
         this.team?.name || '',
         [Validators.required, Validators.minLength(2)],
       ],
-      city: [
-        this.team?.city || '',
+      manager: [
+        this.team?.manager || '',
         [Validators.required, Validators.minLength(2)],
       ],
-      coach: [
-        this.team?.coach || '',
-        [Validators.required, Validators.minLength(2)],
-      ],
-      players: [
-        this.team?.players || '',
+      numberOfPlayers: [
+        this.team?.numberOfPlayers || 1,
         [Validators.required, Validators.min(1), Validators.max(30)],
       ],
       logo: [null], // file control - not required for editing
@@ -105,13 +102,13 @@ export class TeamForm implements OnInit, OnChanges {
       return;
     }
 
-    // Prepare payload as TeamFormData object
-    const teamData = {
+    // Prepare payload as team request object
+    const teamData: CreateTeamRequest | UpdateTeamRequest = {
       name: this.teamForm.value.name,
-      city: this.teamForm.value.city,
-      coach: this.teamForm.value.coach,
-      players: parseInt(this.teamForm.value.players, 10),
-      logoUrl: this.logoPreview || undefined
+      manager: this.teamForm.value.manager,
+      numberOfPlayers: parseInt(this.teamForm.value.numberOfPlayers, 10),
+      logoUrl: this.logoPreview || undefined,
+      ...(this.tournamentId ? { tournamentId: this.tournamentId } : {})
     };
 
     this.save.emit(teamData);

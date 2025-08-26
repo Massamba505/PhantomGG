@@ -7,11 +7,11 @@
       <div class="team-meta text-sm mt-1 flex flex-col gap-1">
         <span class="flex items-center gap-1">
           <lucide-angular [img]="icons.MapPin" size="16"></lucide-angular>
-          {{ team.city }}
+          {{ team.tournamentName }}
         </span>
         <span class="flex items-center gap-1">
           <lucide-angular [img]="icons.User" size="16"></lucide-angular>
-          Coach: {{ team.coach }}
+          Manager: {{ team.manager }}
         </span>
       </div>
     </div>
@@ -39,7 +39,9 @@
   <div class="grid grid-cols-2 gap-4 text-center border-t pt-4">
     <div class="team-stat">
       <div class="stat-label text-xs uppercase tracking-wide">Players</div>
-      <div class="stat-value text-base font-medium">{{ team.players }}</div>
+      <div class="stat-value text-base font-medium">
+        {{ team.numberOfPlayers }}
+      </div>
     </div>
 
     @if (team.createdAt) {

@@ -2,7 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { Tournament, TournamentFormData } from '@/app/shared/models/tournament';
+import { TournamentService } from '@/app/core/services/tournament.service';
+import { Tournament, UpdateTournamentRequest } from '@/app/shared/models/tournament';
 import { TournamentForm } from '@/app/shared/components/tournament-form/tournament-form';
 
 @Component({
@@ -15,6 +16,7 @@ export class EditTournament implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private tournamentService = inject(TournamentService);
 
   tournament: Tournament | null = null;
   isLoading = true;
@@ -29,39 +31,44 @@ export class EditTournament implements OnInit {
     }
   }
 
-  private loadTournament(id: string) {
-    setTimeout(() => {
-      this.tournament = {
-        id: id,
-        name: 'Summer Championship 2024',
-        description: 'Annual summer tournament featuring the best teams from across the region.',
-        location: 'Downtown Sports Arena',
-        registrationDeadline: '2024-06-01',
-        startDate: '2024-06-15',
-        endDate: '2024-06-30',
-        maxTeams: 16,
-        entryFee: 100,
-        prizePool: 5000,
-        contactEmail: 'contact@tournament.com',
-        status: 'active',
-        createdAt: '2024-05-01',
-        teams: [],
-        bannerUrl: 'https://example.com/banner.jpg'
-      };
+  private async loadTournament(id: string) {
+    try {
+      this.isLoading = true;
+      const response = await this.tournamentService.getTournamentById(id).toPromise();
+      
+      if (response?.success && response.data) {
+        this.tournament = response.data;
+      } else {
+        this.toast.error('Tournament not found');
+        this.router.navigate(['/tournaments']);
+      }
+    } catch (error) {
+      console.error('Failed to load tournament:', error);
+      this.toast.error('Failed to load tournament');
+      this.router.navigate(['/tournaments']);
+    } finally {
       this.isLoading = false;
-    }, 500);
+    }
   }
 
-  onTournamentSaved(tournamentData: TournamentFormData) {
+  async onTournamentSaved(tournamentData: UpdateTournamentRequest) {
     if (!this.tournament) return;
 
-    console.log('Tournament update data:', tournamentData);
-    
-    
-    setTimeout(() => {
-      this.toast.success('Tournament updated successfully!');
-      this.router.navigate(['/tournaments']);
-    }, 1500);
+    try {
+      console.log('Tournament update data:', tournamentData);
+      
+      const response = await this.tournamentService.updateTournament(this.tournament.id, tournamentData).toPromise();
+      
+      if (response?.success) {
+        this.toast.success('Tournament updated successfully!');
+        this.router.navigate(['/tournaments']);
+      } else {
+        this.toast.error('Failed to update tournament');
+      }
+    } catch (error) {
+      console.error('Failed to update tournament:', error);
+      this.toast.error('Failed to update tournament');
+    }
   }
 
   onCancel() {

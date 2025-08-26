@@ -15,6 +15,5 @@ public class UpdateTeamDto
     [Range(1, 50)]
     public int NumberOfPlayers { get; set; }
 
-    [Url]
     public string? LogoUrl { get; set; }
 }

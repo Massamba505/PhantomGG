@@ -52,9 +52,7 @@ public partial class PhantomContext : DbContext
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.LogoUrl)
-                .HasMaxLength(500)
-                .IsUnicode(false);
+            entity.Property(e => e.LogoUrl).IsUnicode(false);
             entity.Property(e => e.Manager)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -79,9 +77,7 @@ public partial class PhantomContext : DbContext
             entity.HasIndex(e => e.Status, "IX_Tournaments_Status");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.BannerUrl)
-                .HasMaxLength(500)
-                .IsUnicode(false);
+            entity.Property(e => e.BannerUrl).IsUnicode(false);
             entity.Property(e => e.ContactEmail)
                 .HasMaxLength(100)
                 .IsUnicode(false);

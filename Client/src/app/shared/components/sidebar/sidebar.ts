@@ -100,7 +100,7 @@ export class Sidebar implements OnInit, OnDestroy {
       roles: [Roles.Organizer, Roles.General],
     },
   ];
-
+  
   ngOnInit() {
     window.addEventListener('resize', this.handleResize);
   }

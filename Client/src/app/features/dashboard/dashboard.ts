@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TournamentService } from '@/app/core/services/tournament.service';
+import { Tournament, TournamentSearchRequest } from '@/app/shared/models/tournament';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,53 +12,48 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [DashboardLayout, CommonModule, RouterLink],
 })
-export class Dashboard {
-  // Dummy data for the dashboard
-  upcomingTournaments = [
-    {
-      id: 1,
-      name: 'Summer Showdown',
-      date: '2023-07-15',
-      game: 'League of Legends',
-      participants: 16,
-      status: 'open'
-    },
-    {
-      id: 2,
-      name: 'Winter Championship',
-      date: '2023-08-22',
-      game: 'Valorant',
-      participants: 8,
-      status: 'open'
-    },
-    {
-      id: 3,
-      name: 'Fall Classic',
-      date: '2023-09-10',
-      game: 'Counter-Strike 2',
-      participants: 32,
-      status: 'draft'
-    }
-  ];
+export class Dashboard implements OnInit {
+  private tournamentService = inject(TournamentService);
   
-  recentTournaments = [
-    {
-      id: 101,
-      name: 'Spring Invitational',
-      date: '2023-05-20',
-      game: 'Dota 2',
-      participants: 12,
-      status: 'completed',
-      winner: 'Team Phoenix'
-    },
-    {
-      id: 102,
-      name: 'Regional Qualifier',
-      date: '2023-06-05',
-      game: 'Rocket League',
-      participants: 24,
-      status: 'completed',
-      winner: 'Cosmic Racers'
+  upcomingTournaments = signal<Tournament[]>([]);
+  recentTournaments = signal<Tournament[]>([]);
+  loading = signal<boolean>(false);
+  
+  ngOnInit() {
+    this.loadDashboardData();
+  }
+  
+  async loadDashboardData() {
+    try {
+      this.loading.set(true);
+      
+      // Load upcoming tournaments (active status)
+      const upcomingRequest: TournamentSearchRequest = {
+        status: 'active',
+        pageSize: 5
+      };
+      
+      // Load recent tournaments (completed status)
+      const recentRequest: TournamentSearchRequest = {
+        status: 'completed',
+        pageSize: 5
+      };
+      
+      const [upcomingResponse, recentResponse] = await Promise.all([
+        this.tournamentService.searchTournaments(upcomingRequest).toPromise(),
+        this.tournamentService.searchTournaments(recentRequest).toPromise()
+      ]);
+      
+      this.upcomingTournaments.set(upcomingResponse?.data || []);
+      this.recentTournaments.set(recentResponse?.data || []);
+      
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+      // Set empty arrays on error
+      this.upcomingTournaments.set([]);
+      this.recentTournaments.set([]);
+    } finally {
+      this.loading.set(false);
     }
-  ];
+  }
 }
