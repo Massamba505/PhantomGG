@@ -11,7 +11,8 @@ import {
   User,
   Users,
   Timer,
-  CalendarDays
+  CalendarDays,
+  X
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -27,5 +28,6 @@ export const LucideIcons = {
   User,
   Users,
   Timer,
-  CalendarDays
+  CalendarDays,
+  X
 };

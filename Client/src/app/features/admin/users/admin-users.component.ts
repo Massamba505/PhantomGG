@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { Modal } from '@/app/shared/components/modal/modal.component';
+import { Modal } from '@/app/shared/components/modal/modal';
 
 @Component({
   selector: 'app-admin-users',

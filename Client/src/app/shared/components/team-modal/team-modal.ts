@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Team, TeamFormData } from '../../models/tournament';
 import { TeamForm } from '../team-form/team-form';
 import { ToastService } from '../../services/toast.service';
-import { Modal } from '../modal/modal.component';
+import { Modal } from '../modal/modal';
 
 @Component({
   selector: 'app-team-modal',

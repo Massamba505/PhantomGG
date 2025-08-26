@@ -5,7 +5,7 @@ import { ToastService } from '@/app/shared/services/toast.service';
 import { Router, RouterLink } from '@angular/router';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Modal } from '@/app/shared/components/modal/modal.component';
+import { Modal } from '@/app/shared/components/modal/modal';
 
 @Component({
   selector: 'app-profile',

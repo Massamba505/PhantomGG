@@ -1,7 +1,7 @@
 import { Tournament, TournamentFormData } from '@/app/shared/models/tournament';
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Modal } from '@/app/shared/components/modal/modal.component';
+import { Modal } from '@/app/shared/components/modal/modal';
 import { TournamentFormComponent } from '@/app/shared/components/tournament-form/tournament-form';
 import { TournamentCard } from '@/app/shared/components/tournament-card/tournament-card';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
