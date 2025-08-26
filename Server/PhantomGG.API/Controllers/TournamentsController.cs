@@ -2,31 +2,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhantomGG.API.DTOs;
 using PhantomGG.API.DTOs.Tournament;
+using PhantomGG.API.Security.Interfaces;
 using PhantomGG.API.Services.Interfaces;
-using System.Security.Claims;
 
 namespace PhantomGG.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TournamentsController : ControllerBase
+public class TournamentsController(
+    ITournamentService tournamentService,
+    ICurrentUserService currentUserService) : ControllerBase
 {
-    private readonly ITournamentService _tournamentService;
+    private readonly ITournamentService _tournamentService = tournamentService;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
 
-    public TournamentsController(ITournamentService tournamentService)
-    {
-        _tournamentService = tournamentService;
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-        {
-            return Guid.Empty;
-        }
-        return userId;
-    }
 
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetTournaments()
@@ -68,8 +57,8 @@ public class TournamentsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<ApiResponse>> GetMyTournaments()
     {
-        var userId = GetCurrentUserId();
-        var tournaments = await _tournamentService.GetByOrganizerAsync(userId);
+        var user = _currentUserService.GetCurrentUser();
+        var tournaments = await _tournamentService.GetByOrganizerAsync(user.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -82,8 +71,8 @@ public class TournamentsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<ApiResponse>> CreateTournament([FromBody] CreateTournamentDto createDto)
     {
-        var userId = GetCurrentUserId();
-        var tournament = await _tournamentService.CreateAsync(createDto, userId);
+        var user = _currentUserService.GetCurrentUser();
+        var tournament = await _tournamentService.CreateAsync(createDto, user.Id);
         return CreatedAtAction(
             nameof(GetTournament),
             new { id = tournament.Id },
@@ -99,8 +88,8 @@ public class TournamentsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<ApiResponse>> UpdateTournament(Guid id, [FromBody] UpdateTournamentDto updateDto)
     {
-        var userId = GetCurrentUserId();
-        var tournament = await _tournamentService.UpdateAsync(id, updateDto, userId);
+        var user = _currentUserService.GetCurrentUser();
+        var tournament = await _tournamentService.UpdateAsync(id, updateDto, user.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -113,8 +102,8 @@ public class TournamentsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<ApiResponse>> DeleteTournament(Guid id)
     {
-        var userId = GetCurrentUserId();
-        await _tournamentService.DeleteAsync(id, userId);
+        var user = _currentUserService.GetCurrentUser();
+        await _tournamentService.DeleteAsync(id, user.Id);
         return Ok(new ApiResponse
         {
             Success = true,

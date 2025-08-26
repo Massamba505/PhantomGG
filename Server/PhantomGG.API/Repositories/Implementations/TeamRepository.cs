@@ -60,11 +60,6 @@ public class TeamRepository : ITeamRepository
                                    t.Manager.Contains(searchDto.SearchTerm));
         }
 
-        if (searchDto.TournamentId.HasValue)
-        {
-            query = query.Where(t => t.TournamentId == searchDto.TournamentId.Value);
-        }
-
         query = query.OrderByDescending(t => t.CreatedAt);
 
         if (searchDto.PageSize > 0)

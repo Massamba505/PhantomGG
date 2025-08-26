@@ -2,31 +2,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhantomGG.API.DTOs;
 using PhantomGG.API.DTOs.Team;
+using PhantomGG.API.Security.Interfaces;
 using PhantomGG.API.Services.Interfaces;
-using System.Security.Claims;
 
 namespace PhantomGG.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TeamsController : ControllerBase
+public class TeamsController(
+    ITeamService teamService,
+    ICurrentUserService currentUserService) : ControllerBase
 {
-    private readonly ITeamService _teamService;
-
-    public TeamsController(ITeamService teamService)
-    {
-        _teamService = teamService;
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-        {
-            return Guid.Empty;
-        }
-        return userId;
-    }
+    private readonly ITeamService _teamService = teamService;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
 
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetTeams()
@@ -65,7 +53,7 @@ public class TeamsController : ControllerBase
     }
 
     [HttpPost("search")]
-    public async Task<ActionResult<ApiResponse>> SearchTeams([FromBody] TeamSearchDto searchDto)
+    public async Task<ActionResult<ApiResponse>> SearchTeams([FromQuery] TeamSearchDto searchDto)
     {
         var teams = await _teamService.SearchAsync(searchDto);
         return Ok(new ApiResponse
@@ -80,8 +68,8 @@ public class TeamsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<ApiResponse>> GetMyTeams()
     {
-        var userId = GetCurrentUserId();
-        var teams = await _teamService.GetByLeaderAsync(userId);
+        var user = _currentUserService.GetCurrentUser();
+        var teams = await _teamService.GetByLeaderAsync(user.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -94,8 +82,8 @@ public class TeamsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<ApiResponse>> CreateTeam([FromBody] CreateTeamDto createDto)
     {
-        var userId = GetCurrentUserId();
-        var team = await _teamService.CreateAsync(createDto, userId);
+        var user = _currentUserService.GetCurrentUser();
+        var team = await _teamService.CreateAsync(createDto, user.Id);
         return CreatedAtAction(
             nameof(GetTeam),
             new { id = team.Id },
@@ -111,8 +99,8 @@ public class TeamsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<ApiResponse>> UpdateTeam(Guid id, [FromBody] UpdateTeamDto updateDto)
     {
-        var userId = GetCurrentUserId();
-        var team = await _teamService.UpdateAsync(id, updateDto, userId);
+        var user = _currentUserService.GetCurrentUser();
+        var team = await _teamService.UpdateAsync(id, updateDto, user.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -125,8 +113,8 @@ public class TeamsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<ApiResponse>> DeleteTeam(Guid id)
     {
-        var userId = GetCurrentUserId();
-        await _teamService.DeleteAsync(id, userId);
+        var user = _currentUserService.GetCurrentUser();
+        await _teamService.DeleteAsync(id, user.Id);
         return Ok(new ApiResponse
         {
             Success = true,
