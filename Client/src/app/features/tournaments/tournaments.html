@@ -111,13 +111,6 @@
     }
   </section>
 
-  <app-edit-tournament-modal
-    [isOpen]="isEditModalOpen()"
-    [tournament]="editingTournament()"
-    (close)="isEditModalOpen.set(false); editingTournament.set(null)"
-    (save)="handleSaveTournament($event)"
-  ></app-edit-tournament-modal>
-
   <app-confirm-delete-modal
     [isOpen]="isDeleteModalOpen()"
     [title]="'Delete Tournament'"

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
@@ -14,10 +14,8 @@ import { TournamentForm } from '@/app/shared/components/tournament-form/tourname
   imports: [DashboardLayout, CommonModule, TournamentForm],
 })
 export class CreateTournament {
-  constructor(
-    private router: Router,
-    private toast: ToastService
-  ) {}
+  private router = inject(Router);
+  private toast = inject(ToastService);
 
   onTournamentSaved(tournamentData: TournamentFormData) {
     console.log('Tournament data received:', tournamentData);

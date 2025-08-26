@@ -1,5 +1,5 @@
 import { Tournament } from '@/app/shared/models/tournament';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { TournamentCard } from '@/app/shared/components/tournament-card/tournament-card';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
@@ -9,30 +9,30 @@ import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LucideAngularModule } from "lucide-angular";
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
-import { EditTournamentModal } from './components/modals/edit-tournament-modal';
 
 @Component({
   selector: 'app-tournaments',
   templateUrl: './tournaments.html',
   styleUrls: ['./tournaments.css'],
+  standalone: true,
   imports: [
     DashboardLayout,
     CommonModule,
     FormsModule,
     LucideAngularModule,
     TournamentCard,
-    ConfirmDeleteModal,
-    EditTournamentModal
+    ConfirmDeleteModal
 ],
 })
 
 export class Tournaments implements OnInit {
+  private router = inject(Router);
+  private toast = inject(ToastService);
+  
   sidebarOpen = false;
   searchTerm = '';
   filterStatus = 'all';
-  isEditModalOpen = signal(false);
   isDeleteModalOpen = signal(false);
-  editingTournament = signal<Tournament | null>(null);
   deletingTournament = signal<string | null>(null);
   readonly icons = LucideIcons;
   gridLayout = signal<boolean>(true);
@@ -98,8 +98,6 @@ export class Tournaments implements OnInit {
 
   filteredTournaments: Tournament[] = [];
 
-  constructor(private router: Router, private toast: ToastService) {}
-
   ngOnInit() {
     this.filterTournaments();
   }
@@ -119,11 +117,11 @@ export class Tournaments implements OnInit {
   }
 
   handleEditTournament(tournament: Tournament) {
-    this.editingTournament.set(tournament);
-    this.isEditModalOpen.set(true);
+    // Navigate to edit page instead of opening modal
+    this.router.navigate(['/edit-tournament', tournament.id]);
   }
 
-  switchLayout(toGrid:boolean){
+  switchLayout(toGrid: boolean) {
     this.gridLayout.set(toGrid);
   }
 
@@ -132,7 +130,7 @@ export class Tournaments implements OnInit {
     this.isDeleteModalOpen.set(true);
   }
 
-  confirmDelete(){
+  confirmDelete() {
     this.tournaments = this.tournaments.filter((t) => t.id !== this.deletingTournament());
     this.filterTournaments();
     this.toast.success('Tournament deleted successfully');
@@ -142,19 +140,6 @@ export class Tournaments implements OnInit {
 
   handleViewTournament(tournament: Tournament) {
     this.router.navigate(['/tournament-details', tournament.id]);
-  }
-
-  handleSaveTournament(updatedTournament: Tournament) {
-    const currentTournament = this.editingTournament();
-    if (currentTournament) {
-      this.tournaments = this.tournaments.map((t) =>
-        t.id === currentTournament.id ? updatedTournament : t
-      );
-      this.filterTournaments();
-      this.toast.success('Tournament updated successfully');
-    }
-    this.isEditModalOpen.set(false);
-    this.editingTournament.set(null);
   }
 
   createNewTournament() {

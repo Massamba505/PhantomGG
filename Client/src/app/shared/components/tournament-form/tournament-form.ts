@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
@@ -18,14 +18,14 @@ export class TournamentForm implements OnInit, OnChanges {
   @Output() tournamentSaved = new EventEmitter<TournamentFormData>();
   @Output() cancelled = new EventEmitter<void>();
 
+  private fb = inject(FormBuilder);
+
   tournamentForm!: FormGroup;
   isSubmitted = false;
   isSubmitting = false;
   bannerPreview: string | null = null;
   isDragging = false;
   readonly icons = LucideIcons;
-
-  constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
     this.initializeForm();
@@ -152,6 +152,11 @@ export class TournamentForm implements OnInit, OnChanges {
     };
 
     this.tournamentSaved.emit(tournamentData);
+    
+    // Reset form state after emission
+    setTimeout(() => {
+      this.isSubmitting = false;
+    }, 100);
   }
 
   onCancel() {
