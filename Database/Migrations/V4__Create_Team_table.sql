@@ -1,0 +1,18 @@
+CREATE TABLE Teams (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWID()),
+    Name VARCHAR(200) NOT NULL,
+    Manager VARCHAR(100) NOT NULL,
+    NumberOfPlayers INT NOT NULL DEFAULT 1,
+    LogoUrl VARCHAR(500) NULL,
+    TournamentId UNIQUEIDENTIFIER NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    UpdatedAt DATETIME2 NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    CONSTRAINT PK_Teams PRIMARY KEY (Id),
+    CONSTRAINT FK_Teams_TournamentId FOREIGN KEY (TournamentId) 
+        REFERENCES Tournaments (Id) ON DELETE CASCADE
+);
+
+CREATE INDEX IX_Teams_TournamentId ON Teams (TournamentId);
+CREATE INDEX IX_Teams_IsActive ON Teams (IsActive);
+CREATE INDEX IX_Teams_Name ON Teams (Name);
