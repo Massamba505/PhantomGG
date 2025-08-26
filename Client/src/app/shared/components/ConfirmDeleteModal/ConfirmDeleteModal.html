@@ -1,0 +1,25 @@
+<app-modal [isOpen]="isOpen" (close)="handleClose()" [title]="title">
+  <div class="flex flex-col gap-4 text-center p-4">
+    <div class="mx-auto flex items-center justify-center">
+      <lucide-angular
+        [img]="icons.Trash2 || 'trash-2'"
+        size="28"
+      ></lucide-angular>
+    </div>
+
+    <h3 class="text-lg font-semibold text-destructive">
+      Are you absolutely sure?
+    </h3>
+    <p class="text-sm text-justify">
+      This action cannot be undone. This will permanently delete
+      {{ entityName }} and all its associated data.
+    </p>
+
+    <div class="flex justify-center gap-3 mt-6">
+      <button class="btn btn-outline" (click)="handleClose()">Cancel</button>
+      <button class="btn btn-destructive" (click)="handleConfirm()">
+        Delete {{ entityName }}
+      </button>
+    </div>
+  </div>
+</app-modal>

@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LucideAngularModule } from "lucide-angular";
+import { ConfirmDeleteModal } from "@/app/shared/components/ConfirmDeleteModal/ConfirmDeleteModal";
 
 @Component({
   selector: 'app-tournaments',
@@ -22,7 +23,8 @@ import { LucideAngularModule } from "lucide-angular";
     CommonModule,
     FormsModule,
     LucideAngularModule,
-    TournamentCard
+    TournamentCard,
+    ConfirmDeleteModal
 ],
 })
 

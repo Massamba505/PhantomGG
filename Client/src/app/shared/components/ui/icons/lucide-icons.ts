@@ -15,7 +15,8 @@ import {
   X,
   CirclePlus,
   UserPlus,
-  Trophy
+  Trophy,
+  ChevronsLeft
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -35,5 +36,6 @@ export const LucideIcons = {
   X,
   CirclePlus,
   UserPlus,
-  Trophy
+  Trophy,
+  ChevronsLeft
 };

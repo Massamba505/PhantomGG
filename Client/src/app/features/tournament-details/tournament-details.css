@@ -1,5 +1,4 @@
-/* Tournament details specific styles */
-.badge {
+/* .badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -65,4 +64,4 @@
   outline: none;
   border-color: rgb(var(--primary));
   box-shadow: 0 0 0 1px rgba(var(--primary), 0.5);
-}
+} */
