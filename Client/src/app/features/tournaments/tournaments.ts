@@ -8,26 +8,32 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '@/app/shared/services/toast.service';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { LucideAngularModule } from "lucide-angular";
 
 @Component({
   selector: 'app-tournaments',
   templateUrl: './tournaments.html',
   styleUrls: ['./tournaments.css'],
-  standalone: true,
   imports: [
     Modal,
     TournamentFormComponent,
     DashboardLayout,
     CommonModule,
     FormsModule,
-  ],
+    LucideAngularModule,
+    TournamentCard
+],
 })
+
 export class Tournaments implements OnInit {
   sidebarOpen = false;
   searchTerm = '';
   filterStatus = 'all';
   isEditModalOpen = signal(false);
   editingTournament = signal<Tournament | null>(null);
+  readonly icons = LucideIcons;
+  gridLayout = signal<boolean>(true);
 
   tournaments: Tournament[] = [
     {
@@ -113,6 +119,10 @@ export class Tournaments implements OnInit {
   handleEditTournament(tournament: Tournament) {
     this.editingTournament.set(tournament);
     this.isEditModalOpen.set(true);
+  }
+
+  switchLayout(toGrid:boolean){
+    this.gridLayout.set(toGrid);
   }
 
   handleDeleteTournament(id: string) {
