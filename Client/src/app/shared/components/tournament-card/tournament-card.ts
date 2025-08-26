@@ -1,20 +1,22 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Edit, Trash2, Users, Calendar } from 'lucide-angular';
+import { Edit, Trash2, Users, Calendar, LucideAngularModule } from 'lucide-angular';
 import { Tournament } from '../../models/tournament';
+import { LucideIcons } from '../ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-tournament-card',
   templateUrl: './tournament-card.html',
   styleUrls: ['./tournament-card.css'],
-  standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
 })
 export class TournamentCard {
   @Input() tournament!: Tournament;
   @Output() edit = new EventEmitter<Tournament>();
   @Output() delete = new EventEmitter<string>();
   @Output() view = new EventEmitter<Tournament>();
+
+  readonly icons = LucideIcons;
 
   statusColors = {
     draft: 'bg-muted text-muted-foreground',

@@ -1,4 +1,7 @@
-<div class="card-tournament group cursor-pointer" (click)="onView()">
+<div
+  class="card-tournament flex flex-col justify-between min-h-full group cursor-pointer"
+  (click)="onView()"
+>
   <div class="flex justify-between items-start mb-4">
     <div class="flex-1">
       <h3
@@ -6,8 +9,8 @@
       >
         {{ tournament.name }}
       </h3>
-      <p class="text-muted-foreground text-sm line-clamp-2">
-        {{ tournament.description }}
+      <p class="text-muted-foreground text-sm line-clamp-3">
+        {{ tournament.description }}{{ tournament.description }}
       </p>
     </div>
     <div
@@ -18,14 +21,14 @@
         class="btn btn-sm btn-ghost"
         aria-label="Edit tournament"
       >
-        <!-- <lucide-edit size="16" /> -->
+        <lucide-angular [img]="icons.SquarePen" size="16" />
       </button>
       <button
         (click)="onDelete($event)"
         class="btn btn-sm btn-destructive"
         aria-label="Delete tournament"
       >
-        <!-- <lucide-trash-2 size="16" /> -->
+        <lucide-angular [img]="icons.Trash2" size="16" />
       </button>
     </div>
   </div>
@@ -33,19 +36,22 @@
   <div class="flex items-center justify-between">
     <div class="flex items-center space-x-4 text-sm text-muted-foreground">
       <div class="flex items-center space-x-1">
-        <!-- <lucide-users size="14" /> -->
+        <lucide-angular [img]="icons.Users" size="16" />
         <span>{{ tournament.teams.length }}/{{ tournament.maxTeams }}</span>
       </div>
       <div class="flex items-center space-x-1">
-        <!-- <lucide-calendar size="14" /> -->
+        <lucide-angular [img]="icons.CalendarDays" size="16" />
         <span>{{ tournament.startDate }}</span>
       </div>
     </div>
-    <span class="badge" [ngClass]="{
-      'badge-success': tournament.status === 'active',
-      'badge-secondary': tournament.status === 'draft',
-      'badge-primary': tournament.status === 'completed'
-    }">
+    <span
+      class="badge"
+      [ngClass]="{
+        'badge-success': tournament.status === 'active',
+        'badge-secondary': tournament.status === 'draft',
+        'badge-primary': tournament.status === 'completed'
+      }"
+    >
       {{ tournament.status }}
     </span>
   </div>
