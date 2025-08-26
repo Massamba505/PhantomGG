@@ -16,11 +16,11 @@ CREATE TABLE Tournaments (
     CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
     IsActive BIT NOT NULL DEFAULT 1,
     CONSTRAINT PK_Tournaments PRIMARY KEY (Id),
-    CONSTRAINT FK_Tournaments_CreatedBy FOREIGN KEY (Organizer) 
-        REFERENCES Users (Id) ON DELETE NO ACTION,
+    CONSTRAINT FK_Tournaments_Organizer FOREIGN KEY (Organizer) 
+        REFERENCES Users (Id)
 );
 
 CREATE INDEX IX_Tournaments_Status ON Tournaments (Status);
-CREATE INDEX IX_Tournaments_CreatedBy ON Tournaments (Organizer);
+CREATE INDEX IX_Tournaments_Organizer ON Tournaments (Organizer);
 CREATE INDEX IX_Tournaments_StartDate ON Tournaments (StartDate);
 CREATE INDEX IX_Tournaments_IsActive ON Tournaments (IsActive);
