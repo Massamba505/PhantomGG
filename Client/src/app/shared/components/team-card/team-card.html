@@ -1,49 +1,52 @@
-<div class="team-card">
-  <div class="team-header">
+<div
+  class="card team-card group relative border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+>
+  <div class="flex justify-between items-start mb-4">
     <div class="team-info">
-      <h3 class="team-name">{{ team.name }}</h3>
-      <div class="team-meta">
-        <span class="team-location">
-          <i class="pi pi-map-marker"></i> {{ team.city }}
+      <h3 class="team-name text-lg font-semibold">{{ team.name }}</h3>
+      <div class="team-meta text-sm mt-1 flex flex-col gap-1">
+        <span class="flex items-center gap-1">
+          <lucide-angular [img]="icons.MapPin" size="16"></lucide-angular>
+          {{ team.city }}
         </span>
-        <span class="team-coach">
-          <i class="pi pi-user"></i> Coach: {{ team.coach }}
+        <span class="flex items-center gap-1">
+          <lucide-angular [img]="icons.User" size="16"></lucide-angular>
+          Coach: {{ team.coach }}
         </span>
       </div>
     </div>
-    <div class="team-actions" *ngIf="showActions">
-      <button 
-        (click)="edit.emit(team)" 
-        class="btn btn-sm btn-ghost" 
-        title="Edit Team"
+
+    <div
+      class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity"
+    >
+      <button
+        (click)="edit.emit(team)"
+        class="btn btn-sm btn-ghost"
+        aria-label="Edit team"
       >
-        <i class="pi pi-pencil"></i>
+        <lucide-angular [img]="icons.SquarePen" size="16"></lucide-angular>
       </button>
-      <button 
-        (click)="delete.emit(team.id)" 
-        class="btn btn-sm btn-destructive" 
-        title="Delete Team"
+      <button
+        (click)="delete.emit(team.id)"
+        class="btn btn-sm btn-destructive"
+        aria-label="Delete team"
       >
-        <i class="pi pi-trash"></i>
+        <lucide-angular [img]="icons.Trash2" size="16"></lucide-angular>
       </button>
     </div>
   </div>
 
-  <div class="team-body">
+  <div class="grid grid-cols-2 gap-4 text-center border-t pt-4">
     <div class="team-stat">
-      <div class="stat-label">Players</div>
-      <div class="stat-value">{{ team.players }}</div>
+      <div class="stat-label text-xs uppercase tracking-wide">Players</div>
+      <div class="stat-value text-base font-medium">{{ team.players }}</div>
     </div>
-    
-    <div class="team-stat" *ngIf="team.createdAt">
-      <div class="stat-label">Created</div>
-      <div class="stat-value">{{ getFormattedDate(team.createdAt) }}</div>
-    </div>
-  </div>
 
-  <div class="team-footer" *ngIf="showDetails">
-    <a [routerLink]="['/tournaments', team.tournamentId, 'teams', team.id]" class="btn btn-sm btn-link">
-      View Team Details <i class="pi pi-arrow-right"></i>
-    </a>
+    <div class="team-stat" *ngIf="team.createdAt">
+      <div class="stat-label text-xs uppercase tracking-wide">Created</div>
+      <div class="stat-value text-base font-medium">
+        {{ getFormattedDate(team.createdAt) }}
+      </div>
+    </div>
   </div>
 </div>

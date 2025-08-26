@@ -1,6 +1,5 @@
 <div class="flex h-screen">
   <div class="container mx-auto py-8 px-4 md:px-6">
-    <!-- Header -->
     <header
       class="mb-6 flex flex-row items-center justify-between flex-wrap gap-2"
     >
@@ -28,7 +27,6 @@
       </div>
     </header>
 
-    <!-- Tournament Overview -->
     <div class="card p-6 mb-6">
       <div class="flex flex-col lg:flex-row gap-6">
         <div class="flex-1">
@@ -49,7 +47,6 @@
             {{ tournament?.description }}
           </p>
 
-          <!-- Tournament info grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="p-4 bg-muted/30 rounded-lg">
               <div class="flex items-center gap-3 mb-1">
@@ -129,7 +126,6 @@
                   tournament?.maxTeams || 0
                 }}
               </p>
-              <!-- Team registration progress bar -->
               <div
                 class="w-full h-1.5 bg-muted mt-2 rounded-full overflow-hidden"
               >
@@ -183,7 +179,6 @@
       </div>
     </div>
 
-    <!-- Tabs for different sections -->
     <div class="mb-6">
       <div class="border-b border-border">
         <div class="flex overflow-x-auto">
@@ -253,10 +248,7 @@
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
       >
-        <div
-          *ngFor="let team of tournament?.teams"
-          class="card overflow-hidden h-full"
-        >
+        <div *ngFor="let team of tournament?.teams">
           <app-team-card
             [team]="team"
             [showActions]="true"
@@ -265,7 +257,6 @@
           ></app-team-card>
         </div>
 
-        <!-- Add Team Card -->
         <div
           *ngIf="
             tournament &&
@@ -290,28 +281,12 @@
       <!-- Empty state for no teams -->
       <div
         *ngIf="tournament?.teams?.length === 0"
-        class="card py-12 text-center"
+        class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer hover:border-primary transition-colors"
       >
         <div
           class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="text-muted-foreground"
-          >
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
+          <lucide-angular [img]="icons.Users"></lucide-angular>
         </div>
         <h3 class="text-lg font-semibold mb-2">No teams registered yet</h3>
         <p class="text-muted-foreground mb-6">

@@ -16,7 +16,9 @@ import {
   CirclePlus,
   UserPlus,
   Trophy,
-  ChevronsLeft
+  ChevronsLeft,
+  MapPin,
+  ArrowRight
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -37,5 +39,7 @@ export const LucideIcons = {
   CirclePlus,
   UserPlus,
   Trophy,
-  ChevronsLeft
+  ChevronsLeft,
+  MapPin,
+  ArrowRight
 };
