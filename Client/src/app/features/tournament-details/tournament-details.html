@@ -16,10 +16,12 @@
       </div>
 
       <div class="flex gap-3">
-        <button *ngIf="tournament?.status === 'draft'" class="btn btn-outline">
+        @if (tournament?.status === 'draft') {
+        <button class="btn btn-outline">
           <lucide-angular [img]="icons.SquarePen"></lucide-angular>
           Edit Tournament
         </button>
+        }
         <button (click)="openAddTeamModal()" class="btn btn-primary">
           <lucide-angular [img]="icons.CirclePlus"></lucide-angular>
           Add Team
@@ -50,23 +52,10 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="p-4 bg-muted/30 rounded-lg">
               <div class="flex items-center gap-3 mb-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="text-primary"
-                >
-                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                  <line x1="16" x2="16" y1="2" y2="6" />
-                  <line x1="8" x2="8" y1="2" y2="6" />
-                  <line x1="3" x2="21" y1="10" y2="10" />
-                </svg>
+                <lucide-angular
+                  [img]="icons.Calendar"
+                  size="16"
+                ></lucide-angular>
                 <h3 class="text-sm font-medium">Start Date</h3>
               </div>
               <p class="text-foreground font-medium">
@@ -76,23 +65,10 @@
 
             <div class="p-4 bg-muted/30 rounded-lg">
               <div class="flex items-center gap-3 mb-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="text-primary"
-                >
-                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                  <line x1="16" x2="16" y1="2" y2="6" />
-                  <line x1="8" x2="8" y1="2" y2="6" />
-                  <line x1="3" x2="21" y1="10" y2="10" />
-                </svg>
+                <lucide-angular
+                  [img]="icons.Calendar"
+                  size="16"
+                ></lucide-angular>
                 <h3 class="text-sm font-medium">End Date</h3>
               </div>
               <p class="text-foreground font-medium">
@@ -102,23 +78,7 @@
 
             <div class="p-4 bg-muted/30 rounded-lg">
               <div class="flex items-center gap-3 mb-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="text-primary"
-                >
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
+                <lucide-angular [img]="icons.Users2" size="16"></lucide-angular>
                 <h3 class="text-sm font-medium">Teams</h3>
               </div>
               <p class="text-foreground font-medium">
@@ -138,30 +98,7 @@
 
             <div class="p-4 bg-muted/30 rounded-lg">
               <div class="flex items-center gap-3 mb-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="text-primary"
-                >
-                  <path
-                    d="M12 8c-2.8 0-5 2.2-5 5 0 1.8.9 3.4 2.3 4.3.7.5 1.2.5 1.7.6.1 0 .3 0 .5.1.2 0 .4 0 .5-.1.5-.1 1-.1 1.7-.6 1.4-.9 2.3-2.5 2.3-4.3 0-2.8-2.2-5-5-5Z"
-                  />
-                  <path d="M12 8V3" />
-                  <path d="m9 10 3-2 3 2" />
-                  <path d="M18 12h1.5a2.5 2.5 0 1 0 0-5" />
-                  <path d="M18 10V3" />
-                  <path d="m13.7 7.7 4.3-4.4 2 2" />
-                  <path d="M6 12H4.5a2.5 2.5 0 0 1 0-5" />
-                  <path d="M6 10V3" />
-                  <path d="m10.3 7.7-4.3-4.4-2 2" />
-                </svg>
+                <lucide-angular [img]="icons.Timer" size="16"></lucide-angular>
                 <h3 class="text-sm font-medium">Duration</h3>
               </div>
               <p class="text-foreground font-medium">
@@ -235,7 +172,8 @@
     </div>
 
     <!-- Teams Section -->
-    <div *ngIf="activeTab === 'teams'" class="mb-6">
+    @if (activeTab === 'teams') {
+    <div class="mb-6">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Registered Teams</h2>
         <div class="text-sm text-muted-foreground">
@@ -248,7 +186,8 @@
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
       >
-        <div *ngFor="let team of tournament?.teams">
+        @for (team of tournament?.teams; track team.id) {
+        <div>
           <app-team-card
             [team]="team"
             [showActions]="true"
@@ -256,13 +195,9 @@
             (delete)="openDeleteConfirmation(team.id)"
           ></app-team-card>
         </div>
-
+        } @if ( tournament && tournament.teams && tournament.teams.length <
+        tournament.maxTeams ) {
         <div
-          *ngIf="
-            tournament &&
-            tournament.teams &&
-            tournament.teams.length < tournament.maxTeams
-          "
           class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer hover:border-primary transition-colors"
           (click)="openAddTeamModal()"
         >
@@ -276,11 +211,12 @@
             Click to register a team for this tournament
           </p>
         </div>
+        }
       </div>
 
       <!-- Empty state for no teams -->
+      @if (tournament?.teams?.length === 0) {
       <div
-        *ngIf="tournament?.teams?.length === 0"
         class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer hover:border-primary transition-colors"
       >
         <div
@@ -296,30 +232,21 @@
           Add First Team
         </button>
       </div>
+      }
     </div>
+    }
 
     <!-- Schedule Tab (Placeholder) -->
-    <div *ngIf="activeTab === 'schedule'" class="card p-8 text-center">
+    @if (activeTab === 'schedule') {
+    <div class="card p-8 text-center">
       <div
         class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+        <lucide-angular
+          [img]="icons.Calendar"
+          size="24"
           class="text-muted-foreground"
-        >
-          <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-          <line x1="16" x2="16" y1="2" y2="6" />
-          <line x1="8" x2="8" y1="2" y2="6" />
-          <line x1="3" x2="21" y1="10" y2="10" />
-        </svg>
+        ></lucide-angular>
       </div>
       <h3 class="text-lg font-semibold mb-2">Schedule Not Generated</h3>
       <p class="text-muted-foreground mb-6">
@@ -329,32 +256,19 @@
         Generate Schedule
       </button>
     </div>
+    }
 
     <!-- Bracket Tab (Placeholder) -->
-    <div *ngIf="activeTab === 'bracket'" class="card p-8 text-center">
+    @if (activeTab === 'bracket') {
+    <div class="card p-8 text-center">
       <div
         class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+        <lucide-angular
+          [img]="icons.GitBranch"
+          size="24"
           class="text-muted-foreground"
-        >
-          <path d="M8 20V8c0-2.2 1.8-4 4-4h8" />
-          <path d="M6 12h4" />
-          <path d="M14 12h4" />
-          <path d="M6 16h2" />
-          <path d="M14 16h2" />
-          <path d="M8 4v16" />
-          <path d="M16 4v16" />
-        </svg>
+        ></lucide-angular>
       </div>
       <h3 class="text-lg font-semibold mb-2">Tournament Bracket Not Created</h3>
       <p class="text-muted-foreground mb-6">
@@ -364,34 +278,19 @@
         Create Bracket
       </button>
     </div>
+    }
 
     <!-- Results Tab (Placeholder) -->
-    <div *ngIf="activeTab === 'results'" class="card p-8 text-center">
+    @if (activeTab === 'results') {
+    <div class="card p-8 text-center">
       <div
         class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+        <lucide-angular
+          [img]="icons.Target"
+          size="24"
           class="text-muted-foreground"
-        >
-          <path d="M7 22a5 5 0 0 1-2-4" />
-          <path d="M7 16.93c.96.43 1.96.74 2.99.91" />
-          <path
-            d="M3.34 14A6.8 6.8 0 0 1 2 10c0-4.42 4.48-8 10-8s10 3.58 10 8a7.19 7.19 0 0 1-.33 2"
-          />
-          <path d="M5 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
-          <path
-            d="M14.33 22h-.09a.35.35 0 0 1-.24-.32v-10a.34.34 0 0 1 .33-.34c.08 0 .15.03.21.08l7.34 6a.33.33 0 0 1-.21.59h-4.49l-2.57 3.85a.35.35 0 0 1-.28.14v0z"
-          />
-        </svg>
+        ></lucide-angular>
       </div>
       <h3 class="text-lg font-semibold mb-2">No Results Available</h3>
       <p class="text-muted-foreground mb-6">
@@ -401,6 +300,7 @@
         View Results
       </button>
     </div>
+    }
   </div>
 
   <!-- Team Management Modals -->

@@ -6,11 +6,13 @@ import { LoginRequest } from '@/app/shared/models/Authentication';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { ToastService } from '@/app/shared/services/toast.service';
+import { LucideAngularModule } from 'lucide-angular';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './login.html',
 })
 export class Login {
@@ -18,6 +20,8 @@ export class Login {
   private authState = inject(AuthStateService);
   private router = inject(Router);
   private toastService = inject(ToastService);
+
+  readonly icons = LucideIcons;
 
   showPassword = signal(false);
   submitted = signal(false);

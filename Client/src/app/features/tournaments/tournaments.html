@@ -78,15 +78,16 @@
       </div>
     </div>
 
+    @if (filteredTournaments.length > 0) {
     <div
-      *ngIf="filteredTournaments.length > 0"
       [class]="
         gridLayout()
           ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
           : 'flex flex-col gap-3'
       "
     >
-      <div *ngFor="let tournament of filteredTournaments">
+      @for (tournament of filteredTournaments; track tournament.id) {
+      <div>
         <app-tournament-card
           [tournament]="tournament"
           (delete)="handleDeleteTournament($event)"
@@ -94,10 +95,10 @@
           (view)="handleViewTournament($event)"
         ></app-tournament-card>
       </div>
+      }
     </div>
-
+    } @if (filteredTournaments.length === 0) {
     <div
-      *ngIf="filteredTournaments.length === 0"
       class="border-2 max-w-md border-dashed rounded-lg flex flex-col items-center justify-center p-8 text-center h-full cursor-pointer"
       (click)="createNewTournament()"
     >
@@ -107,6 +108,7 @@
       <p class="text-sm mb-4 max-w-xs">Try adjusting your search criteria</p>
       <button class="btn btn-primary">Create Tournament</button>
     </div>
+    }
   </section>
 
   <app-modal
@@ -114,12 +116,13 @@
     (close)="isEditModalOpen.set(false); editingTournament.set(null)"
     title="Edit Tournament"
   >
+    @if (editingTournament()) {
     <app-tournament-form
-      *ngIf="editingTournament()"
       [tournament]="editingTournament()!"
       (save)="handleSaveTournament($event)"
       (cancel)="isEditModalOpen.set(false); editingTournament.set(null)"
     ></app-tournament-form>
+    }
   </app-modal>
 
   <app-confirm-delete-modal

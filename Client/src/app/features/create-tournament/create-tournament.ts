@@ -10,18 +10,22 @@ import { CommonModule } from '@angular/common';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
+import { LucideAngularModule } from 'lucide-angular';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-create-tournament',
   templateUrl: './create-tournament.html',
   styleUrls: ['./create-tournament.css'],
   standalone: true,
-  imports: [DashboardLayout, CommonModule, ReactiveFormsModule],
+  imports: [DashboardLayout, CommonModule, ReactiveFormsModule, LucideAngularModule],
 })
 export class CreateTournament {
   isSubmitting = false;
   isSubmitted = false;
   bannerPreview: string | null = null;
+
+  readonly icons = LucideIcons;
 
   tournamentForm: FormGroup;
 

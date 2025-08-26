@@ -14,11 +14,13 @@ import { passwordStrengthValidator } from '@/app/shared/validators/password.vali
 import { matchPasswordsValidator } from '@/app/shared/validators/match-passwords.validator';
 import { getPasswordScore } from '@/app/shared/utils/PasswordScore';
 import { SignUpRequest } from '@/app/shared/models/Authentication';
+import { LucideAngularModule } from 'lucide-angular';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './signup.html',
 })
 export class Signup {
@@ -26,6 +28,8 @@ export class Signup {
   private authState = inject(AuthStateService);
   private router = inject(Router);
   private toast = inject(ToastService);
+
+  readonly icons = LucideIcons;
 
   showPassword = signal(false);
   showPassword2 = signal(false);

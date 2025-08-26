@@ -6,11 +6,13 @@ import { Router, RouterLink } from '@angular/router';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Modal } from '@/app/shared/components/modal/modal';
+import { LucideAngularModule } from 'lucide-angular';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, DashboardLayout, RouterLink, ReactiveFormsModule, Modal],
+  imports: [CommonModule, DashboardLayout, RouterLink, ReactiveFormsModule, Modal, LucideAngularModule],
   templateUrl: './profile.html',
   styleUrls: ['./profile.css']
 })
@@ -19,6 +21,8 @@ export class Profile {
   private toast = inject(ToastService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+
+  readonly icons = LucideIcons;
 
   user = this.authState.user;
   isEditProfileModalOpen = signal(false);

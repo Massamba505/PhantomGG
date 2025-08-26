@@ -18,7 +18,19 @@ import {
   Trophy,
   ChevronsLeft,
   MapPin,
-  ArrowRight
+  ArrowRight,
+  Calendar,
+  Users2,
+  Crown,
+  GitBranch,
+  Target,
+  Edit,
+  Lock,
+  LogOut,
+  Home,
+  Eye,
+  EyeOff,
+  Loader2
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -41,5 +53,17 @@ export const LucideIcons = {
   Trophy,
   ChevronsLeft,
   MapPin,
-  ArrowRight
+  ArrowRight,
+  Calendar,
+  Users2,
+  Crown,
+  GitBranch,
+  Target,
+  Edit,
+  Lock,
+  LogOut,
+  Home,
+  Eye,
+  EyeOff,
+  Loader2
 };

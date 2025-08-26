@@ -10,17 +10,23 @@
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
       <div class="card p-4 flex flex-col">
-        <h3 class="text-sm font-medium text-muted-foreground mb-1">Active Tournaments</h3>
+        <h3 class="text-sm font-medium text-muted-foreground mb-1">
+          Active Tournaments
+        </h3>
         <p class="text-3xl font-bold">3</p>
         <span class="mt-auto text-xs text-success">+2 this month</span>
       </div>
       <div class="card p-4 flex flex-col">
-        <h3 class="text-sm font-medium text-muted-foreground mb-1">Participants</h3>
+        <h3 class="text-sm font-medium text-muted-foreground mb-1">
+          Participants
+        </h3>
         <p class="text-3xl font-bold">56</p>
         <span class="mt-auto text-xs text-success">+12 this month</span>
       </div>
       <div class="card p-4 flex flex-col">
-        <h3 class="text-sm font-medium text-muted-foreground mb-1">Completed</h3>
+        <h3 class="text-sm font-medium text-muted-foreground mb-1">
+          Completed
+        </h3>
         <p class="text-3xl font-bold">2</p>
         <span class="mt-auto text-xs text-muted-foreground">This month</span>
       </div>
@@ -36,17 +42,34 @@
         <table class="w-full">
           <thead>
             <tr class="border-b border-border">
-              <th class="text-left py-3 px-4 font-medium text-muted-foreground">Name</th>
-              <th class="text-left py-3 px-4 font-medium text-muted-foreground">Game</th>
-              <th class="text-left py-3 px-4 font-medium text-muted-foreground">Date</th>
-              <th class="text-left py-3 px-4 font-medium text-muted-foreground">Participants</th>
-              <th class="text-left py-3 px-4 font-medium text-muted-foreground">Status</th>
+              <th class="text-left py-3 px-4 font-medium text-muted-foreground">
+                Name
+              </th>
+              <th class="text-left py-3 px-4 font-medium text-muted-foreground">
+                Game
+              </th>
+              <th class="text-left py-3 px-4 font-medium text-muted-foreground">
+                Date
+              </th>
+              <th class="text-left py-3 px-4 font-medium text-muted-foreground">
+                Participants
+              </th>
+              <th class="text-left py-3 px-4 font-medium text-muted-foreground">
+                Status
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let tournament of upcomingTournaments" class="border-b border-border hover:bg-muted/30 transition-colors">
+            @for (tournament of upcomingTournaments; track tournament.id ||
+            $index) {
+            <tr
+              class="border-b border-border hover:bg-muted/30 transition-colors"
+            >
               <td class="py-3 px-4">
-                <a [routerLink]="['/tournaments', tournament.id]" class="font-medium hover:text-primary">
+                <a
+                  [routerLink]="['/tournaments', tournament.id]"
+                  class="font-medium hover:text-primary"
+                >
                   {{ tournament.name }}
                 </a>
               </td>
@@ -54,11 +77,18 @@
               <td class="py-3 px-4">{{ tournament.date }}</td>
               <td class="py-3 px-4">{{ tournament.participants }}</td>
               <td class="py-3 px-4">
-                <span class="badge" [ngClass]="{'badge-success': tournament.status === 'open', 'badge-muted': tournament.status === 'draft'}">
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'badge-success': tournament.status === 'open',
+                    'badge-muted': tournament.status === 'draft'
+                  }"
+                >
                   {{ tournament.status }}
                 </span>
               </td>
             </tr>
+            }
           </tbody>
         </table>
       </div>
@@ -71,20 +101,28 @@
         <a routerLink="/tournaments" class="btn-link">View all</a>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div *ngFor="let tournament of recentTournaments" class="card p-4">
+        @for (tournament of recentTournaments; track tournament.id || $index) {
+        <div class="card p-4">
           <div class="flex justify-between items-start mb-2">
             <h3 class="font-medium">{{ tournament.name }}</h3>
             <span class="badge badge-muted">{{ tournament.status }}</span>
           </div>
-          <p class="text-sm text-muted-foreground mb-2">{{ tournament.game }}</p>
+          <p class="text-sm text-muted-foreground mb-2">
+            {{ tournament.game }}
+          </p>
           <div class="flex justify-between items-end mt-3">
             <div class="text-sm">
-              <span class="text-muted-foreground">Winner:</span> 
+              <span class="text-muted-foreground">Winner:</span>
               <span class="font-medium">{{ tournament.winner }}</span>
             </div>
-            <a [routerLink]="['/tournaments', tournament.id]" class="btn-link text-sm">View details</a>
+            <a
+              [routerLink]="['/tournaments', tournament.id]"
+              class="btn-link text-sm"
+              >View details</a
+            >
           </div>
         </div>
+        }
       </div>
     </div>
 
@@ -92,9 +130,13 @@
     <div class="card p-6 mt-8">
       <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <a routerLink="/create-tournament" class="btn btn-primary">Create Tournament</a>
+        <a routerLink="/create-tournament" class="btn btn-primary"
+          >Create Tournament</a
+        >
         <a routerLink="/profile" class="btn btn-outline">Update Profile</a>
-        <a routerLink="/tournaments" class="btn btn-outline">Browse Tournaments</a>
+        <a routerLink="/tournaments" class="btn btn-outline"
+          >Browse Tournaments</a
+        >
       </div>
     </div>
   </section>
