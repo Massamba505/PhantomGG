@@ -1,10 +1,10 @@
 <div
   class="fixed left-0 top-0 h-full sidebar-transition z-40 bg-sidebar-bg border-r border-sidebar-border"
-  [ngClass]="isOpen ? 'w-64' : 'w-16'"
+  [ngClass]="actuallyOpen() ? 'w-64' : 'w-16'"
 >
   <div class="h-16 flex items-center justify-between px-4">
     <div class="flex items-center gap-2 overflow-hidden">
-      @if (isOpen) {
+      @if (actuallyOpen()) {
       <img
         src="PhantomGG_LOGO.png"
         alt="PhantomGG Logo"
@@ -22,7 +22,7 @@
   </div>
 
   <div class="p-3 pt-2">
-    @if (isOpen) {
+    @if (actuallyOpen()) {
     <div
       class="text-xs uppercase font-medium text-muted-foreground tracking-wider mb-3 px-2"
     >
@@ -32,7 +32,7 @@
 
     <nav class="space-y-1">
       @for (item of menuItems; track item.title) {
-      @if(item.roles.includes(userRole)) {
+      @if(item.roles.includes(userRole())) {
       <a
         [routerLink]="item.url"
         routerLinkActive="bg-gray-400/40"
@@ -42,7 +42,7 @@
           <lucide-angular [img]="item.icon" class="h-5 w-5"></lucide-angular>
         </div>
 
-        @if (isOpen) {
+        @if (actuallyOpen()) {
         <span class="truncate">{{ item.title }}</span>
         }
       </a>
@@ -50,7 +50,7 @@
     </nav>
 
     <div class="mt-6 mb-2">
-      @if (isOpen) {
+      @if (actuallyOpen()) {
       <div
         class="text-xs uppercase font-medium text-muted-foreground tracking-wider mb-3 px-2"
       >
@@ -60,7 +60,7 @@
 
       <nav class="space-y-1">
         @for (action of quickActions; track action.title) { @if
-        (action.roles.includes(userRole)) {
+        (action.roles.includes(userRole())) {
         <a
           [routerLink]="action.url"
           routerLinkActive="bg-gray-400/40"
@@ -73,7 +73,7 @@
             ></lucide-angular>
           </div>
 
-          @if (isOpen) {
+          @if (actuallyOpen()) {
           <span class="truncate">{{ action.title }}</span>
           }
         </a>

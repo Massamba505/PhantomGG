@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, input, output, OnInit, OnChanges, SimpleChanges, signal, computed, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -15,21 +15,21 @@ import { Team, CreateTeamRequest, UpdateTeamRequest } from '../../models/tournam
   imports: [NgClass, ReactiveFormsModule],
 })
 export class TeamForm implements OnInit, OnChanges {
-  @Input() team: Team | null = null;
-  @Input() tournamentId: string | null = null;
-  @Output() save = new EventEmitter<CreateTeamRequest | UpdateTeamRequest>();
-  @Output() cancel = new EventEmitter<void>();
+  team = input<Team | null>(null);
+  tournamentId = input<string | null>(null);
+  save = output<CreateTeamRequest | UpdateTeamRequest>();
+  cancel = output<void>();
+
+  private fb = inject(FormBuilder);
 
   teamForm!: FormGroup;
-  submitted = false;
-  logoPreview: string | null = null;
+  submitted = signal(false);
+  logoPreview = signal<string | null>(null);
 
-  constructor(private fb: FormBuilder) {
-    console.log('TeamForm constructor - team:', this.team)
-  }
+  isEditMode = computed(() => this.team() !== null);
 
   ngOnInit() {
-    console.log('TeamForm ngOnInit - team:', this.team);
+    console.log('TeamForm ngOnInit - team:', this.team());
     this.initializeForm();
   }
 
@@ -42,28 +42,29 @@ export class TeamForm implements OnInit, OnChanges {
   }
 
   private initializeForm() {
-    console.log('Initializing form with team:', this.team);
+    const team = this.team();
+    console.log('Initializing form with team:', team);
     this.teamForm = this.fb.group({
       name: [
-        this.team?.name || '',
+        team?.name || '',
         [Validators.required, Validators.minLength(2)],
       ],
       manager: [
-        this.team?.manager || '',
+        team?.manager || '',
         [Validators.required, Validators.minLength(2)],
       ],
       numberOfPlayers: [
-        this.team?.numberOfPlayers || 1,
+        team?.numberOfPlayers || 1,
         [Validators.required, Validators.min(1), Validators.max(30)],
       ],
       logo: [null], // file control - not required for editing
     });
 
     // Set logo preview if team has logoUrl
-    if (this.team?.logoUrl) {
-      this.logoPreview = this.team.logoUrl;
+    if (team?.logoUrl) {
+      this.logoPreview.set(team.logoUrl);
     } else {
-      this.logoPreview = null;
+      this.logoPreview.set(null);
     }
 
     console.log('Form initialized with values:', this.teamForm.value);
@@ -87,7 +88,7 @@ export class TeamForm implements OnInit, OnChanges {
       this.teamForm.get('logo')?.updateValueAndValidity();
 
       const reader = new FileReader();
-      reader.onload = () => (this.logoPreview = reader.result as string);
+      reader.onload = () => this.logoPreview.set(reader.result as string);
       reader.readAsDataURL(file);
     }
   }
@@ -97,7 +98,7 @@ export class TeamForm implements OnInit, OnChanges {
   }
 
   onSubmit() {
-    this.submitted = true;
+    this.submitted.set(true);
     if (this.teamForm.invalid) {
       return;
     }
@@ -107,8 +108,8 @@ export class TeamForm implements OnInit, OnChanges {
       name: this.teamForm.value.name,
       manager: this.teamForm.value.manager,
       numberOfPlayers: parseInt(this.teamForm.value.numberOfPlayers, 10),
-      logoUrl: this.logoPreview || undefined,
-      ...(this.tournamentId ? { tournamentId: this.tournamentId } : {})
+      logoUrl: this.logoPreview() || undefined,
+      ...(this.tournamentId() ? { tournamentId: this.tournamentId()! } : {})
     };
 
     this.save.emit(teamData);

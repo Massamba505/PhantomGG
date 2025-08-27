@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '../icons/lucide-icons';
@@ -10,8 +10,8 @@ import { LucideIcons } from '../icons/lucide-icons';
   imports: [CommonModule, LucideAngularModule],
 })
 export class Modal {
-  @Input() isOpen = false;
-  @Input() title = '';
-  @Output() close = new EventEmitter<void>();
+  isOpen = input<boolean>(false);
+  title = input<string>('');
+  close = output<void>();
   readonly icons = LucideIcons;
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, input, output, OnInit, OnChanges, SimpleChanges, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Team, CreateTeamRequest, UpdateTeamRequest } from '@/app/shared/models/tournament';
 import { TeamForm } from '@/app/shared/components/team-form/team-form';
@@ -11,12 +11,13 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
   imports: [CommonModule, TeamForm, Modal],
   template: `
     <app-modal 
-      [isOpen]="isOpen" 
+      [isOpen]="isOpen()" 
       (close)="close.emit()" 
-      [title]="team ? 'Edit Team' : 'Add Team'"
+      [title]="modalTitle()"
     >
       <app-team-form
-        [team]="team"
+        [team]="team()"
+        [tournamentId]="tournamentId()"
         (save)="onSaveTeam($event)"
         (cancel)="close.emit()"
       ></app-team-form>
@@ -24,17 +25,19 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
   `,
 })
 export class TeamModal implements OnInit, OnChanges {
-  @Input() isOpen = false;
-  @Input() team: Team | null = null;
-  @Input() tournamentId: string | null = null;
+  isOpen = input<boolean>(false);
+  team = input<Team | null>(null);
+  tournamentId = input<string | null>(null);
 
-  @Output() save = new EventEmitter<Team>();
-  @Output() close = new EventEmitter<void>();
+  save = output<Team>();
+  close = output<void>();
 
-  constructor(private toastService: ToastService) {}
+  private toastService = inject(ToastService);
+
+  modalTitle = computed(() => this.team() ? 'Edit Team' : 'Add Team');
 
   ngOnInit() {
-    console.log('TeamModal initialized with team:', this.team);
+    console.log('TeamModal initialized with team:', this.team());
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -44,21 +47,24 @@ export class TeamModal implements OnInit, OnChanges {
   }
 
   onSaveTeam(formData: CreateTeamRequest | UpdateTeamRequest) {
-    if (!this.tournamentId) {
+    const tournamentId = this.tournamentId();
+    if (!tournamentId) {
       this.toastService.error('Tournament ID is required');
       return;
     }
 
+    const currentTeam = this.team();
+    
     // Create a new team object with the form data
     const teamData: Team = {
-      id: this.team?.id || crypto.randomUUID(),
+      id: currentTeam?.id || crypto.randomUUID(),
       name: formData.name,
       manager: formData.manager,
       numberOfPlayers: formData.numberOfPlayers,
       logoUrl: formData.logoUrl,
-      tournamentId: this.tournamentId,
+      tournamentId: tournamentId,
       tournamentName: '', // This will be populated by the API
-      createdAt: this.team?.createdAt || new Date().toISOString(),
+      createdAt: currentTeam?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 

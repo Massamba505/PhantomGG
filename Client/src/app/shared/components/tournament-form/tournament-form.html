@@ -3,12 +3,11 @@
     <label class="block text-sm font-medium mb-2">Tournament Banner</label>
 
     <div
-      class="relative border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer hover:border-primary transition h-48 bg-muted/30"
+      class="relative border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition h-48"
       (click)="fileInput.click()"
       (dragover)="onDragOver($event)"
       (dragleave)="onDragLeave($event)"
       (drop)="onDrop($event)"
-      [ngClass]="{ 'border-primary bg-primary/10': isDragging }"
     >
       <input
         type="file"
@@ -18,21 +17,19 @@
         (change)="onBannerChange($event)"
       />
 
-      @if (!bannerPreview) {
+      @if (!bannerPreview()) {
       <div class="text-center px-4">
         <p class="text-sm text-muted-foreground">
           Drag & drop your banner here, or
-          <span class="text-primary font-medium underline"
-            >click to upload</span
-          >
+          <span class="font-medium underline">click to upload</span>
         </p>
         <p class="text-xs text-muted-foreground mt-1">
           Recommended: 1200x400px
         </p>
       </div>
-      } @if (bannerPreview) {
+      } @if (bannerPreview()) {
       <img
-        [src]="bannerPreview"
+        [src]="bannerPreview()"
         alt="Banner Preview"
         class="absolute inset-0 w-full h-full object-cover rounded-xl"
       />
@@ -53,10 +50,10 @@
         class="input-field"
         [ngClass]="{
           'border-destructive':
-            isSubmitted && tournamentForm.get('name')?.invalid
+            isSubmitted() && tournamentForm.get('name')?.invalid
         }"
       />
-      @if (isSubmitted && tournamentForm.get('name')?.invalid) {
+      @if (isSubmitted() && tournamentForm.get('name')?.invalid) {
       <div class="text-sm error mt-1">
         Tournament name is required (min 3 characters)
       </div>
@@ -74,10 +71,10 @@
         class="input-field h-32 resize-none"
         [ngClass]="{
           'border-destructive':
-            isSubmitted && tournamentForm.get('description')?.invalid
+            isSubmitted() && tournamentForm.get('description')?.invalid
         }"
       ></textarea>
-      @if (isSubmitted && tournamentForm.get('description')?.invalid) {
+      @if (isSubmitted() && tournamentForm.get('description')?.invalid) {
       <div class="text-sm error mt-1">
         Description must be at least 10 characters
       </div>
@@ -96,10 +93,10 @@
         class="input-field"
         [ngClass]="{
           'border-destructive':
-            isSubmitted && tournamentForm.get('location')?.invalid
+            isSubmitted() && tournamentForm.get('location')?.invalid
         }"
       />
-      @if (isSubmitted && tournamentForm.get('location')?.invalid) {
+      @if (isSubmitted() && tournamentForm.get('location')?.invalid) {
       <div class="text-sm error mt-1">Location is required</div>
       }
     </div>
@@ -133,7 +130,7 @@
         formControlName="startDate"
         class="input-field"
       />
-      @if (isSubmitted && tournamentForm.get('startDate')?.invalid) {
+      @if (isSubmitted() && tournamentForm.get('startDate')?.invalid) {
       <div class="text-sm error mt-1">Start date is required</div>
       }
     </div>
@@ -148,7 +145,7 @@
         formControlName="endDate"
         class="input-field"
       />
-      @if (isSubmitted && tournamentForm.get('endDate')?.invalid) {
+      @if (isSubmitted() && tournamentForm.get('endDate')?.invalid) {
       <div class="text-sm error mt-1">End date is required</div>
       } @if (tournamentForm.errors?.['dateRange']) {
       <div class="text-sm error mt-1">End date must be after start date</div>
@@ -206,42 +203,42 @@
       placeholder="contact@example.com"
       class="input-field"
     />
-    @if (isSubmitted &&
+    @if (isSubmitted() &&
     tournamentForm.get('contactEmail')?.errors?.['required']) {
     <div class="text-sm error mt-1">Contact email is required</div>
-    } @if (isSubmitted && tournamentForm.get('contactEmail')?.errors?.['email'])
-    {
+    } @if (isSubmitted() &&
+    tournamentForm.get('contactEmail')?.errors?.['email']) {
     <div class="text-sm error mt-1">Please enter a valid email</div>
     }
   </div>
 
   <div class="flex gap-4">
-    @if (isEditMode) {
+    @if (isEditMode()) {
     <button
       type="button"
       (click)="onCancel()"
       class="btn btn-outline flex-1"
-      [disabled]="isSubmitting"
+      [disabled]="isSubmitting()"
     >
       Cancel
     </button>
     }
     <button
       type="submit"
-      [disabled]="isSubmitting"
+      [disabled]="isSubmitting()"
       class="btn btn-primary"
-      [class.w-full]="!isEditMode"
-      [class.flex-1]="isEditMode"
+      [class.w-full]="!isEditMode()"
+      [class.flex-1]="isEditMode()"
     >
       <div class="flex items-center justify-center gap-2">
-        @if (isSubmitting) {
+        @if (isSubmitting()) {
         <lucide-angular
           [img]="icons.Loader2"
           size="16"
           class="animate-spin"
         ></lucide-angular>
         }
-        {{ submitButtonText }}
+        {{ submitButtonText() }}
       </div>
     </button>
   </div>

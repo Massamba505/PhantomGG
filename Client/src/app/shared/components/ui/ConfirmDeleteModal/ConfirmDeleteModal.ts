@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Modal } from "../modal/modal";
 import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '../icons/lucide-icons';
@@ -10,11 +10,11 @@ import { LucideIcons } from '../icons/lucide-icons';
   styleUrl: './ConfirmDeleteModal.css',
 })
 export class ConfirmDeleteModal { 
-  @Input() isOpen: boolean = false;
-  @Input() title: string = 'Delete';
-  @Input() entityName: string = '';
-  @Output() close = new EventEmitter<void>();
-  @Output() confirm = new EventEmitter<void>();
+  isOpen = input<boolean>(false);
+  title = input<string>('Delete');
+  entityName = input<string>('');
+  close = output<void>();
+  confirm = output<void>();
 
   readonly icons = LucideIcons;
 
@@ -25,5 +25,4 @@ export class ConfirmDeleteModal {
   handleConfirm() {
     this.confirm.emit();
   }
-
 }

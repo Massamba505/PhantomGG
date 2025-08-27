@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Team } from '../../models/tournament';
 import { LucideAngularModule } from "lucide-angular";
@@ -12,10 +12,10 @@ import { LucideIcons } from '../ui/icons/lucide-icons';
   imports: [CommonModule, LucideAngularModule],
 })
 export class TeamCard {
-  @Input() team!: Team;
-  @Input() showActions = true;
-  @Output() edit = new EventEmitter<Team>();
-  @Output() delete = new EventEmitter<string>();
+  team = input.required<Team>();
+  showActions = input<boolean>(true);
+  edit = output<Team>();
+  delete = output<string>();
   readonly icons = LucideIcons;
   
   

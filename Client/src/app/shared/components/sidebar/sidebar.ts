@@ -1,10 +1,12 @@
 import {
   Component,
-  Input,
-  Output,
-  EventEmitter,
+  input,
+  output,
   OnInit,
   OnDestroy,
+  signal,
+  computed,
+  effect,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -41,9 +43,20 @@ interface MenuItem {
   templateUrl: './sidebar.html',
 })
 export class Sidebar implements OnInit, OnDestroy {
-  @Input() isOpen = true;
-  @Input() userRole!: Roles;
-  @Output() toggle = new EventEmitter<void>();
+  isOpen = input<boolean>(true);
+  userRole = input.required<Roles>();
+  toggle = output<void>();
+
+  // Internal state for responsive behavior
+  private internalOpen = signal(true);
+  
+  // Use input value or internal responsive state
+  actuallyOpen = computed(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth > 768 ? this.isOpen() : this.internalOpen();
+    }
+    return this.isOpen();
+  });
 
   readonly MenuIcon = MenuIcon;
   menuItems: MenuItem[] = [
@@ -110,6 +123,6 @@ export class Sidebar implements OnInit, OnDestroy {
   }
 
   handleResize = () => {
-    this.isOpen = window.innerWidth > 768;
+    this.internalOpen.set(window.innerWidth > 768);
   };
 }

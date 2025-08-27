@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, input, output, OnInit, OnChanges, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
@@ -13,19 +13,32 @@ import { Tournament, CreateTournamentRequest, UpdateTournamentRequest } from '@/
   imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
 })
 export class TournamentForm implements OnInit, OnChanges {
-  @Input() tournament: Tournament | null = null;
-  @Input() mode: 'create' | 'edit' = 'create';
-  @Output() tournamentSaved = new EventEmitter<CreateTournamentRequest | UpdateTournamentRequest>();
-  @Output() cancelled = new EventEmitter<void>();
+  tournament = input<Tournament | null>(null);
+  mode = input<'create' | 'edit'>('create');
+  tournamentSaved = output<CreateTournamentRequest | UpdateTournamentRequest>();
+  cancelled = output<void>();
 
   private fb = inject(FormBuilder);
 
   tournamentForm!: FormGroup;
-  isSubmitted = false;
-  isSubmitting = false;
-  bannerPreview: string | null = null;
-  isDragging = false;
+  isSubmitted = signal(false);
+  isSubmitting = signal(false);
+  bannerPreview = signal<string | null>(null);
+  isDragging = signal(false);
   readonly icons = LucideIcons;
+
+  isEditMode = computed(() => this.mode() === 'edit');
+  
+  formTitle = computed(() => 
+    this.isEditMode() ? 'Edit Tournament' : 'Create Tournament'
+  );
+
+  submitButtonText = computed(() => {
+    if (this.isSubmitting()) {
+      return this.isEditMode() ? 'Updating...' : 'Creating...';
+    }
+    return this.isEditMode() ? 'Update Tournament' : 'Create Tournament';
+  });
 
   ngOnInit() {
     this.initializeForm();
@@ -38,37 +51,23 @@ export class TournamentForm implements OnInit, OnChanges {
   }
 
   private initializeForm() {
+    const tournament = this.tournament();
     this.tournamentForm = this.fb.group({
-      name: [this.tournament?.name || '', [Validators.required, Validators.minLength(3)]],
-      description: [this.tournament?.description || '', [Validators.required, Validators.minLength(10)]],
-      location: [this.tournament?.location || '', [Validators.required]],
-      registrationDeadline: [this.tournament?.registrationDeadline || '', [Validators.required]],
-      startDate: [this.tournament?.startDate || '', [Validators.required]],
-      endDate: [this.tournament?.endDate || '', [Validators.required]],
-      maxTeams: [this.tournament?.maxTeams || 16, [Validators.required]],
-      entryFee: [this.tournament?.entryFee || 0],
-      prize: [this.tournament?.prize || 0],
-      contactEmail: [this.tournament?.contactEmail || '', [Validators.required, Validators.email]],
+      name: [tournament?.name || '', [Validators.required, Validators.minLength(3)]],
+      description: [tournament?.description || '', [Validators.required, Validators.minLength(10)]],
+      location: [tournament?.location || '', [Validators.required]],
+      registrationDeadline: [tournament?.registrationDeadline || '', [Validators.required]],
+      startDate: [tournament?.startDate || '', [Validators.required]],
+      endDate: [tournament?.endDate || '', [Validators.required]],
+      maxTeams: [tournament?.maxTeams || 16, [Validators.required]],
+      entryFee: [tournament?.entryFee || 0],
+      prize: [tournament?.prize || 0],
+      contactEmail: [tournament?.contactEmail || '', [Validators.required, Validators.email]],
     }, { validators: [this.dateRangeValidator, this.deadlineValidator] });
 
-    if (this.tournament?.bannerUrl) {
-      this.bannerPreview = this.tournament.bannerUrl;
+    if (tournament?.bannerUrl) {
+      this.bannerPreview.set(tournament.bannerUrl);
     }
-  }
-
-  get isEditMode(): boolean {
-    return this.mode === 'edit';
-  }
-
-  get formTitle(): string {
-    return this.isEditMode ? 'Edit Tournament' : 'Create Tournament';
-  }
-
-  get submitButtonText(): string {
-    if (this.isSubmitting) {
-      return this.isEditMode ? 'Updating...' : 'Creating...';
-    }
-    return this.isEditMode ? 'Update Tournament' : 'Create Tournament';
   }
 
   private dateRangeValidator = (form: FormGroup) => {
@@ -100,17 +99,17 @@ export class TournamentForm implements OnInit, OnChanges {
 
   onDragOver(event: DragEvent) {
     event.preventDefault();
-    this.isDragging = true;
+    this.isDragging.set(true);
   }
 
   onDragLeave(event: DragEvent) {
     event.preventDefault();
-    this.isDragging = false;
+    this.isDragging.set(false);
   }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
-    this.isDragging = false;
+    this.isDragging.set(false);
     
     if (event.dataTransfer?.files && event.dataTransfer.files[0]) {
       this.handleFileSelect(event.dataTransfer.files[0]);
@@ -124,19 +123,19 @@ export class TournamentForm implements OnInit, OnChanges {
 
     const reader = new FileReader();
     reader.onload = () => {
-      this.bannerPreview = reader.result as string;
+      this.bannerPreview.set(reader.result as string);
     };
     reader.readAsDataURL(file);
   }
 
   onSubmit() {
-    this.isSubmitted = true;
+    this.isSubmitted.set(true);
     
     if (this.tournamentForm.invalid) {
       return;
     }
 
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
 
     const tournamentData: CreateTournamentRequest | UpdateTournamentRequest = {
       name: this.tournamentForm.value.name,
@@ -149,14 +148,14 @@ export class TournamentForm implements OnInit, OnChanges {
       entryFee: this.tournamentForm.value.entryFee || 0,
       prize: this.tournamentForm.value.prize || 0,
       contactEmail: this.tournamentForm.value.contactEmail,
-      bannerUrl: this.bannerPreview || undefined,
+      bannerUrl: this.bannerPreview() || undefined,
     };
 
     this.tournamentSaved.emit(tournamentData);
     
     // Reset form state after emission
     setTimeout(() => {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }, 100);
   }
 
@@ -165,9 +164,9 @@ export class TournamentForm implements OnInit, OnChanges {
   }
 
   resetForm() {
-    this.isSubmitting = false;
-    this.isSubmitted = false;
-    this.bannerPreview = null;
+    this.isSubmitting.set(false);
+    this.isSubmitted.set(false);
+    this.bannerPreview.set(null);
     this.tournamentForm.reset({
       maxTeams: 16,
       entryFee: 0,

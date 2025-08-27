@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Edit, Trash2, Users, Calendar, LucideAngularModule } from 'lucide-angular';
 import { Tournament } from '../../models/tournament';
@@ -11,10 +11,10 @@ import { LucideIcons } from '../ui/icons/lucide-icons';
   imports: [CommonModule, LucideAngularModule],
 })
 export class TournamentCard {
-  @Input() tournament!: Tournament;
-  @Output() edit = new EventEmitter<Tournament>();
-  @Output() delete = new EventEmitter<string>();
-  @Output() view = new EventEmitter<Tournament>();
+  tournament = input.required<Tournament>();
+  edit = output<Tournament>();
+  delete = output<string>();
+  view = output<Tournament>();
 
   readonly icons = LucideIcons;
 
@@ -26,15 +26,15 @@ export class TournamentCard {
 
   onEdit(event: Event) {
     event.stopPropagation();
-    this.edit.emit(this.tournament);
+    this.edit.emit(this.tournament());
   }
 
   onDelete(event: Event) {
     event.stopPropagation();
-    this.delete.emit(this.tournament.id);
+    this.delete.emit(this.tournament().id);
   }
 
   onView() {
-    this.view.emit(this.tournament);
+    this.view.emit(this.tournament());
   }
 }
