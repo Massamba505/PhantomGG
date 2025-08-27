@@ -6,7 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import {
   LucideAngularModule,
@@ -18,7 +18,7 @@ import { LucideIcons } from '../ui/icons/lucide-icons';
 @Component({
   selector: 'app-profile-dropdown',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, RouterLink],
   templateUrl: './profile-dropdown.html',
 })
 export class ProfileDropdown {
@@ -36,11 +36,6 @@ export class ProfileDropdown {
 
   closeDropdown() {
     this.open.set(false);
-  }
-
-  navigateTo(path: string) {
-    this.closeDropdown();
-    this.router.navigate([path]);
   }
 
   logout() {

@@ -38,7 +38,6 @@ export class Login {
   onSubmit(event: Event) {
     event.preventDefault();
     this.submitted.set(true);
-    debugger;
     if (this.userForm.invalid) {
       return;
     }

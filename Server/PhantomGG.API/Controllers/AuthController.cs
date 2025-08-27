@@ -127,7 +127,7 @@ public class AuthController(
     /// Logout user by clearing refresh token cookie
     /// </summary>
     [HttpPost("logout")]
-    [Authorize]
+    //[Authorize]
     public async Task<ActionResult<ApiResponse>> Logout()
     {
         var refreshToken = Request.Cookies[_cookieSettings.RefreshTokenCookieName];
