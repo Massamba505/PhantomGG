@@ -4,7 +4,7 @@
     (click)="toggleDropdown()"
   >
     <img
-      src="PhantomGG_LOGO.png"
+      [src]="user.profilePictureUrl"
       alt="Profile"
       class="w-10 h-10 rounded-full border-2 border-gray-300 object-cover"
     />
@@ -19,7 +19,7 @@
       class="w-full text-left px-4 py-2 text-sm text-gray-700 rounded-lg flex justify-between items-center hover:bg-gray-100"
     >
       Profile
-      <lucide-angular [img]="icon[0].UserCircle2"></lucide-angular>
+      <lucide-angular [img]="icons.UserCircle2"></lucide-angular>
     </button>
 
     <button
@@ -27,7 +27,7 @@
       class="w-full text-left px-4 py-2 text-sm text-gray-700 rounded-lg flex justify-between items-center hover:bg-gray-100"
     >
       Settings
-      <lucide-angular [img]="icon[1].Settings"></lucide-angular>
+      <lucide-angular [img]="icons.Settings"></lucide-angular>
     </button>
 
     <button
@@ -35,7 +35,7 @@
       class="w-full text-left px-4 py-2 text-sm text-gray-700 rounded-lg flex justify-between items-center hover:bg-gray-100"
     >
       Logout
-      <lucide-angular [img]="icon[2].LogOut"></lucide-angular>
+      <lucide-angular [img]="icons.LogOut"></lucide-angular>
     </button>
   </div>
   }

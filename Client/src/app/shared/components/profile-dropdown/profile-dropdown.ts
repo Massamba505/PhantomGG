@@ -10,12 +10,10 @@ import { Router } from '@angular/router';
 
 import {
   LucideAngularModule,
-  UserCircle2,
-  Settings,
-  LogOut,
 } from 'lucide-angular';
 
 import { AuthStateService } from '@/app/store/AuthStateService';
+import { LucideIcons } from '../ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-profile-dropdown',
@@ -26,17 +24,11 @@ import { AuthStateService } from '@/app/store/AuthStateService';
 export class ProfileDropdown {
   private router = inject(Router);
   private el = inject(ElementRef);
-  private auth = inject(AuthStateService);
-
+  private authService = inject(AuthStateService);
+  readonly user = this.authService.user()!;
   open = signal(false);
 
-  user = signal('hi');
-
-  icon = [
-    { UserCircle2: UserCircle2 },
-    { Settings: Settings },
-    { LogOut: LogOut },
-  ];
+  readonly icons = LucideIcons;
 
   toggleDropdown() {
     this.open.update((prev) => !prev);
@@ -53,7 +45,7 @@ export class ProfileDropdown {
 
   logout() {
     this.closeDropdown();
-    this.auth.logout();
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 
