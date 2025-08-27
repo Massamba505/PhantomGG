@@ -41,7 +41,7 @@
       </div>
       <div class="flex items-center space-x-1">
         <lucide-angular [img]="icons.CalendarDays" size="16" />
-        <span>{{ tournament().startDate }}</span>
+        <span>{{ tournament().startDate | date : "MMMM d, y, hh:mm a" }}</span>
       </div>
     </div>
     <span
