@@ -45,6 +45,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseStaticFiles(); // Add this line to serve static files
         app.UseCors("CorsPolicy");
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseAuthentication();

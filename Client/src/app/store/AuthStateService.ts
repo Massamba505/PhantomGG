@@ -98,4 +98,8 @@ export class AuthStateService {
     this.tokenService.clearTokens();
     this.userSignal.set(null);
   }
+
+  updateUser(user: User) {
+    this.userSignal.set(user);
+  }
 }

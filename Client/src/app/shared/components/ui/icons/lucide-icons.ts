@@ -33,7 +33,8 @@ import {
   Loader2,
   AlertTriangle,
   Settings,
-  UserCircle2
+  UserCircle2,
+  Camera
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -71,5 +72,6 @@ export const LucideIcons = {
   Loader2,
   AlertTriangle,
   Settings,
-  UserCircle2
+  UserCircle2,
+  Camera
 };
