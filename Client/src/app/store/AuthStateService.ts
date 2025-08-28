@@ -2,11 +2,20 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   LoginRequest,
   SignUpRequest,
+  AuthResponse,
 } from '@/app/shared/models/Authentication';
-import { catchError, tap, throwError, firstValueFrom } from 'rxjs';
+import {
+  catchError,
+  tap,
+  throwError,
+  firstValueFrom,
+  finalize,
+  Observable,
+} from 'rxjs';
 import { AuthService } from '../core/services/auth.service';
 import { TokenRefreshService } from '../core/services/tokenRefresh.service';
 import { User } from '../shared/models/User';
+import { ApiResponse } from '../shared/models/ApiResponse';
 
 @Injectable({
   providedIn: 'root',
@@ -22,93 +31,70 @@ export class AuthStateService {
   readonly loading = this.loadingSignal.asReadonly();
   readonly isAuthenticated = computed(() => !!this.userSignal());
 
+  private withLoading<T>(obs$: Observable<T>): Observable<T> {
+    this.loadingSignal.set(true);
+    return obs$.pipe(finalize(() => this.loadingSignal.set(false)));
+  }
+
   async initAuthState(): Promise<boolean> {
     const token = this.tokenService.getToken();
-    if (!token) {
-      return true;
-    }
+    if (!token) return true;
 
     try {
-      if (this.tokenService.isTokenExpired()) {
-        const refreshResponse: any = await firstValueFrom(
-          this.authService.refresh()
-        );
-        this.tokenService.setToken(refreshResponse.data.accessToken);
-        
-        await firstValueFrom(this.loadUser());
-      } else {
-        await firstValueFrom(this.loadUser());
-      }
-
+      await firstValueFrom(this.loadUser());
       return true;
-    } catch (error) {
-      this.tokenService.clearTokens();
+    } catch {
+      this.clearAuthState();
       return false;
     }
   }
 
   login(credentials: LoginRequest) {
-    this.loadingSignal.set(true);
-
-    return this.authService.login(credentials).pipe(
-      tap((res: any) => {
-        this.loadingSignal.set(false);
-        this.tokenService.setToken(res.data.accessToken);
-        this.userSignal.set(res.data.user);
-      }),
-      catchError((error) => {
-        this.loadingSignal.set(false);
-        return throwError(() => error);
-      })
+    return this.withLoading(
+      this.authService.login(credentials).pipe(
+        tap((res) => this.handleAuthSuccess(res)),
+        catchError((error) => throwError(() => error))
+      )
     );
   }
 
   signup(credentials: SignUpRequest) {
-    this.loadingSignal.set(true);
-
-    return this.authService.signup(credentials).pipe(
-      tap((res: any) => {
-        this.loadingSignal.set(false);
-        this.tokenService.setToken(res.data.accessToken);
-        this.userSignal.set(res.data.user);
-      }),
-      catchError((error) => {
-        this.loadingSignal.set(false);
-        return throwError(() => error);
-      })
+    return this.withLoading(
+      this.authService.signup(credentials).pipe(
+        tap((res) => this.handleAuthSuccess(res)),
+        catchError((error) => throwError(() => error))
+      )
     );
   }
 
-  logout() {
-    this.loadingSignal.set(true);
-
-    this.authService.logout().subscribe({
-      next: () => {
-        this.clearAuthState();
-      },
-      error: () => {
-        this.clearAuthState();
-      },
-    });
+  logout(): Observable<ApiResponse<any>> {
+    return this.withLoading(
+      this.authService.logout().pipe(
+        tap(() => this.clearAuthState()),
+        catchError((error) => {
+          this.clearAuthState();
+          return throwError(() => error);
+        })
+      )
+    );
   }
 
   private loadUser() {
-    this.loadingSignal.set(true);
-    
-    return this.authService.getMe().pipe(
-      tap((res: any) => {
-        this.loadingSignal.set(false);
-        this.userSignal.set(res.data);
-      }),
-      catchError((err) => {
-        this.loadingSignal.set(false);
-        return throwError(() => err);
-      })
+    return this.withLoading(
+      this.authService.getMe().pipe(
+        tap((res) => this.userSignal.set(res.data!)),
+        catchError((err) => throwError(() => err))
+      )
     );
   }
 
+  private handleAuthSuccess(res: ApiResponse<AuthResponse>) {
+    const { accessToken, user } = res.data!;
+    this.tokenService.setToken(accessToken!);
+    this.userSignal.set(user!);
+  }
+
   private clearAuthState() {
-    this.loadingSignal.set(false);
     this.tokenService.clearTokens();
     this.userSignal.set(null);
   }
