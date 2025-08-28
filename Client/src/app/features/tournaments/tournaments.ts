@@ -93,8 +93,7 @@ export class Tournaments implements OnInit {
   }
 
   handleEditTournament(tournament: Tournament) {
-    // Navigate to edit page instead of opening modal
-    this.router.navigate(['/edit-tournament', tournament.id]);
+    this.router.navigate(['/tournaments','edit', tournament.id]);
   }
 
   switchLayout(toGrid: boolean) {
@@ -129,10 +128,10 @@ export class Tournaments implements OnInit {
   }
 
   handleViewTournament(tournament: Tournament) {
-    this.router.navigate(['/tournament-details', tournament.id]);
+    this.router.navigate(['/tournaments','details', tournament.id]);
   }
 
   createNewTournament() {
-    this.router.navigate(['/create-tournament']);
+    this.router.navigate(['/tournaments','create']);
   }
 }

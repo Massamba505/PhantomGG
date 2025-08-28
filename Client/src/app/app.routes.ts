@@ -3,6 +3,8 @@ import { authRoutes } from './features/auth/auth.routes';
 import { authGuard } from './core/guards/auth.guard';
 import { authenticatedGuard } from './core/guards/authenticated.guard';
 import { NotFoundComponent } from './features/not-found/not-found';
+import { Roles } from './shared/constants/roles';
+import { tournamentRoutes } from './features/tournaments/tournament.routes';
 
 export const routes: Routes = [
   {
@@ -11,42 +13,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/landing/landing').then((m) => m.Landing),
     title: 'PhantomGG',
-  },
-  {
-    path: 'dashboard',
-    loadComponent: () =>
-      import('./features/dashboard/dashboard').then((m) => m.Dashboard),
-  },
-  {
-    path: 'tournament-details/:id',
-    loadComponent: () =>
-      import('./features/tournament-details/tournament-details').then(
-        (m) => m.TournamentDetails
-      ),
-  },
-  {
-    path: 'tournament/:id',
-    redirectTo: 'tournament-details/:id',
-    pathMatch: 'full',
-  },
-  {
-    path: 'tournaments',
-    loadComponent: () =>
-      import('./features/tournaments/tournaments').then((m) => m.Tournaments),
-  },
-  {
-    path: 'create-tournament',
-    loadComponent: () =>
-      import('./features/create-tournament/create-tournament').then(
-        (m) => m.CreateTournament
-      ),
-  },
-  {
-    path: 'edit-tournament/:id',
-    loadComponent: () =>
-      import('./features/edit-tournament/edit-tournament').then(
-        (m) => m.EditTournament
-      ),
   },
   {
     path: 'auth',
@@ -64,9 +30,22 @@ export const routes: Routes = [
   {
     path: 'admin',
     canActivate: [authGuard],
-    data: { roles: ['Admin'] },
+    data: { roles: [Roles.Admin] },
     loadComponent: () => import('./features/admin/admin').then((m) => m.Admin),
     title: 'Admin Dashboard - PhantomGG',
+  },
+  {
+    path: 'dashboard',
+    canActivate: [authGuard],
+    data: { roles: [Roles.Organizer] },
+    loadComponent: () =>
+      import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+  },
+  {
+    path: 'tournaments',
+    children: tournamentRoutes,
+    canActivate:[authGuard],
+    data:{roles:[Roles.Organizer]}
   },
   {
     path: 'unauthorized',
