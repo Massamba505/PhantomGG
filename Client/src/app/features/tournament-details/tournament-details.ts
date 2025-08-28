@@ -6,10 +6,17 @@ import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentService } from '@/app/core/services/tournament.service';
 import { TeamService } from '@/app/core/services/team.service';
 import { TeamModal } from './components/modals/team-modal';
-import { TeamCard } from '@/app/shared/components/team-card/team-card';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LucideAngularModule } from "lucide-angular";
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
+import {
+  TournamentTabs,
+  TeamsSection,
+  ScheduleSection,
+  BracketSection,
+  ResultsSection
+} from './components';
+import type { TabType, TabItem } from './components';
 
 @Component({
   selector: 'app-tournament-details',
@@ -20,11 +27,15 @@ import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModa
     CommonModule,
     RouterLink,
     TeamModal,
-    TeamCard,
     DatePipe,
     TitleCasePipe,
     LucideAngularModule,
-    ConfirmDeleteModal
+    ConfirmDeleteModal,
+    TournamentTabs,
+    TeamsSection,
+    ScheduleSection,
+    BracketSection,
+    ResultsSection
 ],
   providers: [ToastService],
 })
@@ -35,26 +46,32 @@ export class TournamentDetails implements OnInit {
   private tournamentService = inject(TournamentService);
   private teamService = inject(TeamService);
 
-  // Modal states - converted to signals
   isAddTeamModalOpen = signal(false);
   isEditTeamModalOpen = signal(false);
   isDeleteTeamConfirmOpen = signal(false);
 
   readonly icons = LucideIcons;
 
-  // Team management - converted to signals
   editingTeam = signal<Team | null>(null);
   teamToDelete = signal<Team | null>(null);
 
-  // Active tab - converted to signal
-  activeTab = signal<'teams' | 'schedule' | 'bracket' | 'results'>('teams');
+  activeTab = signal<TabType>('teams');
+  
+  tabs: TabItem[] = [
+    { key: 'teams' as TabType, label: 'Teams' },
+    { key: 'schedule' as TabType, label: 'Schedule' },
+    { key: 'bracket' as TabType, label: 'Bracket' },
+    { key: 'results' as TabType, label: 'Results' }
+  ];
 
-  // Data signals
   tournament = signal<Tournament | null>(null);
   teams = signal<Team[]>([]);
   loading = signal<boolean>(false);
+  teamsLoading = signal<boolean>(false);
+  scheduleLoading = signal<boolean>(false);
+  bracketLoading = signal<boolean>(false);
+  resultsLoading = signal<boolean>(false);
 
-  // Computed signals for derived values
   tournamentDuration = computed(() => {
     const t = this.tournament();
     if (!t) return 0;
@@ -87,8 +104,8 @@ export class TournamentDetails implements OnInit {
   private async loadTournamentData(tournamentId: string) {
     try {
       this.loading.set(true);
+      this.teamsLoading.set(true);
       
-      // Load tournament details and teams in parallel
       const [tournamentResponse, teamsResponse] = await Promise.all([
         this.tournamentService.getTournamentById(tournamentId).toPromise(),
         this.teamService.searchTeams({ tournamentId }).toPromise()
@@ -108,15 +125,14 @@ export class TournamentDetails implements OnInit {
       this.router.navigate(['/tournaments']);
     } finally {
       this.loading.set(false);
+      this.teamsLoading.set(false);
     }
   }
 
-  // Tab management
-  setActiveTab(tab: 'teams' | 'schedule' | 'bracket' | 'results') {
+  onTabChange(tab: TabType) {
     this.activeTab.set(tab);
   }
 
-  // Tournament utils
   private calculateDuration(startDate: string, endDate: string): number {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -131,7 +147,6 @@ export class TournamentDetails implements OnInit {
     return this.teamRegistrationProgress();
   }
 
-  // Team management methods
   openAddTeamModal() {
     this.isAddTeamModalOpen.set(true);
   }
@@ -142,6 +157,7 @@ export class TournamentDetails implements OnInit {
 
   async handleAddTeam(team: Team) {
     try {
+      this.teamsLoading.set(true);
       const tournamentId = this.tournament()?.id;
       if (!tournamentId) return;
 
@@ -165,6 +181,8 @@ export class TournamentDetails implements OnInit {
     } catch (error) {
       console.error('Failed to add team:', error);
       this.toast.error('Failed to add team');
+    } finally {
+      this.teamsLoading.set(false);
     }
     
     this.closeAddTeamModal();
@@ -245,7 +263,6 @@ export class TournamentDetails implements OnInit {
     this.closeDeleteConfirmation();
   }
 
-  // Tournament actions
   generateSchedule() {
     this.toast.info('Schedule generation is not implemented yet');
   }
@@ -254,8 +271,11 @@ export class TournamentDetails implements OnInit {
     this.toast.info('Bracket creation is not implemented yet');
   }
 
+  setActiveTab(tab: TabType) {
+    this.activeTab.set(tab);
+  }
+
   cancelTournament() {
-    // Would open a confirmation dialog in a real app
     this.toast.warn('Tournament cancellation is not implemented yet');
   }
 }

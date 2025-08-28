@@ -104,168 +104,31 @@
       </div>
     </div>
 
-    <div class="mb-6">
-      <div class="border-b border-border">
-        <div class="flex overflow-x-auto">
-          <button
-            (click)="setActiveTab('teams')"
-            class="px-4 py-2 font-medium border-b-2"
-            [ngClass]="activeTab() === 'teams' ? '' : 'border-transparent'"
-            aria-selected="activeTab() === 'teams'"
-          >
-            Teams
-          </button>
-          <button
-            (click)="setActiveTab('schedule')"
-            class="px-4 py-2 font-medium border-b-2"
-            [ngClass]="activeTab() === 'schedule' ? '' : 'border-transparent'"
-            aria-selected="activeTab() === 'schedule'"
-          >
-            Schedule
-          </button>
-          <button
-            (click)="setActiveTab('bracket')"
-            class="px-4 py-2 font-medium border-b-2"
-            [ngClass]="activeTab() === 'bracket' ? '' : 'border-transparent'"
-            aria-selected="activeTab() === 'bracket'"
-          >
-            Bracket
-          </button>
-          <button
-            (click)="setActiveTab('results')"
-            class="px-4 py-2 font-medium border-b-2"
-            [ngClass]="activeTab() === 'results' ? '' : 'border-transparent'"
-            aria-selected="activeTab() === 'results'"
-          >
-            Results
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-tournament-tabs
+      [activeTab]="activeTab()"
+      [tabs]="tabs"
+      (tabChange)="setActiveTab($event)"
+    >
+    </app-tournament-tabs>
 
-    <!-- Teams Section -->
-    @if (activeTab() === 'teams') {
-    <div class="mb-6">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold">Registered Teams</h2>
-        <div class="text-sm">
-          {{ teams().length || 0 }} of {{ tournament()?.maxTeams || 0 }} teams
-        </div>
-      </div>
-
-      <!-- Teams Grid Display -->
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-      >
-        @for (team of teams(); track team.id) {
-        <div>
-          <app-team-card
-            [team]="team"
-            [showActions]="true"
-            (edit)="handleEditTeam($event)"
-            (delete)="openDeleteConfirmation(team.id)"
-          ></app-team-card>
-        </div>
-        } @if ( tournament() && teams().length < tournament()!.maxTeams &&
-        teams().length !== 0 ) {
-        <div
-          class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer transition-colors"
-          (click)="openAddTeamModal()"
-        >
-          <div
-            class="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4"
-          >
-            <lucide-angular [img]="icons.UserPlus" size="50"></lucide-angular>
-          </div>
-          <h3 class="font-medium mb-1">Add New Team</h3>
-          <p class="text-sm text-center">
-            Click to register a team for this tournament
-          </p>
-        </div>
-        }
-      </div>
-
-      <!-- Empty state for no teams -->
-      @if (teams().length === 0) {
-      <div
-        class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer transition-colors"
-      >
-        <div
-          class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-        >
-          <lucide-angular [img]="icons.Users"></lucide-angular>
-        </div>
-        <h3 class="text-lg font-semibold mb-2">No teams registered yet</h3>
-        <p class="mb-6">Add teams to get started with your tournament</p>
-        <button (click)="openAddTeamModal()" class="btn btn-primary">
-          Add First Team
-        </button>
-      </div>
-      }
-    </div>
-    }
-
-    <!-- Schedule Tab (Placeholder) -->
-    @if (activeTab() === 'schedule') {
-    <div class="card p-8 text-center">
-      <div
-        class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-      >
-        <lucide-angular
-          [img]="icons.Calendar"
-          size="24"
-          class=""
-        ></lucide-angular>
-      </div>
-      <h3 class="text-lg font-semibold mb-2">Schedule Not Generated</h3>
-      <p class="mb-6">Generate a schedule to start planning matches</p>
-      <button (click)="generateSchedule()" class="btn btn-primary">
-        Generate Schedule
-      </button>
-    </div>
-    }
-
-    <!-- Bracket Tab (Placeholder) -->
-    @if (activeTab() === 'bracket') {
-    <div class="card p-8 text-center">
-      <div
-        class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-      >
-        <lucide-angular
-          [img]="icons.GitBranch"
-          size="24"
-          class=""
-        ></lucide-angular>
-      </div>
-      <h3 class="text-lg font-semibold mb-2">Tournament Bracket Not Created</h3>
-      <p class="mb-6">
-        Create a bracket to visualize the tournament progression
-      </p>
-      <button (click)="createBracket()" class="btn btn-primary">
-        Create Bracket
-      </button>
-    </div>
-    }
-
-    <!-- Results Tab (Placeholder) -->
-    @if (activeTab() === 'results') {
-    <div class="card p-8 text-center">
-      <div
-        class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-      >
-        <lucide-angular
-          [img]="icons.Target"
-          size="24"
-          class=""
-        ></lucide-angular>
-      </div>
-      <h3 class="text-lg font-semibold mb-2">No Results Available</h3>
-      <p class="mb-6">Match results will appear here once games begin</p>
-      <button disabled class="btn btn-outline cursor-not-allowed opacity-60">
-        View Results
-      </button>
-    </div>
-    }
+    <!-- Tab Content -->
+    @switch (activeTab()) { @case ('teams') {
+    <app-teams-section
+      [tournament]="tournament()"
+      [teams]="teams()"
+      [loading]="teamsLoading()"
+      (addTeam)="openAddTeamModal()"
+      (editTeam)="handleEditTeam($event)"
+      (deleteTeam)="openDeleteConfirmation($event)"
+    >
+    </app-teams-section>
+    } @case ('schedule') {
+    <app-schedule-section [loading]="scheduleLoading()"> </app-schedule-section>
+    } @case ('bracket') {
+    <app-bracket-section [loading]="bracketLoading()"> </app-bracket-section>
+    } @case ('results') {
+    <app-results-section [loading]="resultsLoading()"> </app-results-section>
+    } }
   </div>
 
   <!-- Team Management Modals -->
