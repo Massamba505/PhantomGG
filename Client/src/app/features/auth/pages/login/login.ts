@@ -27,7 +27,6 @@ export class Login {
   submitted = signal(false);
 
   loading = this.authState.loading;
-  error = this.authState.error;
 
   userForm = this.fb.group({
     email: ['', [Validators.required, Validators.email, strictEmailValidator]],
@@ -49,11 +48,6 @@ export class Login {
           this.toastService.success('Login successful!');
           this.router.navigate(['/dashboard']);
         }
-      },
-      error: (error) => {
-        this.toastService.error(
-          error.error?.message || 'Login failed. Please check your credentials.'
-        );
       },
     });
   }

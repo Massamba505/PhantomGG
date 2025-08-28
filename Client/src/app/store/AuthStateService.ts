@@ -17,11 +17,9 @@ export class AuthStateService {
 
   private userSignal = signal<User | null>(null);
   private loadingSignal = signal<boolean>(false);
-  private errorSignal = signal<string | null>(null);
 
   readonly user = this.userSignal.asReadonly();
   readonly loading = this.loadingSignal.asReadonly();
-  readonly error = this.errorSignal.asReadonly();
   readonly isAuthenticated = computed(() => !!this.userSignal());
 
   async initAuthState(): Promise<boolean> {
@@ -35,16 +33,9 @@ export class AuthStateService {
         const refreshResponse: any = await firstValueFrom(
           this.authService.refresh()
         );
-
-        if (refreshResponse.success) {
-          this.tokenService.setToken(refreshResponse.data.accessToken);
-          this.tokenService.setTokenExpiry(
-            refreshResponse.data.accessTokenExpiresAt
-          );
-          await firstValueFrom(this.loadUser());
-        } else {
-          throw new Error('Refresh failed');
-        }
+        this.tokenService.setToken(refreshResponse.data.accessToken);
+        
+        await firstValueFrom(this.loadUser());
       } else {
         await firstValueFrom(this.loadUser());
       }
@@ -58,23 +49,15 @@ export class AuthStateService {
 
   login(credentials: LoginRequest) {
     this.loadingSignal.set(true);
-    this.errorSignal.set(null);
 
     return this.authService.login(credentials).pipe(
       tap((res: any) => {
         this.loadingSignal.set(false);
-
-        if (res.success) {
-          this.tokenService.setToken(res.data.accessToken);
-          this.tokenService.setTokenExpiry(res.data.accessTokenExpiresAt);
-          this.userSignal.set(res.data.user);
-        } else {
-          this.errorSignal.set(res.message ?? 'Login failed');
-        }
+        this.tokenService.setToken(res.data.accessToken);
+        this.userSignal.set(res.data.user);
       }),
       catchError((error) => {
         this.loadingSignal.set(false);
-        this.errorSignal.set(error.error.message ?? 'Login failed');
         return throwError(() => error);
       })
     );
@@ -82,29 +65,15 @@ export class AuthStateService {
 
   signup(credentials: SignUpRequest) {
     this.loadingSignal.set(true);
-    this.errorSignal.set(null);
 
     return this.authService.signup(credentials).pipe(
       tap((res: any) => {
         this.loadingSignal.set(false);
-
-        if (res.success && res.data.accessToken) {
-          this.tokenService.setToken(res.data.accessToken);
-          this.tokenService.setTokenExpiry(res.data.accessTokenExpiresAt);
-          this.userSignal.set(res.data.user);
-        } else {
-          this.errorSignal.set(res.message ?? 'Signup failed');
-        }
+        this.tokenService.setToken(res.data.accessToken);
+        this.userSignal.set(res.data.user);
       }),
       catchError((error) => {
         this.loadingSignal.set(false);
-
-        let errorMsg = 'Signup failed';
-        if (error.error && error.error.message) {
-          errorMsg = error.error.message;
-        }
-
-        this.errorSignal.set(errorMsg);
         return throwError(() => error);
       })
     );
@@ -125,6 +94,7 @@ export class AuthStateService {
 
   private loadUser() {
     this.loadingSignal.set(true);
+    
     return this.authService.getMe().pipe(
       tap((res: any) => {
         this.loadingSignal.set(false);
@@ -141,6 +111,5 @@ export class AuthStateService {
     this.loadingSignal.set(false);
     this.tokenService.clearTokens();
     this.userSignal.set(null);
-    this.errorSignal.set(null);
   }
 }

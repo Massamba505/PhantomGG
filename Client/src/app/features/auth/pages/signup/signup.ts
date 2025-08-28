@@ -80,12 +80,7 @@ export class Signup {
         if (this.authState.isAuthenticated()) {
           this.router.navigate(['/dashboard']);
         }
-      },
-      error: (err) => {
-        this.toast.error(
-          err.error?.message || 'Registration failed. Please try again.'
-        );
-      },
+      }
     });
   }
 
