@@ -4,9 +4,7 @@
 >
   <div class="flex justify-between items-start">
     <div class="flex-1">
-      <h3
-        class="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors"
-      >
+      <h3 class="text-xl font-semibold mb-2 group-hover transition-colors">
         {{ tournament().name }}
       </h3>
       <p class="text-sm line-clamp-3">
@@ -34,7 +32,7 @@
   </div>
 
   <div class="flex items-center justify-between">
-    <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+    <div class="flex items-center space-x-4 text-sm">
       <div class="flex items-center space-x-1">
         <lucide-angular [img]="icons.Users" size="16" />
         <span>{{ tournament().teamCount }}/{{ tournament().maxTeams }}</span>

@@ -17,9 +17,7 @@
       />
 
       @if (!logoPreview()) {
-      <p class="text-sm text-muted-foreground">
-        Drag & drop or click to upload
-      </p>
+      <p class="text-sm">Drag & drop or click to upload</p>
       } @if (logoPreview()) {
       <img
         [src]="logoPreview()"

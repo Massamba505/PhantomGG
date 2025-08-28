@@ -83,13 +83,13 @@
         <button
           type="button"
           (click)="togglePassword()"
-          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          class="absolute right-3 top-1/2 transform -translate-y-1/2"
           aria-label="Toggle password visibility"
         >
           @if (!showPassword()) {
-            <lucide-angular [img]="icons.EyeOff" size="18"></lucide-angular>
+          <lucide-angular [img]="icons.EyeOff" size="18"></lucide-angular>
           } @else {
-            <lucide-angular [img]="icons.Eye" size="18"></lucide-angular>
+          <lucide-angular [img]="icons.Eye" size="18"></lucide-angular>
           }
         </button>
       </div>
@@ -118,13 +118,13 @@
         <button
           type="button"
           (click)="togglePassword2()"
-          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          class="absolute right-3 top-1/2 transform -translate-y-1/2"
           aria-label="Toggle password visibility"
         >
           @if (!showPassword2()) {
-            <lucide-angular [img]="icons.EyeOff" size="18"></lucide-angular>
+          <lucide-angular [img]="icons.EyeOff" size="18"></lucide-angular>
           } @else {
-            <lucide-angular [img]="icons.Eye" size="18"></lucide-angular>
+          <lucide-angular [img]="icons.Eye" size="18"></lucide-angular>
           }
         </button>
       </div>
@@ -186,10 +186,7 @@
 
   <div class="text-center mt-6">
     <span class="text-sm">Already have an account? </span>
-    <a
-      routerLink="/auth/login"
-      class="text-primary hover:underline font-medium text-sm"
-    >
+    <a routerLink="/auth/login" class="hover:underline font-medium text-sm">
       Log in
     </a>
   </div>

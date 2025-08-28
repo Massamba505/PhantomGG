@@ -19,9 +19,9 @@ export class TournamentCard {
   readonly icons = LucideIcons;
 
   statusColors = {
-    draft: 'bg-muted text-muted-foreground',
-    active: 'bg-primary text-primary-foreground',
-    completed: 'bg-success text-success-foreground',
+    draft: 'bg-muted',
+    active: 'bg-primary',
+    completed: 'bg-success',
   };
 
   onEdit(event: Event) {

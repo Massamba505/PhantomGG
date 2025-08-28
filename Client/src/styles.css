@@ -358,7 +358,7 @@
 
   /* Card Styles */
   .card {
-    background: var(--gradient-card);
+    background: var(--card);
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
     padding: 1.25rem;
@@ -366,40 +366,9 @@
     transition: all 0.2s ease;
   }
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  .card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: hsl(var(--card-foreground));
-    margin: 0;
-  }
-
-  .card-description {
-    font-size: 0.875rem;
-    color: hsl(var(--muted-foreground));
-    margin-bottom: 1rem;
-  }
-
-  .card-content {
-    margin-bottom: 1rem;
-  }
-
-  .card-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-
   .card-tournament,
   .card-team {
-    background: var(--gradient-card);
+    background: var(--card);
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
     padding: 1.25rem;

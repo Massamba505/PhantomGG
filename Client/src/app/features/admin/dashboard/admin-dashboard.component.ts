@@ -11,28 +11,28 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
     <app-dashboard-layout>
       <div class="container mx-auto py-8 px-4 md:px-6">
         <header class="mb-8">
-          <h1 class="text-2xl font-bold text-card-foreground mb-1">Admin Dashboard</h1>
-          <p class="text-muted-foreground">Manage your platform settings and users</p>
+          <h1 class="text-2xl font-bold mb-1">Admin Dashboard</h1>
+          <p class="">Manage your platform settings and users</p>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div class="card p-6">
             <div class="flex flex-col">
-              <h3 class="text-sm font-medium text-muted-foreground mb-1">Total Users</h3>
+              <h3 class="text-sm font-medium  mb-1">Total Users</h3>
               <p class="text-3xl font-bold">245</p>
               <span class="mt-auto text-xs text-success">+12 this month</span>
             </div>
           </div>
           <div class="card p-6">
             <div class="flex flex-col">
-              <h3 class="text-sm font-medium text-muted-foreground mb-1">Active Tournaments</h3>
+              <h3 class="text-sm font-medium  mb-1">Active Tournaments</h3>
               <p class="text-3xl font-bold">38</p>
               <span class="mt-auto text-xs text-success">+5 this month</span>
             </div>
           </div>
           <div class="card p-6">
             <div class="flex flex-col">
-              <h3 class="text-sm font-medium text-muted-foreground mb-1">Revenue</h3>
+              <h3 class="text-sm font-medium  mb-1">Revenue</h3>
               <p class="text-3xl font-bold">$12,450</p>
               <span class="mt-auto text-xs text-success">+8% this month</span>
             </div>
@@ -50,10 +50,10 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
                   </div>
                   <div>
                     <p class="font-medium">John Doe</p>
-                    <p class="text-xs text-muted-foreground">john.doe@example.com</p>
+                    <p class="text-xs ">john.doe@example.com</p>
                   </div>
                 </div>
-                <span class="text-xs text-muted-foreground">2 hours ago</span>
+                <span class="text-xs ">2 hours ago</span>
               </div>
               <div class="flex items-center justify-between pb-3 border-b border-border">
                 <div class="flex items-center gap-3">
@@ -62,10 +62,10 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
                   </div>
                   <div>
                     <p class="font-medium">Jane Smith</p>
-                    <p class="text-xs text-muted-foreground">jane.smith@example.com</p>
+                    <p class="text-xs ">jane.smith@example.com</p>
                   </div>
                 </div>
-                <span class="text-xs text-muted-foreground">5 hours ago</span>
+                <span class="text-xs ">5 hours ago</span>
               </div>
               <div class="flex items-center justify-between pb-3 border-b border-border">
                 <div class="flex items-center gap-3">
@@ -74,10 +74,10 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
                   </div>
                   <div>
                     <p class="font-medium">Robert Johnson</p>
-                    <p class="text-xs text-muted-foreground">robert.j@example.com</p>
+                    <p class="text-xs ">robert.j@example.com</p>
                   </div>
                 </div>
-                <span class="text-xs text-muted-foreground">Yesterday</span>
+                <span class="text-xs ">Yesterday</span>
               </div>
             </div>
             <div class="mt-4 text-center">
@@ -90,7 +90,7 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
             <div class="space-y-4">
               <div class="flex items-center gap-3 pb-3 border-b border-border">
                 <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="">
                     <path d="M18 2H6v6H2v6h4v6h12v-6h4V8h-4V2Z"/>
                     <circle cx="12" cy="8" r="2"/>
                     <circle cx="12" cy="14" r="2"/>
@@ -98,13 +98,13 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
                 </div>
                 <div class="flex-1">
                   <p class="font-medium">New tournament created</p>
-                  <p class="text-xs text-muted-foreground">Summer League 2025 by Michael Brown</p>
+                  <p class="text-xs ">Summer League 2025 by Michael Brown</p>
                 </div>
-                <span class="text-xs text-muted-foreground">1 hour ago</span>
+                <span class="text-xs ">1 hour ago</span>
               </div>
               <div class="flex items-center gap-3 pb-3 border-b border-border">
                 <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                     <circle cx="9" cy="7" r="4"/>
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -113,13 +113,13 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
                 </div>
                 <div class="flex-1">
                   <p class="font-medium">New team registered</p>
-                  <p class="text-xs text-muted-foreground">FC Barcelona Academy joined Summer League</p>
+                  <p class="text-xs ">FC Barcelona Academy joined Summer League</p>
                 </div>
-                <span class="text-xs text-muted-foreground">3 hours ago</span>
+                <span class="text-xs ">3 hours ago</span>
               </div>
               <div class="flex items-center gap-3 pb-3 border-b border-border">
                 <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="">
                     <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
                     <line x1="16" x2="16" y1="2" y2="6"/>
                     <line x1="8" x2="8" y1="2" y2="6"/>
@@ -134,9 +134,9 @@ import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layou
                 </div>
                 <div class="flex-1">
                   <p class="font-medium">Tournament status updated</p>
-                  <p class="text-xs text-muted-foreground">Champions Cup changed from Draft to Active</p>
+                  <p class="text-xs ">Champions Cup changed from Draft to Active</p>
                 </div>
-                <span class="text-xs text-muted-foreground">Yesterday</span>
+                <span class="text-xs ">Yesterday</span>
               </div>
             </div>
             <div class="mt-4 text-center">

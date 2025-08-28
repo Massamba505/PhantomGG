@@ -15,22 +15,22 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
       <div class="container mx-auto py-8 px-4 md:px-6">
         <header class="mb-6">
           <div class="flex items-center gap-2 mb-1">
-            <a routerLink="/admin" class="text-muted-foreground hover:text-foreground transition-colors flex items-center">
+            <a routerLink="/admin" class="transition-colors flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
                 <path d="m15 18-6-6 6-6"/>
               </svg>
               <span>Back to Admin Dashboard</span>
             </a>
           </div>
-          <h1 class="text-2xl font-bold text-card-foreground mb-1">Manage Users</h1>
-          <p class="text-muted-foreground">View and manage all users on your platform</p>
+          <h1 class="text-2xl font-bold mb-1">Manage Users</h1>
+          <p class="">View and manage all users on your platform</p>
         </header>
 
         <!-- User Management Controls -->
         <div class="card p-6 mb-6">
           <div class="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
             <div class="relative flex-1 max-w-md">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
+              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none ">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="11" cy="11" r="8"/>
                   <path d="m21 21-4.3-4.3"/>
@@ -72,12 +72,12 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
             <table class="w-full">
               <thead>
                 <tr class="border-b border-border">
-                  <th class="text-left py-3 px-4 font-medium text-muted-foreground">Name</th>
-                  <th class="text-left py-3 px-4 font-medium text-muted-foreground">Email</th>
-                  <th class="text-left py-3 px-4 font-medium text-muted-foreground">Role</th>
-                  <th class="text-left py-3 px-4 font-medium text-muted-foreground">Status</th>
-                  <th class="text-left py-3 px-4 font-medium text-muted-foreground">Joined</th>
-                  <th class="text-left py-3 px-4 font-medium text-muted-foreground">Actions</th>
+                  <th class="text-left py-3 px-4 font-medium ">Name</th>
+                  <th class="text-left py-3 px-4 font-medium ">Email</th>
+                  <th class="text-left py-3 px-4 font-medium ">Role</th>
+                  <th class="text-left py-3 px-4 font-medium ">Status</th>
+                  <th class="text-left py-3 px-4 font-medium ">Joined</th>
+                  <th class="text-left py-3 px-4 font-medium ">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -104,7 +104,7 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
                       {{ user.isActive ? 'Active' : 'Inactive' }}
                     </span>
                   </td>
-                  <td class="py-3 px-4 text-muted-foreground">{{ user.joinedDate }}</td>
+                  <td class="py-3 px-4 ">{{ user.joinedDate }}</td>
                   <td class="py-3 px-4">
                     <div class="flex items-center gap-2">
                       <button class="btn-icon btn-ghost" (click)="editUser(user)">
@@ -131,7 +131,7 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
           
           <div *ngIf="filteredUsers.length === 0" class="py-12 text-center">
             <div class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted-foreground">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="8.5" cy="7" r="4"/>
                 <path d="M20 8v6"/>
@@ -139,12 +139,12 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
               </svg>
             </div>
             <h3 class="text-lg font-semibold mb-2">No users found</h3>
-            <p class="text-muted-foreground mb-6">Try adjusting your search or filters</p>
+            <p class=" mb-6">Try adjusting your search or filters</p>
           </div>
           
           <!-- Pagination -->
           <div class="p-4 border-t border-border flex justify-between items-center">
-            <div class="text-sm text-muted-foreground">
+            <div class="text-sm ">
               Showing <span class="font-medium">1</span> to <span class="font-medium">{{ filteredUsers.length }}</span> of <span class="font-medium">{{ users.length }}</span> users
             </div>
             <div class="flex gap-2">
