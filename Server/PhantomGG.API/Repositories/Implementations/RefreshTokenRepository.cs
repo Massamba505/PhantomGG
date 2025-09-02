@@ -24,9 +24,7 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     public async Task<IEnumerable<RefreshToken>> GetActiveByUserIdAsync(Guid userId)
     {
         return await _context.RefreshTokens
-            .Where(rt => rt.UserId == userId &&
-                        rt.RevokedAt == null &&
-                        rt.ExpiresAt > DateTime.UtcNow)
+            .Where(rt => rt.UserId == userId && rt.ExpiresAt > DateTime.UtcNow)
             .ToListAsync();
     }
 
@@ -36,24 +34,19 @@ public class RefreshTokenRepository : IRefreshTokenRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task RevokeAsync(RefreshToken token)
+    public async Task DeleteAsync(RefreshToken token)
     {
-        token.RevokedAt = DateTime.UtcNow;
-        _context.RefreshTokens.Update(token);
+        _context.RefreshTokens.Remove(token);
         await _context.SaveChangesAsync();
     }
 
-    public async Task RevokeAllForUserAsync(Guid userId)
+    public async Task DeleteAllForUserAsync(Guid userId)
     {
-        var activeTokens = await _context.RefreshTokens
-            .Where(rt => rt.UserId == userId && rt.RevokedAt == null)
+        var userTokens = await _context.RefreshTokens
+            .Where(rt => rt.UserId == userId)
             .ToListAsync();
 
-        foreach (var token in activeTokens)
-        {
-            token.RevokedAt = DateTime.UtcNow;
-        }
-
+        _context.RefreshTokens.RemoveRange(userTokens);
         await _context.SaveChangesAsync();
     }
 }

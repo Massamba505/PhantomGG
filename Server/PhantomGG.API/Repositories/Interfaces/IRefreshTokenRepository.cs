@@ -7,6 +7,6 @@ public interface IRefreshTokenRepository
     Task<RefreshToken?> GetByTokenAsync(string token);
     Task<IEnumerable<RefreshToken>> GetActiveByUserIdAsync(Guid userId);
     Task CreateAsync(RefreshToken token);
-    Task RevokeAsync(RefreshToken token);
-    Task RevokeAllForUserAsync(Guid userId);
+    Task DeleteAsync(RefreshToken token);
+    Task DeleteAllForUserAsync(Guid userId);
 }
