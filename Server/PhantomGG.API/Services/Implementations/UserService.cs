@@ -1,19 +1,23 @@
-using Microsoft.EntityFrameworkCore;
 using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Exceptions;
 using PhantomGG.API.Mappings;
 using PhantomGG.API.Repositories.Interfaces;
+using PhantomGG.API.Security.Interfaces;
 using PhantomGG.API.Services.Interfaces;
-using BC = BCrypt.Net.BCrypt;
 
 namespace PhantomGG.API.Services.Implementations;
 
-public class UserService(IUserRepository userRepository, ITournamentRepository tournamentRepository, IImageService imageService) : IUserService
+public class UserService(
+    IUserRepository userRepository, 
+    ITournamentRepository tournamentRepository,
+    IPasswordHasher passwordHasher,
+    IImageService imageService) : IUserService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
     private readonly IImageService _imageService = imageService;
+    private readonly IPasswordHasher _passwordHasher = passwordHasher;
 
     public async Task<UserDto> GetByIdAsync(Guid id)
     {
@@ -34,7 +38,6 @@ public class UserService(IUserRepository userRepository, ITournamentRepository t
             throw new NotFoundException("User not found");
         }
 
-        // Check if email is being changed and if it already exists
         if (user.Email != request.Email)
         {
             var emailExists = await _userRepository.EmailExistsAsync(request.Email);
@@ -44,7 +47,6 @@ public class UserService(IUserRepository userRepository, ITournamentRepository t
             }
         }
 
-        // Update user properties
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
         user.Email = request.Email;
@@ -61,14 +63,12 @@ public class UserService(IUserRepository userRepository, ITournamentRepository t
             throw new NotFoundException("User not found");
         }
 
-        // Verify current password
-        if (!BC.Verify(request.CurrentPassword, user.PasswordHash))
+        if (!_passwordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
         {
             throw new ValidationException("Current password is incorrect");
         }
 
-        // Hash new password
-        user.PasswordHash = BC.HashPassword(request.NewPassword);
+        user.PasswordHash = _passwordHasher.HashPassword(request.NewPassword);
         await _userRepository.UpdateAsync(user);
     }
 
