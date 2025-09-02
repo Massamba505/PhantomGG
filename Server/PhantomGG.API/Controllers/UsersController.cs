@@ -44,34 +44,6 @@ public class UsersController(
         });
     }
 
-    [HttpGet("stats")]
-    public async Task<ActionResult<ApiResponse>> GetUserStats()
-    {
-        var currentUser = _currentUserService.GetCurrentUser();
-        var stats = await _userService.GetUserStatsAsync(currentUser.Id);
-
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Message = "User stats retrieved successfully",
-            Data = stats
-        });
-    }
-
-    [HttpGet("activity")]
-    public async Task<ActionResult<ApiResponse>> GetUserActivity([FromQuery] int page = 1, [FromQuery] int limit = 10)
-    {
-        var currentUser = _currentUserService.GetCurrentUser();
-        var activity = await _userService.GetUserActivityAsync(currentUser.Id, page, limit);
-
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Message = "User activity retrieved successfully",
-            Data = activity
-        });
-    }
-
     [HttpPost("profile-picture")]
     public async Task<ActionResult<ApiResponse>> UploadProfilePicture(IFormFile profilePicture)
     {

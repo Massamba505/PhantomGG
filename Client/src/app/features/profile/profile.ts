@@ -1,24 +1,25 @@
-import { Component, inject, signal, OnInit, effect } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from "@/app/shared/components/ui/modal/modal";
-import { UserService, UpdateProfileRequest, ChangePasswordRequest, UserStatsResponse, ActivityItem } from '@/app/core/services/user.service';
+import { UserService } from '@/app/core/services/user.service';
+import { ChangePasswordRequest, UpdateProfileRequest } from '@/app/shared/models/User';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, DashboardLayout, RouterLink, ReactiveFormsModule, LucideAngularModule, Modal],
+  imports: [CommonModule, DashboardLayout, ReactiveFormsModule, LucideAngularModule, Modal],
   templateUrl: './profile.html',
   styleUrls: ['./profile.css']
 })
-export class Profile implements OnInit {
+export class Profile {
   private authState = inject(AuthStateService);
   private userService = inject(UserService);
   private toast = inject(ToastService);
@@ -34,16 +35,6 @@ export class Profile implements OnInit {
 
   isUpdatingProfile = signal(false);
   isChangingPassword = signal(false);
-  isLoadingStats = signal(false);
-  isLoadingActivity = signal(false);
-
-  stats = signal<UserStatsResponse>({
-    activeTournaments: 0,
-    teamsManaged: 0,
-    completedTournaments: 0
-  });
-
-  recentActivity = signal<ActivityItem[]>([]);
 
   profileForm: FormGroup = this.fb.group({
     firstName: ['', Validators.required],
@@ -71,39 +62,6 @@ export class Profile implements OnInit {
         this.profilePictureUrl.set(currentUser.profilePictureUrl || '');
       }
     });
-  }
-
-  ngOnInit() {
-    this.loadUserStats();
-    this.loadUserActivity();
-  }
-
-  private async loadUserStats() {
-    try {
-      this.isLoadingStats.set(true);
-      const response = await this.userService.getUserStats().toPromise();
-      if (response?.success && response.data) {
-        this.stats.set(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to load user stats:', error);
-    } finally {
-      this.isLoadingStats.set(false);
-    }
-  }
-
-  private async loadUserActivity() {
-    try {
-      this.isLoadingActivity.set(true);
-      const response = await this.userService.getUserActivity(1, 5).toPromise();
-      if (response?.success && response.data) {
-        this.recentActivity.set(response.data.activities);
-      }
-    } catch (error) {
-      console.error('Failed to load user activity:', error);
-    } finally {
-      this.isLoadingActivity.set(false);
-    }
   }
 
   onProfilePictureSelected(event: Event) {

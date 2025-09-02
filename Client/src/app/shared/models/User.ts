@@ -8,3 +8,14 @@ export interface User {
   profilePictureUrl: string;
   role: Roles;
 }
+
+export interface UpdateProfileRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}

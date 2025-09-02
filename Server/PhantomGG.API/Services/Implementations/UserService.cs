@@ -72,51 +72,6 @@ public class UserService(IUserRepository userRepository, ITournamentRepository t
         await _userRepository.UpdateAsync(user);
     }
 
-    public async Task<UserStatsDto> GetUserStatsAsync(Guid userId)
-    {
-        // Get tournaments created by this user (as organizer)
-        var tournaments = await _tournamentRepository.GetByOrganizerAsync(userId);
-
-        var activeTournaments = tournaments.Count(t => t.Status == "active" || t.Status == "draft");
-        var completedTournaments = tournaments.Count(t => t.Status == "completed");
-
-        // For teams managed, we need to count teams across all tournaments
-        // This would typically be done with a proper join or separate repository method
-        var teamsManaged = 0; // Placeholder - would need team repository to get accurate count
-
-        return new UserStatsDto
-        {
-            ActiveTournaments = activeTournaments,
-            TeamsManaged = teamsManaged,
-            CompletedTournaments = completedTournaments
-        };
-    }
-
-    public async Task<UserActivityDto> GetUserActivityAsync(Guid userId, int page, int limit)
-    {
-        var tournaments = await _tournamentRepository.GetByOrganizerAsync(userId);
-
-        var activities = tournaments
-            .OrderByDescending(t => t.CreatedAt)
-            .Skip((page - 1) * limit)
-            .Take(limit)
-            .Select(t => new ActivityItemDto
-            {
-                Id = Guid.NewGuid().ToString(),
-                Type = "tournament",
-                Message = $"Created tournament \"{t.Name}\"",
-                Date = t.CreatedAt.ToString("MMMM dd, yyyy"),
-                EntityId = t.Id.ToString()
-            })
-            .ToList();
-
-        return new UserActivityDto
-        {
-            Activities = activities,
-            TotalCount = tournaments.Count()
-        };
-    }
-
     public async Task<ProfilePictureUploadDto> UploadProfilePictureAsync(Guid userId, IFormFile file)
     {
         var user = await _userRepository.GetByIdAsync(userId);
