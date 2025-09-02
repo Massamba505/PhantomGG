@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@/environments/environment.development';
 import { ApiResponse } from '@/app/shared/models/ApiResponse';
@@ -36,9 +36,24 @@ export class TeamService {
   }
 
   searchTeams(searchRequest: TeamSearchRequest): Observable<ApiResponse<Team[]>> {
-    return this.http.post<ApiResponse<Team[]>>(
+    let params = new HttpParams();
+    
+    if (searchRequest.searchTerm) {
+      params = params.set('searchTerm', searchRequest.searchTerm);
+    }
+    if (searchRequest.tournamentId) {
+      params = params.set('tournamentId', searchRequest.tournamentId);
+    }
+    if (searchRequest.pageNumber) {
+      params = params.set('pageNumber', searchRequest.pageNumber.toString());
+    }
+    if (searchRequest.pageSize) {
+      params = params.set('pageSize', searchRequest.pageSize.toString());
+    }
+
+    return this.http.get<ApiResponse<Team[]>>(
       `${this.env.apiUrl}/teams/search`,
-      searchRequest
+      { params }
     );
   }
 

@@ -64,9 +64,6 @@ export interface UpdateTournamentRequest {
 export interface TournamentSearchRequest {
   searchTerm?: string;
   status?: string;
-  location?: string;
-  startDateFrom?: string;
-  startDateTo?: string;
   pageNumber?: number;
   pageSize?: number;
 }

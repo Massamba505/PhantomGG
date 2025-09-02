@@ -1,6 +1,6 @@
 import { Tournament, TournamentSearchRequest } from '@/app/shared/models/tournament';
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TournamentCard } from '@/app/shared/components/tournament-card/tournament-card';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
 import { CommonModule } from '@angular/common';
@@ -28,6 +28,7 @@ import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModa
 
 export class Tournaments implements OnInit {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private toast = inject(ToastService);
   private tournamentService = inject(TournamentService);
   
@@ -41,13 +42,35 @@ export class Tournaments implements OnInit {
   loading = signal<boolean>(false);
 
   tournaments = signal<Tournament[]>([]);
-  filteredTournaments = signal<Tournament[]>([]);
 
   ngOnInit() {
-    this.loadTournaments();
+    this.route.queryParams.subscribe(params => {
+      this.searchTerm = params['searchTerm'] || '';
+      this.filterStatus = params['status'] || 'All';
+      
+      if (this.searchTerm || (this.filterStatus && this.filterStatus !== 'All')) {
+        this.searchTournaments();
+      } else {
+        this.loadAllTournaments();
+      }
+    });
   }
 
-  async loadTournaments() {
+  async loadAllTournaments() {
+    try {
+      this.loading.set(true);
+      const response = await this.tournamentService.getAllTournaments().toPromise();
+      this.tournaments.set(response?.data || []);
+    } catch (error) {
+      console.error('Failed to load tournaments:', error);
+      this.toast.error('Failed to load tournaments');
+      this.tournaments.set([]);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async searchTournaments() {
     try {
       this.loading.set(true);
       const searchRequest: TournamentSearchRequest = {
@@ -57,39 +80,39 @@ export class Tournaments implements OnInit {
       
       const response = await this.tournamentService.searchTournaments(searchRequest).toPromise();
       this.tournaments.set(response?.data || []);
-      this.filterTournaments();
     } catch (error) {
-      console.error('Failed to load tournaments:', error);
-      this.toast.error('Failed to load tournaments');
+      console.error('Failed to search tournaments:', error);
+      this.toast.error('Failed to search tournaments');
       this.tournaments.set([]);
-      this.filteredTournaments.set([]);
     } finally {
       this.loading.set(false);
     }
   }
 
-  filterTournaments() {
-    const tournaments = this.tournaments();
-    const filtered = tournaments.filter((tournament: Tournament) => {
-      const matchesSearch =
-        this.searchTerm === '' ||
-        tournament.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-        tournament.description
-          .toLowerCase()
-          .includes(this.searchTerm.toLowerCase());
-      const matchesFilter =
-        this.filterStatus === 'All' || tournament.status === this.filterStatus;
-      return matchesSearch && matchesFilter;
-    });
-    this.filteredTournaments.set(filtered);
-  }
-
   onSearchChange() {
-    this.loadTournaments();
+    this.updateUrlAndLoad();
   }
 
   onFilterChange() {
-    this.loadTournaments();
+    this.updateUrlAndLoad();
+  }
+
+  private updateUrlAndLoad() {
+    const queryParams: any = {};
+    
+    if (this.searchTerm) {
+      queryParams.searchTerm = this.searchTerm;
+    }
+    
+    if (this.filterStatus && this.filterStatus !== 'All') {
+      queryParams.status = this.filterStatus;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      queryParamsHandling: 'replace'
+    });
   }
 
   handleEditTournament(tournament: Tournament) {
@@ -115,7 +138,6 @@ export class Tournaments implements OnInit {
       const currentTournaments = this.tournaments();
       const updatedTournaments = currentTournaments.filter((t: Tournament) => t.id !== tournamentId);
       this.tournaments.set(updatedTournaments);
-      this.filterTournaments();
       
       this.toast.success('Tournament deleted successfully');
     } catch (error) {

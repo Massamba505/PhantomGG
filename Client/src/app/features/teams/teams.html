@@ -13,39 +13,21 @@
         </div>
         <input
           type="text"
-          placeholder="Search tournaments..."
+          placeholder="Search teams..."
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchChange()"
           class="input-field pl-10 w-full"
         />
       </div>
-
-      <div class="relative flex-1 max-w-md">
-        <div
-          class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
-        >
-          <lucide-angular [img]="icons.Funnel" size="20"></lucide-angular>
-        </div>
-        <select
-          [(ngModel)]="filterStatus"
-          (ngModelChange)="onFilterChange()"
-          class="form-select appearance-none w-full pr-10"
-        >
-          <option value="All">All Statuses</option>
-          <option value="Draft">Draft</option>
-          <option value="Active">Active</option>
-          <option value="Completed">Completed</option>
-        </select>
-      </div>
     </div>
 
     <div class="flex justify-end">
       <button
-        (click)="createNewTournament()"
+        (click)="createNewTeam()"
         class="btn btn-primary flex items-center justify-center gap-2"
       >
         <lucide-angular [img]="icons.CirclePlus" [size]="20"></lucide-angular>
-        <span>Create Tournament</span>
+        <span>Create Team</span>
       </button>
     </div>
   </div>
@@ -59,8 +41,8 @@
     <div class="mb-4 flex justify-between items-center">
       <p>
         Showing
-        <span>{{ tournaments().length }}</span>
-        tournaments
+        <span>{{ teams().length }}</span>
+        teams
       </p>
       <div class="flex gap-2">
         <button
@@ -83,7 +65,7 @@
       </div>
     </div>
 
-    @if (tournaments().length > 0) {
+    @if (teams().length > 0) {
     <div
       [class]="
         gridLayout()
@@ -91,35 +73,38 @@
           : 'flex flex-col gap-3'
       "
     >
-      @for (tournament of tournaments(); track tournament.id) {
+      @for (team of teams(); track team.id) {
       <div>
-        <app-tournament-card
-          [tournament]="tournament"
-          (delete)="handleDeleteTournament($event)"
-          (edit)="handleEditTournament($event)"
-          (view)="handleViewTournament($event)"
-        ></app-tournament-card>
+        <app-team-card
+          [team]="team"
+          [showActions]="true"
+          (edit)="handleEditTeam($event)"
+          (delete)="handleDeleteTeam(team.id)"
+          (click)="handleViewTeam(team)"
+        ></app-team-card>
       </div>
       }
     </div>
-    } @if (tournaments().length === 0) {
+    } @if (teams().length === 0) {
     <div
       class="border-2 max-w-md border-dashed rounded-lg flex flex-col items-center justify-center p-8 text-center h-full cursor-pointer"
-      (click)="createNewTournament()"
+      (click)="createNewTeam()"
     >
-      <lucide-angular [img]="icons.Trophy" size="50"></lucide-angular>
+      <lucide-angular [img]="icons.Users" size="50"></lucide-angular>
 
-      <h3 class="text-lg font-medium mb-1 mt-5">No Tournaments Found</h3>
-      <p class="text-sm mb-4 max-w-xs">Try adjusting your search criteria</p>
-      <button class="btn btn-primary">Create Tournament</button>
+      <h3 class="text-lg font-medium mb-1 mt-5">No Teams Found</h3>
+      <p class="text-sm mb-4 max-w-xs">
+        Try adjusting your search criteria or create a new team
+      </p>
+      <button class="btn btn-primary">Create Team</button>
     </div>
     } }
   </section>
 
   <app-confirm-delete-modal
     [isOpen]="isDeleteModalOpen()"
-    [title]="'Delete Tournament'"
-    [entityName]="'tournament'"
+    [title]="'Delete Team'"
+    [entityName]="'team'"
     (close)="isDeleteModalOpen.set(false)"
     (confirm)="confirmDelete()"
   ></app-confirm-delete-modal>

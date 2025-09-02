@@ -41,9 +41,21 @@ public class TournamentsController(
         });
     }
 
-    [HttpPost("search")]
-    public async Task<ActionResult<ApiResponse>> SearchTournaments([FromBody] TournamentSearchDto searchDto)
+    [HttpGet("search")]
+    public async Task<ActionResult<ApiResponse>> SearchTournaments(
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] string? status = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
+        var searchDto = new TournamentSearchDto
+        {
+            SearchTerm = searchTerm,
+            Status = status,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
         var tournaments = await _tournamentService.SearchAsync(searchDto);
         return Ok(new ApiResponse
         {
@@ -54,7 +66,7 @@ public class TournamentsController(
     }
 
     [HttpGet("my-tournaments")]
-    // [Authorize]
+    [Authorize]
     public async Task<ActionResult<ApiResponse>> GetMyTournaments()
     {
         var user = _currentUserService.GetCurrentUser();

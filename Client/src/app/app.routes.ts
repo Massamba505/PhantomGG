@@ -48,6 +48,14 @@ export const routes: Routes = [
     data:{roles:[Roles.Organizer]}
   },
   {
+    path: 'teams',
+    canActivate: [authGuard],
+    data: { roles: [Roles.Organizer] },
+    loadComponent: () =>
+      import('./features/teams/teams').then((m) => m.Teams),
+    title: 'Teams - PhantomGG',
+  },
+  {
     path: 'unauthorized',
     loadComponent: () =>
       import('./features/unauthorized/unauthorized').then((m) => m.Unauthorized),

@@ -77,7 +77,7 @@ export class Sidebar implements OnInit, OnDestroy {
       title: 'Teams',
       url: '/teams',
       icon: Users,
-      roles: [Roles.General],
+      roles: [Roles.Organizer, Roles.General],
     },
     {
       title: 'Fixtures',

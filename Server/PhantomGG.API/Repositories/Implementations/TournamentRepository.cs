@@ -61,21 +61,6 @@ public class TournamentRepository : ITournamentRepository
             query = query.Where(t => t.Status == searchDto.Status);
         }
 
-        if (!string.IsNullOrEmpty(searchDto.Location))
-        {
-            query = query.Where(t => t.Location != null && t.Location.Contains(searchDto.Location));
-        }
-
-        if (searchDto.StartDateFrom.HasValue)
-        {
-            query = query.Where(t => t.StartDate >= searchDto.StartDateFrom.Value);
-        }
-
-        if (searchDto.StartDateTo.HasValue)
-        {
-            query = query.Where(t => t.StartDate <= searchDto.StartDateTo.Value);
-        }
-
         query = query.OrderByDescending(t => t.CreatedAt);
 
         if (searchDto.PageSize > 0)

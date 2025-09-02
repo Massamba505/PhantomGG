@@ -52,9 +52,19 @@ public class TeamsController(
         });
     }
 
-    [HttpPost("search")]
-    public async Task<ActionResult<ApiResponse>> SearchTeams([FromQuery] TeamSearchDto searchDto)
+    [HttpGet("search")]
+    public async Task<ActionResult<ApiResponse>> SearchTeams(
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
+        var searchDto = new TeamSearchDto
+        {
+            SearchTerm = searchTerm,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+
         var teams = await _teamService.SearchAsync(searchDto);
         return Ok(new ApiResponse
         {
