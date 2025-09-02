@@ -12,4 +12,5 @@ public interface ITeamService
     Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid leaderId);
     Task<TeamDto> UpdateAsync(Guid id, UpdateTeamDto updateDto, Guid userId);
     Task DeleteAsync(Guid id, Guid userId);
+    Task<string> UploadTeamLogoAsync(Guid teamId, IFormFile file, Guid userId);
 }

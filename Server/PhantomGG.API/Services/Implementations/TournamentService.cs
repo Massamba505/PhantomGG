@@ -1,20 +1,18 @@
+using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.Tournament;
 using PhantomGG.API.Exceptions;
-using PhantomGG.API.Models;
+using PhantomGG.API.Mappings;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
-using PhantomGG.API.Mappings;
 
 namespace PhantomGG.API.Services.Implementations;
 
-public class TournamentService : ITournamentService
+public class TournamentService(
+    ITournamentRepository tournamentRepository,
+    IImageService imageService) : ITournamentService
 {
-    private readonly ITournamentRepository _tournamentRepository;
-
-    public TournamentService(ITournamentRepository tournamentRepository)
-    {
-        _tournamentRepository = tournamentRepository;
-    }
+    private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
+    private readonly IImageService _imageService = imageService;
 
     public async Task<IEnumerable<TournamentDto>> GetAllAsync()
     {
@@ -76,5 +74,31 @@ public class TournamentService : ITournamentService
             throw new ForbiddenException("You are not authorized to delete this tournament");
 
         await _tournamentRepository.DeleteAsync(id);
+    }
+
+    public async Task<string> UploadTournamentBannerAsync(Guid tournamentId, IFormFile file, Guid userId)
+    {
+        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+        if (tournament == null)
+        {
+            throw new NotFoundException("Tournament not found");
+        }
+
+        if (!await _tournamentRepository.IsOrganizerAsync(tournamentId, userId))
+        {
+            throw new ForbiddenException("You are not authorized to modify this tournament");
+        }
+
+        if (!string.IsNullOrEmpty(tournament.BannerUrl))
+        {
+            await _imageService.DeleteImageAsync(tournament.BannerUrl);
+        }
+
+        var bannerUrl = await _imageService.SaveImageAsync(file, ImageType.TournamentBanner, tournamentId);
+
+        tournament.BannerUrl = bannerUrl;
+        await _tournamentRepository.UpdateAsync(tournament);
+
+        return bannerUrl;
     }
 }

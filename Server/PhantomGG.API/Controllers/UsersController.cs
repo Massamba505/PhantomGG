@@ -59,9 +59,7 @@ public class UsersController(
     }
 
     [HttpGet("activity")]
-    public async Task<ActionResult<ApiResponse>> GetUserActivity(
-        [FromQuery] int page = 1,
-        [FromQuery] int limit = 10)
+    public async Task<ActionResult<ApiResponse>> GetUserActivity([FromQuery] int page = 1, [FromQuery] int limit = 10)
     {
         var currentUser = _currentUserService.GetCurrentUser();
         var activity = await _userService.GetUserActivityAsync(currentUser.Id, page, limit);
@@ -83,27 +81,6 @@ public class UsersController(
             {
                 Success = false,
                 Message = "No file provided"
-            });
-        }
-
-        // Validate file type
-        var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
-        if (!allowedTypes.Contains(profilePicture.ContentType))
-        {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = "Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed"
-            });
-        }
-
-        // Validate file size (max 5MB)
-        if (profilePicture.Length > 5 * 1024 * 1024)
-        {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = "File size cannot exceed 5MB"
             });
         }
 

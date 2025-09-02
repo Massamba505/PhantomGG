@@ -110,4 +110,18 @@ public class TournamentsController(
             Message = "Tournament deleted successfully"
         });
     }
+
+    [HttpPost("{id:guid}/upload-banner")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse>> UploadTournamentBanner(Guid id, IFormFile file)
+    {
+        var user = _currentUserService.GetCurrentUser();
+        var bannerUrl = await _tournamentService.UploadTournamentBannerAsync(id, file, user.Id);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = new { bannerUrl },
+            Message = "Tournament banner uploaded successfully"
+        });
+    }
 }

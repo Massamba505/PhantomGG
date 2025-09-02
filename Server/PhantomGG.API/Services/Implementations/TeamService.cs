@@ -1,22 +1,20 @@
+using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.Team;
 using PhantomGG.API.Exceptions;
-using PhantomGG.API.Models;
+using PhantomGG.API.Mappings;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
-using PhantomGG.API.Mappings;
 
 namespace PhantomGG.API.Services.Implementations;
 
-public class TeamService : ITeamService
+public class TeamService(
+    ITeamRepository teamRepository, 
+    ITournamentRepository tournamentRepository, 
+    IImageService imageService) : ITeamService
 {
-    private readonly ITeamRepository _teamRepository;
-    private readonly ITournamentRepository _tournamentRepository;
-
-    public TeamService(ITeamRepository teamRepository, ITournamentRepository tournamentRepository)
-    {
-        _teamRepository = teamRepository;
-        _tournamentRepository = tournamentRepository;
-    }
+    private readonly ITeamRepository _teamRepository = teamRepository;
+    private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
+    private readonly IImageService _imageService = imageService;
 
     public async Task<IEnumerable<TeamDto>> GetAllAsync()
     {
@@ -35,8 +33,6 @@ public class TeamService : ITeamService
 
     public async Task<IEnumerable<TeamDto>> GetByLeaderAsync(Guid leaderId)
     {
-        // Note: Since Team model uses Manager (string), we can't directly filter by Guid
-        // This method might need to be reconsidered based on your authentication system
         var teams = await _teamRepository.GetAllAsync();
         return teams.Select(team => team.ToTeamDto());
     }
@@ -55,11 +51,9 @@ public class TeamService : ITeamService
 
     public async Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid leaderId)
     {
-        // Validate tournament exists
         if (!await _tournamentRepository.ExistsAsync(createDto.TournamentId))
             throw new NotFoundException("Tournament not found");
 
-        // Check if team name is unique in tournament
         if (await _teamRepository.TeamNameExistsInTournamentAsync(createDto.Name, createDto.TournamentId))
             throw new ConflictException("A team with this name already exists in the tournament");
 
@@ -77,7 +71,6 @@ public class TeamService : ITeamService
         if (existingTeam == null)
             throw new NotFoundException("Team not found");
 
-        // Check if new name is unique in tournament (excluding current team)
         if (await _teamRepository.TeamNameExistsInTournamentAsync(updateDto.Name, existingTeam.TournamentId, id))
             throw new ConflictException("A team with this name already exists in the tournament");
 
@@ -92,5 +85,31 @@ public class TeamService : ITeamService
             throw new NotFoundException("Team not found");
 
         await _teamRepository.DeleteAsync(id);
+    }
+
+    public async Task<string> UploadTeamLogoAsync(Guid teamId, IFormFile file, Guid userId)
+    {
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+        {
+            throw new NotFoundException("Team not found");
+        }
+
+        if(team.Tournament.Organizer != userId)
+        {
+            throw new ForbiddenException("You are not authorized to modify this team");
+        }
+
+        if (!string.IsNullOrEmpty(team.LogoUrl))
+        {
+            await _imageService.DeleteImageAsync(team.LogoUrl);
+        }
+
+        var logoUrl = await _imageService.SaveImageAsync(file, ImageType.Logo, teamId);
+
+        team.LogoUrl = logoUrl;
+        await _teamRepository.UpdateAsync(team);
+
+        return logoUrl;
     }
 }

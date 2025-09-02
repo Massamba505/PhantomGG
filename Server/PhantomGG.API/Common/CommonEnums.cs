@@ -6,3 +6,10 @@ public enum UserRoles
     Organizer,
     User,
 }
+
+public enum ImageType
+{
+    profilePicture,
+    TournamentBanner,
+    Logo
+}

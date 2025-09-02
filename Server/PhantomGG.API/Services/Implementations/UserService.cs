@@ -1,17 +1,19 @@
+using Microsoft.EntityFrameworkCore;
+using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.User;
 using PhantomGG.API.Exceptions;
 using PhantomGG.API.Mappings;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using BC = BCrypt.Net.BCrypt;
 
 namespace PhantomGG.API.Services.Implementations;
 
-public class UserService(IUserRepository userRepository, ITournamentRepository tournamentRepository) : IUserService
+public class UserService(IUserRepository userRepository, ITournamentRepository tournamentRepository, IImageService imageService) : IUserService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
+    private readonly IImageService _imageService = imageService;
 
     public async Task<UserDto> GetByIdAsync(Guid id)
     {
@@ -92,8 +94,6 @@ public class UserService(IUserRepository userRepository, ITournamentRepository t
 
     public async Task<UserActivityDto> GetUserActivityAsync(Guid userId, int page, int limit)
     {
-        // This would typically come from an activity log table
-        // For now, we'll generate some mock data based on user's tournaments
         var tournaments = await _tournamentRepository.GetByOrganizerAsync(userId);
 
         var activities = tournaments
@@ -125,29 +125,19 @@ public class UserService(IUserRepository userRepository, ITournamentRepository t
             throw new NotFoundException("User not found");
         }
 
-        // Generate a unique filename
-        var fileName = $"{userId}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-        var uploadPath = Path.Combine("wwwroot", "uploads", "profile-pictures");
-
-        // Ensure directory exists
-        Directory.CreateDirectory(uploadPath);
-
-        var filePath = Path.Combine(uploadPath, fileName);
-
-        // Save the file
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
         {
-            await file.CopyToAsync(stream);
+            await _imageService.DeleteImageAsync(user.ProfilePictureUrl);
         }
 
-        // Update user's profile picture URL
-        var profilePictureUrl = $"/uploads/profile-pictures/{fileName}";
-        user.ProfilePictureUrl = profilePictureUrl;
+        var imageUrl = await _imageService.SaveImageAsync(file, ImageType.profilePicture, userId);
+
+        user.ProfilePictureUrl = imageUrl;
         await _userRepository.UpdateAsync(user);
 
         return new ProfilePictureUploadDto
         {
-            ProfilePictureUrl = profilePictureUrl
+            ProfilePictureUrl = imageUrl
         };
     }
 }

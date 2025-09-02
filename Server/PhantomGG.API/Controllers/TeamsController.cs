@@ -121,4 +121,18 @@ public class TeamsController(
             Message = "Team deleted successfully"
         });
     }
+
+    [HttpPost("{id:guid}/upload-logo")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse>> UploadTeamLogo(Guid id, IFormFile file)
+    {
+        var user = _currentUserService.GetCurrentUser();
+        var logoUrl = await _teamService.UploadTeamLogoAsync(id, file, user.Id);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = new { logoUrl },
+            Message = "Team logo uploaded successfully"
+        });
+    }
 }

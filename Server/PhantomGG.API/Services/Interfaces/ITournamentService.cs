@@ -11,4 +11,6 @@ public interface ITournamentService
     Task<TournamentDto> CreateAsync(CreateTournamentDto createDto, Guid organizerId);
     Task<TournamentDto> UpdateAsync(Guid id, UpdateTournamentDto updateDto, Guid userId);
     Task DeleteAsync(Guid id, Guid userId);
+    //Task<string> UploadTournamentLogoAsync(Guid tournamentId, IFormFile file, Guid userId);
+    Task<string> UploadTournamentBannerAsync(Guid tournamentId, IFormFile file, Guid userId);
 }

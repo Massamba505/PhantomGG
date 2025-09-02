@@ -170,5 +170,6 @@ public class Program
         services.AddScoped<ICookieService, CookieService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IRefreshTokeService, RefreshTokenService>();
+        services.AddScoped<IImageService, LocalFileImageService>();
     }
 }
