@@ -1,15 +1,18 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { LoginRequest } from '@/app/shared/models/Authentication';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { ToastService } from '@/app/shared/services/toast.service';
+import { LucideAngularModule } from 'lucide-angular';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './login.html',
 })
 export class Login {
@@ -18,11 +21,12 @@ export class Login {
   private router = inject(Router);
   private toastService = inject(ToastService);
 
+  readonly icons = LucideIcons;
+
   showPassword = signal(false);
   submitted = signal(false);
 
   loading = this.authState.loading;
-  error = this.authState.error;
 
   userForm = this.fb.group({
     email: ['', [Validators.required, Validators.email, strictEmailValidator]],
@@ -33,7 +37,6 @@ export class Login {
   onSubmit(event: Event) {
     event.preventDefault();
     this.submitted.set(true);
-
     if (this.userForm.invalid) {
       return;
     }
@@ -42,11 +45,9 @@ export class Login {
     this.authState.login(credentials).subscribe({
       next: () => {
         if (this.authState.isAuthenticated()) {
-          this.router.navigate(['/profile']);
+          this.toastService.success('Login successful!');
+          this.router.navigate(['/dashboard']);
         }
-      },
-      error: (error) => {
-        this.toastService.error(error.error.message);
       },
     });
   }

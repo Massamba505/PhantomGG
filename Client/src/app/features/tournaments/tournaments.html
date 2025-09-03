@@ -1,0 +1,135 @@
+<app-dashboard-layout>
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-border pb-6 gap-4"
+  >
+    <div
+      class="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full"
+    >
+      <div class="relative flex-1 max-w-2xl">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+          <lucide-angular [img]="icons.Search" size="20"></lucide-angular>
+        </div>
+        <input
+          type="text"
+          placeholder="Search tournaments..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+          class="input-field pl-10 w-full"
+        />
+      </div>
+
+      <div class="relative flex-1 max-w-md">
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+          <lucide-angular [img]="icons.Funnel" size="20"></lucide-angular>
+        </div>
+        <select
+          [(ngModel)]="filterStatus"
+          (ngModelChange)="onFilterChange()"
+          class="form-select appearance-none w-full pr-10"
+        >
+          <option value="All">All Statuses</option>
+          <option value="Draft">Draft</option>
+          <option value="Active">Active</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex justify-end">
+      <button
+        (click)="createNewTournament()"
+        class="btn btn-primary flex items-center justify-center gap-2"
+      >
+        <lucide-angular [img]="icons.CirclePlus" [size]="20"></lucide-angular>
+        <span>Create Tournament</span>
+      </button>
+    </div>
+  </div>
+
+  <section class="pt-6">
+    @if (loading()) {
+    <div class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2"></div>
+    </div>
+    } @else {
+    <div class="mb-4 flex justify-between items-center">
+      <p class="text-sm">
+        Showing
+        <span class="font-medium">{{ tournaments().length }}</span>
+        tournaments
+      </p>
+      <div class="flex gap-2">
+        <button
+          (click)="switchLayout(false)"
+          class="cursor-pointer"
+          title="List View"
+        >
+          <lucide-angular
+            [img]="icons.StretchHorizontal"
+            size="20"
+          ></lucide-angular>
+        </button>
+        <button
+          (click)="switchLayout(true)"
+          class="cursor-pointer"
+          title="Grid View"
+        >
+          <lucide-angular [img]="icons.LayoutGrid" size="20"></lucide-angular>
+        </button>
+      </div>
+    </div>
+
+    @if (tournaments().length > 0) { @if (gridLayout()) {
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    >
+      @for (tournament of tournaments(); track tournament.id) {
+      <app-tournament-card
+        [tournament]="tournament"
+        [layout]="'grid'"
+        (delete)="handleDeleteTournament($event)"
+        (edit)="handleEditTournament($event)"
+        (view)="handleViewTournament($event)"
+      ></app-tournament-card>
+      }
+    </div>
+    } @else {
+    <div class="flex flex-col space-y-2">
+      @for (tournament of tournaments(); track tournament.id) {
+      <app-tournament-card
+        [tournament]="tournament"
+        [layout]="'horizontal'"
+        (delete)="handleDeleteTournament($event)"
+        (edit)="handleEditTournament($event)"
+        (view)="handleViewTournament($event)"
+      ></app-tournament-card>
+      }
+    </div>
+    } } @if (tournaments().length === 0) {
+    <div
+      class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-12 text-center max-w-md mx-auto cursor-pointer hover:border-primary/50 transition-colors"
+      (click)="createNewTournament()"
+    >
+      <div class="mb-4 p-3 rounded-full bg-muted">
+        <lucide-angular [img]="icons.Trophy" size="32"></lucide-angular>
+      </div>
+      <h3 class="text-lg font-semibold mb-2">No Tournaments Found</h3>
+      <p class="text-sm mb-6">
+        Try adjusting your search criteria or create your first tournament
+      </p>
+      <button class="btn btn-primary">
+        <lucide-angular [img]="icons.CirclePlus" size="16"></lucide-angular>
+        Create Tournament
+      </button>
+    </div>
+    } }
+  </section>
+
+  <app-confirm-delete-modal
+    [isOpen]="isDeleteModalOpen()"
+    [title]="'Delete Tournament'"
+    [entityName]="'tournament'"
+    (close)="isDeleteModalOpen.set(false)"
+    (confirm)="confirmDelete()"
+  ></app-confirm-delete-modal>
+</app-dashboard-layout>

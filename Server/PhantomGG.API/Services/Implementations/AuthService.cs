@@ -85,8 +85,8 @@ public class AuthService(
 
     public async Task<AuthDto> RefreshAsync(string refreshTokenFromCookie)
     {
-        var revokedRefreshToken = await _refreshTokeService.RevokeAsync(refreshTokenFromCookie);
-        var user = revokedRefreshToken.User;
+        var deletedRefreshToken = await _refreshTokeService.DeleteAsync(refreshTokenFromCookie);
+        var user = deletedRefreshToken.User;
         var accessToken = _tokenService.GenerateAccessToken(user);
         var refreshToken = await _refreshTokeService.AddRefreshToken(user);
 
@@ -103,7 +103,7 @@ public class AuthService(
 
     public async Task LogoutAsync(string refreshTokenFromCookie)
     {
-        await _refreshTokeService.RevokeAsync(refreshTokenFromCookie);
+        await _refreshTokeService.DeleteAsync(refreshTokenFromCookie);
     }
 
     private static void ValidateRegisterRequest(RegisterRequestDto request)

@@ -1,11 +1,9 @@
-<div class="relative w-screen h-screen bg-background text-foreground">
-  <!-- Theme toggle positioned in top-right corner -->
-  <div class="absolute top-4 right-4 z-50">
-    <app-theme-toggle></app-theme-toggle>
-  </div>
-  
-  <!-- Main content area -->
-  <main class="flex flex-col w-full h-full items-center justify-center">
-    <ng-content></ng-content>
+<div class="relative min-h-screen flex flex-col">
+  <main class="flex-1 flex flex-col w-full">
+    <app-toast class="fixed top-4 right-4 z-50" />
+
+    <div class="flex-1">
+      <ng-content></ng-content>
+    </div>
   </main>
 </div>

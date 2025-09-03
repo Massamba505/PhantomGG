@@ -2,118 +2,80 @@
 
 @layer base {
   :root {
+    /* Base colors */
     --background: 210 20% 98%;
     --foreground: 222 28% 18%;
 
+    /* Card colors */
     --card: 0 0% 100%;
     --card-foreground: 222 28% 20%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 28% 18%;
-
+    /* Primary colors */
     --primary: 222 60% 42%;
-    --primary-glow: 222 60% 52%;
     --primary-foreground: 0 0% 100%;
 
+    /* Secondary colors */
     --secondary: 210 20% 93%;
     --secondary-foreground: 222 15% 35%;
 
+    /* Muted colors */
     --muted: 210 20% 95%;
     --muted-foreground: 222 10% 60%;
 
-    --accent: 200 85% 45%;
-    --accent-foreground: 0 0% 100%;
-
+    /* Status colors */
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 10%;
 
     --success: 142 70% 35%;
     --success-foreground: 0 0% 100%;
 
+    /* UI component colors */
     --border: 210 20% 85%;
     --input: 210 20% 96%;
     --ring: 222 60% 42%;
 
-    --sidebar-bg: 210 25% 97%;
-    --sidebar-border: 210 20% 88%;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-glow))
-    );
-    --gradient-dark: linear-gradient(
-      180deg,
-      hsl(var(--background)),
-      hsl(210 20% 95%)
-    );
-    --gradient-card: linear-gradient(
-      145deg,
-      hsl(var(--card)),
-      hsl(210 20% 98%)
-    );
-
-    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.15);
-
-    --radius: 0.4rem;
+    /* Radius */
+    --radius: 0.5rem;
   }
 
   .dark {
+    /* Base colors */
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
 
+    /* Card colors */
     --card: 222 44% 13%;
     --card-foreground: 210 40% 95%;
 
-    --popover: 222 46% 12%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 215 20% 35%;
-    --primary-glow: 215 20% 45%;
+    /* Primary colors */
+    --primary: 215 40% 40%;
     --primary-foreground: 0 0% 100%;
 
+    /* Secondary colors */
     --secondary: 220 15% 26%;
     --secondary-foreground: 210 40% 90%;
 
+    /* Muted colors */
     --muted: 220 14% 20%;
     --muted-foreground: 215 15% 65%;
 
-    --accent: 200 80% 35%;
-    --accent-foreground: 210 40% 98%;
-
+    /* Status colors */
     --destructive: 0 84% 55%;
     --destructive-foreground: 210 40% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 10%;
 
     --success: 142 76% 36%;
     --success-foreground: 210 40% 98%;
 
+    /* UI component colors */
     --border: 220 15% 22%;
-    --input: 220 15% 20%;
+    --input: 222 47% 11%;
     --ring: 200 100% 45%;
-
-    --sidebar-bg: 222 47% 10%;
-    --sidebar-border: 220 15% 18%;
-
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-glow))
-    );
-    --gradient-dark: linear-gradient(
-      180deg,
-      hsl(var(--background)),
-      hsl(220 40% 7%)
-    );
-    --gradient-card: linear-gradient(
-      145deg,
-      hsl(var(--card)),
-      hsl(220 15% 15%)
-    );
-
-    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2);
   }
 
   * {
@@ -123,83 +85,62 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 }
 
 @layer components {
-  .primary-button {
-    width: 100%;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius);
-    transition: all 0.25s ease-in-out;
+  /* Buttons */
+  .btn {
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
     text-decoration: none;
     cursor: pointer;
-    background: var(--gradient-primary);
+    border: 1px solid transparent;
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
-    box-shadow: var(--shadow-lg), 0 0 10px hsl(var(--primary) / 0.2);
   }
 
-  .primary-button:hover {
-    background: linear-gradient(
-      to right,
-      hsl(var(--primary) / 0.9),
-      hsl(var(--primary-glow))
-    );
+  .btn-primary:hover:not(:disabled) {
+    opacity: 0.9;
   }
 
-  .secondary-button {
-    width: 100%;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius);
-    transition: all 0.25s ease-in-out;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
+  .btn-secondary {
     background-color: hsl(var(--secondary));
     color: hsl(var(--secondary-foreground));
     border: 1px solid hsl(var(--border));
-    box-shadow: var(--shadow-lg);
   }
 
-  .secondary-button:hover {
-    background: linear-gradient(
-      to right,
-      hsl(var(--secondary) / 0.9),
-      hsl(var(--secondary-glow))
-    );
+  .btn-secondary:hover:not(:disabled) {
+    opacity: 0.8;
   }
 
-  .btn {
-    width: 100%;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius);
-    transition: all 0.25s ease-in-out;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
+  .btn-outline {
+    background-color: transparent;
     border: 1px solid hsl(var(--border));
+    color: hsl(var(--foreground));
   }
 
-  .btn-success {
-    background-color: hsl(var(--success));
-    color: hsl(var(--success-foreground));
-  }
-
-  .btn-success:hover {
-    background-color: hsl(142 70% 40%);
+  .btn-outline:hover:not(:disabled) {
+    background-color: hsl(var(--muted));
   }
 
   .btn-destructive {
@@ -207,27 +148,11 @@
     color: hsl(var(--destructive-foreground));
   }
 
-  .btn-destructive:hover {
-    background-color: hsl(0 75% 60%);
+  .btn-destructive:hover:not(:disabled) {
+    opacity: 0.9;
   }
 
-  .card,
-  .card-tournament,
-  .card-team {
-    background: var(--gradient-card);
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    padding: 1.25rem;
-    box-shadow: var(--shadow-lg);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .card-tournament:hover,
-  .card-team:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
-  }
-
+  /* Input Fields */
   .input-field {
     width: 100%;
     padding: 0.5rem 0.75rem;
@@ -235,8 +160,8 @@
     color: hsl(var(--foreground));
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
-    font-size: 1rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
   }
 
   .input-field::placeholder {
@@ -246,7 +171,230 @@
   .input-field:focus {
     outline: none;
     border-color: hsl(var(--ring));
-    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.35);
+  }
+
+  .input-field:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .input-field.error {
+    border-color: hsl(var(--destructive));
+  }
+
+  /* Select */
+  .form-select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--input));
+    color: hsl(var(--foreground));
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+  }
+
+  .form-select option {
+    border: 1px solid black;
+  }
+
+  .form-select:focus {
+    outline: none;
+    border-color: hsl(var(--ring));
+  }
+
+  /* Textarea */
+  .textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background-color: hsl(var(--input));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s ease;
+  }
+
+  .textarea:focus {
+    outline: none;
+    border-color: hsl(var(--ring));
+  }
+
+  /* Checkbox */
+  .checkbox {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.25rem;
+    background-color: hsl(var(--input));
+    cursor: pointer;
+  }
+
+  .checkbox:checked {
+    background-color: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+  }
+
+  /* Action Buttons */
+  .action-button {
+    background-color: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 0.375rem;
+    color: hsl(var(--secondary-foreground));
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+  }
+
+  .action-button:hover {
+    opacity: 0.8;
+  }
+
+  .action-button-danger {
+    background-color: hsl(var(--destructive));
+    border: 1px solid hsl(var(--destructive));
+    border-radius: var(--radius);
+    padding: 0.375rem;
+    color: hsl(var(--destructive-foreground));
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+  }
+
+  .action-button-danger:hover {
+    opacity: 0.9;
+  }
+
+  /* Basic Card */
+  .card {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+
+  /* Tournament Card */
+  .card-tournament {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1em;
+  }
+
+  .card-tournament:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transform: translateY(-1px);
+  }
+
+  /* Tournament Banner */
+  .tournament-banner {
+    background-color: hsl(var(--muted));
+    height: 160px;
+    min-height: 160px;
+    border-radius: var(--radius);
+  }
+
+  /* Team Card */
+  .card-team {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 1rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    gap: 0.1em;
+  }
+
+  .card-team:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transform: translateY(-1px);
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 9999px;
+  }
+
+  .badge-primary {
+    background-color: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+    border: 1px solid hsl(var(--primary) / 0.2);
+  }
+
+  .badge-secondary {
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border: 1px solid hsl(var(--border));
+  }
+
+  .badge-success {
+    background-color: hsl(var(--success) / 0.1);
+    color: hsl(var(--success));
+    border: 1px solid hsl(var(--success) / 0.2);
+  }
+
+  .badge-warning {
+    background-color: hsl(var(--warning) / 0.1);
+    color: hsl(var(--warning-foreground));
+    border: 1px solid hsl(var(--warning) / 0.2);
+  }
+
+  .badge-destructive {
+    background-color: hsl(var(--destructive) / 0.1);
+    color: hsl(var(--destructive));
+    border: 1px solid hsl(var(--destructive) / 0.2);
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--secondary-foreground));
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: hsl(var(--foreground));
+  }
+
+  .error-message {
+    color: hsl(var(--destructive));
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .required {
+    color: hsl(var(--destructive));
+  }
+
+  .modal {
+    background-color: hsl(var(--background));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
   }
 }
 
@@ -256,8 +404,57 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
-.theme-transition {
-  transition: background-color 0.2s ease, color 0.2s ease;
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.4);
+}
+
+/* Line Clamp Utilities */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

@@ -1,0 +1,64 @@
+<div
+  class="card-team group cursor-pointer relative min-w-xs"
+  (click)="onView()"
+>
+  <div class="relative w-25 h-25 flex-shrink-0 rounded-l-md">
+    @if (team().logoUrl) {
+    <img
+      [src]="team().logoUrl"
+      [alt]="team().name + ' logo'"
+      class="w-full h-full object-contain rounded-md"
+      (error)="onImageError($event)"
+    />
+    }
+  </div>
+
+  @if (showActions()) {
+  <div
+    class="absolute right-3 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+  >
+    <button
+      (click)="onEdit($event)"
+      class="action-button"
+      aria-label="Edit team"
+    >
+      <lucide-angular [img]="icons.SquarePen" size="14" />
+    </button>
+    <button
+      (click)="onDelete($event)"
+      class="action-button-danger"
+      aria-label="Delete team"
+    >
+      <lucide-angular [img]="icons.Trash2" size="14" />
+    </button>
+  </div>
+  }
+
+  <div class="flex-1 ml-4 flex flex-col h-full justify-between">
+    <div class="flex items-start justify-between mb-2">
+      <h3
+        class="text-base font-semibold truncate max-w-[10rem] transition-colors mb-1"
+      >
+        {{ team().name }}
+      </h3>
+    </div>
+
+    <div class="flex flex-col items-start justify-between gap-1 text-sm">
+      <div class="flex items-center gap-1">
+        <lucide-angular [img]="icons.Users" size="14" />
+        <span>
+          {{ team().numberOfPlayers }}
+          {{ team().numberOfPlayers === 1 ? "Player" : "Players" }}
+        </span>
+      </div>
+      <div class="flex items-center gap-1">
+        <lucide-angular [img]="icons.UserCircle2" size="14" />
+        <span class="truncate max-w-[10rem]">{{ team().manager }}</span>
+      </div>
+      <div class="flex items-center gap-1 text-xs whitespace-nowrap">
+        <lucide-angular [img]="icons.Calendar" size="12" />
+        <span>{{ getFormattedDate(team().createdAt) }}</span>
+      </div>
+    </div>
+  </div>
+</div>

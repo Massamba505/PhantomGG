@@ -1,0 +1,159 @@
+import { Tournament, TournamentSearchRequest } from '@/app/shared/models/tournament';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { TournamentCard } from '@/app/shared/components/tournament-card/tournament-card';
+import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ToastService } from '@/app/shared/services/toast.service';
+import { TournamentService } from '@/app/core/services/tournament.service';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { LucideAngularModule } from "lucide-angular";
+import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
+
+@Component({
+  selector: 'app-tournaments',
+  templateUrl: './tournaments.html',
+  styleUrls: ['./tournaments.css'],
+  standalone: true,
+  imports: [
+    DashboardLayout,
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    TournamentCard,
+    ConfirmDeleteModal
+],
+})
+
+export class Tournaments implements OnInit {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
+  private tournamentService = inject(TournamentService);
+  
+  sidebarOpen = false;
+  searchTerm = '';
+  filterStatus = 'All';
+  isDeleteModalOpen = signal(false);
+  deletingTournament = signal<string | null>(null);
+  readonly icons = LucideIcons;
+  gridLayout = signal<boolean>(true);
+  loading = signal<boolean>(false);
+
+  tournaments = signal<Tournament[]>([]);
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.searchTerm = params['searchTerm'] || '';
+      this.filterStatus = params['status'] || 'All';
+      
+      if (this.searchTerm || (this.filterStatus && this.filterStatus !== 'All')) {
+        this.searchTournaments();
+      } else {
+        this.loadAllTournaments();
+      }
+    });
+  }
+
+  async loadAllTournaments() {
+    try {
+      this.loading.set(true);
+      const response = await this.tournamentService.getAllTournaments().toPromise();
+      this.tournaments.set(response?.data || []);
+    } catch (error) {
+      console.error('Failed to load tournaments:', error);
+      this.toast.error('Failed to load tournaments');
+      this.tournaments.set([]);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async searchTournaments() {
+    try {
+      this.loading.set(true);
+      const searchRequest: TournamentSearchRequest = {
+        searchTerm: this.searchTerm || undefined,
+        status: this.filterStatus === 'All' ? undefined : this.filterStatus
+      };
+      
+      const response = await this.tournamentService.searchTournaments(searchRequest).toPromise();
+      this.tournaments.set(response?.data || []);
+    } catch (error) {
+      console.error('Failed to search tournaments:', error);
+      this.toast.error('Failed to search tournaments');
+      this.tournaments.set([]);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  onSearchChange() {
+    this.updateUrlAndLoad();
+  }
+
+  onFilterChange() {
+    this.updateUrlAndLoad();
+  }
+
+  private updateUrlAndLoad() {
+    const queryParams: any = {};
+    
+    if (this.searchTerm) {
+      queryParams.searchTerm = this.searchTerm;
+    }
+    
+    if (this.filterStatus && this.filterStatus !== 'All') {
+      queryParams.status = this.filterStatus;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      queryParamsHandling: 'replace'
+    });
+  }
+
+  handleEditTournament(tournament: Tournament) {
+    this.router.navigate(['/tournaments','edit', tournament.id]);
+  }
+
+  switchLayout(toGrid: boolean) {
+    this.gridLayout.set(toGrid);
+  }
+
+  handleDeleteTournament(id: string) {
+    this.deletingTournament.set(id);
+    this.isDeleteModalOpen.set(true);
+  }
+
+  async confirmDelete() {
+    const tournamentId = this.deletingTournament();
+    if (!tournamentId) return;
+
+    try {
+      await this.tournamentService.deleteTournament(tournamentId).toPromise();
+      
+      const currentTournaments = this.tournaments();
+      const updatedTournaments = currentTournaments.filter((t: Tournament) => t.id !== tournamentId);
+      this.tournaments.set(updatedTournaments);
+      
+      this.toast.success('Tournament deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete tournament:', error);
+      this.toast.error('Failed to delete tournament');
+    } finally {
+      this.isDeleteModalOpen.set(false);
+      this.deletingTournament.set(null);
+    }
+  }
+
+  handleViewTournament(tournament: Tournament) {
+    this.router.navigate(['/tournaments','details', tournament.id]);
+  }
+
+  createNewTournament() {
+    this.router.navigate(['/tournaments','create']);
+  }
+}

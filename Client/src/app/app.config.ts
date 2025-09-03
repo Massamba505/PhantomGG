@@ -15,6 +15,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { apiInterceptor } from './core/interceptors/Api.interceptor';
 import { MessageService } from 'primeng/api';
 import { AuthStateService } from './store/AuthStateService';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 function initializeTheme(themeService: ThemeService) {
   return () => {
@@ -31,7 +32,7 @@ function initializeAuthState(authStateService: AuthStateService) {
 export const appConfig: ApplicationConfig = {
   providers: [
     MessageService,
-    provideHttpClient(withInterceptors([apiInterceptor])),
+    provideHttpClient(withInterceptors([apiInterceptor, errorInterceptor])),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),

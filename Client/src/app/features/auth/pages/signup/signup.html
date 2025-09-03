@@ -1,144 +1,191 @@
-<div class="auth-form">
-  <div class="text-center mb-8">
-    <h1 class="text-2xl font-bold mb-2">Become a Phantom! 👻👻</h1>
+<div class="card">
+  <div class="text-center mb-6">
+    <h1 class="text-2xl font-bold mb-2">Create an Account</h1>
   </div>
 
   <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="space-y-4">
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium mb-2"
-          >First Name<span class="ml-1 text-red-600">*</span></label
-        >
+    <div class="flex flex-wrap gap-4">
+      <div class="w-full md:w-fit">
+        <label class="form-label">
+          First Name<span class="required ml-1">*</span>
+        </label>
         <input
-          class="input-field w-full"
+          class="input-field"
+          [class.error]="
+            (submitted() || signupForm.controls['firstName'].touched) &&
+            signupForm.controls['firstName'].errors
+          "
           type="text"
-          placeholder="Phantom"
+          placeholder="Massamba"
           formControlName="firstName"
         />
         @if ((submitted() || signupForm.controls['firstName'].touched) &&
         signupForm.controls['firstName'].errors) {
-        <p class="text-xs text-red-600 mt-1">First name is required</p>
+        <p class="error-message">First name is required</p>
         }
       </div>
 
-      <div>
-        <label class="block text-sm font-medium mb-2"
-          >Last Name<span class="ml-1 text-red-600">*</span></label
-        >
+      <div class="w-full md:w-fit">
+        <label class="form-label">
+          Last Name<span class="required ml-1">*</span>
+        </label>
         <input
-          class="input-field w-full"
+          class="input-field"
+          [class.error]="
+            (submitted() || signupForm.controls['lastName'].touched) &&
+            signupForm.controls['lastName'].errors
+          "
           type="text"
-          placeholder="Striker"
+          placeholder="Maphalala"
           formControlName="lastName"
         />
         @if ((submitted() || signupForm.controls['lastName'].touched) &&
         signupForm.controls['lastName'].errors) {
-        <p class="text-xs text-red-600 mt-1">Last name is required</p>
+        <p class="error-message">Last name is required</p>
         }
       </div>
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-2"
-        >Email<span class="ml-1 text-red-600">*</span></label
-      >
+      <label class="form-label">
+        Email<span class="required ml-1">*</span>
+      </label>
       <input
-        class="input-field w-full"
+        class="input-field"
+        [class.error]="
+          (submitted() || signupForm.controls['email'].touched) &&
+          signupForm.controls['email'].errors
+        "
         type="email"
-        placeholder="phantomplayer@tournament.com"
+        placeholder="massamba.maphalala@gmail.com"
         formControlName="email"
       />
       @if ((submitted() || signupForm.controls['email'].touched) &&
       signupForm.controls['email'].errors) {
-      <p class="text-xs text-red-600 mt-1">Enter a valid email address</p>
+      <p class="error-message">Please enter a valid email address</p>
       }
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-2"
-        >Password<span class="ml-1 text-red-600">*</span></label
-      >
+      <label class="form-label">
+        Password<span class="required ml-1">*</span>
+      </label>
       <div class="relative">
         <input
-          class="input-field w-full pr-12"
+          class="input-field pr-10"
+          [class.error]="(submitted() || signupForm.controls['password'].touched) && signupForm.controls['password'].errors?.['required']"
           [type]="showPassword() ? 'text' : 'password'"
-          placeholder="Make it tactically strong! 👻"
+          placeholder="Create a strong password"
           formControlName="password"
         />
         <button
-          (click)="togglePassword()"
           type="button"
-          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          (click)="togglePassword()"
+          class="absolute right-3 top-1/2 transform -translate-y-1/2"
+          aria-label="Toggle password visibility"
         >
-          {{ showPassword() ? "🐵" : "🙈" }}
+          @if (!showPassword()) {
+          <lucide-angular [img]="icons.EyeOff" size="18"></lucide-angular>
+          } @else {
+          <lucide-angular [img]="icons.Eye" size="18"></lucide-angular>
+          }
         </button>
       </div>
-
       @if ((submitted() || signupForm.controls['password'].touched) &&
       signupForm.controls['password'].errors?.['required']) {
-      <p class="text-xs text-red-600 mt-1">Password is required</p>
-      } @if ((submitted() || signupForm.controls['password'].value)) {
-      <p class="mt-1 text-sm" [ngClass]="passwordStrength.color">
+      <p class="error-message">Password is required</p>
+      } @else if (signupForm.controls['password'].value) {
+      <p class="text-xs mt-1" [class]="passwordStrength.color">
         {{ passwordStrength.label }}
       </p>
       }
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-2"
-        >Confirm Password<span class="ml-1 text-red-600">*</span></label
-      >
+      <label class="form-label">
+        Confirm Password<span class="required ml-1">*</span>
+      </label>
       <div class="relative">
         <input
-          class="input-field w-full pr-12"
+          class="input-field pr-10"
+          [class.error]="signupForm.errors?.['passwordMismatch'] && (signupForm.controls['confirmPassword'].touched || signupForm.controls['password'].touched || submitted())"
           [type]="showPassword2() ? 'text' : 'password'"
-          placeholder="Same formation, secure the goal! 🥅"
+          placeholder="Confirm your password"
           formControlName="confirmPassword"
         />
         <button
-          (click)="togglePassword2()"
           type="button"
-          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          (click)="togglePassword2()"
+          class="absolute right-3 top-1/2 transform -translate-y-1/2"
+          aria-label="Toggle password visibility"
         >
-          {{ showPassword2() ? "🐵" : "🙈" }}
+          @if (!showPassword2()) {
+          <lucide-angular [img]="icons.EyeOff" size="18"></lucide-angular>
+          } @else {
+          <lucide-angular [img]="icons.Eye" size="18"></lucide-angular>
+          }
         </button>
       </div>
-      @if ( signupForm.errors?.['passwordMismatch'] && (
-      signupForm.controls['confirmPassword'].touched ||
-      signupForm.controls['password'].touched || submitted() ) ) {
-      <p class="text-xs text-red-600 mt-1">Passwords do not match</p>
+      @if (signupForm.errors?.['passwordMismatch'] &&
+      (signupForm.controls['confirmPassword'].touched ||
+      signupForm.controls['password'].touched || submitted())) {
+      <p class="error-message">Passwords do not match</p>
       }
     </div>
 
     <button
       type="submit"
-      class="primary-button w-full mt-5"
+      class="btn btn-primary py-2.5 mt-3 w-full"
       [disabled]="loading()"
     >
-      {{ loading() ? "Loading..." : "Join the Phantom League! 👻" }}
+      @if (loading()) {
+      <span class="animate-pulse">Creating account...</span>
+      } @else {
+      <span>Create Account</span>
+      }
     </button>
   </form>
 
   <div class="flex items-center my-6">
-    <div class="border-t border-border flex-1"></div>
-    <span class="px-4 text-muted-foreground text-sm">OR</span>
-    <div class="border-t border-border flex-1"></div>
+    <div class="border-t flex-1"></div>
+    <span class="px-4 text-sm">OR</span>
+    <div class="border-t flex-1"></div>
   </div>
 
-  <div class="w-full-4 mb-6">
-    <button class="secondary-button w-full gap-2">
-      <span>Google</span>
-    </button>
-  </div>
-
-  <div class="text-center">
-    <span class="text-muted">Already in the phantom? </span>
-    <a
-      routerLink="/auth/login"
-      class="text-secondary hover:underline font-medium"
+  <button
+    class="btn btn-secondary mb-4 flex items-center justify-center gap-2 w-full"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="currentColor"
     >
-      Score your login!
+      <path
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+        fill="#4285F4"
+      />
+      <path
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+        fill="#34A853"
+      />
+      <path
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+        fill="#FBBC05"
+      />
+      <path
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+        fill="#EA4335"
+      />
+    </svg>
+    Continue with Google
+  </button>
+
+  <div class="text-center mt-6">
+    <span class="text-sm">Already have an account? </span>
+    <a routerLink="/auth/login" class="hover:underline font-medium text-sm">
+      Log in
     </a>
-    <span>👻</span>
   </div>
 </div>

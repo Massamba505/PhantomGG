@@ -47,12 +47,12 @@ public class RefreshTokenService(
         };
     }
 
-    public async Task RevokeAllForUserAsync(Guid userId)
+    public async Task DeleteAllForUserAsync(Guid userId)
     {
-        await _refreshTokenRepository.RevokeAllForUserAsync(userId);
+        await _refreshTokenRepository.DeleteAllForUserAsync(userId);
     }
 
-    public async Task<RefreshToken> RevokeAsync(string refreshTokenFromCookie)
+    public async Task<RefreshToken> DeleteAsync(string refreshTokenFromCookie)
     {
         if (string.IsNullOrWhiteSpace(refreshTokenFromCookie))
         {
@@ -65,18 +65,12 @@ public class RefreshTokenService(
             throw new UnauthorizedException("Invalid refresh token");
         }
 
-        if (refreshTokenEntity.RevokedAt.HasValue)
-        {
-            await RevokeAllForUserAsync(refreshTokenEntity.UserId);
-            throw new UnauthorizedException("Token reuse detected. All tokens revoked.");
-        }
-
         if (refreshTokenEntity.ExpiresAt <= DateTime.UtcNow)
         {
             throw new UnauthorizedException("Refresh token has expired");
         }
 
-        await _refreshTokenRepository.RevokeAsync(refreshTokenEntity);
+        await _refreshTokenRepository.DeleteAsync(refreshTokenEntity);
 
         return refreshTokenEntity;
     }

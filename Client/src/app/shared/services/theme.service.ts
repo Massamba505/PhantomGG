@@ -14,10 +14,8 @@ export class ThemeService {
   public currentTheme = computed(() => this.themeMode());
   
   constructor() {
-    // Apply theme on initialization
     this.applyTheme();
     
-    // Create an effect to handle theme changes
     effect(() => {
       const theme = this.themeMode();
       this.saveTheme(theme);
@@ -41,11 +39,6 @@ export class ThemeService {
   
   private applyTheme(): void {
     const isDarkMode = this.isDarkMode();
-    
-    // Apply transition class before changing theme
-    this.addTransitionClass();
-    
-    // Add/remove the dark class on the document
     if (isDarkMode) {
       document.documentElement.classList.add(this.DARK_CLASS);
       document.documentElement.classList.add(this.PRIMENG_DARK_CLASS);
@@ -53,20 +46,6 @@ export class ThemeService {
       document.documentElement.classList.remove(this.DARK_CLASS);
       document.documentElement.classList.remove(this.PRIMENG_DARK_CLASS);
     }
-  }
-  
-  /**
-   * Adds a transition class that's automatically removed after transition completes
-   * to prevent transitions on page load
-   */
-  private addTransitionClass(): void {
-    // Add class to enable transitions
-    document.documentElement.classList.add('theme-transition');
-    
-    // Remove the transition class after the transition is complete
-    setTimeout(() => {
-      document.documentElement.classList.remove('theme-transition');
-    }, 400); // Slightly longer than the CSS transition time
   }
   
   public setTheme(theme: ThemeMode): void {

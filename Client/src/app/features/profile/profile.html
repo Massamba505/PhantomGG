@@ -1,0 +1,247 @@
+<app-dashboard-layout>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-1">
+      <div class="card p-6">
+        <div class="flex flex-col items-center">
+          <div class="relative group mb-4">
+            <div
+              class="w-32 h-32 rounded-full overflow-hidden flex items-center justify-center border-4 border-background shadow-lg"
+            >
+              @if (profilePictureUrl()) {
+              <img
+                [src]="profilePictureUrl()"
+                [alt]="user()?.firstName + ' ' + user()?.lastName"
+                class="w-full h-full object-cover"
+              />
+              } @else {
+              <lucide-angular [img]="icons.User" size="48"></lucide-angular>
+              }
+            </div>
+
+            <label
+              for="profilePictureInput"
+              class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-full"
+            >
+              <lucide-angular [img]="icons.Edit" size="24"></lucide-angular>
+            </label>
+            <input
+              id="profilePictureInput"
+              type="file"
+              accept="image/*"
+              (change)="onProfilePictureSelected($event)"
+              class="hidden"
+            />
+          </div>
+
+          <h2 class="text-xl font-bold mb-1">
+            {{ user()?.firstName }} {{ user()?.lastName }}
+          </h2>
+          <p class="mb-4">{{ user()?.role }}</p>
+
+          <div class="w-full border-t border-border my-4"></div>
+
+          <div class="w-full">
+            <div class="flex justify-between items-center py-2">
+              <span class="">Email</span>
+              <span class="font-medium">{{ user()?.email }}</span>
+            </div>
+            <div class="flex justify-between items-center py-2">
+              <span class="">Member Since</span>
+              <span class="font-medium">August 15, 2025</span>
+            </div>
+            <div class="flex justify-between items-center py-2">
+              <span class="">Status</span>
+              <span class="badge badge-success">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-6 mt-6">
+        <h3 class="font-semibold mb-4">Account Actions</h3>
+        <div class="space-y-3">
+          <button
+            class="btn btn-outline w-full justify-start"
+            (click)="isEditProfileModalOpen.set(true)"
+          >
+            <lucide-angular
+              [img]="icons.Edit"
+              size="18"
+              class="mr-2"
+            ></lucide-angular>
+            Edit Profile
+          </button>
+          <button
+            class="btn btn-outline w-full justify-start"
+            (click)="isChangePasswordModalOpen.set(true)"
+          >
+            <lucide-angular
+              [img]="icons.Lock"
+              size="18"
+              class="mr-2"
+            ></lucide-angular>
+            Change Password
+          </button>
+          <button
+            class="btn btn-destructive w-full justify-start"
+            (click)="confirmLogout()"
+          >
+            <lucide-angular
+              [img]="icons.LogOut"
+              size="18"
+              class="mr-2"
+            ></lucide-angular>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-2">
+      <div class="card p-6">
+        <h3 class="font-semibold mb-4">Profile Overview</h3>
+        <div class="space-y-4">
+          <div class="text-center py-8">
+            <lucide-angular
+              [img]="icons.User"
+              size="48"
+              class="mx-auto mb-4"
+            ></lucide-angular>
+            <p class="">Welcome to your profile dashboard</p>
+            <p class="text-sm mt-2">
+              Use the profile actions on the left to manage your account
+              settings
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-modal
+    [isOpen]="isEditProfileModalOpen()"
+    (close)="isEditProfileModalOpen.set(false)"
+    title="Edit Profile"
+  >
+    <form
+      [formGroup]="profileForm"
+      (ngSubmit)="updateProfile()"
+      class="space-y-4"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label block text-sm font-medium mb-2"
+            >First Name</label
+          >
+          <input type="text" formControlName="firstName" class="input-field" />
+        </div>
+        <div>
+          <label class="form-label block text-sm font-medium mb-2"
+            >Last Name</label
+          >
+          <input type="text" formControlName="lastName" class="input-field" />
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label block text-sm font-medium mb-2"
+          >Email Address</label
+        >
+        <input type="email" formControlName="email" class="input-field" />
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="isEditProfileModalOpen.set(false)"
+          [disabled]="isUpdatingProfile()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="profileForm.invalid || isUpdatingProfile()"
+        >
+          @if (isUpdatingProfile()) {
+          <lucide-angular
+            [img]="icons.Loader2"
+            size="16"
+            class="animate-spin mr-2"
+          ></lucide-angular>
+          Updating... } @else { Save Changes }
+        </button>
+      </div>
+    </form>
+  </app-modal>
+
+  <app-modal
+    [isOpen]="isChangePasswordModalOpen()"
+    (close)="isChangePasswordModalOpen.set(false)"
+    title="Change Password"
+  >
+    <form
+      [formGroup]="passwordForm"
+      (ngSubmit)="updatePassword()"
+      class="space-y-4"
+    >
+      <div>
+        <label class="form-label block text-sm font-medium mb-2"
+          >Current Password</label
+        >
+        <input
+          type="password"
+          formControlName="currentPassword"
+          class="input-field"
+        />
+      </div>
+
+      <div>
+        <label class="form-label block text-sm font-medium mb-2"
+          >New Password</label
+        >
+        <input
+          type="password"
+          formControlName="newPassword"
+          class="input-field"
+        />
+      </div>
+
+      <div>
+        <label class="form-label block text-sm font-medium mb-2"
+          >Confirm New Password</label
+        >
+        <input
+          type="password"
+          formControlName="confirmPassword"
+          class="input-field"
+        />
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button
+          type="button"
+          class="btn btn-outline"
+          (click)="isChangePasswordModalOpen.set(false)"
+          [disabled]="isChangingPassword()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="passwordForm.invalid || isChangingPassword()"
+        >
+          @if (isChangingPassword()) {
+          <lucide-angular
+            [img]="icons.Loader2"
+            size="16"
+            class="animate-spin mr-2"
+          ></lucide-angular>
+          Updating... } @else { Update Password }
+        </button>
+      </div>
+    </form>
+  </app-modal>
+</app-dashboard-layout>

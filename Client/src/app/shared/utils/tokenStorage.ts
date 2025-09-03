@@ -1,6 +1,5 @@
 export class TokenStorage {
   private static readonly ACCESS_TOKEN_KEY = 'access_token';
-  private static readonly TOKEN_EXPIRY_KEY = 'token_expiry';
 
   static setAccessToken(token: string): void {
     localStorage.setItem(this.ACCESS_TOKEN_KEY, token);
@@ -10,30 +9,33 @@ export class TokenStorage {
     return localStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
 
-  static setTokenExpiry(expiry: Date | string): void {
-    const expiryStr =
-      typeof expiry === 'string' ? expiry : expiry.toISOString();
-    localStorage.setItem(this.TOKEN_EXPIRY_KEY, expiryStr);
+  static clear(): void {
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
   }
 
+  private static decodePayload(token: string){
+    try {
+      const payload = token.split('.')[1];
+      return JSON.parse(atob(payload));
+    } catch {
+      return null;
+    }
+  }
+  
   static getTokenExpiry(): Date | null {
-    const expiry = localStorage.getItem(this.TOKEN_EXPIRY_KEY);
+    const token = this.getAccessToken();
+    if (!token) return null;
 
-    if (!expiry) return null;
-
-    const date = new Date(expiry);
-    return isNaN(date.getTime()) ? null : date;
+    const payload = this.decodePayload(token);
+    if (!payload?.exp) return null;
+    
+    return new Date(payload.exp * 1000);
   }
 
   static isTokenExpired(): boolean {
     const expiry = this.getTokenExpiry();
     if (!expiry) return true;
 
-    return expiry.getTime() <= new Date().getTime();
-  }
-
-  static clear(): void {
-    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
-    localStorage.removeItem(this.TOKEN_EXPIRY_KEY);
+    return expiry.getTime() <= Date.now();
   }
 }

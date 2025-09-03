@@ -1,0 +1,109 @@
+<app-dashboard-layout>
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-border pb-6 gap-4"
+  >
+    <div
+      class="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full"
+    >
+      <div class="relative flex-1 max-w-2xl">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+          <lucide-angular [img]="icons.Search" size="20"></lucide-angular>
+        </div>
+        <input
+          type="text"
+          placeholder="Search teams..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+          class="input-field pl-10 w-full"
+        />
+      </div>
+    </div>
+
+    <div class="flex justify-end">
+      <button
+        (click)="createNewTeam()"
+        class="btn btn-primary flex items-center justify-center gap-2"
+      >
+        <lucide-angular [img]="icons.CirclePlus" [size]="20"></lucide-angular>
+        <span>Create Team</span>
+      </button>
+    </div>
+  </div>
+
+  <section class="p-6">
+    @if (loading()) {
+    <div class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2"></div>
+    </div>
+    } @else {
+    <div class="mb-4 flex justify-between items-center">
+      <p>
+        Showing
+        <span>{{ teams().length }}</span>
+        teams
+      </p>
+      <div class="flex gap-2">
+        <button
+          (click)="switchLayout(false)"
+          title="Stretch Horizontal"
+          class="cursor-pointer"
+        >
+          <lucide-angular
+            [img]="icons.StretchHorizontal"
+            size="20"
+          ></lucide-angular>
+        </button>
+        <button
+          (click)="switchLayout(true)"
+          title="Layout Grid"
+          class="cursor-pointer"
+        >
+          <lucide-angular [img]="icons.LayoutGrid" size="20"></lucide-angular>
+        </button>
+      </div>
+    </div>
+
+    @if (teams().length > 0) {
+    <div
+      [class]="
+        gridLayout()
+          ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+          : 'flex flex-col gap-3'
+      "
+    >
+      @for (team of teams(); track team.id) {
+      <div>
+        <app-team-card
+          [team]="team"
+          [showActions]="true"
+          (edit)="handleEditTeam($event)"
+          (delete)="handleDeleteTeam(team.id)"
+          (view)="handleViewTeam($event)"
+        ></app-team-card>
+      </div>
+      }
+    </div>
+    } @if (teams().length === 0) {
+    <div
+      class="border-2 max-w-md border-dashed rounded-lg flex flex-col items-center justify-center p-8 text-center h-full cursor-pointer"
+      (click)="createNewTeam()"
+    >
+      <lucide-angular [img]="icons.Users" size="50"></lucide-angular>
+
+      <h3 class="text-lg font-medium mb-1 mt-5">No Teams Found</h3>
+      <p class="text-sm mb-4 max-w-xs">
+        Try adjusting your search criteria or create a new team
+      </p>
+      <button class="btn btn-primary">Create Team</button>
+    </div>
+    } }
+  </section>
+
+  <app-confirm-delete-modal
+    [isOpen]="isDeleteModalOpen()"
+    [title]="'Delete Team'"
+    [entityName]="'team'"
+    (close)="isDeleteModalOpen.set(false)"
+    (confirm)="confirmDelete()"
+  ></app-confirm-delete-modal>
+</app-dashboard-layout>

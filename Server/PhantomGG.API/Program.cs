@@ -45,6 +45,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseStaticFiles(); // Add this line to serve static files
         app.UseCors("CorsPolicy");
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseAuthentication();
@@ -156,14 +157,19 @@ public class Program
     {
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<ITournamentRepository, TournamentRepository>();
+        services.AddScoped<ITeamRepository, TeamRepository>();
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ITournamentService, TournamentService>();
+        services.AddScoped<ITeamService, TeamService>();
 
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
         services.AddScoped<ICookieService, CookieService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IRefreshTokeService, RefreshTokenService>();
+        services.AddScoped<IImageService, LocalFileImageService>();
     }
 }

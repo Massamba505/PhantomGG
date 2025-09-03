@@ -1,0 +1,155 @@
+<div class="flex h-screen">
+  <div class="container mx-auto py-8 px-4 md:px-6">
+    <header
+      class="mb-6 flex flex-row items-center justify-between flex-wrap gap-2"
+    >
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <a
+            routerLink="/tournaments"
+            class="transition-colors flex items-center"
+          >
+            <lucide-angular [img]="icons.ChevronsLeft"></lucide-angular>
+            <span>Back to tournaments</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        @if (tournament()?.status === 'draft') {
+        <button class="btn btn-outline">
+          <lucide-angular [img]="icons.SquarePen"></lucide-angular>
+          Edit Tournament
+        </button>
+        }
+        <button (click)="openAddTeamModal()" class="btn btn-primary">
+          <lucide-angular [img]="icons.CirclePlus"></lucide-angular>
+          Add Team
+        </button>
+      </div>
+    </header>
+
+    <div class="card p-6 mb-6">
+      <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-3">
+            <h2 class="text-2xl font-bold">{{ tournament()?.name }}</h2>
+            <span
+              class="badge"
+              [ngClass]="{
+                'badge-draft': tournament()?.status === 'draft',
+                'badge-active': tournament()?.status === 'active',
+                'badge-completed': tournament()?.status === 'completed'
+              }"
+            >
+              {{ tournament()?.status | titlecase }}
+            </span>
+          </div>
+          <p class="mb-6 max-w-3xl">
+            {{ tournament()?.description }}
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="p-4 rounded-lg">
+              <div class="flex items-center gap-3 mb-1">
+                <lucide-angular
+                  [img]="icons.Calendar"
+                  size="16"
+                ></lucide-angular>
+                <h3 class="text-sm font-medium">Start Date</h3>
+              </div>
+              <p class="font-medium">
+                {{ tournament()?.startDate | date : "MMMM d, y, hh:mm a" }}
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg">
+              <div class="flex items-center gap-3 mb-1">
+                <lucide-angular
+                  [img]="icons.Calendar"
+                  size="16"
+                ></lucide-angular>
+                <h3 class="text-sm font-medium">End Date</h3>
+              </div>
+              <p class="font-medium">
+                {{ tournament()?.endDate | date : "MMMM d, y, hh:mm a" }}
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg">
+              <div class="flex items-center gap-3 mb-1">
+                <lucide-angular [img]="icons.Users2" size="16"></lucide-angular>
+                <h3 class="text-sm font-medium">Teams</h3>
+              </div>
+              <p class="font-medium">{{ teamsCount() }}/{{ maxTeams() }}</p>
+              <div class="w-full h-1.5 mt-2 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full"
+                  [style.width.%]="teamRegistrationProgress()"
+                ></div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-lg">
+              <div class="flex items-center gap-3 mb-1">
+                <lucide-angular [img]="icons.Timer" size="16"></lucide-angular>
+                <h3 class="text-sm font-medium">Duration</h3>
+              </div>
+              <p class="font-medium">{{ tournamentDuration() }} days</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <app-tournament-tabs
+      [activeTab]="activeTab()"
+      [tabs]="tabs"
+      (tabChange)="setActiveTab($event)"
+    >
+    </app-tournament-tabs>
+
+    <!-- Tab Content -->
+    @switch (activeTab()) { @case ('teams') {
+    <app-teams-section
+      [tournament]="tournament()"
+      [teams]="teams()"
+      [loading]="teamsLoading()"
+      (addTeam)="openAddTeamModal()"
+      (editTeam)="handleEditTeam($event)"
+      (deleteTeam)="openDeleteConfirmation($event)"
+    >
+    </app-teams-section>
+    } @case ('schedule') {
+    <app-schedule-section [loading]="scheduleLoading()"> </app-schedule-section>
+    } @case ('bracket') {
+    <app-bracket-section [loading]="bracketLoading()"> </app-bracket-section>
+    } @case ('results') {
+    <app-results-section [loading]="resultsLoading()"> </app-results-section>
+    } }
+  </div>
+
+  <!-- Team Management Modals -->
+  <app-team-modal
+    [isOpen]="isAddTeamModalOpen()"
+    [tournamentId]="tournament()?.id || ''"
+    (save)="handleAddTeam($event)"
+    (close)="closeAddTeamModal()"
+  ></app-team-modal>
+
+  <app-team-modal
+    [isOpen]="isEditTeamModalOpen()"
+    [team]="editingTeam()"
+    [tournamentId]="tournament()?.id || ''"
+    (save)="handleUpdateTeam($event)"
+    (close)="closeEditTeamModal()"
+  ></app-team-modal>
+
+  <app-confirm-delete-modal
+    [isOpen]="isDeleteTeamConfirmOpen()"
+    [title]="'Delete Team'"
+    [entityName]="'team'"
+    (close)="closeDeleteConfirmation()"
+    (confirm)="confirmDeleteTeam()"
+  ></app-confirm-delete-modal>
+</div>

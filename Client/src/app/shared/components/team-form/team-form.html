@@ -1,0 +1,89 @@
+<form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="space-y-4">
+  <div>
+    <label class="block text-sm font-medium mb-2">Team Logo *</label>
+
+    <div
+      class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition"
+      (click)="fileInput.click()"
+      (drop)="onLogoChange($event)"
+      (dragover)="allowDrop($event)"
+    >
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        hidden
+        (change)="onLogoChange($event)"
+      />
+
+      @if (!logoPreview()) {
+      <p class="text-sm">Drag & drop or click to upload</p>
+      } @if (logoPreview()) {
+      <img
+        [src]="logoPreview()"
+        alt="Logo Preview"
+        class="mx-auto max-h-32 object-contain rounded-lg shadow"
+      />
+      }
+    </div>
+
+    @if (submitted() && teamForm.controls['logo'].invalid) {
+    <div class="error-message text-sm mt-1">Logo is required</div>
+    }
+  </div>
+  <div>
+    <label class="block text-sm font-medium mb-2">Team Name *</label>
+    <input
+      type="text"
+      formControlName="name"
+      class="input-field w-full"
+      [ngClass]="{ error: submitted() && teamForm.controls['name'].invalid }"
+    />
+    @if (submitted() && teamForm.controls['name'].invalid) {
+    <div class="error-message text-sm mt-1">
+      Team name is required (min 2 chars)
+    </div>
+    }
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-2">Manager *</label>
+    <input
+      type="text"
+      formControlName="manager"
+      class="input-field w-full"
+      [ngClass]="{ error: submitted() && teamForm.controls['manager'].invalid }"
+    />
+    @if (submitted() && teamForm.controls['manager'].invalid) {
+    <div class="error-message text-sm mt-1">Manager is required</div>
+    }
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-2">Number of Players *</label>
+    <input
+      type="number"
+      formControlName="numberOfPlayers"
+      class="input-field w-full"
+      [ngClass]="{
+        error: submitted() && teamForm.controls['numberOfPlayers'].invalid
+      }"
+    />
+    @if (submitted() && teamForm.controls['numberOfPlayers'].invalid) {
+    <div class="error-message text-sm mt-1">Must be between 1 and 30</div>
+    }
+  </div>
+
+  <div class="flex space-x-3 pt-4">
+    <button type="button" (click)="onCancel()" class="btn btn-secondary flex-1">
+      Cancel
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary flex-1"
+      [disabled]="submitted() && teamForm.invalid"
+    >
+      {{ team() ? "Update Team" : "Add Team" }}
+    </button>
+  </div>
+</form>

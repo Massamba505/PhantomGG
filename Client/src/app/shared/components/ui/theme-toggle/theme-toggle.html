@@ -1,12 +1,12 @@
 <button
-  class="btn-ghost p-3 rounded-full hover:bg-muted transition-all duration-300"
+  class="p-2 rounded-full cursor-pointer hover:bg-[hsl(var(--muted))] transition-colors"
   (click)="toggleTheme()"
   [attr.aria-label]="buttonLabel()"
   [title]="buttonLabel()"
 >
   @if (currentIcon() === 'light') {
-  <span class="text-xl">🌞</span>
-  } @if (currentIcon() === 'dark') {
-  <span class="text-xl">🌜</span>
+  <lucide-angular [img]="icons.Sun" size="20"></lucide-angular>
+  } @else {
+  <lucide-angular [img]="icons.Moon" size="20"></lucide-angular>
   }
 </button>
