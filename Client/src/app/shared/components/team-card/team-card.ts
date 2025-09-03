@@ -18,6 +18,20 @@ export class TeamCard {
   delete = output<string>();
   readonly icons = LucideIcons;
   
+  onEdit(event: Event) {
+    event.stopPropagation();
+    this.edit.emit(this.team());
+  }
+
+  onDelete(event: Event) {
+    event.stopPropagation();
+    this.delete.emit(this.team().id);
+  }
+
+  onImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+  }
   
   getFormattedDate(dateString: string): string {
     if (!dateString) return '';

@@ -1,8 +1,9 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Edit, Trash2, Users, Calendar, LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
 import { Tournament } from '../../models/tournament';
 import { LucideIcons } from '../ui/icons/lucide-icons';
+import { getFormattedDate } from '../../utils/DateFormat';
 
 @Component({
   selector: 'app-tournament-card',
@@ -18,12 +19,6 @@ export class TournamentCard {
 
   readonly icons = LucideIcons;
 
-  statusColors = {
-    draft: 'bg-muted',
-    active: 'bg-primary',
-    completed: 'bg-success',
-  };
-
   onEdit(event: Event) {
     event.stopPropagation();
     this.edit.emit(this.tournament());
@@ -36,5 +31,14 @@ export class TournamentCard {
 
   onView() {
     this.view.emit(this.tournament());
+  }
+
+  onImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+  }
+
+  getFormattedDate(dateString: string, short: boolean = false): string {
+    return getFormattedDate(dateString, short)
   }
 }

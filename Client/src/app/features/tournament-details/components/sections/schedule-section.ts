@@ -10,14 +10,14 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
       @if (loading()) {
         <!-- Loading State -->
         <div class="p-8 text-center">
-          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full  mb-4">
             <lucide-angular 
               [img]="icons.Loader2" 
               size="20" 
-              class="animate-spin text-muted-foreground"
+              class="animate-spin "
             ></lucide-angular>
           </div>
-          <p class="text-muted-foreground">Loading schedule...</p>
+          <p class="">Loading schedule...</p>
         </div>
       } @else if (hasSchedule()) {
         <!-- Schedule Content -->
@@ -26,7 +26,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
             <h3 class="text-lg font-semibold">Tournament Schedule</h3>
             <button 
               (click)="onRegenerateSchedule()"
-              class="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md hover:bg-muted transition-colors"
+              class="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md  transition-colors"
             >
               <lucide-angular [img]="icons.SquarePen" size="14"></lucide-angular>
               Regenerate
@@ -34,22 +34,22 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
           </div>
           
           <!-- Schedule content will go here -->
-          <div class="text-center py-12 text-muted-foreground">
+          <div class="text-center py-12 ">
             <p>Schedule display component will be implemented here</p>
           </div>
         </div>
       } @else {
         <!-- Empty State -->
         <div class="p-8 text-center">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full  flex items-center justify-center">
             <lucide-angular 
               [img]="icons.Calendar" 
               size="24"
-              class="text-muted-foreground"
+              class=""
             ></lucide-angular>
           </div>
           <h3 class="text-lg font-semibold mb-2">Schedule Not Generated</h3>
-          <p class="text-muted-foreground mb-6 max-w-sm mx-auto">
+          <p class=" mb-6 max-w-sm mx-auto">
             Generate a schedule to start planning matches for your tournament
           </p>
           <button 
@@ -61,7 +61,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
             Generate Schedule
           </button>
           @if (teamsCount() < 2) {
-            <p class="text-sm text-muted-foreground mt-3">
+            <p class="text-sm  mt-3">
               At least 2 teams are required to generate a schedule
             </p>
           }

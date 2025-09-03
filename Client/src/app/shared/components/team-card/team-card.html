@@ -1,56 +1,86 @@
 <div
-  class="card team-card group relative border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+  class="card-team group cursor-pointer overflow-hidden min-w-96 max-w-2xl w-full flex rounded-md border border-border bg-card hover:shadow-md transition-shadow"
 >
-  <div class="flex justify-between items-start mb-4">
-    <div class="team-info">
-      <h3 class="team-name text-lg font-semibold">{{ team().name }}</h3>
-      <div class="team-meta text-sm mt-1 flex flex-col gap-1">
-        <span class="flex items-center gap-1">
-          <lucide-angular [img]="icons.MapPin" size="16"></lucide-angular>
-          {{ team().tournamentName }}
-        </span>
-        <span class="flex items-center gap-1">
-          <lucide-angular [img]="icons.User" size="16"></lucide-angular>
-          Manager: {{ team().manager }}
-        </span>
-      </div>
+  <div
+    class="relative w-24 aspect-square flex-shrink-0 overflow-hidden rounded-s-md"
+  >
+    @if (team().logoUrl) {
+    <img
+      [src]="team().logoUrl"
+      [alt]="team().name + ' logo'"
+      class="w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
+      (error)="onImageError($event)"
+    />
+    } @else {
+    <div class="w-full h-full flex items-center justify-center">
+      <lucide-angular [img]="icons.Users" size="20" class="opacity-40" />
     </div>
+    }
 
-    <div
-      class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity"
-    >
-      <button
-        (click)="edit.emit(team())"
-        class="btn btn-sm btn-ghost"
-        aria-label="Edit team"
+    <div class="absolute bottom-1 left-1">
+      <span
+        class="badge px-1.5 py-0.5 text-xs font-medium border border-border"
       >
-        <lucide-angular [img]="icons.SquarePen" size="16"></lucide-angular>
-      </button>
-      <button
-        (click)="delete.emit(team().id)"
-        class="btn btn-sm btn-destructive"
-        aria-label="Delete team"
-      >
-        <lucide-angular [img]="icons.Trash2" size="16"></lucide-angular>
-      </button>
+        {{ team().numberOfPlayers }}
+      </span>
     </div>
   </div>
 
-  <div class="grid grid-cols-2 gap-4 text-center border-t pt-4">
-    <div class="team-stat">
-      <div class="stat-label text-xs uppercase tracking-wide">Players</div>
-      <div class="stat-value text-base font-medium">
-        {{ team().numberOfPlayers }}
+  <div class="flex-1 p-4 flex flex-col justify-between min-h-24">
+    <div class="flex items-start justify-between mb-2">
+      <div class="flex-1 min-w-0">
+        <h3
+          class="text-lg font-semibold truncate group-hover:text-primary transition-colors"
+        >
+          {{ team().name }}
+        </h3>
+        <p class="text-sm truncate">
+          {{ team().tournamentName }}
+        </p>
       </div>
+
+      @if (showActions()) {
+      <div
+        class="flex space-x-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+      >
+        <button
+          (click)="onEdit($event)"
+          class="btn-ghost btn-sm p-1.5"
+          aria-label="Edit team"
+        >
+          <lucide-angular [img]="icons.SquarePen" size="12" />
+        </button>
+        <button
+          (click)="onDelete($event)"
+          class="btn-destructive btn-sm p-1.5 rounded"
+          aria-label="Delete team"
+        >
+          <lucide-angular [img]="icons.Trash2" size="12" />
+        </button>
+      </div>
+      }
     </div>
 
-    @if (team().createdAt) {
-    <div class="team-stat">
-      <div class="stat-label text-xs uppercase tracking-wide">Joined</div>
-      <div class="stat-value text-base font-medium">
-        {{ getFormattedDate(team().createdAt) }}
+    <div class="flex items-center justify-between gap-5 text-sm">
+      <div class="flex items-center gap-4 overflow-hidden">
+        <div class="flex items-center gap-1 truncate max-w-[8rem]">
+          <lucide-angular [img]="icons.UserCircle2" size="14" />
+          <span class="truncate">{{ team().manager }}</span>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <lucide-angular [img]="icons.Users" size="14" />
+          <span>
+            {{ team().numberOfPlayers }}
+            {{ team().numberOfPlayers === 1 ? "Player" : "Players" }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1 text-xs opacity-70 whitespace-nowrap">
+        <lucide-angular [img]="icons.Calendar" size="12" />
+        <span>{{ getFormattedDate(team().createdAt) }}</span>
       </div>
     </div>
-    }
   </div>
 </div>

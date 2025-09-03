@@ -10,14 +10,14 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
       @if (loading()) {
         <!-- Loading State -->
         <div class="p-8 text-center">
-          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full  mb-4">
             <lucide-angular 
               [img]="icons.Loader2" 
               size="20" 
-              class="animate-spin text-muted-foreground"
+              class="animate-spin "
             ></lucide-angular>
           </div>
-          <p class="text-muted-foreground">Loading bracket...</p>
+          <p>Loading bracket...</p>
         </div>
       } @else if (hasBracket()) {
         <!-- Bracket Content -->
@@ -27,14 +27,14 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
             <div class="flex gap-2">
               <button 
                 (click)="onEditBracket()"
-                class="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md hover:bg-muted transition-colors"
+                class="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md transition-colors"
               >
                 <lucide-angular [img]="icons.Edit" size="14"></lucide-angular>
                 Edit
               </button>
               <button 
                 (click)="onRegenerateBracket()"
-                class="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md hover:bg-muted transition-colors"
+                class="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md transition-colors"
               >
                 <lucide-angular [img]="icons.SquarePen" size="14"></lucide-angular>
                 Regenerate
@@ -43,22 +43,22 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
           </div>
           
           <!-- Bracket visualization will go here -->
-          <div class="text-center py-12 text-muted-foreground">
+          <div class="text-center py-12 ">
             <p>Bracket visualization component will be implemented here</p>
           </div>
         </div>
       } @else {
         <!-- Empty State -->
         <div class="p-8 text-center">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full  flex items-center justify-center">
             <lucide-angular 
               [img]="icons.GitBranch" 
               size="24"
-              class="text-muted-foreground"
+              class=""
             ></lucide-angular>
           </div>
           <h3 class="text-lg font-semibold mb-2">Tournament Bracket Not Created</h3>
-          <p class="text-muted-foreground mb-6 max-w-sm mx-auto">
+          <p class=" mb-6 max-w-sm mx-auto">
             Create a bracket to visualize the tournament progression and matchups
           </p>
           <button 
@@ -70,7 +70,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
             Create Bracket
           </button>
           @if (teamsCount() < 2) {
-            <p class="text-sm text-muted-foreground mt-3">
+            <p class="text-sm  mt-3">
               At least 2 teams are required to create a bracket
             </p>
           }

@@ -10,14 +10,14 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
       @if (loading()) {
         <!-- Loading State -->
         <div class="p-8 text-center">
-          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full  mb-4">
             <lucide-angular 
               [img]="icons.Loader2" 
               size="20" 
-              class="animate-spin text-muted-foreground"
+              class="animate-spin"
             ></lucide-angular>
           </div>
-          <p class="text-muted-foreground">Loading results...</p>
+          <p>Loading results...</p>
         </div>
       } @else if (hasResults()) {
         <!-- Results Content -->
@@ -27,7 +27,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
             <div class="flex gap-2">
               <button 
                 (click)="onExportResults()"
-                class="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md hover:bg-muted transition-colors"
+                class="inline-flex items-center gap-2 px-3 py-2 text-sm border border-border rounded-md transition-colors"
               >
                 <lucide-angular [img]="icons.ArrowRight" size="14"></lucide-angular>
                 Export
@@ -55,7 +55,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
             </div>
             
             <!-- Standings/Results List -->
-            <div class="text-center py-8 text-muted-foreground">
+            <div class="text-center py-8">
               <p>Match results and standings will be displayed here</p>
             </div>
           </div>
@@ -63,20 +63,20 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
       } @else {
         <!-- Empty State -->
         <div class="p-8 text-center">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full  flex items-center justify-center">
             <lucide-angular 
               [img]="icons.Target" 
               size="24"
-              class="text-muted-foreground"
+              class=""
             ></lucide-angular>
           </div>
           <h3 class="text-lg font-semibold mb-2">No Results Available</h3>
-          <p class="text-muted-foreground mb-6 max-w-sm mx-auto">
+          <p class="mb-6 max-w-sm mx-auto">
             Match results will appear here once games begin and matches are completed
           </p>
           
           @if (tournamentStatus() === 'draft') {
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-md">
+            <div class="inline-flex items-center gap-2 px-4 py-2   rounded-md">
               <lucide-angular [img]="icons.Timer" size="16"></lucide-angular>
               Tournament not started
             </div>
@@ -89,7 +89,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
               View Live Matches
             </button>
           } @else {
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-md cursor-not-allowed opacity-60">
+            <div class="inline-flex items-center gap-2 px-4 py-2   rounded-md cursor-not-allowed opacity-60">
               <lucide-angular [img]="icons.Target" size="16"></lucide-angular>
               View Results
             </div>

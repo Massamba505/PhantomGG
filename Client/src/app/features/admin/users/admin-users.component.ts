@@ -81,7 +81,7 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let user of filteredUsers" class="border-b border-border hover:bg-muted/30 transition-colors">
+                <tr *ngFor="let user of filteredUsers" class="border-b border-border transition-colors">
                   <td class="py-3 px-4">
                     <div class="flex items-center gap-3">
                       <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
@@ -130,7 +130,7 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
           </div>
           
           <div *ngIf="filteredUsers.length === 0" class="py-12 text-center">
-            <div class="w-16 h-16 mx-auto mb-4 bg-muted/30 rounded-full flex items-center justify-center">
+            <div class="w-16 h-16 mx-auto mb-4  rounded-full flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="8.5" cy="7" r="4"/>

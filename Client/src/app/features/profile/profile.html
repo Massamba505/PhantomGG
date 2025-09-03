@@ -5,7 +5,7 @@
         <div class="flex flex-col items-center">
           <div class="relative group mb-4">
             <div
-              class="w-32 h-32 rounded-full overflow-hidden flex items-center justify-center bg-muted border-4 border-background shadow-lg"
+              class="w-32 h-32 rounded-full overflow-hidden flex items-center justify-center border-4 border-background shadow-lg"
             >
               @if (profilePictureUrl()) {
               <img
@@ -14,11 +14,7 @@
                 class="w-full h-full object-cover"
               />
               } @else {
-              <lucide-angular
-                [img]="icons.User"
-                size="48"
-                class="text-muted-foreground"
-              ></lucide-angular>
+              <lucide-angular [img]="icons.User" size="48"></lucide-angular>
               }
             </div>
 
@@ -109,12 +105,10 @@
             <lucide-angular
               [img]="icons.User"
               size="48"
-              class="mx-auto mb-4 text-muted-foreground"
+              class="mx-auto mb-4"
             ></lucide-angular>
-            <p class="text-muted-foreground">
-              Welcome to your profile dashboard
-            </p>
-            <p class="text-sm text-muted-foreground mt-2">
+            <p class="">Welcome to your profile dashboard</p>
+            <p class="text-sm mt-2">
               Use the profile actions on the left to manage your account
               settings
             </p>
