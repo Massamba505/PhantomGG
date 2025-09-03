@@ -40,8 +40,15 @@ export class ProfileDropdown {
 
   logout() {
     this.closeDropdown();
-    this.authService.logout();
-    this.router.navigate(['/']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+        this.router.navigate(['/']);
+      }
+    });
   }
 
   @HostListener('document:mousedown', ['$event'])
