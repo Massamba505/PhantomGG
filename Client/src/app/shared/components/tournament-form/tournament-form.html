@@ -66,7 +66,7 @@
         id="description"
         formControlName="description"
         placeholder="Describe your tournament"
-        class="input-field h-32 resize-none"
+        class="textarea"
         [ngClass]="{
           'border-destructive':
             isSubmitted() && tournamentForm.get('description')?.invalid

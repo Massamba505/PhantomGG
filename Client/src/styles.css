@@ -9,18 +9,14 @@
     /* Card colors */
     --card: 0 0% 100%;
     --card-foreground: 222 28% 20%;
-    --card-hover: 210 25% 97%;
 
     /* Primary colors */
     --primary: 222 60% 42%;
-    --primary-glow: 222 60% 52%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 222 60% 38%;
 
     /* Secondary colors */
     --secondary: 210 20% 93%;
     --secondary-foreground: 222 15% 35%;
-    --secondary-hover: 210 20% 88%;
 
     /* Muted colors */
     --muted: 210 20% 95%;
@@ -29,43 +25,20 @@
     /* Status colors */
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
-    --destructive-hover: 0 70% 45%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 10%;
-    --warning-hover: 38 92% 45%;
 
     --success: 142 70% 35%;
     --success-foreground: 0 0% 100%;
-    --success-hover: 142 70% 30%;
-
-    --info: 200 85% 45%;
-    --info-foreground: 0 0% 100%;
-    --info-hover: 200 85% 40%;
 
     /* UI component colors */
     --border: 210 20% 85%;
     --input: 210 20% 96%;
     --ring: 222 60% 42%;
-    --focus-ring: 222 60% 42% / 0.35;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-glow))
-    );
-    --gradient-dark: linear-gradient(
-      180deg,
-      hsl(var(--background)),
-      hsl(210 20% 95%)
-    );
 
     /* Radius */
-    --radius: 0.4rem;
-    --radius-md: 0.6rem;
-    --radius-lg: 0.8rem;
-    --radius-full: 9999px;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -76,18 +49,14 @@
     /* Card colors */
     --card: 222 44% 13%;
     --card-foreground: 210 40% 95%;
-    --card-hover: 222 44% 15%;
 
     /* Primary colors */
     --primary: 215 40% 40%;
-    --primary-glow: 215 40% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 215 40% 35%;
 
     /* Secondary colors */
     --secondary: 220 15% 26%;
     --secondary-foreground: 210 40% 90%;
-    --secondary-hover: 220 15% 22%;
 
     /* Muted colors */
     --muted: 220 14% 20%;
@@ -96,37 +65,17 @@
     /* Status colors */
     --destructive: 0 84% 55%;
     --destructive-foreground: 210 40% 98%;
-    --destructive-hover: 0 84% 50%;
 
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 10%;
-    --warning-hover: 38 92% 45%;
 
     --success: 142 76% 36%;
     --success-foreground: 210 40% 98%;
-    --success-hover: 142 76% 31%;
-
-    --info: 200 80% 35%;
-    --info-foreground: 210 40% 98%;
-    --info-hover: 200 80% 30%;
 
     /* UI component colors */
     --border: 220 15% 22%;
     --input: 222 47% 11%;
     --ring: 200 100% 45%;
-    --focus-ring: 200 100% 45% / 0.35;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(
-      135deg,
-      hsl(var(--primary)),
-      hsl(var(--primary-glow))
-    );
-    --gradient-dark: linear-gradient(
-      180deg,
-      hsl(var(--background)),
-      hsl(220 40% 7%)
-    );
   }
 
   * {
@@ -142,17 +91,17 @@
 }
 
 @layer components {
-  /* Button Styles */
+  /* Buttons */
   .btn {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    font-weight: 600;
+    font-weight: 500;
     padding: 0.5rem 1rem;
     border-radius: var(--radius);
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease;
     text-decoration: none;
     cursor: pointer;
     border: 1px solid transparent;
@@ -160,81 +109,38 @@
     white-space: nowrap;
   }
 
-  .btn:focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
-  }
-
   .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
 
-  /* Primary Button */
   .btn-primary {
-    background: var(--gradient-primary);
+    background-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
   }
 
-  .btn-primary:hover {
-    background: linear-gradient(
-      to right,
-      hsl(var(--primary-hover)),
-      hsl(var(--primary))
-    );
-    transform: translateY(-1px);
+  .btn-primary:hover:not(:disabled) {
+    opacity: 0.9;
   }
 
-  .btn-primary:active {
-    transform: translateY(0);
-  }
-
-  /* Secondary Button */
   .btn-secondary {
     background-color: hsl(var(--secondary));
     color: hsl(var(--secondary-foreground));
     border: 1px solid hsl(var(--border));
   }
 
-  .btn-secondary:hover {
-    background-color: hsl(var(--secondary-hover));
-    transform: translateY(-1px);
+  .btn-secondary:hover:not(:disabled) {
+    opacity: 0.8;
   }
 
-  .btn-secondary:active {
-    transform: translateY(0);
-  }
-
-  /* Ghost Button */
-  .btn-ghost {
-    background-color: transparent;
-    color: hsl(var(--foreground));
-  }
-
-  .btn-ghost:hover {
-    background-color: hsl(var(--muted));
-  }
-
-  /* Outline Button */
   .btn-outline {
     background-color: transparent;
     border: 1px solid hsl(var(--border));
     color: hsl(var(--foreground));
   }
 
-  .btn-outline:hover {
+  .btn-outline:hover:not(:disabled) {
     background-color: hsl(var(--muted));
-    border-color: hsl(var(--muted-foreground));
-  }
-
-  /* Status Buttons */
-  .btn-success {
-    background-color: hsl(var(--success));
-    color: hsl(var(--success-foreground));
-  }
-
-  .btn-success:hover {
-    background-color: hsl(var(--success-hover));
   }
 
   .btn-destructive {
@@ -242,116 +148,11 @@
     color: hsl(var(--destructive-foreground));
   }
 
-  .btn-destructive:hover {
-    background-color: hsl(var(--destructive-hover));
+  .btn-destructive:hover:not(:disabled) {
+    opacity: 0.9;
   }
 
-  .btn-warning {
-    background-color: hsl(var(--warning));
-    color: hsl(var(--warning-foreground));
-  }
-
-  .btn-warning:hover {
-    background-color: hsl(var(--warning-hover));
-  }
-
-  .btn-info {
-    background-color: hsl(var(--info));
-    color: hsl(var(--info-foreground));
-  }
-
-  .btn-info:hover {
-    background-color: hsl(var(--info-hover));
-  }
-
-  .modal {
-    background-color: hsl(var(--background));
-  }
-
-  /* Card Styles */
-  .card {
-    background: var(--card);
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    padding: 1.25rem;
-    transition: all 0.2s ease;
-  }
-
-  .card-tournament,
-  .card-team {
-    background: var(--card);
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    padding: 1.25rem;
-  }
-
-  .card-tournament:hover,
-  .card-team:hover {
-    transform: translateY(-2px);
-    background-color: hsl(var(--card-hover));
-  }
-
-  .tournament-banner {
-    position: relative;
-    background-color: hsl(var(--muted));
-    height: 160px;
-    min-height: 160px;
-  }
-
-  /* Form Elements */
-  .form-group {
-    margin-bottom: 1rem;
-  }
-
-  .form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: hsl(var(--foreground));
-  }
-
-  .action-button {
-    background-color: hsl(var(--background) / 0.8);
-    backdrop-filter: blur(8px);
-    border: 1px solid hsl(var(--border));
-    border-radius: 0.375rem;
-    padding: 0.375rem;
-    color: hsl(var(--foreground) / 0.7);
-    transition: all 0.15s ease;
-  }
-
-  .action-button:hover {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-  }
-
-  .action-button-danger {
-    background-color: hsl(var(--destructive) / 0.8);
-    backdrop-filter: blur(8px);
-    border: 1px solid hsl(var(--destructive));
-    border-radius: 0.375rem;
-    padding: 0.375rem;
-    color: hsl(var(--destructive-foreground));
-    transition: all 0.15s ease;
-  }
-
-  .action-button-danger:hover {
-    background-color: hsl(var(--destructive));
-    color: hsl(var(--destructive-foreground));
-  }
-
-  .status-badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    background-color: hsl(var(--background) / 0.8);
-    backdrop-filter: blur(8px);
-    border: 1px solid hsl(var(--border));
-    color: hsl(var(--foreground) / 0.8);
-  }
-
+  /* Input Fields */
   .input-field {
     width: 100%;
     padding: 0.5rem 0.75rem;
@@ -360,7 +161,7 @@
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
     font-size: 0.875rem;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease;
   }
 
   .input-field::placeholder {
@@ -377,22 +178,207 @@
     cursor: not-allowed;
   }
 
+  .input-field.error {
+    border-color: hsl(var(--destructive));
+  }
+
+  /* Select */
   .form-select {
     width: 100%;
     padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
+    border-radius: var(--radius);
     border: 1px solid hsl(var(--border));
-    background-color: hsl(var(--background));
+    background-color: hsl(var(--input));
     color: hsl(var(--foreground));
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+  }
+
+  .form-select option {
+    border: 1px solid black;
   }
 
   .form-select:focus {
     outline: none;
+    border-color: hsl(var(--ring));
+  }
+
+  /* Textarea */
+  .textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background-color: hsl(var(--input));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s ease;
+  }
+
+  .textarea:focus {
+    outline: none;
+    border-color: hsl(var(--ring));
+  }
+
+  /* Checkbox */
+  .checkbox {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.25rem;
+    background-color: hsl(var(--input));
+    cursor: pointer;
+  }
+
+  .checkbox:checked {
+    background-color: hsl(var(--primary));
     border-color: hsl(var(--primary));
   }
 
-  .input-error {
-    border-color: hsl(var(--destructive));
+  /* Action Buttons */
+  .action-button {
+    background-color: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 0.375rem;
+    color: hsl(var(--secondary-foreground));
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+  }
+
+  .action-button:hover {
+    opacity: 0.8;
+  }
+
+  .action-button-danger {
+    background-color: hsl(var(--destructive));
+    border: 1px solid hsl(var(--destructive));
+    border-radius: var(--radius);
+    padding: 0.375rem;
+    color: hsl(var(--destructive-foreground));
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+  }
+
+  .action-button-danger:hover {
+    opacity: 0.9;
+  }
+
+  /* Basic Card */
+  .card {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+
+  /* Tournament Card */
+  .card-tournament {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1em;
+  }
+
+  .card-tournament:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transform: translateY(-1px);
+  }
+
+  /* Tournament Banner */
+  .tournament-banner {
+    background-color: hsl(var(--muted));
+    height: 160px;
+    min-height: 160px;
+    border-radius: var(--radius);
+  }
+
+  /* Team Card */
+  .card-team {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    gap: 0.1em;
+  }
+
+  .card-team:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transform: translateY(-1px);
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 9999px;
+  }
+
+  .badge-primary {
+    background-color: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+    border: 1px solid hsl(var(--primary) / 0.2);
+  }
+
+  .badge-secondary {
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border: 1px solid hsl(var(--border));
+  }
+
+  .badge-success {
+    background-color: hsl(var(--success) / 0.1);
+    color: hsl(var(--success));
+    border: 1px solid hsl(var(--success) / 0.2);
+  }
+
+  .badge-warning {
+    background-color: hsl(var(--warning) / 0.1);
+    color: hsl(var(--warning-foreground));
+    border: 1px solid hsl(var(--warning) / 0.2);
+  }
+
+  .badge-destructive {
+    background-color: hsl(var(--destructive) / 0.1);
+    color: hsl(var(--destructive));
+    border: 1px solid hsl(var(--destructive) / 0.2);
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    color: hsl(var(--secondary-foreground));
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: hsl(var(--foreground));
   }
 
   .error-message {
@@ -403,41 +389,12 @@
 
   .required {
     color: hsl(var(--destructive));
-    border-color: hsl(var(--destructive));
   }
 
-  /* Badge Styles */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.125rem 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  .badge-primary {
-    background-color: hsl(var(--primary) / 0.1);
-    color: hsl(var(--primary));
-  }
-
-  .badge-secondary {
-    background-color: hsl(var(--secondary));
-    color: hsl(var(--secondary-foreground));
-  }
-
-  .badge-success {
-    background-color: hsl(var(--success) / 0.1);
-    color: hsl(var(--success));
-  }
-
-  .badge-destructive {
-    background-color: hsl(var(--destructive) / 0.1);
-    color: hsl(var(--destructive));
-  }
-
-  .badge-outline {
-    background-color: transparent;
+  .modal {
+    background-color: hsl(var(--background));
     border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
   }
 }
 
@@ -469,25 +426,10 @@ body {
   background: hsl(var(--muted-foreground) / 0.5);
 }
 
-/* Dark mode scrollbar adjustments */
 .dark ::-webkit-scrollbar-track {
   background: hsl(var(--background));
 }
 
 .dark ::-webkit-scrollbar-thumb {
   background: hsl(var(--muted-foreground) / 0.4);
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.7;
-  }
 }

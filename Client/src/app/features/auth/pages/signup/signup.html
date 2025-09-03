@@ -1,19 +1,17 @@
-<div
-  class="max-w-md mx-auto w-full p-6 rounded-lg shadow-lg border border-border"
->
+<div class="card">
   <div class="text-center mb-6">
     <h1 class="text-2xl font-bold mb-2">Create an Account</h1>
   </div>
 
   <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="space-y-4">
-    <div class="grid grid-cols-2 gap-4">
-      <div class="form-group">
+    <div class="flex flex-wrap gap-4">
+      <div class="w-full md:w-fit">
         <label class="form-label">
           First Name<span class="required ml-1">*</span>
         </label>
         <input
           class="input-field"
-          [class.input-error]="
+          [class.error]="
             (submitted() || signupForm.controls['firstName'].touched) &&
             signupForm.controls['firstName'].errors
           "
@@ -27,13 +25,13 @@
         }
       </div>
 
-      <div class="form-group">
+      <div class="w-full md:w-fit">
         <label class="form-label">
           Last Name<span class="required ml-1">*</span>
         </label>
         <input
           class="input-field"
-          [class.input-error]="
+          [class.error]="
             (submitted() || signupForm.controls['lastName'].touched) &&
             signupForm.controls['lastName'].errors
           "
@@ -48,13 +46,13 @@
       </div>
     </div>
 
-    <div class="form-group">
+    <div>
       <label class="form-label">
         Email<span class="required ml-1">*</span>
       </label>
       <input
         class="input-field"
-        [class.input-error]="
+        [class.error]="
           (submitted() || signupForm.controls['email'].touched) &&
           signupForm.controls['email'].errors
         "
@@ -68,14 +66,14 @@
       }
     </div>
 
-    <div class="form-group">
+    <div>
       <label class="form-label">
         Password<span class="required ml-1">*</span>
       </label>
       <div class="relative">
         <input
           class="input-field pr-10"
-          [class.input-error]="(submitted() || signupForm.controls['password'].touched) && signupForm.controls['password'].errors?.['required']"
+          [class.error]="(submitted() || signupForm.controls['password'].touched) && signupForm.controls['password'].errors?.['required']"
           [type]="showPassword() ? 'text' : 'password'"
           placeholder="Create a strong password"
           formControlName="password"
@@ -103,14 +101,14 @@
       }
     </div>
 
-    <div class="form-group">
+    <div>
       <label class="form-label">
         Confirm Password<span class="required ml-1">*</span>
       </label>
       <div class="relative">
         <input
           class="input-field pr-10"
-          [class.input-error]="signupForm.errors?.['passwordMismatch'] && (signupForm.controls['confirmPassword'].touched || signupForm.controls['password'].touched || submitted())"
+          [class.error]="signupForm.errors?.['passwordMismatch'] && (signupForm.controls['confirmPassword'].touched || signupForm.controls['password'].touched || submitted())"
           [type]="showPassword2() ? 'text' : 'password'"
           placeholder="Confirm your password"
           formControlName="confirmPassword"

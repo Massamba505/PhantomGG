@@ -1,6 +1,4 @@
-<div
-  class="max-w-md mx-auto w-full p-6 rounded-lg shadow-lg border border-border"
->
+<div class="card">
   <div class="text-center mb-6">
     <h1 class="text-2xl font-bold mb-2">Welcome Back</h1>
   </div>
@@ -13,7 +11,7 @@
       <input
         id="email"
         class="input-field"
-        [class.input-error]="
+        [class.error]="
           (submitted() || userForm.controls['email'].touched) &&
           userForm.controls['email'].errors
         "
@@ -43,7 +41,7 @@
         <input
           id="password"
           class="input-field pr-10"
-          [class.input-error]="
+          [class.error]="
             (submitted() || userForm.controls['password'].touched) &&
             userForm.controls['password'].errors
           "
@@ -76,7 +74,7 @@
         type="checkbox"
         id="rememberMe"
         formControlName="rememberMe"
-        class="w-4 h-4 cursor-pointer"
+        class="checkbox"
       />
       <label for="rememberMe" class="text-sm">Remember me</label>
     </div>
@@ -133,7 +131,7 @@
   <div class="text-center mt-6">
     <span class="text-sm">Don't have an account? </span>
     <a routerLink="/auth/signup" class="hover:underline font-medium text-sm">
-      Sign up for free
+      Sign up
     </a>
   </div>
 </div>
