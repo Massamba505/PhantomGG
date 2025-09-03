@@ -6,9 +6,7 @@
       class="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full"
     >
       <div class="relative flex-1 max-w-2xl">
-        <div
-          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-        >
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
           <lucide-angular [img]="icons.Search" size="20"></lucide-angular>
         </div>
         <input
@@ -21,9 +19,7 @@
       </div>
 
       <div class="relative flex-1 max-w-md">
-        <div
-          class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
-        >
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
           <lucide-angular [img]="icons.Funnel" size="20"></lucide-angular>
         </div>
         <select
@@ -57,11 +53,9 @@
     </div>
     } @else {
     <div class="mb-4 flex justify-between items-center">
-      <p class="text-sm text-muted-foreground">
+      <p class="text-sm">
         Showing
-        <span class="font-medium text-foreground">{{
-          tournaments().length
-        }}</span>
+        <span class="font-medium">{{ tournaments().length }}</span>
         tournaments
       </p>
       <div class="flex gap-2">
@@ -117,14 +111,10 @@
       (click)="createNewTournament()"
     >
       <div class="mb-4 p-3 rounded-full bg-muted">
-        <lucide-angular
-          [img]="icons.Trophy"
-          size="32"
-          class="text-muted-foreground"
-        ></lucide-angular>
+        <lucide-angular [img]="icons.Trophy" size="32"></lucide-angular>
       </div>
       <h3 class="text-lg font-semibold mb-2">No Tournaments Found</h3>
-      <p class="text-sm text-muted-foreground mb-6">
+      <p class="text-sm mb-6">
         Try adjusting your search criteria or create your first tournament
       </p>
       <button class="btn btn-primary">

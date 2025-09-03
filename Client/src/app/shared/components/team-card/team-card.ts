@@ -16,6 +16,7 @@ export class TeamCard {
   showActions = input<boolean>(true);
   edit = output<Team>();
   delete = output<string>();
+  view = output<Team>();
   readonly icons = LucideIcons;
   
   onEdit(event: Event) {
@@ -26,6 +27,10 @@ export class TeamCard {
   onDelete(event: Event) {
     event.stopPropagation();
     this.delete.emit(this.team().id);
+  }
+
+  onView() {
+    this.view.emit(this.team());
   }
 
   onImageError(event: Event) {

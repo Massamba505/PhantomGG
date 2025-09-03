@@ -6,9 +6,7 @@
       class="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full"
     >
       <div class="relative flex-1 max-w-2xl">
-        <div
-          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-        >
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
           <lucide-angular [img]="icons.Search" size="20"></lucide-angular>
         </div>
         <input
@@ -80,7 +78,7 @@
           [showActions]="true"
           (edit)="handleEditTeam($event)"
           (delete)="handleDeleteTeam(team.id)"
-          (click)="handleViewTeam(team)"
+          (view)="handleViewTeam($event)"
         ></app-team-card>
       </div>
       }

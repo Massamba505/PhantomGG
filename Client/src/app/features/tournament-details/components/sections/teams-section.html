@@ -12,9 +12,7 @@
   </div>
 
   <div class="relative mb-4">
-    <div
-      class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-    >
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
       <lucide-angular [img]="icons.Search" size="20" class=""></lucide-angular>
     </div>
     <input
@@ -29,11 +27,7 @@
       (click)="clearSearch()"
       class="absolute inset-y-0 right-0 pr-3 flex items-center"
     >
-      <lucide-angular
-        [img]="icons.X"
-        size="16"
-        class="hover:text-foreground"
-      ></lucide-angular>
+      <lucide-angular [img]="icons.X" size="16"></lucide-angular>
     </button>
     }
   </div>
@@ -54,7 +48,9 @@
     </div>
   </div>
   } @else {
-  <div class="flex flex-wrap gap-4">
+  <div
+    class="flex flex-wrap justify-center sm:justify-start sm:items-center gap-4"
+  >
     @for (team of filteredTeams(); track team.id) {
     <div>
       <app-team-card
@@ -67,7 +63,7 @@
     } @if (tournament() && filteredTeams().length < tournament()!.maxTeams &&
     filteredTeams().length !== 0) {
     <div
-      class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-6 h-full cursor-pointer transition-colors hover:border-primary"
+      class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center px-6 py-3 cursor-pointer"
       (click)="onAddTeam()"
     >
       <div class="w-12 h-12 rounded-full flex items-center justify-center mb-4">
@@ -78,7 +74,7 @@
         ></lucide-angular>
       </div>
       <h3 class="font-medium mb-1">Add New Team</h3>
-      <p class="text-sm text-center">
+      <p class="text-xs text-center">
         Click to register a team for this tournament
       </p>
     </div>
