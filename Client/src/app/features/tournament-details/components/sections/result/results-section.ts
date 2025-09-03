@@ -98,28 +98,6 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
       }
     </div>
   `,
-  styles: [`
-    .card {
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-    }
-
-    .animate-spin {
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      from {
-        transform: rotate(0deg);
-      }
-      to {
-        transform: rotate(360deg);
-      }
-    }
-  `],
-  standalone: true,
   imports: [CommonModule, LucideAngularModule]
 })
 export class ResultsSection {
