@@ -11,10 +11,6 @@
     --card-foreground: 222 28% 20%;
     --card-hover: 210 25% 97%;
 
-    /* Popover colors */
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 28% 18%;
-
     /* Primary colors */
     --primary: 222 60% 42%;
     --primary-glow: 222 60% 52%;
@@ -29,11 +25,6 @@
     /* Muted colors */
     --muted: 210 20% 95%;
     --muted-foreground: 222 10% 60%;
-
-    /* Accent colors */
-    --accent: 200 85% 45%;
-    --accent-foreground: 0 0% 100%;
-    --accent-hover: 200 85% 40%;
 
     /* Status colors */
     --destructive: 0 70% 50%;
@@ -58,13 +49,6 @@
     --ring: 222 60% 42%;
     --focus-ring: 222 60% 42% / 0.35;
 
-    /* Sidebar specific colors */
-    --sidebar-bg: 210 25% 97%;
-    --sidebar-border: 210 20% 88%;
-    --sidebar-item: 210 20% 93%;
-    --sidebar-item-hover: 210 20% 88%;
-    --sidebar-item-active: 222 60% 90%;
-
     /* Gradients */
     --gradient-primary: linear-gradient(
       135deg,
@@ -76,23 +60,8 @@
       hsl(var(--background)),
       hsl(210 20% 95%)
     );
-    --gradient-card: linear-gradient(
-      145deg,
-      hsl(var(--card)),
-      hsl(210 20% 98%)
-    );
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-      0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.15);
 
     /* Radius */
-    --radius-sm: 0.2rem;
     --radius: 0.4rem;
     --radius-md: 0.6rem;
     --radius-lg: 0.8rem;
@@ -109,10 +78,6 @@
     --card-foreground: 210 40% 95%;
     --card-hover: 222 44% 15%;
 
-    /* Popover colors */
-    --popover: 222 46% 12%;
-    --popover-foreground: 210 40% 98%;
-
     /* Primary colors */
     --primary: 215 40% 40%;
     --primary-glow: 215 40% 50%;
@@ -127,11 +92,6 @@
     /* Muted colors */
     --muted: 220 14% 20%;
     --muted-foreground: 215 15% 65%;
-
-    /* Accent colors */
-    --accent: 200 80% 35%;
-    --accent-foreground: 210 40% 98%;
-    --accent-hover: 200 80% 30%;
 
     /* Status colors */
     --destructive: 0 84% 55%;
@@ -156,13 +116,6 @@
     --ring: 200 100% 45%;
     --focus-ring: 200 100% 45% / 0.35;
 
-    /* Sidebar specific colors */
-    --sidebar-bg: 222 47% 10%;
-    --sidebar-border: 220 15% 18%;
-    --sidebar-item: 220 15% 15%;
-    --sidebar-item-hover: 220 15% 20%;
-    --sidebar-item-active: 215 40% 25%;
-
     /* Gradients */
     --gradient-primary: linear-gradient(
       135deg,
@@ -174,20 +127,6 @@
       hsl(var(--background)),
       hsl(220 40% 7%)
     );
-    --gradient-card: linear-gradient(
-      145deg,
-      hsl(var(--card)),
-      hsl(220 15% 15%)
-    );
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
-      0 2px 4px -1px rgba(0, 0, 0, 0.2);
-    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4),
-      0 10px 10px -5px rgba(0, 0, 0, 0.2);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2);
   }
 
   * {
@@ -231,30 +170,12 @@
     cursor: not-allowed;
   }
 
-  .btn-icon {
-    padding: 0.5rem;
-    border-radius: var(--radius-full);
-  }
-
-  .btn-sm {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-  }
-
-  .btn-lg {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-  }
-
   /* Primary Button */
-  .primary-button,
   .btn-primary {
     background: var(--gradient-primary);
     color: hsl(var(--primary-foreground));
-    box-shadow: var(--shadow-md), 0 0 10px hsl(var(--primary) / 0.2);
   }
 
-  .primary-button:hover,
   .btn-primary:hover {
     background: linear-gradient(
       to right,
@@ -262,35 +183,26 @@
       hsl(var(--primary))
     );
     transform: translateY(-1px);
-    box-shadow: var(--shadow-lg), 0 0 15px hsl(var(--primary) / 0.25);
   }
 
-  .primary-button:active,
   .btn-primary:active {
     transform: translateY(0);
-    box-shadow: var(--shadow-sm);
   }
 
   /* Secondary Button */
-  .secondary-button,
   .btn-secondary {
     background-color: hsl(var(--secondary));
     color: hsl(var(--secondary-foreground));
     border: 1px solid hsl(var(--border));
-    box-shadow: var(--shadow-md);
   }
 
-  .secondary-button:hover,
   .btn-secondary:hover {
     background-color: hsl(var(--secondary-hover));
     transform: translateY(-1px);
-    box-shadow: var(--shadow-lg);
   }
 
-  .secondary-button:active,
   .btn-secondary:active {
     transform: translateY(0);
-    box-shadow: var(--shadow-sm);
   }
 
   /* Ghost Button */
@@ -362,7 +274,6 @@
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
     padding: 1.25rem;
-    box-shadow: var(--shadow-md);
     transition: all 0.2s ease;
   }
 
@@ -372,15 +283,12 @@
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
     padding: 1.25rem;
-    box-shadow: var(--shadow-md);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .card-tournament:hover,
   .card-team:hover {
     transform: translateY(-2px);
     background-color: hsl(var(--card-hover));
-    box-shadow: var(--shadow-lg);
   }
 
   .tournament-banner {
@@ -462,7 +370,6 @@
   .input-field:focus {
     outline: none;
     border-color: hsl(var(--ring));
-    box-shadow: 0 0 0 3px hsl(var(--focus-ring));
   }
 
   .input-field:disabled {
@@ -482,7 +389,6 @@
   .form-select:focus {
     outline: none;
     border-color: hsl(var(--primary));
-    box-shadow: 0 0 0 1px hsl(var(--primary), 0.5);
   }
 
   .input-error {
@@ -504,7 +410,6 @@
   .badge {
     display: inline-flex;
     align-items: center;
-    border-radius: var(--radius-sm);
     padding: 0.125rem 0.5rem;
     font-size: 0.75rem;
     font-weight: 500;
@@ -533,31 +438,6 @@
   .badge-outline {
     background-color: transparent;
     border: 1px solid hsl(var(--border));
-  }
-
-  /* Utility Classes */
-  .text-shadow-sm {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
-
-  .text-shadow {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .text-shadow-lg {
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-  }
-
-  .glassmorphism {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .dark .glassmorphism {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 }
 
