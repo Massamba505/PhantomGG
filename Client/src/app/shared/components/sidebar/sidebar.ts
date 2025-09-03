@@ -47,10 +47,8 @@ export class Sidebar implements OnInit, OnDestroy {
   userRole = input.required<Roles>();
   toggle = output<void>();
 
-  // Internal state for responsive behavior
   private internalOpen = signal(true);
   
-  // Use input value or internal responsive state
   actuallyOpen = computed(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth > 768 ? this.isOpen() : this.internalOpen();
@@ -74,12 +72,6 @@ export class Sidebar implements OnInit, OnDestroy {
       badge: 'New',
     },
     {
-      title: 'Teams',
-      url: '/teams',
-      icon: Users,
-      roles: [Roles.Organizer, Roles.General],
-    },
-    {
       title: 'Fixtures',
       url: '/fixtures',
       icon: Calendar,
@@ -96,22 +88,10 @@ export class Sidebar implements OnInit, OnDestroy {
   quickActions: MenuItem[] = [
     {
       title: 'Create Tournament',
-      url: '/create-tournament',
+      url: '/tournaments/create',
       icon: PlusCircle,
       roles: [Roles.Organizer],
-    },
-    {
-      title: 'Create Team',
-      url: '/create-team',
-      icon: PlusCircle,
-      roles: [Roles.General],
-    },
-    {
-      title: 'Help & Support',
-      url: '/help',
-      icon: HelpCircle,
-      roles: [Roles.Organizer, Roles.General],
-    },
+    }
   ];
   
   ngOnInit() {
