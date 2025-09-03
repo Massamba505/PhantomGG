@@ -13,6 +13,7 @@ import { getFormattedDate } from '../../utils/DateFormat';
 })
 export class TournamentCard {
   tournament = input.required<Tournament>();
+  layout = input<'grid' | 'horizontal'>('grid');
   edit = output<Tournament>();
   delete = output<string>();
   view = output<Tournament>();

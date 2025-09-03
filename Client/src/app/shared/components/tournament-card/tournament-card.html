@@ -1,98 +1,148 @@
 <div
-  class="card-tournament flex flex-col h-full w-full group cursor-pointer"
+  class="card-tournament flex group cursor-pointer"
+  [class]="
+    layout() === 'horizontal'
+      ? 'flex-row gap-4 h-32 w-full'
+      : 'flex-col h-full w-full'
+  "
   (click)="onView()"
 >
-  <div class="tournament-banner relative overflow-hidden rounded-sm">
+  <div
+    class="absolute flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+    [class]="layout() === 'horizontal' ? 'top-3 right-3' : 'z-10 top-7 right-7'"
+  >
+    <button
+      (click)="onEdit($event)"
+      class="action-button"
+      aria-label="Edit tournament"
+    >
+      <lucide-angular [img]="icons.SquarePen" size="14" />
+    </button>
+    <button
+      (click)="onDelete($event)"
+      class="action-button-danger"
+      aria-label="Delete tournament"
+    >
+      <lucide-angular [img]="icons.Trash2" size="14" />
+    </button>
+  </div>
+
+  <div
+    class="relative overflow-hidden rounded-sm"
+    [class]="layout() === 'horizontal' ? ' flex-shrink-0 w-48' : 'h-48'"
+  >
     @if (tournament().bannerUrl) {
     <img
       [src]="tournament().bannerUrl"
       [alt]="tournament().name + ' banner'"
       class="w-full h-full object-cover"
+      (error)="onImageError($event)"
     />
     }
 
-    <div
-      class="absolute top-3 right-3 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-    >
-      <button
-        (click)="onEdit($event)"
-        class="action-button"
-        aria-label="Edit tournament"
-      >
-        <lucide-angular [img]="icons.SquarePen" size="14" />
-      </button>
-      <button
-        (click)="onDelete($event)"
-        class="action-button-danger"
-        aria-label="Delete tournament"
-      >
-        <lucide-angular [img]="icons.Trash2" size="14" />
-      </button>
-    </div>
-
     <div class="absolute top-3 left-3">
-      <span class="status-badge" [attr.data-status]="tournament().status">
+      <span
+        class="status-badge text-xs px-2 py-1"
+        [class.badge-success]="tournament().status === 'Active'"
+        [class.badge-warning]="tournament().status === 'Draft'"
+        [class.badge-secondary]="tournament().status === 'Completed'"
+      >
         {{ tournament().status | titlecase }}
       </span>
     </div>
   </div>
 
-  <div class="p-4 flex flex-col flex-1">
+  <div
+    class="flex flex-col flex-1"
+    [class]="layout() === 'horizontal' ? 'justify-between py-2' : 'pt-4 '"
+  >
     <div class="mb-3">
       <h3
-        class="text-lg font-semibold mb-2 line-clamp-2 group-hover:text-primary transition-colors"
+        class="font-semibold"
+        [class]="
+          layout() === 'horizontal'
+            ? 'mb-1 line-clamp-1'
+            : 'text-lg mb-2 line-clamp-2'
+        "
       >
         {{ tournament().name }}
       </h3>
-      <p class="text-sm opacity-70 line-clamp-2">
+      <p
+        [class]="
+          layout() === 'horizontal'
+            ? 'text-xs line-clamp-1'
+            : 'text-sm line-clamp-2'
+        "
+      >
         {{ tournament().description }}
       </p>
     </div>
 
-    <div class="space-y-2 mb-3 flex-1">
+    <div
+      [class]="
+        layout() === 'horizontal'
+          ? 'flex flex-wrap gap-x-4 gap-y-1 mb-2'
+          : 'space-y-2 mb-3 flex-1'
+      "
+    >
       <div class="flex items-center gap-1">
-        <lucide-angular [img]="icons.Users" size="16" />
-        <span class="text-sm">
+        <lucide-angular
+          [img]="icons.Users"
+          [size]="layout() === 'horizontal' ? 14 : 16"
+        />
+        <span [class]="layout() === 'horizontal' ? 'text-xs' : 'text-sm'">
           {{ tournament().teamCount }}/{{ tournament().maxTeams }} Teams
         </span>
       </div>
 
       <div class="flex items-center gap-1">
-        <lucide-angular [img]="icons.CalendarDays" size="16" />
-        <span class="text-sm">
+        <lucide-angular
+          [img]="icons.CalendarDays"
+          [size]="layout() === 'horizontal' ? 14 : 16"
+        />
+        <span [class]="layout() === 'horizontal' ? 'text-xs' : 'text-sm'">
           {{ getFormattedDate(tournament().startDate) }}
         </span>
       </div>
 
       @if (tournament().location) {
       <div class="flex items-center gap-1">
-        <lucide-angular [img]="icons.MapPin" size="16" />
-        <span class="text-sm">{{ tournament().location }}</span>
+        <lucide-angular
+          [img]="icons.MapPin"
+          [size]="layout() === 'horizontal' ? 14 : 16"
+        />
+        <span [class]="layout() === 'horizontal' ? 'text-xs' : 'text-sm'">
+          {{ tournament().location }}
+        </span>
       </div>
       } @if (tournament().prize) {
       <div class="flex items-center gap-1">
-        <lucide-angular [img]="icons.Trophy" size="16" />
-        <span class="text-sm font-medium">
+        <lucide-angular
+          [img]="icons.Trophy"
+          [size]="layout() === 'horizontal' ? 14 : 16"
+        />
+        <span
+          class="font-medium"
+          [class]="layout() === 'horizontal' ? 'text-xs' : 'text-sm'"
+        >
           ${{ tournament().prize | number : "1.0-0" }}
         </span>
       </div>
       }
     </div>
 
-    <div class="pt-3 border-t">
+    @if (layout() !== 'horizontal') {
+    <div class="pt-3 border-t border-border">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
-          <div class="">
-            <lucide-angular [img]="icons.User" size="14" class="opacity-60" />
-          </div>
-          <span class="text-xs opacity-60">
-            by {{ tournament().organizerName }}
-          </span>
+          <lucide-angular [img]="icons.User" size="14" class="" />
+          <span class="text-xs"> by {{ tournament().organizerName }} </span>
         </div>
-        <div class="text-xs opacity-40">
+        <div class="text-xs">
           {{ getFormattedDate(tournament().createdAt, true) }}
         </div>
       </div>
     </div>
+    }
   </div>
 </div>

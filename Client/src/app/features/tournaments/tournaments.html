@@ -50,23 +50,25 @@
     </div>
   </div>
 
-  <section class="p-6">
+  <section class="pt-6">
     @if (loading()) {
     <div class="flex justify-center items-center py-12">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2"></div>
     </div>
     } @else {
     <div class="mb-4 flex justify-between items-center">
-      <p>
+      <p class="text-sm text-muted-foreground">
         Showing
-        <span>{{ tournaments().length }}</span>
+        <span class="font-medium text-foreground">{{
+          tournaments().length
+        }}</span>
         tournaments
       </p>
       <div class="flex gap-2">
         <button
           (click)="switchLayout(false)"
-          title="Stretch Horizontal"
           class="cursor-pointer"
+          title="List View"
         >
           <lucide-angular
             [img]="icons.StretchHorizontal"
@@ -75,43 +77,60 @@
         </button>
         <button
           (click)="switchLayout(true)"
-          title="Layout Grid"
           class="cursor-pointer"
+          title="Grid View"
         >
           <lucide-angular [img]="icons.LayoutGrid" size="20"></lucide-angular>
         </button>
       </div>
     </div>
 
-    @if (tournaments().length > 0) {
+    @if (tournaments().length > 0) { @if (gridLayout()) {
     <div
-      [class]="
-        gridLayout()
-          ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-          : 'flex flex-col gap-3'
-      "
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
     >
       @for (tournament of tournaments(); track tournament.id) {
-      <div>
-        <app-tournament-card
-          [tournament]="tournament"
-          (delete)="handleDeleteTournament($event)"
-          (edit)="handleEditTournament($event)"
-          (view)="handleViewTournament($event)"
-        ></app-tournament-card>
-      </div>
+      <app-tournament-card
+        [tournament]="tournament"
+        [layout]="'grid'"
+        (delete)="handleDeleteTournament($event)"
+        (edit)="handleEditTournament($event)"
+        (view)="handleViewTournament($event)"
+      ></app-tournament-card>
       }
     </div>
-    } @if (tournaments().length === 0) {
+    } @else {
+    <div class="flex flex-col space-y-2">
+      @for (tournament of tournaments(); track tournament.id) {
+      <app-tournament-card
+        [tournament]="tournament"
+        [layout]="'horizontal'"
+        (delete)="handleDeleteTournament($event)"
+        (edit)="handleEditTournament($event)"
+        (view)="handleViewTournament($event)"
+      ></app-tournament-card>
+      }
+    </div>
+    } } @if (tournaments().length === 0) {
     <div
-      class="border-2 max-w-md border-dashed rounded-lg flex flex-col items-center justify-center p-8 text-center h-full cursor-pointer"
+      class="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center p-12 text-center max-w-md mx-auto cursor-pointer hover:border-primary/50 transition-colors"
       (click)="createNewTournament()"
     >
-      <lucide-angular [img]="icons.Trophy" size="50"></lucide-angular>
-
-      <h3 class="text-lg font-medium mb-1 mt-5">No Tournaments Found</h3>
-      <p class="text-sm mb-4 max-w-xs">Try adjusting your search criteria</p>
-      <button class="btn btn-primary">Create Tournament</button>
+      <div class="mb-4 p-3 rounded-full bg-muted">
+        <lucide-angular
+          [img]="icons.Trophy"
+          size="32"
+          class="text-muted-foreground"
+        ></lucide-angular>
+      </div>
+      <h3 class="text-lg font-semibold mb-2">No Tournaments Found</h3>
+      <p class="text-sm text-muted-foreground mb-6">
+        Try adjusting your search criteria or create your first tournament
+      </p>
+      <button class="btn btn-primary">
+        <lucide-angular [img]="icons.CirclePlus" size="16"></lucide-angular>
+        Create Tournament
+      </button>
     </div>
     } }
   </section>
