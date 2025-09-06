@@ -20,9 +20,6 @@ public class UpdateTournamentDto
     [Required]
     public DateTime StartDate { get; set; }
 
-    [Required]
-    public DateTime EndDate { get; set; }
-
     [Range(4, 128)]
     public int MaxTeams { get; set; }
 
@@ -30,12 +27,18 @@ public class UpdateTournamentDto
     public decimal? EntryFee { get; set; }
 
     [Range(0, 999999.99)]
-    public decimal? Prize { get; set; }
+    public decimal? PrizePool { get; set; }
 
     [EmailAddress]
     public string? ContactEmail { get; set; }
 
     public string? BannerUrl { get; set; }
 
+    public string? LogoUrl { get; set; }
+
     public string Status { get; set; } = string.Empty;
+
+    public int? MatchDuration { get; set; }
+
+    public bool IsPublic { get; set; } = true;
 }

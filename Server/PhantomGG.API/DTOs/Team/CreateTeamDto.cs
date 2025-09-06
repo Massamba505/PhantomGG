@@ -8,14 +8,24 @@ public class CreateTeamDto
     [StringLength(200, MinimumLength = 2)]
     public string Name { get; set; } = string.Empty;
 
+    [StringLength(10)]
+    public string? ShortName { get; set; }
+
     [Required]
     [StringLength(100, MinimumLength = 2)]
-    public string Manager { get; set; } = string.Empty;
+    public string ManagerName { get; set; } = string.Empty;
 
-    [Range(1, 50)]
-    public int NumberOfPlayers { get; set; } = 1;
+    [Required]
+    [EmailAddress]
+    [StringLength(100)]
+    public string ManagerEmail { get; set; } = string.Empty;
+
+    [StringLength(10)]
+    public string? ManagerPhone { get; set; }
 
     public string? LogoUrl { get; set; }
+
+    public string? TeamPhotoUrl { get; set; }
 
     [Required]
     public Guid TournamentId { get; set; }
