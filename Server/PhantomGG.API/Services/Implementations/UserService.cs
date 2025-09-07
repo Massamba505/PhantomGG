@@ -9,13 +9,11 @@ using PhantomGG.API.Services.Interfaces;
 namespace PhantomGG.API.Services.Implementations;
 
 public class UserService(
-    IUserRepository userRepository, 
-    ITournamentRepository tournamentRepository,
+    IUserRepository userRepository,
     IPasswordHasher passwordHasher,
     IImageService imageService) : IUserService
 {
     private readonly IUserRepository _userRepository = userRepository;
-    private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
     private readonly IImageService _imageService = imageService;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
 
@@ -63,7 +61,8 @@ public class UserService(
             throw new NotFoundException("User not found");
         }
 
-        if (!_passwordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+        var validePassword = _passwordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash);
+        if (!validePassword)
         {
             throw new ValidationException("Current password is incorrect");
         }
@@ -85,7 +84,7 @@ public class UserService(
             await _imageService.DeleteImageAsync(user.ProfilePictureUrl);
         }
 
-        var imageUrl = await _imageService.SaveImageAsync(file, ImageType.profilePicture, userId);
+        var imageUrl = await _imageService.SaveImageAsync(file, ImageType.ProfilePicture, userId);
 
         user.ProfilePictureUrl = imageUrl;
         await _userRepository.UpdateAsync(user);

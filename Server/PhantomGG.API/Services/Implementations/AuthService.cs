@@ -43,7 +43,7 @@ public class AuthService(
             Email = request.Email.ToLower(),
             PasswordHash = _passwordHasher.HashPassword(request.Password),
             ProfilePictureUrl = request.ProfilePictureUrl ?? $"https://eu.ui-avatars.com/api/?name={request.FirstName}+{request.LastName}&size=250",
-            Role = request.Role.ToString() ?? UserRoles.Organizer.ToString(),
+            Role = request.Role.ToString(),
             CreatedAt = DateTime.UtcNow,
             IsActive = true
         };
@@ -109,6 +109,11 @@ public class AuthService(
         else if (!IsValidPassword(request.Password))
         {
             errors.Add("Password must contain at least one letter and one digit");
+        }
+
+        if(!EnumHelper.ToEnum<UserRoles>(request.Role).HasValue)
+        {
+            errors.Add("Invalid role");
         }
 
         if (errors.Any())

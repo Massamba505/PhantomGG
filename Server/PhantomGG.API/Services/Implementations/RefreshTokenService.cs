@@ -59,19 +59,20 @@ public class RefreshTokenService(
             throw new UnauthorizedException("Refresh token is required");
         }
 
-        var refreshTokenEntity = await GetByTokenAsync(refreshTokenFromCookie);
-        if (refreshTokenEntity == null)
+        var refreshToken = await GetByTokenAsync(refreshTokenFromCookie);
+        if (refreshToken == null)
         {
             throw new UnauthorizedException("Invalid refresh token");
         }
 
-        if (refreshTokenEntity.ExpiresAt <= DateTime.UtcNow)
+        if (refreshToken.ExpiresAt <= DateTime.UtcNow)
         {
+            await _refreshTokenRepository.DeleteAsync(refreshToken);
             throw new UnauthorizedException("Refresh token has expired");
         }
 
-        await _refreshTokenRepository.DeleteAsync(refreshTokenEntity);
+        await _refreshTokenRepository.DeleteAsync(refreshToken);
 
-        return refreshTokenEntity;
+        return refreshToken;
     }
 }
