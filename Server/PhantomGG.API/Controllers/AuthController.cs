@@ -27,13 +27,12 @@ public class AuthController(
     /// <summary>
     /// Register a new user account
     /// </summary>
+    /// <param name="request">User registration data</param>
     [HttpPost("register")]
     [AllowAnonymous]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterRequestDto request)
     {
         var result = await _authService.RegisterAsync(request);
-
-        _cookieService.SetRefreshToken(Response, result.RefreshToken);
 
         var response = new ApiResponse
         {
@@ -42,8 +41,7 @@ public class AuthController(
             Data = new
             {
                 user = result.User,
-                accessToken = result.AccessToken,
-                accessTokenExpiresAt = result.AccessTokenExpiresAt
+                accessToken = result.AccessToken
             }
         };
 
@@ -53,13 +51,12 @@ public class AuthController(
     /// <summary>
     /// Authenticate user credentials and login
     /// </summary>
+    /// <param name="request">Login credentials including email and password</param>
     [HttpPost("login")]
     [AllowAnonymous]
     public async Task<ActionResult<ApiResponse>> Login([FromBody] LoginRequestDto request)
     {
         var result = await _authService.LoginAsync(request);
-
-        _cookieService.SetRefreshToken(Response, result.RefreshToken, request.RememberMe);
 
         var response = new ApiResponse
         {
@@ -68,8 +65,7 @@ public class AuthController(
             Data = new
             {
                 user = result.User,
-                accessToken = result.AccessToken,
-                accessTokenExpiresAt = result.AccessTokenExpiresAt
+                accessToken = result.AccessToken
             }
         };
 
@@ -83,11 +79,9 @@ public class AuthController(
     [AllowAnonymous]
     public async Task<ActionResult<ApiResponse>> Refresh()
     {
-        var refreshToken = Request.Cookies[_cookieSettings.RefreshTokenCookieName];
+        var refreshToken = Request.Cookies[_cookieSettings.RefreshTokenCookieName] ?? string.Empty;
 
-        var result = await _authService.RefreshAsync(refreshToken ?? string.Empty);
-
-        _cookieService.SetRefreshToken(Response, result.RefreshToken);
+        var result = await _authService.RefreshAsync(refreshToken);
 
         var response = new ApiResponse
         {
@@ -95,8 +89,7 @@ public class AuthController(
             Message = "Token refreshed successfully",
             Data = new
             {
-                accessToken = result.AccessToken,
-                accessTokenExpiresAt = result.AccessTokenExpiresAt
+                accessToken = result.AccessToken
             }
         };
 
@@ -127,7 +120,7 @@ public class AuthController(
     /// Logout user by clearing refresh token cookie
     /// </summary>
     [HttpPost("logout")]
-    //[Authorize]
+    [Authorize]
     public async Task<ActionResult<ApiResponse>> Logout()
     {
         var refreshToken = Request.Cookies[_cookieSettings.RefreshTokenCookieName];

@@ -1,3 +1,4 @@
+using PhantomGG.API.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.API.DTOs.Auth;
@@ -24,5 +25,5 @@ public class RegisterRequestDto
     [StringLength(255, MinimumLength = 1)]
     public string? ProfilePictureUrl { get; set; }
 
-    public string? Role { get; set; }
+    public UserRoles? Role { get; set; }
 }

@@ -1,7 +1,8 @@
+using PhantomGG.API.Common;
 using PhantomGG.API.DTOs.Auth;
-using PhantomGG.API.Models;
 using PhantomGG.API.Exceptions;
 using PhantomGG.API.Mappings;
+using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Security.Interfaces;
 using PhantomGG.API.Services.Interfaces;
@@ -13,18 +14,23 @@ public class AuthService(
     IUserRepository userRepository,
     IRefreshTokeService refreshTokeService,
     IPasswordHasher passwordHasher,
-    ITokenService tokenService) : IAuthService
+    ITokenService tokenService,
+    ICookieService cookieService,
+    IHttpContextAccessor httpContextAccessor) : IAuthService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
     private readonly ITokenService _tokenService = tokenService;
     private readonly IRefreshTokeService _refreshTokeService = refreshTokeService;
+    private readonly ICookieService _cookieService = cookieService;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public async Task<AuthDto> RegisterAsync(RegisterRequestDto request)
     {
         ValidateRegisterRequest(request);
 
-        if (await _userRepository.EmailExistsAsync(request.Email.ToLower()))
+        var emailExist = await _userRepository.EmailExistsAsync(request.Email.ToLower());
+        if (emailExist)
         {
             throw new ConflictException("Email address is already registered");
         }
@@ -37,24 +43,14 @@ public class AuthService(
             Email = request.Email.ToLower(),
             PasswordHash = _passwordHasher.HashPassword(request.Password),
             ProfilePictureUrl = request.ProfilePictureUrl ?? $"https://eu.ui-avatars.com/api/?name={request.FirstName}+{request.LastName}&size=250",
-            Role = "Organizer",
+            Role = request.Role.ToString() ?? UserRoles.Organizer.ToString(),
             CreatedAt = DateTime.UtcNow,
             IsActive = true
         };
 
         await _userRepository.CreateAsync(user);
 
-        var accessToken = _tokenService.GenerateAccessToken(user);
-        var refreshToken = await _refreshTokeService.AddRefreshToken(user);
-
-        return new AuthDto
-        {
-            AccessToken = accessToken.Token,
-            AccessTokenExpiresAt = accessToken.ExpiresAt,
-            RefreshToken = refreshToken.Token,
-            RefreshTokenExpiresAt = refreshToken.ExpiresAt,
-            User = user.ToUserDto()
-        };
+        return await GenerateTokensAsync(user);
     }
 
     public async Task<AuthDto> LoginAsync(LoginRequestDto request)
@@ -65,41 +61,22 @@ public class AuthService(
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+        var validPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash);
+        if (!validPassword)
         {
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        var accessToken = _tokenService.GenerateAccessToken(user);
-        var refreshToken = await _refreshTokeService.AddRefreshToken(user);
-
-        return new AuthDto
-        {
-            AccessToken = accessToken.Token,
-            AccessTokenExpiresAt = accessToken.ExpiresAt,
-            RefreshToken = refreshToken.Token,
-            RefreshTokenExpiresAt = refreshToken.ExpiresAt,
-            User = user.ToUserDto()
-        };
+        return await GenerateTokensAsync(user, rememberMe:request.RememberMe);
     }
 
     public async Task<AuthDto> RefreshAsync(string refreshTokenFromCookie)
     {
         var deletedRefreshToken = await _refreshTokeService.DeleteAsync(refreshTokenFromCookie);
         var user = deletedRefreshToken.User;
-        var accessToken = _tokenService.GenerateAccessToken(user);
-        var refreshToken = await _refreshTokeService.AddRefreshToken(user);
 
-        return new AuthDto
-        {
-            AccessToken = accessToken.Token,
-            AccessTokenExpiresAt = accessToken.ExpiresAt,
-            RefreshToken = refreshToken.Token,
-            RefreshTokenExpiresAt = refreshToken.ExpiresAt,
-            User = user.ToUserDto()
-        };
+        return await GenerateTokensAsync(user);
     }
-
 
     public async Task LogoutAsync(string refreshTokenFromCookie)
     {
@@ -124,10 +101,6 @@ public class AuthService(
         {
             errors.Add("Email is required and must be valid and no more than 100 characters");
         }
-        else if (!IsValidEmail(request.Email))
-        {
-            errors.Add("Email format is invalid");
-        }
 
         if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)
         {
@@ -144,21 +117,23 @@ public class AuthService(
         }
     }
 
-    private static bool IsValidEmail(string email)
-    {
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(email);
-            return addr.Address == email;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
     private static bool IsValidPassword(string password)
     {
         return Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$");
+    }
+
+    private async Task<AuthDto> GenerateTokensAsync(User user, bool rememberMe = true)
+    {
+        var accessToken = _tokenService.GenerateAccessToken(user);
+        var refreshToken = await _refreshTokeService.AddRefreshToken(user);
+        var result = new AuthDto
+        {
+            AccessToken = accessToken.Token,
+            User = user.ToUserDto()
+        };
+
+        _cookieService.SetRefreshToken(_httpContextAccessor.HttpContext!.Response, refreshToken.Token, rememberMe);
+
+        return result;
     }
 }

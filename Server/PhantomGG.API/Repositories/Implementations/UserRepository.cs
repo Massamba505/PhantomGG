@@ -5,14 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace PhantomGG.API.Repositories.Implementations;
 
-public class UserRepository : IUserRepository
+public class UserRepository(PhantomContext context) : IUserRepository
 {
-    private readonly PhantomContext _context;
-
-    public UserRepository(PhantomContext context)
-    {
-        _context = context;
-    }
+    private readonly PhantomContext _context = context;
 
     public async Task<User?> GetByEmailAsync(string email)
     {
