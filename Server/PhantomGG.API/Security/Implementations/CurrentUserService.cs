@@ -4,17 +4,19 @@ using System.Security.Claims;
 
 namespace PhantomGG.API.Security.Implementations;
 
-public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
+public class CurrentUserService(
+    IHttpContextAccessor httpContextAccessor) : ICurrentUserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public CurrentUserDto GetCurrentUser()
     {
-        var user = _httpContextAccessor.HttpContext?.User;
-        if (user?.Identity?.IsAuthenticated != true)
+        if (!IsAuthenticated())
         {
             throw new UnauthorizedAccessException("User is not authenticated");
         }
+
+        var user = _httpContextAccessor.HttpContext?.User!;
 
         var idClaim = user.FindFirst(ClaimTypes.NameIdentifier);
         var emailClaim =  user.FindFirst(ClaimTypes.Email);
@@ -40,8 +42,8 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
 
     public bool IsInRole(string role)
     {
-        var user = _httpContextAccessor.HttpContext?.User;
-        if (user?.Identity?.IsAuthenticated != true) return false;
+        if (!IsAuthenticated()) return false;
+        var user = _httpContextAccessor.HttpContext?.User!;
 
         var roleClaim = user.FindFirst(ClaimTypes.Role);
         return roleClaim?.Value == role;
