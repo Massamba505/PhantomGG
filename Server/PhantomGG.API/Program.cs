@@ -158,12 +158,17 @@ public class Program
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ITournamentRepository, TournamentRepository>();
+        services.AddScoped<ITournamentFormatRepository, TournamentFormatRepository>();
         services.AddScoped<ITeamRepository, TeamRepository>();
+        services.AddScoped<IPlayerRepository, PlayerRepository>();
+        services.AddScoped<IMatchRepository, MatchRepository>();
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITournamentService, TournamentService>();
         services.AddScoped<ITeamService, TeamService>();
+        services.AddScoped<IPlayerService, PlayerService>();
+        services.AddScoped<IMatchService, MatchService>();
 
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();

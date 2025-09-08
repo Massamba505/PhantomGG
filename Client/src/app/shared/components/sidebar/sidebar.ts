@@ -62,7 +62,7 @@ export class Sidebar implements OnInit, OnDestroy {
       title: 'Dashboard',
       url: '/dashboard',
       icon: Home,
-      roles: [Roles.Organizer, Roles.General],
+      roles: [Roles.Organizer, Roles.User],
     },
     {
       title: 'Tournaments',
@@ -75,13 +75,13 @@ export class Sidebar implements OnInit, OnDestroy {
       title: 'Fixtures',
       url: '/fixtures',
       icon: Calendar,
-      roles: [Roles.Organizer, Roles.General],
+      roles: [Roles.Organizer, Roles.User],
     },
     {
       title: 'Notifications',
       url: '/notifications',
       icon: Bell,
-      roles: [Roles.Organizer, Roles.General],
+      roles: [Roles.Organizer, Roles.User],
     },
   ];
 

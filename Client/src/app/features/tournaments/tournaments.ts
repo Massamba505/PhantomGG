@@ -1,5 +1,5 @@
 import { Tournament, TournamentSearchRequest } from '@/app/shared/models/tournament';
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TournamentCard } from '@/app/shared/components/tournament-card/tournament-card';
 import { DashboardLayout } from '@/app/shared/components/layouts/dashboard-layout/dashboard-layout';
@@ -10,6 +10,8 @@ import { TournamentService } from '@/app/core/services/tournament.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LucideAngularModule } from "lucide-angular";
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
+import { AuthStateService } from '@/app/store/AuthStateService';
+import { canManageTournaments } from '@/app/core/guards/role.guard';
 
 @Component({
   selector: 'app-tournaments',
@@ -31,6 +33,7 @@ export class Tournaments implements OnInit {
   private route = inject(ActivatedRoute);
   private toast = inject(ToastService);
   private tournamentService = inject(TournamentService);
+  private authService = inject(AuthStateService);
   
   sidebarOpen = false;
   searchTerm = '';
@@ -42,6 +45,9 @@ export class Tournaments implements OnInit {
   loading = signal<boolean>(false);
 
   tournaments = signal<Tournament[]>([]);
+  
+  // Role-based computed properties using role guard utilities
+  canManageTournaments = computed(() => canManageTournaments());
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -116,6 +122,10 @@ export class Tournaments implements OnInit {
   }
 
   handleEditTournament(tournament: Tournament) {
+    if (!this.canManageTournaments()) {
+      this.toast.error('You do not have permission to edit tournaments');
+      return;
+    }
     this.router.navigate(['/tournaments','edit', tournament.id]);
   }
 
@@ -124,11 +134,20 @@ export class Tournaments implements OnInit {
   }
 
   handleDeleteTournament(id: string) {
+    if (!this.canManageTournaments()) {
+      this.toast.error('You do not have permission to delete tournaments');
+      return;
+    }
     this.deletingTournament.set(id);
     this.isDeleteModalOpen.set(true);
   }
 
   async confirmDelete() {
+    if (!this.canManageTournaments()) {
+      this.toast.error('You do not have permission to delete tournaments');
+      return;
+    }
+    
     const tournamentId = this.deletingTournament();
     if (!tournamentId) return;
 
@@ -154,6 +173,10 @@ export class Tournaments implements OnInit {
   }
 
   createNewTournament() {
+    if (!this.canManageTournaments()) {
+      this.toast.error('You do not have permission to create tournaments');
+      return;
+    }
     this.router.navigate(['/tournaments','create']);
   }
 }

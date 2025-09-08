@@ -15,4 +15,5 @@ public interface ITournamentRepository
     Task<bool> ExistsAsync(Guid id);
     Task<bool> IsOrganizerAsync(Guid tournamentId, Guid userId);
     Task<int> GetTeamCountAsync(Guid tournamentId);
+    Task<int> GetApprovedTeamCountAsync(Guid tournamentId);
 }

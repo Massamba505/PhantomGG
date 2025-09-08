@@ -1,0 +1,134 @@
+<app-user-layout>
+  <div class="my-tournaments-container">
+    <div class="header">
+      <h1>My Tournaments</h1>
+      <p class="subtitle">Tournaments you've joined or are participating in</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="loading">
+      <div class="spinner"></div>
+      <p>Loading your tournaments...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div
+      *ngIf="!isLoading() && myTournaments().length === 0"
+      class="empty-state"
+    >
+      <div class="empty-icon">🏆</div>
+      <h3>No tournaments yet</h3>
+      <p>
+        You haven't joined any tournaments yet. Browse available tournaments to
+        get started!
+      </p>
+      <button class="btn-primary" (click)="browseTournaments()">
+        Browse Tournaments
+      </button>
+    </div>
+
+    <!-- Tournament List -->
+    <div
+      *ngIf="!isLoading() && myTournaments().length > 0"
+      class="tournaments-grid"
+    >
+      <div
+        *ngFor="let tournament of myTournaments()"
+        class="tournament-card"
+        [class.active]="tournament.status === 'Active'"
+        [class.upcoming]="tournament.status === 'Upcoming'"
+        [class.completed]="tournament.status === 'Completed'"
+      >
+        <div class="tournament-header">
+          <h3>{{ tournament.name }}</h3>
+          <span class="status-badge" [attr.data-status]="tournament.status">
+            {{ tournament.status }}
+          </span>
+        </div>
+
+        <div class="tournament-info">
+          <div class="info-item">
+            <span class="label">Game:</span>
+            <span class="value">{{ tournament.game }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Format:</span>
+            <span class="value">{{ tournament.format }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Prize Pool:</span>
+            <span class="value prize">{{
+              tournament.prizePool | currency
+            }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Start Date:</span>
+            <span class="value">{{
+              tournament.startDate | date : "MMM d, y"
+            }}</span>
+          </div>
+        </div>
+
+        <div class="tournament-progress" *ngIf="tournament.status === 'Active'">
+          <div class="progress-info">
+            <span>Round {{ tournament.currentRound || 1 }}</span>
+            <span
+              >{{ tournament.participantCount }}/{{
+                tournament.maxParticipants
+              }}
+              players</span
+            >
+          </div>
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="getProgressPercentage(tournament)"
+            ></div>
+          </div>
+        </div>
+
+        <div class="tournament-actions">
+          <button class="btn-outline" (click)="viewTournament(tournament.id)">
+            View Details
+          </button>
+          <button
+            *ngIf="tournament.status === 'Active'"
+            class="btn-primary"
+            (click)="viewSchedule(tournament.id)"
+          >
+            My Schedule
+          </button>
+          <button
+            *ngIf="tournament.status === 'Upcoming'"
+            class="btn-secondary"
+            (click)="manageTournament(tournament.id)"
+          >
+            Manage Entry
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div *ngIf="!isLoading() && myTournaments().length > 0" class="quick-stats">
+      <div class="stat-card">
+        <div class="stat-number">{{ activeTournaments().length }}</div>
+        <div class="stat-label">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ upcomingTournaments().length }}</div>
+        <div class="stat-label">Upcoming</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ completedTournaments().length }}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">
+          {{ totalPrizeWinnings() | currency : "USD" : "symbol" : "1.0-0" }}
+        </div>
+        <div class="stat-label">Prize Winnings</div>
+      </div>
+    </div>
+  </div>
+</app-user-layout>

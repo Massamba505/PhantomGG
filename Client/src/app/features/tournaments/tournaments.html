@@ -36,6 +36,8 @@
     </div>
 
     <div class="flex justify-end">
+      <!-- Only show create button to organizers and admins -->
+      @if (canManageTournaments()) {
       <button
         (click)="createNewTournament()"
         class="btn btn-primary flex items-center justify-center gap-2"
@@ -43,6 +45,7 @@
         <lucide-angular [img]="icons.CirclePlus" [size]="20"></lucide-angular>
         <span>Create Tournament</span>
       </button>
+      }
     </div>
   </div>
 

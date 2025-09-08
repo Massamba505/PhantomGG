@@ -1,0 +1,171 @@
+<app-user-layout>
+  <div class="schedule-container">
+    <div class="header">
+      <h1>My Schedule</h1>
+      <p class="subtitle">Upcoming matches, tournaments, and team events</p>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button
+        *ngFor="let filter of filterOptions()"
+        class="filter-tab"
+        [class.active]="activeFilter() === filter.value"
+        (click)="setActiveFilter(filter.value)"
+      >
+        {{ filter.label }}
+        <span class="count" *ngIf="filter.count && filter.count > 0"
+          >({{ filter.count }})</span
+        >
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="loading">
+      <div class="spinner"></div>
+      <p>Loading your schedule...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div
+      *ngIf="!isLoading() && filteredEvents().length === 0"
+      class="empty-state"
+    >
+      <div class="empty-icon">📅</div>
+      <h3>No events scheduled</h3>
+      <p>
+        You don't have any
+        {{ activeFilter() === "all" ? "" : activeFilter() }} events scheduled.
+      </p>
+      <div class="action-buttons">
+        <button class="btn-primary" (click)="findTournaments()">
+          Join Tournament
+        </button>
+        <button class="btn-outline" (click)="findTeams()">Find Teams</button>
+      </div>
+    </div>
+
+    <!-- Schedule Grid -->
+    <div
+      *ngIf="!isLoading() && filteredEvents().length > 0"
+      class="schedule-grid"
+    >
+      <div
+        *ngFor="let event of filteredEvents()"
+        class="event-card"
+        [class.upcoming]="event.status === 'upcoming'"
+        [class.live]="event.status === 'live'"
+        [class.completed]="event.status === 'completed'"
+        [class.cancelled]="event.status === 'cancelled'"
+      >
+        <div class="event-header">
+          <div class="event-type-badge" [attr.data-type]="event.type">
+            {{ getEventTypeLabel(event.type) }}
+          </div>
+          <div class="event-status" [attr.data-status]="event.status">
+            {{ event.status | titlecase }}
+          </div>
+        </div>
+
+        <div class="event-content">
+          <h3 class="event-title">{{ event.title }}</h3>
+
+          <div class="event-details">
+            <div class="detail-item" *ngIf="event.tournamentName">
+              <span class="detail-icon">🏆</span>
+              <span class="detail-text">{{ event.tournamentName }}</span>
+            </div>
+            <div class="detail-item" *ngIf="event.teamName">
+              <span class="detail-icon">👥</span>
+              <span class="detail-text">{{ event.teamName }}</span>
+            </div>
+            <div class="detail-item" *ngIf="event.opponent">
+              <span class="detail-icon">⚔️</span>
+              <span class="detail-text">vs {{ event.opponent }}</span>
+            </div>
+            <div class="detail-item" *ngIf="event.location">
+              <span class="detail-icon">📍</span>
+              <span class="detail-text">{{ event.location }}</span>
+            </div>
+          </div>
+
+          <div class="event-time">
+            <div class="time-item">
+              <span class="time-label">Date:</span>
+              <span class="time-value">{{
+                event.startTime | date : "MMM d, y"
+              }}</span>
+            </div>
+            <div class="time-item">
+              <span class="time-label">Time:</span>
+              <span class="time-value">
+                {{ event.startTime | date : "h:mm a" }} -
+                {{ event.endTime | date : "h:mm a" }}
+              </span>
+            </div>
+          </div>
+
+          <div class="event-description" *ngIf="event.description">
+            <p>{{ event.description }}</p>
+          </div>
+
+          <div
+            class="event-result"
+            *ngIf="event.status === 'completed' && event.result"
+          >
+            <div class="result-badge" [attr.data-result]="event.result">
+              {{ event.result | titlecase }}
+            </div>
+          </div>
+        </div>
+
+        <div class="event-actions">
+          <button
+            *ngIf="event.status === 'upcoming' && event.type === 'match'"
+            class="btn-outline"
+            (click)="viewMatchDetails(event.id)"
+          >
+            Match Details
+          </button>
+          <button
+            *ngIf="event.type === 'tournament'"
+            class="btn-primary"
+            (click)="viewTournament(event.id)"
+          >
+            View Tournament
+          </button>
+          <button
+            *ngIf="event.status === 'live'"
+            class="btn-live"
+            (click)="joinLive(event.id)"
+          >
+            🔴 Join Live
+          </button>
+          <button class="btn-secondary" (click)="addToCalendar(event)">
+            Add to Calendar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div *ngIf="!isLoading() && events().length > 0" class="quick-stats">
+      <div class="stat-card">
+        <div class="stat-number">{{ upcomingEventsCount() }}</div>
+        <div class="stat-label">Upcoming Events</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ todayEventsCount() }}</div>
+        <div class="stat-label">Today's Events</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ thisWeekEventsCount() }}</div>
+        <div class="stat-label">This Week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ completedEventsCount() }}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+    </div>
+  </div>
+</app-user-layout>

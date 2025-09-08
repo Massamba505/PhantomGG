@@ -1,0 +1,262 @@
+<app-user-layout>
+  <div class="join-tournament-container">
+    <div class="header">
+      <button class="back-button" (click)="goBack()">← Back</button>
+      <h1>Join Tournament</h1>
+      <p class="subtitle">Enter a tournament and compete with your team</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="loading">
+      <div class="spinner"></div>
+      <p>Loading tournament information...</p>
+    </div>
+
+    <!-- Tournament Selection -->
+    <div
+      *ngIf="!isLoading() && !selectedTournament()"
+      class="tournament-selection"
+    >
+      <h2>Select a Tournament</h2>
+
+      <div class="search-bar">
+        <input
+          type="text"
+          placeholder="Search tournaments..."
+          [(ngModel)]="searchTerm"
+          (input)="searchTournaments()"
+          class="search-input"
+        />
+      </div>
+
+      <div class="tournaments-grid">
+        <div
+          *ngFor="let tournament of filteredTournaments()"
+          class="tournament-card"
+          [class.selected]="form().tournamentId === tournament.id"
+          (click)="selectTournament(tournament)"
+        >
+          <div class="tournament-header">
+            <h3>{{ tournament.name }}</h3>
+            <div
+              class="tournament-status"
+              [attr.data-status]="tournament.status"
+            >
+              {{ tournament.status | titlecase }}
+            </div>
+          </div>
+
+          <div class="tournament-details">
+            <div class="detail-item">
+              <span class="detail-icon">📍</span>
+              <span class="detail-text">{{
+                tournament.location || "Online"
+              }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-icon">📅</span>
+              <span class="detail-text">{{
+                tournament.startDate | date : "MMM d, y"
+              }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-icon">💰</span>
+              <span class="detail-text">${{ tournament.prize | number }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-icon">👥</span>
+              <span class="detail-text"
+                >{{ tournament.teamCount }}/{{
+                  tournament.maxTeams
+                }}
+                teams</span
+              >
+            </div>
+          </div>
+
+          <div class="tournament-description">
+            <p>{{ tournament.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="filteredTournaments().length === 0" class="empty-state">
+        <div class="empty-icon">🏆</div>
+        <h3>No tournaments found</h3>
+        <p>There are no tournaments matching your search criteria.</p>
+      </div>
+    </div>
+
+    <!-- Tournament Details & Team Selection -->
+    <div *ngIf="!isLoading() && selectedTournament()" class="registration-form">
+      <div class="tournament-info">
+        <div class="tournament-banner">
+          <h2>{{ selectedTournament()?.name }}</h2>
+          <div class="tournament-meta">
+            <span class="meta-item"
+              >📍 {{ selectedTournament()?.location || "Online" }}</span
+            >
+            <span class="meta-item"
+              >📅
+              {{ selectedTournament()?.startDate | date : "MMM d, y" }}</span
+            >
+            <span class="meta-item"
+              >💰 ${{ selectedTournament()?.prize | number }}</span
+            >
+            <span class="meta-item"
+              >👥 {{ selectedTournament()?.teamCount }}/{{
+                selectedTournament()?.maxTeams
+              }}</span
+            >
+          </div>
+        </div>
+
+        <div class="tournament-description">
+          <h3>Tournament Description</h3>
+          <p>{{ selectedTournament()?.description }}</p>
+        </div>
+
+        <div class="tournament-rules">
+          <h3>Tournament Rules</h3>
+          <ul>
+            <li>Standard tournament rules apply</li>
+            <li>Teams must have all players present at start time</li>
+            <li>No cheating or exploits allowed</li>
+            <li>Respectful conduct required at all times</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="team-selection">
+        <h3>Choose Your Team</h3>
+
+        <div class="team-options">
+          <div class="option-toggle">
+            <label class="toggle-option" [class.active]="!form().createNewTeam">
+              <input
+                type="radio"
+                [value]="false"
+                [(ngModel)]="form().createNewTeam"
+                name="teamOption"
+              />
+              Use Existing Team
+            </label>
+            <label class="toggle-option" [class.active]="form().createNewTeam">
+              <input
+                type="radio"
+                [value]="true"
+                [(ngModel)]="form().createNewTeam"
+                name="teamOption"
+              />
+              Create New Team
+            </label>
+          </div>
+
+          <!-- Existing Team Selection -->
+          <div *ngIf="!form().createNewTeam" class="existing-teams">
+            <div class="teams-list">
+              <div
+                *ngFor="let team of userTeams()"
+                class="team-option"
+                [class.selected]="form().teamId === team.id"
+                (click)="selectTeam(team.id)"
+              >
+                <div class="team-info">
+                  <div class="team-logo">
+                    <img
+                      *ngIf="team.logoUrl"
+                      [src]="team.logoUrl"
+                      [alt]="team.name + ' logo'"
+                    />
+                    <div *ngIf="!team.logoUrl" class="logo-placeholder">
+                      {{ getTeamInitials(team.name) }}
+                    </div>
+                  </div>
+                  <div class="team-details">
+                    <h4>{{ team.name }}</h4>
+                    <p>{{ team.numberOfPlayers }} players</p>
+                    <span class="team-role">{{ team.role || "Member" }}</span>
+                  </div>
+                </div>
+                <div
+                  class="selection-indicator"
+                  *ngIf="form().teamId === team.id"
+                >
+                  ✓
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="userTeams().length === 0" class="no-teams">
+              <p>You don't have any teams yet. Create a new team below.</p>
+              <button class="btn-outline" (click)="form().createNewTeam = true">
+                Create New Team
+              </button>
+            </div>
+          </div>
+
+          <!-- New Team Creation -->
+          <div *ngIf="form().createNewTeam" class="new-team-form">
+            <div class="form-group">
+              <label for="teamName">Team Name</label>
+              <input
+                type="text"
+                id="teamName"
+                [(ngModel)]="form().teamName"
+                placeholder="Enter your team name"
+                class="form-input"
+                required
+              />
+            </div>
+
+            <div class="team-info-note">
+              <p>
+                📝 You'll be able to invite team members after registering for
+                the tournament.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="terms-section">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="form().agreeToTerms" required />
+          <span class="checkmark"></span>
+          I agree to the tournament rules and terms of service
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-secondary" (click)="selectedTournament.set(null)">
+          Back to Tournament Selection
+        </button>
+        <button
+          class="btn-primary"
+          (click)="submitRegistration()"
+          [disabled]="!canSubmit()"
+        >
+          {{ isSubmitting() ? "Registering..." : "Join Tournament" }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="registrationSuccess()" class="success-state">
+      <div class="success-icon">🎉</div>
+      <h2>Registration Successful!</h2>
+      <p>
+        You have successfully registered for {{ selectedTournament()?.name }}.
+      </p>
+
+      <div class="success-actions">
+        <button class="btn-primary" (click)="viewTournament()">
+          View Tournament
+        </button>
+        <button class="btn-outline" (click)="goToMyTournaments()">
+          My Tournaments
+        </button>
+      </div>
+    </div>
+  </div>
+</app-user-layout>
