@@ -50,6 +50,8 @@ export class TournamentFormComponent implements OnInit {
     minPlayersPerTeam: [7, [Validators.required, Validators.min(7), Validators.max(25)]],
     entryFee: [0, [Validators.min(0)]],
     prizePool: [0, [Validators.min(0)]],
+    bannerUrl: "",
+    logoUrl: "",
     contactEmail: ['', [Validators.email]],
     matchDuration: [90, [Validators.required, Validators.min(60), Validators.max(120)]],
     isPublic: [true]
@@ -90,6 +92,8 @@ export class TournamentFormComponent implements OnInit {
       maxTeams: this.tournament.maxTeams,
       maxPlayersPerTeam: this.tournament.maxPlayersPerTeam,
       minPlayersPerTeam: this.tournament.minPlayersPerTeam,
+      bannerUrl: this.tournament.bannerUrl || "",
+      logoUrl: this.tournament.logoUrl || "",
       entryFee: this.tournament.entryFee || 0,
       prizePool: this.tournament.prizePool || 0,
       contactEmail: this.tournament.contactEmail,
@@ -125,6 +129,8 @@ export class TournamentFormComponent implements OnInit {
       minPlayersPerTeam: formValue.minPlayersPerTeam || undefined,
       entryFee: formValue.entryFee || undefined,
       prizePool: formValue.prizePool || undefined,
+      bannerUrl: formValue.bannerUrl || undefined,
+      logoUrl: formValue.logoUrl || undefined,
       contactEmail: formValue.contactEmail || undefined,
       matchDuration: formValue.matchDuration || undefined,
       isPublic: formValue.isPublic ?? undefined
@@ -182,6 +188,7 @@ export class TournamentFormComponent implements OnInit {
     this.tournamentService.uploadOrganizerTournamentBanner(this.tournament.id, file).subscribe({
       next: (response) => {
         this.currentBannerUrl.set(response.bannerUrl);
+        this.tournamentForm.patchValue({bannerUrl:this.currentBannerUrl()})
         this.toastService.success('Banner uploaded successfully');
         this.uploadingBanner.set(false);
       }
@@ -198,6 +205,7 @@ export class TournamentFormComponent implements OnInit {
     this.tournamentService.uploadTournamentLogo(this.tournament.id, file).subscribe({
       next: (response) => {
         this.currentLogoUrl.set(response.logoUrl);
+        this.tournamentForm.patchValue({logoUrl:this.currentLogoUrl()})
         this.toastService.success('Logo uploaded successfully');
         this.uploadingLogo.set(false);
       }
