@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CreateTournament, UpdateTournament, Tournament, TournamentFormat } from '@/app/api/models/tournament.models';
 import { TournamentService } from '@/app/api/services';
 import { ToastService } from '@/app/shared/services/toast.service';
@@ -35,15 +35,85 @@ export class TournamentFormComponent implements OnInit {
   formats = signal<TournamentFormat[]>([]);
   currentBannerUrl = signal<string | null>(null);
   currentLogoUrl = signal<string | null>(null);
+  
+  // Get today's date in the correct format for datetime-local inputs
+  get todayDateTime(): string {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  }
+
+  // Custom validators
+  static dateNotInPast(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const selectedDate = new Date(control.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      return { dateInPast: true };
+    }
+    return null;
+  }
+
+  static registrationDeadlineValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.parent) return null;
+    
+    const registrationStart = control.parent.get('registrationStartDate')?.value;
+    const registrationDeadline = control.value;
+    const startDate = control.parent.get('startDate')?.value;
+    
+    if (!registrationDeadline) return null;
+    
+    // Check if deadline is after registration start
+    if (registrationStart && new Date(registrationDeadline) <= new Date(registrationStart)) {
+      return { deadlineBeforeStart: true };
+    }
+    
+    // Check if deadline is before tournament start
+    if (startDate && new Date(registrationDeadline) >= new Date(startDate)) {
+      return { deadlineAfterTournamentStart: true };
+    }
+    
+    return null;
+  }
+
+  static tournamentStartDateValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.parent) return null;
+    
+    const registrationDeadline = control.parent.get('registrationDeadline')?.value;
+    const startDate = control.value;
+    
+    if (!startDate) return null;
+    
+    // Check if start date is after registration deadline
+    if (registrationDeadline && new Date(startDate) <= new Date(registrationDeadline)) {
+      return { startBeforeDeadline: true };
+    }
+    
+    return null;
+  }
 
   tournamentForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
     description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(2000)]],
     location: ['', [Validators.maxLength(200)]],
     formatId: ['', [Validators.required]],
-    registrationStartDate: [''],
-    registrationDeadline: [''],
-    startDate: ['', [Validators.required]],
+    registrationStartDate: ['', [
+      Validators.required, 
+      TournamentFormComponent.dateNotInPast
+    ]],
+    registrationDeadline: ['', [
+      Validators.required, 
+      TournamentFormComponent.dateNotInPast,
+      TournamentFormComponent.registrationDeadlineValidator
+    ]],
+    startDate: ['', [
+      Validators.required, 
+      TournamentFormComponent.dateNotInPast,
+      TournamentFormComponent.tournamentStartDateValidator
+    ]],
     minTeams: [2, [Validators.required, Validators.min(2), Validators.max(64)]],
     maxTeams: [16, [Validators.required, Validators.min(4), Validators.max(128)]],
     maxPlayersPerTeam: [11, [Validators.required, Validators.min(7), Validators.max(25)]],
@@ -66,13 +136,59 @@ export class TournamentFormComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.setupCrossFieldValidation();
+    
     if (this.tournament) {
       this.isEdit.set(true);
       this.populateForm();
       this.currentBannerUrl.set(this.tournament.bannerUrl || null);
       this.currentLogoUrl.set(this.tournament.logoUrl || null);
     }
-    this.getTournamentFormats()
+    this.getTournamentFormats();
+  }
+
+  private setupCrossFieldValidation() {
+    // Re-validate related fields when date fields change
+    this.tournamentForm.get('registrationStartDate')?.valueChanges.subscribe(() => {
+      this.tournamentForm.get('registrationDeadline')?.updateValueAndValidity({ onlySelf: true });
+    });
+
+    this.tournamentForm.get('registrationDeadline')?.valueChanges.subscribe(() => {
+      this.tournamentForm.get('startDate')?.updateValueAndValidity({ onlySelf: true });
+    });
+
+    this.tournamentForm.get('startDate')?.valueChanges.subscribe(() => {
+      this.tournamentForm.get('registrationDeadline')?.updateValueAndValidity({ onlySelf: true });
+    });
+  }
+
+  // Helper methods for template validation checks
+  hasFieldError(fieldName: string, errorType: string): boolean {
+    const field = this.tournamentForm.get(fieldName);
+    return !!(field?.hasError(errorType) && (field?.dirty || field?.touched));
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.tournamentForm.get(fieldName);
+    if (!field || !field.errors || !field.touched) return '';
+
+    if (field.hasError('required')) {
+      return `${fieldName.replace(/([A-Z])/g, ' $1').toLowerCase()} is required`;
+    }
+    if (field.hasError('dateInPast')) {
+      return 'Date cannot be in the past';
+    }
+    if (field.hasError('deadlineBeforeStart')) {
+      return 'Registration deadline must be after registration start';
+    }
+    if (field.hasError('deadlineAfterTournamentStart')) {
+      return 'Registration deadline must be before tournament start';
+    }
+    if (field.hasError('startBeforeDeadline')) {
+      return 'Tournament start must be after registration deadline';
+    }
+    
+    return '';
   }
 
   populateForm() {

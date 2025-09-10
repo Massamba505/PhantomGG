@@ -184,21 +184,37 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <label class="form-label">Registration Start</label>
+        <label class="form-label"
+          >Registration Start <span class="required">*</span></label
+        >
         <input
           type="datetime-local"
           class="input-field"
           formControlName="registrationStartDate"
+          [min]="todayDateTime"
         />
+        @if (getFieldError('registrationStartDate')) {
+        <div class="error-message">
+          {{ getFieldError("registrationStartDate") }}
+        </div>
+        }
       </div>
 
       <div>
-        <label class="form-label">Registration Deadline</label>
+        <label class="form-label"
+          >Registration Deadline <span class="required">*</span></label
+        >
         <input
           type="datetime-local"
           class="input-field"
           formControlName="registrationDeadline"
+          [min]="todayDateTime"
         />
+        @if (getFieldError('registrationDeadline')) {
+        <div class="error-message">
+          {{ getFieldError("registrationDeadline") }}
+        </div>
+        }
       </div>
 
       <div>
@@ -209,10 +225,10 @@
           type="datetime-local"
           class="input-field"
           formControlName="startDate"
+          [min]="todayDateTime"
         />
-        @if (tournamentForm.get('startDate')?.invalid &&
-        tournamentForm.get('startDate')?.touched) {
-        <div class="error-message">Start date is required</div>
+        @if (getFieldError('startDate')) {
+        <div class="error-message">{{ getFieldError("startDate") }}</div>
         }
       </div>
     </div>
