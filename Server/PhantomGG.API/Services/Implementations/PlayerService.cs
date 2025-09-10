@@ -5,6 +5,7 @@ using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
 using PhantomGG.API.Security.Interfaces;
 using PhantomGG.API.Mappings;
+using PhantomGG.API.Exceptions;
 
 namespace PhantomGG.API.Services.Implementations
 {
@@ -91,7 +92,7 @@ namespace PhantomGG.API.Services.Implementations
         {
             // Validate user is authenticated
             if (!_currentUserService.IsAuthenticated())
-                throw new UnauthorizedAccessException("You must be logged in to create a player.");
+                throw new UnauthorizedException("You must be logged in to create a player.");
 
             // Validate team exists
             var team = await _teamRepository.GetByIdAsync(createDto.TeamId);
@@ -106,7 +107,7 @@ namespace PhantomGG.API.Services.Implementations
             bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
 
             if (!isTeamManager && !isTournamentOrganizer)
-                throw new UnauthorizedAccessException("You don't have permission to add players to this team.");
+                throw new UnauthorizedException("You don't have permission to add players to this team.");
 
             // Check team player limit
             var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(createDto.TeamId);
@@ -127,7 +128,7 @@ namespace PhantomGG.API.Services.Implementations
 
             // Check permissions
             if (!_currentUserService.IsAuthenticated())
-                throw new UnauthorizedAccessException("You must be logged in to update a player.");
+                throw new UnauthorizedException("You must be logged in to update a player.");
 
             var currentUser = _currentUserService.GetCurrentUser();
             var team = await _teamRepository.GetByIdAsync(existingPlayer.TeamId);
@@ -140,7 +141,7 @@ namespace PhantomGG.API.Services.Implementations
             bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
 
             if (!isTeamManager && !isTournamentOrganizer)
-                throw new UnauthorizedAccessException("You don't have permission to update this player.");
+                throw new UnauthorizedException("You don't have permission to update this player.");
 
             existingPlayer.UpdateFromDto(updateDto);
             var updatedPlayer = await _playerRepository.UpdateAsync(existingPlayer);
@@ -156,7 +157,7 @@ namespace PhantomGG.API.Services.Implementations
 
             // Check permissions
             if (!_currentUserService.IsAuthenticated())
-                throw new UnauthorizedAccessException("You must be logged in to delete a player.");
+                throw new UnauthorizedException("You must be logged in to delete a player.");
 
             var currentUser = _currentUserService.GetCurrentUser();
             var team = await _teamRepository.GetByIdAsync(player.TeamId);
@@ -169,7 +170,7 @@ namespace PhantomGG.API.Services.Implementations
             bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
 
             if (!isTeamManager && !isTournamentOrganizer)
-                throw new UnauthorizedAccessException("You don't have permission to delete this player.");
+                throw new UnauthorizedException("You don't have permission to delete this player.");
 
             // Check if tournament has started
             if (tournament != null && tournament.StartDate <= DateTime.UtcNow)
@@ -199,7 +200,7 @@ namespace PhantomGG.API.Services.Implementations
 
             // Check permissions
             if (!await IsPlayerOwnedByUserAsync(playerId, userId))
-                throw new UnauthorizedAccessException("You don't have permission to update this player's photo.");
+                throw new UnauthorizedException("You don't have permission to update this player's photo.");
 
             // For MVP, return a placeholder URL
             // TODO: Implement actual file upload service

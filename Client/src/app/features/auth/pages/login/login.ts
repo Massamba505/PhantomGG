@@ -2,12 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { LoginRequest } from '@/app/shared/models/Authentication';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { LoginRequest } from '@/app/api/models';
 
 @Component({
   selector: 'app-login',

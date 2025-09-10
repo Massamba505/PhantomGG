@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PhantomGG.API.DTOs.Match;
 using PhantomGG.API.Services.Interfaces;
 using PhantomGG.API.Security.Interfaces;
+using PhantomGG.API.Exceptions;
 
 namespace PhantomGG.API.Controllers;
 
@@ -130,7 +131,7 @@ public class MatchesController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedException ex)
         {
             return Forbid(ex.Message);
         }
@@ -169,7 +170,7 @@ public class MatchesController : ControllerBase
         {
             return NotFound();
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedException ex)
         {
             return Forbid(ex.Message);
         }
@@ -208,7 +209,7 @@ public class MatchesController : ControllerBase
         {
             return NotFound();
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedException ex)
         {
             return Forbid(ex.Message);
         }
@@ -241,7 +242,7 @@ public class MatchesController : ControllerBase
         {
             return NotFound();
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedException ex)
         {
             return Forbid(ex.Message);
         }
@@ -277,7 +278,7 @@ public class MatchesController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedException ex)
         {
             return Forbid(ex.Message);
         }
@@ -323,7 +324,7 @@ public class MatchesController : ControllerBase
         {
             return BadRequest(new { success = false, message = ex.Message });
         }
-        catch (UnauthorizedAccessException ex)
+        catch (UnauthorizedException ex)
         {
             return StatusCode(403, new { success = false, message = ex.Message });
         }

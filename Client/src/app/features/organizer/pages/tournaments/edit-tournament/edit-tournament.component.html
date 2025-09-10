@@ -1,0 +1,30 @@
+<div class="mb-2">
+  <button class="btn btn-outline" (click)="goBack()">
+    <lucide-angular [img]="icons.ArrowLeft" [size]="20"></lucide-angular>
+    Back
+  </button>
+</div>
+@if (loading()) {
+<div class="text-center py-12">
+  <p>Loading tournament...</p>
+</div>
+} @if (!loading() && !tournament()) {
+<div class="text-center py-12">
+  <h2 class="text-xl font-semibold mb-2">Tournament Not Found</h2>
+  <p class="opacity-75 mb-4">
+    The tournament you're trying to edit doesn't exist.
+  </p>
+  <button class="btn btn-primary" (click)="goBack()">
+    Back to Tournaments
+  </button>
+</div>
+} @if (!loading() && tournament()) {
+<div class="max-w-4xl">
+  <app-tournament-form
+    [tournament]="tournament()"
+    [loadingState]="saving()"
+    (formUpdate)="onUpdate($event)"
+    (formCancel)="goBack()"
+  />
+</div>
+}

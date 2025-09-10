@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PhantomGG.API.Common;
 using PhantomGG.API.Data;
+using PhantomGG.API.DTOs;
 using PhantomGG.API.DTOs.Tournament;
 using PhantomGG.API.Models;
 using PhantomGG.API.Repositories.Interfaces;
@@ -45,12 +46,48 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
 
         if (!string.IsNullOrEmpty(searchDto.SearchTerm))
         {
-            query = query.Where(t => t.Name.Contains(searchDto.SearchTerm));
+            query = query.Where(t => t.Name.Contains(searchDto.SearchTerm) ||
+                                    t.Description.Contains(searchDto.SearchTerm));
         }
 
-        if (!string.IsNullOrEmpty(searchDto.Status.ToString()))
+        if (!string.IsNullOrEmpty(searchDto.Status))
         {
-            query = query.Where(t => t.Status == searchDto.Status.ToString());
+            query = query.Where(t => t.Status == searchDto.Status);
+        }
+
+        if (!string.IsNullOrEmpty(searchDto.Location))
+        {
+            query = query.Where(t => t.Location != null && t.Location.Contains(searchDto.Location));
+        }
+
+        if (!string.IsNullOrEmpty(searchDto.FormatId) && Guid.TryParse(searchDto.FormatId, out var formatId))
+        {
+            query = query.Where(t => t.FormatId == formatId);
+        }
+
+        if (searchDto.MinPrizePool.HasValue)
+        {
+            query = query.Where(t => t.PrizePool >= searchDto.MinPrizePool.Value);
+        }
+
+        if (searchDto.MaxPrizePool.HasValue)
+        {
+            query = query.Where(t => t.PrizePool <= searchDto.MaxPrizePool.Value);
+        }
+
+        if (searchDto.StartDateFrom.HasValue)
+        {
+            query = query.Where(t => t.StartDate >= searchDto.StartDateFrom.Value);
+        }
+
+        if (searchDto.StartDateTo.HasValue)
+        {
+            query = query.Where(t => t.StartDate <= searchDto.StartDateTo.Value);
+        }
+
+        if (searchDto.IsPublic.HasValue)
+        {
+            query = query.Where(t => t.IsPublic == searchDto.IsPublic.Value);
         }
 
         query = query.OrderByDescending(t => t.CreatedAt);
@@ -62,6 +99,93 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         }
 
         return await query.ToListAsync();
+    }
+
+    public async Task<PaginatedResponse<Tournament>> SearchWithPaginationAsync(TournamentSearchDto searchDto, Guid? userId = null)
+    {
+        var baseQuery = _context.Tournaments
+            .Include(t => t.Format)
+            .Include(t => t.Organizer)
+            .Where(t => t.IsActive);
+
+        var filteredQuery = baseQuery;
+
+        if(userId.HasValue)
+        {
+            filteredQuery = filteredQuery.Where(t => t.OrganizerId == userId.Value);
+        }
+
+        if (!string.IsNullOrEmpty(searchDto.SearchTerm))
+        {
+            filteredQuery = filteredQuery.Where(t =>
+                t.Name.Contains(searchDto.SearchTerm) ||
+                t.Description.Contains(searchDto.SearchTerm));
+        }
+
+        if (!string.IsNullOrEmpty(searchDto.Status))
+        {
+            filteredQuery = filteredQuery.Where(t => t.Status == searchDto.Status);
+        }
+
+        if (!string.IsNullOrEmpty(searchDto.Location))
+        {
+            filteredQuery = filteredQuery.Where(t =>
+                t.Location != null && t.Location.Contains(searchDto.Location));
+        }
+
+        if (!string.IsNullOrEmpty(searchDto.FormatId) && Guid.TryParse(searchDto.FormatId, out var formatId))
+        {
+            filteredQuery = filteredQuery.Where(t => t.FormatId == formatId);
+        }
+
+        if (searchDto.MinPrizePool.HasValue)
+        {
+            filteredQuery = filteredQuery.Where(t => t.PrizePool >= searchDto.MinPrizePool.Value);
+        }
+
+        if (searchDto.MaxPrizePool.HasValue)
+        {
+            filteredQuery = filteredQuery.Where(t => t.PrizePool <= searchDto.MaxPrizePool.Value);
+        }
+
+        if (searchDto.StartDateFrom.HasValue)
+        {
+            filteredQuery = filteredQuery.Where(t => t.StartDate >= searchDto.StartDateFrom.Value);
+        }
+
+        if (searchDto.StartDateTo.HasValue)
+        {
+            filteredQuery = filteredQuery.Where(t => t.StartDate <= searchDto.StartDateTo.Value);
+        }
+
+        if (searchDto.IsPublic.HasValue)
+        {
+            filteredQuery = filteredQuery.Where(t => t.IsPublic == searchDto.IsPublic.Value);
+        }
+
+        var totalRecords = await filteredQuery.CountAsync();
+
+        var paginatedQuery = filteredQuery.OrderByDescending(t => t.CreatedAt);
+
+        List<Tournament> tournaments;
+        if (searchDto.PageSize > 0)
+        {
+            tournaments = await paginatedQuery
+                .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
+                .Take(searchDto.PageSize)
+                .ToListAsync();
+        }
+        else
+        {
+            tournaments = await paginatedQuery.ToListAsync();
+        }
+
+        return new PaginatedResponse<Tournament>(
+            tournaments,
+            searchDto.PageNumber,
+            searchDto.PageSize > 0 ? searchDto.PageSize : totalRecords,
+            totalRecords
+        );
     }
 
     public async Task<Tournament> CreateAsync(Tournament tournament)

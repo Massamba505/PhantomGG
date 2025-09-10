@@ -53,6 +53,21 @@ public class TournamentsController(
     }
 
     /// <summary>
+    /// Get all tournament formats
+    /// </summary>
+    [HttpGet("formats")]
+    public async Task<ActionResult<ApiResponse>> GetAllFormats()
+    {
+        var formats = await _tournamentService.GetAllFormatsAsync();
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = formats,
+            Message = "All formats retrieved successfully"
+        });
+    }
+
+    /// <summary>
     /// Get a specific tournament by ID
     /// </summary>
     /// <param name="id">The tournament ID</param>
@@ -71,32 +86,10 @@ public class TournamentsController(
     /// <summary>
     /// Search tournaments with various filters
     /// </summary>
-    /// <param name="searchTerm">Search term for tournament name or description</param>
-    /// <param name="startDate">Filter by start date (tournaments starting after this date)</param>
-    /// <param name="endDate">Filter by end date (tournaments ending before this date)</param>
-    /// <param name="status">Filter by tournament status</param>
-    /// <param name="pageNumber">Page number for pagination</param>
-    /// <param name="pageSize">Number of items per page</param>
     [HttpGet("search")]
-    public async Task<ActionResult<ApiResponse>> SearchTournaments(
-        [FromQuery] string? searchTerm = null,
-        [FromQuery] DateTime? startDate = null,
-        [FromQuery] DateTime? endDate = null,
-        [FromQuery] string? status = null,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<ApiResponse>> SearchTournaments([FromQuery] TournamentSearchDto searchDto)
     {
-        var searchDto = new TournamentSearchDto
-        {
-            SearchTerm = searchTerm,
-            StartDate = startDate,
-            EndDate = endDate,
-            Status = string.IsNullOrEmpty(status) ? null : Enum.Parse<TournamentStatus>(status, true),
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        };
-
-        var tournaments = await _tournamentService.SearchAsync(searchDto);
+        var tournaments = await _tournamentService.SearchWithPaginationAsync(searchDto);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -206,7 +199,7 @@ public class TournamentsController(
     {
         var searchDto = new TournamentSearchDto
         {
-            Status = TournamentStatus.InProgress,
+            Status = "InProgress",
             PageNumber = pageNumber,
             PageSize = pageSize
         };

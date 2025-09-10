@@ -1,10 +1,14 @@
-using PhantomGG.API.DTOs.Tournament;
-using PhantomGG.API.Repositories.Interfaces;
-using PhantomGG.API.Services.Interfaces;
-using PhantomGG.API.Security.Interfaces;
-using PhantomGG.API.Mappings;
 using PhantomGG.API.Common;
+using PhantomGG.API.DTOs;
+using PhantomGG.API.DTOs.Tournament;
+using PhantomGG.API.DTOs.TournamentFormat;
+using PhantomGG.API.Exceptions;
+using PhantomGG.API.Mappings;
 using PhantomGG.API.Models;
+using PhantomGG.API.Repositories.Implementations;
+using PhantomGG.API.Repositories.Interfaces;
+using PhantomGG.API.Security.Interfaces;
+using PhantomGG.API.Services.Interfaces;
 
 namespace PhantomGG.API.Services.Implementations;
 
@@ -12,13 +16,26 @@ public class TournamentService(
     ITournamentRepository tournamentRepository,
     ITeamRepository teamRepository,
     ICurrentUserService currentUserService,
-    IImageService imageService) : ITournamentService
+    IImageService imageService,
+    ITournamentFormatRepository tournamentFormatRepository) : ITournamentService
 {
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
+    private ITournamentFormatRepository _tournamentFormatRepository = tournamentFormatRepository;
     private readonly ITeamRepository _teamRepository = teamRepository;
     private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly IImageService _imageService = imageService;
 
+
+    public async Task<IEnumerable<TournamentFormatDto>> GetAllFormatsAsync()
+    {
+        var formats = await _tournamentFormatRepository.GetAllAsync();
+        return formats.Select(f => new TournamentFormatDto
+        {
+            Id = f.Id,
+            Name = f.Name,
+            Description = f.Description,
+        });
+    }
     public async Task<IEnumerable<TournamentDto>> GetAllAsync()
     {
         var tournaments = await _tournamentRepository.GetAllAsync();
@@ -52,6 +69,20 @@ public class TournamentService(
         return tournaments.Select(tournament => tournament.ToTournamentDto());
     }
 
+    public async Task<PaginatedResponse<TournamentDto>> SearchWithPaginationAsync(TournamentSearchDto searchDto, Guid? userId = null)
+    {
+        var paginatedTournaments = await _tournamentRepository.SearchWithPaginationAsync(searchDto, userId:userId);
+
+        var tournamentDtos = paginatedTournaments.Data.Select(tournament => tournament.ToTournamentDto());
+
+        return new PaginatedResponse<TournamentDto>(
+            tournamentDtos,
+            paginatedTournaments.PageNumber,
+            paginatedTournaments.PageSize,
+            paginatedTournaments.TotalRecords
+        );
+    }
+
     public async Task<TournamentDto> CreateAsync(CreateTournamentDto createDto, Guid organizerId)
     {
         var tournament = createDto.ToTournament(organizerId);
@@ -66,7 +97,7 @@ public class TournamentService(
             throw new ArgumentException("Tournament not found");
 
         if (existingTournament.OrganizerId != userId)
-            throw new UnauthorizedAccessException("You don't have permission to update this tournament");
+            throw new UnauthorizedException("You don't have permission to update this tournament");
 
         existingTournament.UpdateFromDto(updateDto);
         var updatedTournament = await _tournamentRepository.UpdateAsync(existingTournament);
@@ -80,7 +111,7 @@ public class TournamentService(
             throw new ArgumentException("Tournament not found");
 
         if (tournament.OrganizerId != userId)
-            throw new UnauthorizedAccessException("You don't have permission to delete this tournament");
+            throw new UnauthorizedException("You don't have permission to delete this tournament");
 
         await _tournamentRepository.DeleteAsync(id);
     }
@@ -92,7 +123,7 @@ public class TournamentService(
             throw new ArgumentException("Tournament not found");
 
         if (tournament.OrganizerId != userId)
-            throw new UnauthorizedAccessException("You don't have permission to modify this tournament");
+            throw new UnauthorizedException("You don't have permission to modify this tournament");
 
         tournament.Status = status.ToString();
         return tournament;
@@ -112,7 +143,7 @@ public class TournamentService(
             throw new ArgumentException("Tournament not found");
 
         if (tournament.OrganizerId != userId)
-            throw new UnauthorizedAccessException("You don't have permission to modify this tournament");
+            throw new UnauthorizedException("You don't have permission to modify this tournament");
 
         tournament = await ChangeTournamentStatue(id, userId, TournamentStatus.Completed);
         var updatedTournament = await _tournamentRepository.UpdateAsync(tournament);
@@ -178,7 +209,7 @@ public class TournamentService(
 
         var currentUser = _currentUserService.GetCurrentUser();
         if (team.ManagerEmail != currentUser.Email)
-            throw new UnauthorizedAccessException("You don't have permission to register this team");
+            throw new UnauthorizedException("You don't have permission to register this team");
 
         if (team.TournamentId == tournamentId)
             throw new InvalidOperationException("Team is already registered for this tournament");
@@ -209,7 +240,7 @@ public class TournamentService(
 
         var currentUser = _currentUserService.GetCurrentUser();
         if (team.ManagerEmail != currentUser.Email)
-            throw new UnauthorizedAccessException("You don't have permission to unregister this team");
+            throw new UnauthorizedException("You don't have permission to unregister this team");
 
         if (team.TournamentId != tournamentId)
             throw new InvalidOperationException("Team is not registered for this tournament");
@@ -231,7 +262,7 @@ public class TournamentService(
             throw new ArgumentException("Tournament not found");
 
         if (tournament.OrganizerId != userId)
-            throw new UnauthorizedAccessException("You don't have permission to upload banner for this tournament");
+            throw new UnauthorizedException("You don't have permission to upload banner for this tournament");
 
         if (!string.IsNullOrEmpty(tournament.BannerUrl))
         {
@@ -252,7 +283,7 @@ public class TournamentService(
             throw new ArgumentException("Tournament not found");
 
         if (tournament.OrganizerId != userId)
-            throw new UnauthorizedAccessException("You don't have permission to upload logo for this tournament");
+            throw new UnauthorizedException("You don't have permission to upload logo for this tournament");
 
         // Delete old logo if exists
         if (!string.IsNullOrEmpty(tournament.LogoUrl))

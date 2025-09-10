@@ -1,5 +1,6 @@
 using PhantomGG.API.Models;
 using PhantomGG.API.DTOs.Tournament;
+using PhantomGG.API.DTOs;
 
 namespace PhantomGG.API.Repositories.Interfaces;
 
@@ -9,6 +10,7 @@ public interface ITournamentRepository
     Task<Tournament?> GetByIdAsync(Guid id);
     Task<IEnumerable<Tournament>> GetByOrganizerAsync(Guid organizerId);
     Task<IEnumerable<Tournament>> SearchAsync(TournamentSearchDto searchDto);
+    Task<PaginatedResponse<Tournament>> SearchWithPaginationAsync(TournamentSearchDto searchDto, Guid? userId = null);
     Task<Tournament> CreateAsync(Tournament tournament);
     Task<Tournament> UpdateAsync(Tournament tournament);
     Task DeleteAsync(Guid id);

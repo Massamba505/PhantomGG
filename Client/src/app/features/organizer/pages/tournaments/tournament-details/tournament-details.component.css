@@ -1,0 +1,14 @@
+.tournament-banner {
+  position: relative;
+  border-radius: calc(var(--radius) - 2px);
+  overflow: hidden;
+  background-color: hsl(var(--muted));
+  min-height: 200px;
+}
+
+.tournament-banner .h-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}

@@ -5,6 +5,7 @@ using PhantomGG.API.Repositories.Interfaces;
 using PhantomGG.API.Services.Interfaces;
 using PhantomGG.API.Security.Interfaces;
 using PhantomGG.API.Mappings;
+using PhantomGG.API.Exceptions;
 
 namespace PhantomGG.API.Services.Implementations;
 
@@ -80,7 +81,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Tournament not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(createDto.TournamentId, userId))
-            throw new UnauthorizedAccessException("You don't have permission to create matches for this tournament");
+            throw new UnauthorizedException("You don't have permission to create matches for this tournament");
 
         // Validate teams exist and are part of the tournament
         var homeTeam = await _teamRepository.GetByIdAsync(createDto.HomeTeamId);
@@ -108,7 +109,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Match not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(id, userId))
-            throw new UnauthorizedAccessException("You don't have permission to update this match");
+            throw new UnauthorizedException("You don't have permission to update this match");
 
         match.UpdateFromDto(updateDto);
         var updatedMatch = await _matchRepository.UpdateAsync(match);
@@ -122,7 +123,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Match not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(id, userId))
-            throw new UnauthorizedAccessException("You don't have permission to update this match result");
+            throw new UnauthorizedException("You don't have permission to update this match result");
 
         // Update match result
         match.HomeScore = resultDto.HomeScore;
@@ -140,7 +141,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Match not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(id, userId))
-            throw new UnauthorizedAccessException("You don't have permission to delete this match");
+            throw new UnauthorizedException("You don't have permission to delete this match");
 
         await _matchRepository.DeleteAsync(id);
     }
@@ -158,7 +159,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Tournament not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(generateDto.TournamentId, userId))
-            throw new UnauthorizedAccessException("You don't have permission to generate fixtures for this tournament");
+            throw new UnauthorizedException("You don't have permission to generate fixtures for this tournament");
 
         var teams = await _teamRepository.GetByTournamentAsync(generateDto.TournamentId);
         var teamsList = teams.Where(t => t.RegistrationStatus == "Approved").ToList();
@@ -232,7 +233,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Tournament not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(generateDto.TournamentId, userId))
-            throw new UnauthorizedAccessException("You don't have permission to generate fixtures for this tournament");
+            throw new UnauthorizedException("You don't have permission to generate fixtures for this tournament");
 
         var teams = await _teamRepository.GetByTournamentAsync(generateDto.TournamentId);
         var teamsList = teams.Where(t => t.RegistrationStatus == "Approved").ToList();
@@ -332,7 +333,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Match not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(matchId, userId))
-            throw new UnauthorizedAccessException("You don't have permission to start this match");
+            throw new UnauthorizedException("You don't have permission to start this match");
 
         match.Status = "In Progress";
 
@@ -347,7 +348,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Match not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(matchId, userId))
-            throw new UnauthorizedAccessException("You don't have permission to end this match");
+            throw new UnauthorizedException("You don't have permission to end this match");
 
         match.Status = "Completed";
 
@@ -362,7 +363,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Match not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(matchId, userId))
-            throw new UnauthorizedAccessException("You don't have permission to cancel this match");
+            throw new UnauthorizedException("You don't have permission to cancel this match");
 
         match.Status = "Cancelled";
 
@@ -377,7 +378,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Match not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(matchId, userId))
-            throw new UnauthorizedAccessException("You don't have permission to postpone this match");
+            throw new UnauthorizedException("You don't have permission to postpone this match");
 
         match.MatchDate = newDate;
         match.Status = "Postponed";
@@ -406,7 +407,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Tournament not found");
 
         if (!await _tournamentRepository.IsOrganizerAsync(generateDto.TournamentId, userId))
-            throw new UnauthorizedAccessException("You don't have permission to generate fixtures for this tournament");
+            throw new UnauthorizedException("You don't have permission to generate fixtures for this tournament");
 
         // Check if we have enough teams
         var approvedTeamCount = await _tournamentRepository.GetApprovedTeamCountAsync(generateDto.TournamentId);
