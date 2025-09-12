@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -31,6 +31,10 @@
     <ProjectReference Include="..\PhantomGG.Common\PhantomGG.Common.csproj" />
     <ProjectReference Include="..\PhantomGG.Models\PhantomGG.Models.csproj" />
     <ProjectReference Include="..\PhantomGG.Service\PhantomGG.Service.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>

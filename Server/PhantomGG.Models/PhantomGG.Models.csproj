@@ -10,4 +10,8 @@
     <ProjectReference Include="..\PhantomGG.Common\PhantomGG.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+  </ItemGroup>
+
 </Project>

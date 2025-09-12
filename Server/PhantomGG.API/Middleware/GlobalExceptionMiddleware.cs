@@ -1,5 +1,5 @@
-using PhantomGG.API.DTOs;
-using PhantomGG.API.Exceptions;
+using PhantomGG.Models.DTOs;
+using PhantomGG.Service.Exceptions;
 using System.Net;
 using System.Text.Json;
 
