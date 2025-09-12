@@ -1,4 +1,5 @@
 using PhantomGG.API.DTOs.User;
+using PhantomGG.API.Exceptions;
 using PhantomGG.API.Security.Interfaces;
 using System.Security.Claims;
 
@@ -13,18 +14,18 @@ public class CurrentUserService(
     {
         if (!IsAuthenticated())
         {
-            throw new UnauthorizedAccessException("User is not authenticated");
+            throw new UnauthorizedException("User is not authenticated");
         }
 
         var user = _httpContextAccessor.HttpContext?.User!;
 
         var idClaim = user.FindFirst(ClaimTypes.NameIdentifier);
-        var emailClaim =  user.FindFirst(ClaimTypes.Email);
+        var emailClaim = user.FindFirst(ClaimTypes.Email);
         var roleClaim = user.FindFirst(ClaimTypes.Role);
 
         if (idClaim == null || emailClaim == null || roleClaim == null)
         {
-            throw new UnauthorizedAccessException("Required claims are missing");
+            throw new UnauthorizedException("Required claims are missing");
         }
 
         return new CurrentUserDto

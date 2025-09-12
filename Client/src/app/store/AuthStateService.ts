@@ -1,10 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import {
-  LoginRequest,
-  SignUpRequest,
-  AuthResponse,
-} from '@/app/shared/models/Authentication';
-import {
   catchError,
   tap,
   throwError,
@@ -12,10 +7,9 @@ import {
   finalize,
   Observable,
 } from 'rxjs';
-import { AuthService } from '../core/services/auth.service';
 import { TokenRefreshService } from '../core/services/tokenRefresh.service';
-import { User } from '../shared/models/User';
-import { ApiResponse } from '../shared/models/ApiResponse';
+import { ApiResponse, Auth, LoginRequest, RegisterRequest, User } from '../api/models';
+import { AuthService } from '../api/services';
 
 @Injectable({
   providedIn: 'root',
@@ -58,7 +52,7 @@ export class AuthStateService {
     );
   }
 
-  signup(credentials: SignUpRequest) {
+  signup(credentials: RegisterRequest) {
     return this.withLoading(
       this.authService.signup(credentials).pipe(
         tap((res) => this.handleAuthSuccess(res)),
@@ -67,7 +61,7 @@ export class AuthStateService {
     );
   }
 
-  logout(): Observable<ApiResponse<any>> {
+  logout(): Observable<void> {
     return this.withLoading(
       this.authService.logout().pipe(
         tap(() => this.clearAuthState()),
@@ -81,17 +75,17 @@ export class AuthStateService {
 
   private loadUser() {
     return this.withLoading(
-      this.authService.getMe().pipe(
-        tap((res) => this.userSignal.set(res.data!)),
+      this.authService.getCurrentUser().pipe(
+        tap((data) => this.userSignal.set(data)),
         catchError((err) => throwError(() => err))
       )
     );
   }
 
-  private handleAuthSuccess(res: ApiResponse<AuthResponse>) {
-    const { accessToken, user } = res.data!;
-    this.tokenService.setToken(accessToken!);
-    this.userSignal.set(user!);
+  private handleAuthSuccess(res: Auth) {
+    const { accessToken, user } = res;
+    this.tokenService.setToken(accessToken);
+    this.userSignal.set(user);
   }
 
   private clearAuthState() {

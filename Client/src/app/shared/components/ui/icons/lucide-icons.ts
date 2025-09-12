@@ -34,7 +34,14 @@ import {
   AlertTriangle,
   Settings,
   UserCircle2,
-  Camera
+  Camera,
+  ArrowLeft,
+  CreditCard,
+  Clock,
+  UserCircle,
+  Play,
+  Mail,
+  Activity
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -73,5 +80,12 @@ export const LucideIcons = {
   AlertTriangle,
   Settings,
   UserCircle2,
-  Camera
+  Camera,
+  ArrowLeft,
+  CreditCard,
+  Clock,
+  UserCircle,
+  Play,
+  Mail,
+  Activity
 };

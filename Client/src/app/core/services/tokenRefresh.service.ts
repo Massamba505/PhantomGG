@@ -9,8 +9,8 @@ import {
   take,
 } from 'rxjs';
 import { HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
-import { AuthService } from './auth.service';
 import { TokenStorage } from '@/app/shared/utils/tokenStorage';
+import { AuthService } from '@/app/api/services';
 
 @Injectable({
   providedIn: 'root',
@@ -57,10 +57,10 @@ export class TokenRefreshService {
     this.refreshInProgress.next(true);
     this.refreshTokenSubject.next(null);
 
-    return this.authService.refresh().pipe(
+    return this.authService.refreshToken().pipe(
       switchMap((res: any) => {
         this.refreshInProgress.next(false);
-        const token = res.data.accessToken;
+        const token = res.accessToken;
         this.setToken(token);
 
         this.refreshTokenSubject.next(token);

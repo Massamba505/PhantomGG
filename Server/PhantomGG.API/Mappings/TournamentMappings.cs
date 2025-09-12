@@ -13,19 +13,31 @@ public static class TournamentMappings
             Name = tournament.Name,
             Description = tournament.Description,
             Location = tournament.Location,
+            FormatId = tournament.FormatId,
+            FormatName = tournament.Format?.Name ?? "Unknown",
+            RegistrationStartDate = tournament.RegistrationStartDate,
             RegistrationDeadline = tournament.RegistrationDeadline,
             StartDate = tournament.StartDate,
-            EndDate = tournament.EndDate,
+            MinTeams = tournament.MinTeams,
             MaxTeams = tournament.MaxTeams,
+            MaxPlayersPerTeam = tournament.MaxPlayersPerTeam,
+            MinPlayersPerTeam = tournament.MinPlayersPerTeam,
             EntryFee = tournament.EntryFee,
-            Prize = tournament.Prize,
+            PrizePool = tournament.PrizePool,
             ContactEmail = tournament.ContactEmail,
             BannerUrl = tournament.BannerUrl,
+            LogoUrl = tournament.LogoUrl,
             Status = tournament.Status,
-            Organizer = tournament.Organizer,
-            OrganizerName = tournament.OrganizerNavigation?.FirstName + " " + tournament.OrganizerNavigation?.LastName ?? "Unknown",
+            MatchDuration = tournament.MatchDuration ?? 90,
+            OrganizerId = tournament.OrganizerId,
+            OrganizerName = tournament.Organizer?.FirstName + " " + tournament.Organizer?.LastName ?? "Unknown",
+            CreatedAt = tournament.CreatedAt,
+            UpdatedAt = tournament.UpdatedAt,
+            IsActive = tournament.IsActive,
+            IsPublic = tournament.IsPublic,
             TeamCount = tournament.Teams?.Count ?? 0,
-            CreatedAt = tournament.CreatedAt
+            MatchCount = tournament.Matches?.Count ?? 0,
+            CompletedMatches = tournament.Matches?.Count(m => m.Status == "Completed") ?? 0
         };
     }
 
@@ -37,16 +49,23 @@ public static class TournamentMappings
             Name = dto.Name,
             Description = dto.Description,
             Location = dto.Location,
+            FormatId = dto.FormatId,
+            RegistrationStartDate = dto.RegistrationStartDate,
             RegistrationDeadline = dto.RegistrationDeadline,
             StartDate = dto.StartDate,
-            EndDate = dto.EndDate,
+            MinTeams = dto.MinTeams,
             MaxTeams = dto.MaxTeams,
+            MaxPlayersPerTeam = dto.MaxPlayersPerTeam,
+            MinPlayersPerTeam = dto.MinPlayersPerTeam,
             EntryFee = dto.EntryFee,
-            Prize = dto.Prize,
+            PrizePool = dto.PrizePool,
             ContactEmail = dto.ContactEmail,
             BannerUrl = dto.BannerUrl,
-            Status = "Active",
-            Organizer = organizerId,
+            LogoUrl = dto.LogoUrl,
+            MatchDuration = dto.MatchDuration,
+            IsPublic = dto.IsPublic,
+            Status = "Draft",
+            OrganizerId = organizerId,
             IsActive = true
         };
     }
@@ -58,13 +77,16 @@ public static class TournamentMappings
         tournament.Location = dto.Location;
         tournament.RegistrationDeadline = dto.RegistrationDeadline;
         tournament.StartDate = dto.StartDate;
-        tournament.EndDate = dto.EndDate;
         tournament.MaxTeams = dto.MaxTeams;
         tournament.EntryFee = dto.EntryFee;
-        tournament.Prize = dto.Prize;
+        tournament.PrizePool = dto.PrizePool;
         tournament.ContactEmail = dto.ContactEmail;
         tournament.BannerUrl = dto.BannerUrl;
+        tournament.LogoUrl = dto.LogoUrl;
+        tournament.MatchDuration = dto.MatchDuration;
+        tournament.IsPublic = dto.IsPublic;
         if (!string.IsNullOrEmpty(dto.Status))
             tournament.Status = dto.Status;
+        tournament.UpdatedAt = DateTime.UtcNow;
     }
 }

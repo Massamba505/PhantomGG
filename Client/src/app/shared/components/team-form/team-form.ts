@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Team, CreateTeamRequest, UpdateTeamRequest } from '../../models/tournament';
+import { CreateTeam, Team, UpdateTeam } from '@/app/api/models';
 
 @Component({
   selector: 'app-team-form',
@@ -17,7 +17,7 @@ import { Team, CreateTeamRequest, UpdateTeamRequest } from '../../models/tournam
 export class TeamForm implements OnInit, OnChanges {
   team = input<Team | null>(null);
   tournamentId = input<string | null>(null);
-  save = output<CreateTeamRequest | UpdateTeamRequest>();
+  save = output<CreateTeam | UpdateTeam>();
   cancel = output<void>();
 
   private fb = inject(FormBuilder);
@@ -50,7 +50,7 @@ export class TeamForm implements OnInit, OnChanges {
         [Validators.required, Validators.minLength(2)],
       ],
       manager: [
-        team?.manager || '',
+        team?.managerName || '',
         [Validators.required, Validators.minLength(2)],
       ],
       numberOfPlayers: [
@@ -104,10 +104,9 @@ export class TeamForm implements OnInit, OnChanges {
     }
 
     // Prepare payload as team request object
-    const teamData: CreateTeamRequest | UpdateTeamRequest = {
+    const teamData: CreateTeam | UpdateTeam = {
       name: this.teamForm.value.name,
-      manager: this.teamForm.value.manager,
-      numberOfPlayers: parseInt(this.teamForm.value.numberOfPlayers, 10),
+      managerEmail: this.teamForm.value.manager,
       logoUrl: this.logoPreview() || undefined,
       ...(this.tournamentId() ? { tournamentId: this.tournamentId()! } : {})
     };

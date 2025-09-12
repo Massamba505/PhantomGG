@@ -13,9 +13,9 @@ import { strictEmailValidator } from '@/app/shared/validators/email.validator';
 import { passwordStrengthValidator } from '@/app/shared/validators/password.validator';
 import { matchPasswordsValidator } from '@/app/shared/validators/match-passwords.validator';
 import { getPasswordScore } from '@/app/shared/utils/PasswordScore';
-import { SignUpRequest } from '@/app/shared/models/Authentication';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { RegisterRequest } from '@/app/api/models';
 
 @Component({
   selector: 'app-signup',
@@ -73,7 +73,7 @@ export class Signup {
       return;
     }
 
-    const credentials = this.signupForm.value as SignUpRequest;
+    const credentials = this.signupForm.value as RegisterRequest;
     this.authState.signup(credentials).subscribe({
       next: () => {
         this.toast.success('Account created successfully!');

@@ -60,35 +60,34 @@ export class Sidebar implements OnInit, OnDestroy {
   menuItems: MenuItem[] = [
     {
       title: 'Dashboard',
-      url: '/dashboard',
+      url: '/organizer/dashboard',
       icon: Home,
-      roles: [Roles.Organizer, Roles.General],
+      roles: [Roles.Organizer],
     },
     {
-      title: 'Tournaments',
-      url: '/tournaments',
+      title: 'My Tournaments',
+      url: '/organizer/tournaments',
       icon: Trophy,
       roles: [Roles.Organizer],
-      badge: 'New',
     },
     {
       title: 'Fixtures',
       url: '/fixtures',
       icon: Calendar,
-      roles: [Roles.Organizer, Roles.General],
+      roles: [Roles.Organizer, Roles.User],
     },
     {
       title: 'Notifications',
       url: '/notifications',
       icon: Bell,
-      roles: [Roles.Organizer, Roles.General],
+      roles: [Roles.Organizer, Roles.User],
     },
   ];
 
   quickActions: MenuItem[] = [
     {
       title: 'Create Tournament',
-      url: '/tournaments/create',
+      url: '/organizer/tournaments/create',
       icon: PlusCircle,
       roles: [Roles.Organizer],
     }

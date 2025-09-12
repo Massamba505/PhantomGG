@@ -11,56 +11,54 @@ public class LocalFileImageService(
     private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
+    private readonly long _maxFileSize = 5 * 1024 * 1024; // 5MB
     private readonly string[] _supportedTypes = { "image/jpeg", "image/png", "image/gif", "image/webp" };
-    private readonly long _maxFileSize = 5 * 1024 * 1024;
 
     public async Task<string> SaveImageAsync(IFormFile file, ImageType imageType, Guid? entityId = null)
     {
         ValidateFile(file);
 
         var folderName = GetFolderName(imageType);
-        var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images", folderName);
+        var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", folderName);
 
-        if (!Directory.Exists(uploadsFolder))
+        if (!Directory.Exists(uploadsPath))
         {
-            Directory.CreateDirectory(uploadsFolder);
+            Directory.CreateDirectory(uploadsPath);
         }
 
         var fileName = GenerateFileName(file.FileName, entityId);
-        var filePath = Path.Combine(uploadsFolder, fileName);
+        var filePath = Path.Combine(uploadsPath, fileName);
 
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
-        {
-            await file.CopyToAsync(fileStream);
-        }
+        using var stream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(stream);
 
         return GenerateImageUrl(folderName, fileName);
     }
 
-    public Task<bool> DeleteImageAsync(string imageUrl)
+    public async Task<bool> DeleteImageAsync(string imageUrl)
     {
-        if (string.IsNullOrEmpty(imageUrl)) return Task.FromResult(false);
+        var uri = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
+        var relativePath = uri.IsAbsoluteUri ? uri.AbsolutePath : imageUrl;
 
-        try
+        if (relativePath.StartsWith("/images/"))
         {
-            var uri = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
-            var relativePath = uri.IsAbsoluteUri ? uri.AbsolutePath : imageUrl;
-
-            relativePath = relativePath.TrimStart('/');
-            var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath);
+            var localPath = relativePath.Replace("/images/", "").Replace("/", "\\");
+            var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", localPath);
 
             if (File.Exists(fullPath))
             {
                 File.Delete(fullPath);
-                return Task.FromResult(true);
+                return await Task.Run(() =>
+                {
+                    return true;
+                });
             }
+        }
 
-            return Task.FromResult(false);
-        }
-        catch
+        return await Task.Run(() =>
         {
-            return Task.FromResult(false);
-        }
+            return false;
+        });
     }
 
     private void ValidateFile(IFormFile file)
@@ -85,10 +83,13 @@ public class LocalFileImageService(
     {
         return imageType switch
         {
-            ImageType.profilePicture => "profilepictures",
+            ImageType.ProfilePicture => "profilepictures",
             ImageType.TournamentBanner => "banners",
-            ImageType.Logo => "logos",
-            _ => "misc"
+            ImageType.TournamentLogo => "logos",
+            ImageType.TeamLogo => "teamlogos",
+            ImageType.TeamPhoto => "teamphotos",
+            ImageType.PlayerPhoto => "playerphotos",
+            _ => "uploads"
         };
     }
 
@@ -97,6 +98,7 @@ public class LocalFileImageService(
         var extension = Path.GetExtension(originalFileName).ToLowerInvariant();
         var uniqueId = entityId?.ToString("N") ?? Guid.NewGuid().ToString("N");
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
         return $"{uniqueId}_{timestamp}{extension}";
     }
 

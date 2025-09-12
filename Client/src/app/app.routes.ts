@@ -1,59 +1,48 @@
 import { Routes } from '@angular/router';
 import { authRoutes } from './features/auth/auth.routes';
 import { authGuard } from './core/guards/auth.guard';
-import { authenticatedGuard } from './core/guards/authenticated.guard';
 import { NotFoundComponent } from './features/not-found/not-found';
 import { Roles } from './shared/constants/roles';
-import { tournamentRoutes } from './features/tournaments/tournament.routes';
+import { userRoutes } from './features/user/user.routes';
+import { publicRoutes } from './features/public/public.routes';
+import { organizerRoutes } from './features/organizer/organizer.routes';
+import { publicGuard } from './core/guards/public.guard';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
     loadComponent: () =>
-      import('./features/landing/landing').then((m) => m.Landing),
-    title: 'PhantomGG',
+      import('./features/public/landing/landing').then((m) => m.Landing),
+    title: 'PhantomGG - Esports Tournament Platform',
   },
   {
     path: 'auth',
-    canActivate: [authenticatedGuard],
+    canActivate: [publicGuard],
     loadComponent: () => import('./features/auth/auth').then((m) => m.Auth),
     children: authRoutes,
   },
   {
-    path: 'profile',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/profile/profile').then((m) => m.Profile),
-    title: 'My Profile - PhantomGG',
-  },
-  {
-    path: 'admin',
-    canActivate: [authGuard],
-    data: { roles: [Roles.Admin] },
-    loadComponent: () => import('./features/admin/admin').then((m) => m.Admin),
-    title: 'Admin Dashboard - PhantomGG',
-  },
-  {
     path: 'dashboard',
     canActivate: [authGuard],
-    data: { roles: [Roles.Organizer] },
-    loadComponent: () =>
-      import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+    loadComponent: () => 
+      import('./features/dashboard-selection/dashboard-selection.component').then((m) => m.DashboardSelectionComponent),
+    title: 'Dashboard',
   },
   {
-    path: 'tournaments',
-    children: tournamentRoutes,
-    canActivate:[authGuard],
-    data:{roles:[Roles.Organizer]}
+    path: 'public',
+    children: publicRoutes,
   },
   {
-    path: 'teams',
+    path: 'user',
     canActivate: [authGuard],
-    data: { roles: [Roles.Organizer] },
-    loadComponent: () =>
-      import('./features/teams/teams').then((m) => m.Teams),
-    title: 'Teams - PhantomGG',
+    children: userRoutes,
+  },
+  {
+    path: 'organizer',
+    canActivate: [authGuard],
+    data: { roles: [Roles.Organizer, Roles.Admin] },
+    children: organizerRoutes,
   },
   {
     path: 'unauthorized',

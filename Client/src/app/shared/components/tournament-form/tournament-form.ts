@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { Tournament, CreateTournamentRequest, UpdateTournamentRequest } from '@/app/shared/models/tournament';
+import { CreateTournament, Tournament, UpdateTournament } from '@/app/api/models';
 
 @Component({
   selector: 'app-tournament-form',
@@ -15,7 +15,8 @@ import { Tournament, CreateTournamentRequest, UpdateTournamentRequest } from '@/
 export class TournamentForm implements OnInit, OnChanges {
   tournament = input<Tournament | null>(null);
   mode = input<'create' | 'edit'>('create');
-  tournamentSaved = output<CreateTournamentRequest | UpdateTournamentRequest>();
+  tournamentSaved = output<CreateTournament>();
+  tournamentUpdated = output<UpdateTournament>();
   cancelled = output<void>();
 
   private fb = inject(FormBuilder);
@@ -58,10 +59,10 @@ export class TournamentForm implements OnInit, OnChanges {
       location: [tournament?.location || '', [Validators.required]],
       registrationDeadline: [tournament?.registrationDeadline || '', [Validators.required]],
       startDate: [tournament?.startDate || '', [Validators.required]],
-      endDate: [tournament?.endDate || '', [Validators.required]],
+      endDate: [tournament?.registrationDeadline || '', [Validators.required]],
       maxTeams: [tournament?.maxTeams || 16, [Validators.required]],
       entryFee: [tournament?.entryFee || 0],
-      prize: [tournament?.prize || 0],
+      prize: [tournament?.prizePool || 0],
       contactEmail: [tournament?.contactEmail || '', [Validators.required, Validators.email]],
     }, { validators: [this.dateRangeValidator, this.deadlineValidator] });
 
@@ -137,21 +138,43 @@ export class TournamentForm implements OnInit, OnChanges {
 
     this.isSubmitting.set(true);
 
-    const tournamentData: CreateTournamentRequest | UpdateTournamentRequest = {
-      name: this.tournamentForm.value.name,
-      description: this.tournamentForm.value.description,
-      location: this.tournamentForm.value.location,
-      registrationDeadline: this.tournamentForm.value.registrationDeadline,
-      startDate: this.tournamentForm.value.startDate,
-      endDate: this.tournamentForm.value.endDate,
-      maxTeams: parseInt(this.tournamentForm.value.maxTeams, 10),
-      entryFee: this.tournamentForm.value.entryFee || 0,
-      prize: this.tournamentForm.value.prize || 0,
-      contactEmail: this.tournamentForm.value.contactEmail,
-      bannerUrl: this.bannerPreview() || undefined,
-    };
-
-    this.tournamentSaved.emit(tournamentData);
+    if (this.isEditMode()) {
+      const updateData: UpdateTournament = {
+        name: this.tournamentForm.value.name,
+        description: this.tournamentForm.value.description,
+        location: this.tournamentForm.value.location,
+        registrationDeadline: this.tournamentForm.value.registrationDeadline,
+        startDate: this.tournamentForm.value.startDate,
+        registrationStartDate: this.tournamentForm.value.endDate,
+        maxTeams: parseInt(this.tournamentForm.value.maxTeams, 10),
+        entryFee: this.tournamentForm.value.entryFee || 0,
+        prizePool: this.tournamentForm.value.prize || 0,
+        contactEmail: this.tournamentForm.value.contactEmail,
+        bannerUrl: this.bannerPreview() || undefined,
+      };
+      this.tournamentUpdated.emit(updateData);
+    } else {
+      const createData: CreateTournament = {
+        name: this.tournamentForm.value.name,
+        description: this.tournamentForm.value.description,
+        location: this.tournamentForm.value.location,
+        registrationDeadline: this.tournamentForm.value.registrationDeadline,
+        startDate: this.tournamentForm.value.startDate,
+        registrationStartDate: this.tournamentForm.value.endDate,
+        maxTeams: parseInt(this.tournamentForm.value.maxTeams, 10),
+        entryFee: this.tournamentForm.value.entryFee || 0,
+        prizePool: this.tournamentForm.value.prize || 0,
+        contactEmail: this.tournamentForm.value.contactEmail,
+        bannerUrl: this.bannerPreview() || undefined,
+        formatId: '1', // Default to single elimination for now
+        minTeams: 2,
+        maxPlayersPerTeam: 11,
+        minPlayersPerTeam: 7,
+        matchDuration: 90,
+        isPublic: true
+      };
+      this.tournamentSaved.emit(createData);
+    }
     
     // Reset form state after emission
     setTimeout(() => {

@@ -20,7 +20,6 @@ public enum ImageType
 public enum TournamentStatus
 {
     Draft,
-    Published,
     RegistrationOpen,
     RegistrationClosed,
     InProgress,

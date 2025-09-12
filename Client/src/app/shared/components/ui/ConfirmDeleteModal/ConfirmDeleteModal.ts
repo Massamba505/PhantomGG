@@ -13,16 +13,19 @@ export class ConfirmDeleteModal {
   isOpen = input<boolean>(false);
   title = input<string>('Delete');
   entityName = input<string>('');
+  isLoading = input<boolean>(false);
   close = output<void>();
   confirm = output<void>();
 
   readonly icons = LucideIcons;
 
   handleClose() {
+    if (this.isLoading()) return; 
     this.close.emit();
   }
 
   handleConfirm() {
+    if (this.isLoading()) return;
     this.confirm.emit();
   }
 }

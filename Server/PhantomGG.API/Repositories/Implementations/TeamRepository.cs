@@ -6,14 +6,9 @@ using PhantomGG.API.DTOs.Team;
 
 namespace PhantomGG.API.Repositories.Implementations;
 
-public class TeamRepository : ITeamRepository
+public class TeamRepository(PhantomContext context) : ITeamRepository
 {
-    private readonly PhantomContext _context;
-
-    public TeamRepository(PhantomContext context)
-    {
-        _context = context;
-    }
+    private readonly PhantomContext _context = context;
 
     public async Task<IEnumerable<Team>> GetAllAsync()
     {
@@ -28,6 +23,7 @@ public class TeamRepository : ITeamRepository
     {
         return await _context.Teams
             .Include(t => t.Tournament)
+            .Include(t => t.Players)
             .FirstOrDefaultAsync(t => t.Id == id && t.IsActive);
     }
 
@@ -35,7 +31,8 @@ public class TeamRepository : ITeamRepository
     {
         return await _context.Teams
             .Include(t => t.Tournament)
-            .Where(t => t.Manager == manager && t.IsActive)
+            .Include(t => t.Players)
+            .Where(t => t.ManagerName == manager && t.IsActive)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
     }
@@ -57,7 +54,17 @@ public class TeamRepository : ITeamRepository
         if (!string.IsNullOrEmpty(searchDto.SearchTerm))
         {
             query = query.Where(t => t.Name.Contains(searchDto.SearchTerm) ||
-                                   t.Manager.Contains(searchDto.SearchTerm));
+                                   t.ManagerName.Contains(searchDto.SearchTerm));
+        }
+
+        if (searchDto.TournamentId.HasValue)
+        {
+            query = query.Where(t => t.TournamentId == searchDto.TournamentId.Value);
+        }
+
+        if (!searchDto.RegistrationStatus.HasValue)
+        {
+            query = query.Where(t => t.RegistrationStatus == searchDto.RegistrationStatus.ToString());
         }
 
         query = query.OrderByDescending(t => t.CreatedAt);
@@ -73,7 +80,6 @@ public class TeamRepository : ITeamRepository
 
     public async Task<Team> CreateAsync(Team team)
     {
-        team.CreatedAt = DateTime.UtcNow;
         _context.Teams.Add(team);
         await _context.SaveChangesAsync();
         return team;
@@ -106,7 +112,9 @@ public class TeamRepository : ITeamRepository
     public async Task<bool> TeamNameExistsInTournamentAsync(string name, Guid tournamentId, Guid? excludeId = null)
     {
         var query = _context.Teams
-            .Where(t => t.Name == name && t.TournamentId == tournamentId && t.IsActive);
+            .Where(t => t.Name == name && 
+                t.TournamentId == tournamentId &&
+                t.IsActive);
 
         if (excludeId.HasValue)
         {
