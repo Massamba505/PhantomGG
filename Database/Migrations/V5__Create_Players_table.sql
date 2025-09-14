@@ -14,5 +14,4 @@ CREATE TABLE Players (
 
 CREATE INDEX IX_Players_TeamId ON Players (TeamId);
 CREATE INDEX IX_Players_Position ON Players (Position);
-CREATE INDEX IX_Players_IsActive ON Players (IsActive);
 CREATE INDEX IX_Players_Name ON Players (FirstName, LastName);
