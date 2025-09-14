@@ -1,4 +1,4 @@
-﻿namespace PhantomGG.API.Config;
+﻿namespace PhantomGG.Common.Config;
 
 public class CookieSettings
 {

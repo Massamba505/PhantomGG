@@ -1,15 +1,4 @@
-/**
- * API ENDPOINTS - ROLE-BASED SEPARATION
- * ====================================
- * Clear separation of endpoints based on user roles and responsibilities
- * 
- * ORGANIZER ENDPOINTS - Full tournament management, team approval/rejection, administrative control
- * USER ENDPOINTS - Team/player management, tournament registration, personal dashboard  
- * PUBLIC ENDPOINTS - Read-only tournament discovery and viewing
- */
-
 export const API_ENDPOINTS = {
-  // Authentication endpoints (shared across all roles)
   AUTH: {
     REGISTER: 'auth/register',
     LOGIN: 'auth/login',
@@ -18,15 +7,11 @@ export const API_ENDPOINTS = {
     LOGOUT: 'auth/logout'
   },
 
-  // ===== ORGANIZER ENDPOINTS =====
-  // Full tournament management, team approval/rejection, administrative control
   ORGANIZERS: {
-    // Profile & Dashboard
     PROFILE: 'organizers/profile',
     DASHBOARD: 'organizers/dashboard',
     STATISTICS: 'organizers/statistics',
 
-    // Tournament Management
     TOURNAMENTS: {
       LIST: 'organizers/tournaments',
       GET: (id: string) => `organizers/tournaments/${id}`,
@@ -43,7 +28,6 @@ export const API_ENDPOINTS = {
       DASHBOARD_DATA: (id: string) => `organizers/tournaments/${id}/dashboard`
     },
 
-    // Team Management (Organizer perspective)
     TEAMS: {
       LIST: (tournamentId: string) => `organizers/tournaments/${tournamentId}/teams`,
       GET: (tournamentId: string, teamId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}`,
@@ -58,7 +42,6 @@ export const API_ENDPOINTS = {
       REJECTED: (tournamentId: string) => `organizers/tournaments/${tournamentId}/teams/rejected`
     },
 
-    // Player Management (Organizer perspective)
     PLAYERS: {
       LIST: (tournamentId: string) => `organizers/tournaments/${tournamentId}/players`,
       BY_TEAM: (tournamentId: string, teamId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}/players`,
@@ -72,7 +55,6 @@ export const API_ENDPOINTS = {
       TOP_ASSISTS: (tournamentId: string) => `organizers/tournaments/${tournamentId}/top-assists`
     },
 
-    // Match Management (Organizer perspective)
     MATCHES: {
       LIST: (tournamentId: string) => `organizers/tournaments/${tournamentId}/matches`,
       GET: (tournamentId: string, matchId: string) => `organizers/tournaments/${tournamentId}/matches/${matchId}`,
@@ -86,10 +68,7 @@ export const API_ENDPOINTS = {
     }
   },
 
-  // ===== USER ENDPOINTS =====
-  // Team/player management, tournament registration, personal dashboard
   USERS: {
-    // Profile & Dashboard
     PROFILE: 'users/profile',
     UPDATE_PROFILE: 'users/profile',
     CHANGE_PASSWORD: 'users/change-password',
@@ -97,7 +76,6 @@ export const API_ENDPOINTS = {
     DASHBOARD: 'users/dashboard',
     STATISTICS: 'users/statistics',
 
-    // Team Management (User as team owner/manager)
     TEAMS: {
       LIST: 'users/teams',
       GET: (id: string) => `users/teams/${id}`,
@@ -112,7 +90,6 @@ export const API_ENDPOINTS = {
       MATCH_HISTORY: (id: string) => `users/teams/${id}/matches/history`
     },
 
-    // Player Management (User perspective)
     PLAYERS: {
       LIST: (teamId: string) => `users/teams/${teamId}/players`,
       GET: (teamId: string, playerId: string) => `users/teams/${teamId}/players/${playerId}`,
@@ -124,7 +101,6 @@ export const API_ENDPOINTS = {
       STATISTICS: (playerId: string) => `users/players/${playerId}/statistics`
     },
 
-    // Tournament Participation
     TOURNAMENTS: {
       REGISTER: 'users/tournaments/register',
       APPLICATIONS: 'users/tournaments/applications',
@@ -136,10 +112,7 @@ export const API_ENDPOINTS = {
     }
   },
 
-  // ===== PUBLIC/BROWSER ENDPOINTS =====
-  // Read-only tournament discovery and viewing
   TOURNAMENTS: {
-    // Tournament Discovery
     LIST: 'tournaments',
     SEARCH: 'tournaments/search',
     FEATURED: 'tournaments/featured',
@@ -150,13 +123,11 @@ export const API_ENDPOINTS = {
     BY_FORMAT: (formatId: string) => `tournaments/format/${formatId}`,
     FORMATS: 'tournaments/formats',
 
-    // Tournament Information (Read-only)
     GET: (id: string) => `tournaments/${id}`,
     DETAILS: (id: string) => `tournaments/${id}/details`,
     RULES: (id: string) => `tournaments/${id}/rules`,
     STATISTICS: (id: string) => `tournaments/${id}/statistics`,
     
-    // Tournament Structure (Read-only)
     TEAMS: (id: string) => `tournaments/${id}/teams`,
     STANDINGS: (id: string) => `tournaments/${id}/standings`,
     SCHEDULE: (id: string) => `tournaments/${id}/schedule`,
@@ -164,20 +135,17 @@ export const API_ENDPOINTS = {
     RESULTS: (id: string) => `tournaments/${id}/results`,
     FIXTURES: (id: string) => `tournaments/${id}/fixtures`,
     
-    // Tournament Statistics (Read-only)
     TOP_SCORERS: (id: string) => `tournaments/${id}/players/top-scorers`,
     TOP_ASSISTS: (id: string) => `tournaments/${id}/players/top-assists`,
     BEST_PLAYERS: (id: string) => `tournaments/${id}/players/best`,
     TEAM_STATS: (id: string) => `tournaments/${id}/teams/statistics`,
     
-    // Specific Team/Player Info in Tournament Context
     TEAM_DETAILS: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}`,
     TEAM_ROSTER: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/players`,
     TEAM_MATCHES: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/matches`,
     PLAYER_DETAILS: (tournamentId: string, playerId: string) => `tournaments/${tournamentId}/players/${playerId}`,
     PLAYER_STATS: (tournamentId: string, playerId: string) => `tournaments/${tournamentId}/players/${playerId}/statistics`,
     
-    // Match Information (Read-only)
     MATCH_DETAILS: (tournamentId: string, matchId: string) => `tournaments/${tournamentId}/matches/${matchId}`,
     LIVE_MATCHES: (id: string) => `tournaments/${id}/matches/live`,
     UPCOMING_MATCHES: (id: string) => `tournaments/${id}/matches/upcoming`,

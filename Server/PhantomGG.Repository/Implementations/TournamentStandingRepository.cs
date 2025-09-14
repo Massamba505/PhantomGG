@@ -129,7 +129,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
             return new PlayerGoalStandingDto
             {
                 PlayerId = g.PlayerId,
-                PlayerName =  g.PlayerName ?? string.Empty,
+                PlayerName = g.PlayerName ?? string.Empty,
                 PlayerPhoto = player?.PhotoUrl,
                 TeamId = g.TeamId,
                 TeamName = team.Name,
@@ -171,7 +171,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
                 (assists, team) => new PlayerAssistStandingDto
                 {
                     PlayerId = Guid.Empty, // We don't have player IDs in events, using player name
-                    PlayerName = assists.PlayerName,
+                    PlayerName = assists.PlayerName ?? string.Empty,
                     TeamId = assists.TeamId,
                     TeamName = team.Name,
                     TeamLogo = team.LogoUrl,

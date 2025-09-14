@@ -1,4 +1,4 @@
-using PhantomGG.Service.Config;
+using PhantomGG.Common.Config;
 using PhantomGG.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;

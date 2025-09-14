@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using PhantomGG.Service.Config;
+using PhantomGG.Common.Config;
 using System.Text;
 
 namespace PhantomGG.API.Extensions;

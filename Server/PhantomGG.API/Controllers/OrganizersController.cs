@@ -109,40 +109,6 @@ public class OrganizersController(
     }
 
     /// <summary>
-    /// Upload tournament banner image
-    /// </summary>
-    [HttpPost("tournaments/{id:guid}/banner")]
-    public async Task<ActionResult<ApiResponse>> UploadTournamentBanner(Guid id, IFormFile file)
-    {
-        var user = _currentUserService.GetCurrentUser();
-        var bannerUrl = await _tournamentService.UploadTournamentBannerAsync(id, file, user.Id);
-
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = new { bannerUrl },
-            Message = "Tournament banner uploaded successfully"
-        });
-    }
-
-    /// <summary>
-    /// Upload tournament logo image
-    /// </summary>
-    [HttpPost("tournaments/{id:guid}/logo")]
-    public async Task<ActionResult<ApiResponse>> UploadTournamentLogo(Guid id, IFormFile file)
-    {
-        var user = _currentUserService.GetCurrentUser();
-        var logoUrl = await _tournamentService.UploadTournamentLogoAsync(id, file, user.Id);
-
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = new { logoUrl },
-            Message = "Tournament logo uploaded successfully"
-        });
-    }
-
-    /// <summary>
     /// Search tournaments with filters and pagination
     /// </summary>
     [HttpGet("tournaments/search")]
@@ -241,6 +207,19 @@ public class OrganizersController(
         });
     }
 
+    [HttpPost("tournaments/{tournamentId:guid}/teams/status/{status}")]
+    public async Task<ActionResult<ApiResponse>> UpdateTeamsStatus(Guid tournamentId, TeamRegistrationStatus status)
+    {
+        var me = await _playerService.GetByTournamentAsync(tournamentId);
+
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = true, // team
+            Message = $"Team status changed successfully"
+        });
+    }
+
     /// <summary>
     /// Remove a team from the tournament
     /// </summary>
@@ -288,39 +267,6 @@ public class OrganizersController(
             Success = true,
             Data = players,
             Message = "Team players retrieved successfully"
-        });
-    }
-
-    /// <summary>
-    /// Get comprehensive tournament statistics and metrics
-    /// </summary>
-    [HttpGet("tournaments/{tournamentId:guid}/statistics")]
-    public async Task<ActionResult<ApiResponse>> GetTournamentStatistics(Guid tournamentId)
-    {
-        var tournament = await _tournamentService.GetByIdAsync(tournamentId);
-        var teams = await _teamService.GetByTournamentAsync(tournamentId);
-        var players = await _playerService.GetByTournamentAsync(tournamentId);
-
-        var statistics = new
-        {
-            tournament.Id,
-            tournament.Name,
-            tournament.Status,
-            TotalTeams = teams.Count(),
-            RegisteredTeams = teams.Count(t => t.RegistrationStatus == "Approved"),
-            PendingTeams = teams.Count(t => t.RegistrationStatus == "Pending"),
-            RejectedTeams = teams.Count(t => t.RegistrationStatus == "Rejected"),
-            TotalPlayers = players.Count(),
-            ActivePlayers = players.Count(p => p.IsActive),
-            tournament.CreatedAt,
-            tournament.StartDate
-        };
-
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = statistics,
-            Message = "Tournament statistics retrieved successfully"
         });
     }
 

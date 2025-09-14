@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using PhantomGG.API.Config;
+using PhantomGG.Common.Config;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Service.Interfaces;

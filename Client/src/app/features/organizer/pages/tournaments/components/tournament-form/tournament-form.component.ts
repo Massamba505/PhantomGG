@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, Validati
 import { CreateTournament, UpdateTournament, Tournament, TournamentFormat } from '@/app/api/models/tournament.models';
 import { TournamentService } from '@/app/api/services';
 import { ToastService } from '@/app/shared/services/toast.service';
+import { dateNotInPastValidator, registrationDeadlineValidator, tournamentStartDateValidator } from '@/app/shared/validators/date.validator';
 
 @Component({
   selector: 'app-tournament-form',
@@ -36,63 +37,10 @@ export class TournamentFormComponent implements OnInit {
   currentBannerUrl = signal<string | null>(null);
   currentLogoUrl = signal<string | null>(null);
   
-  // Get today's date in the correct format for datetime-local inputs
   get todayDateTime(): string {
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     return now.toISOString().slice(0, 16);
-  }
-
-  // Custom validators
-  static dateNotInPast(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) return null;
-    
-    const selectedDate = new Date(control.value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    if (selectedDate < today) {
-      return { dateInPast: true };
-    }
-    return null;
-  }
-
-  static registrationDeadlineValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.parent) return null;
-    
-    const registrationStart = control.parent.get('registrationStartDate')?.value;
-    const registrationDeadline = control.value;
-    const startDate = control.parent.get('startDate')?.value;
-    
-    if (!registrationDeadline) return null;
-    
-    // Check if deadline is after registration start
-    if (registrationStart && new Date(registrationDeadline) <= new Date(registrationStart)) {
-      return { deadlineBeforeStart: true };
-    }
-    
-    // Check if deadline is before tournament start
-    if (startDate && new Date(registrationDeadline) >= new Date(startDate)) {
-      return { deadlineAfterTournamentStart: true };
-    }
-    
-    return null;
-  }
-
-  static tournamentStartDateValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.parent) return null;
-    
-    const registrationDeadline = control.parent.get('registrationDeadline')?.value;
-    const startDate = control.value;
-    
-    if (!startDate) return null;
-    
-    // Check if start date is after registration deadline
-    if (registrationDeadline && new Date(startDate) <= new Date(registrationDeadline)) {
-      return { startBeforeDeadline: true };
-    }
-    
-    return null;
   }
 
   tournamentForm = this.fb.group({
@@ -102,17 +50,17 @@ export class TournamentFormComponent implements OnInit {
     formatId: ['', [Validators.required]],
     registrationStartDate: ['', [
       Validators.required, 
-      TournamentFormComponent.dateNotInPast
+      dateNotInPastValidator
     ]],
     registrationDeadline: ['', [
       Validators.required, 
-      TournamentFormComponent.dateNotInPast,
-      TournamentFormComponent.registrationDeadlineValidator
+      dateNotInPastValidator,
+      registrationDeadlineValidator
     ]],
     startDate: ['', [
       Validators.required, 
-      TournamentFormComponent.dateNotInPast,
-      TournamentFormComponent.tournamentStartDateValidator
+      dateNotInPastValidator,
+      tournamentStartDateValidator
     ]],
     minTeams: [2, [Validators.required, Validators.min(2), Validators.max(64)]],
     maxTeams: [16, [Validators.required, Validators.min(4), Validators.max(128)]],
@@ -120,12 +68,13 @@ export class TournamentFormComponent implements OnInit {
     minPlayersPerTeam: [7, [Validators.required, Validators.min(7), Validators.max(25)]],
     entryFee: [0, [Validators.min(0)]],
     prizePool: [0, [Validators.min(0)]],
-    bannerUrl: "",
-    logoUrl: "",
-    contactEmail: ['', [Validators.email]],
+    bannerUrl: ["", Validators.required],
+    logoUrl: ["", Validators.required],
+    contactEmail: ['', [Validators.required, Validators.email]],
     matchDuration: [90, [Validators.required, Validators.min(60), Validators.max(120)]],
     isPublic: [true]
   });
+
 
   getTournamentFormats(){
     this.tournamentService.getTournamentFormats().subscribe({
@@ -148,21 +97,31 @@ export class TournamentFormComponent implements OnInit {
   }
 
   private setupCrossFieldValidation() {
-    // Re-validate related fields when date fields change
-    this.tournamentForm.get('registrationStartDate')?.valueChanges.subscribe(() => {
-      this.tournamentForm.get('registrationDeadline')?.updateValueAndValidity({ onlySelf: true });
-    });
+      let isValidationRunning = false;
 
-    this.tournamentForm.get('registrationDeadline')?.valueChanges.subscribe(() => {
-      this.tournamentForm.get('startDate')?.updateValueAndValidity({ onlySelf: true });
-    });
+      this.tournamentForm.get('registrationStartDate')?.valueChanges.subscribe(() => {
+        if (isValidationRunning) return;
+        isValidationRunning = true;
+        this.tournamentForm.get('registrationDeadline')?.updateValueAndValidity({ onlySelf: true });
+        isValidationRunning = false;
+      });
 
-    this.tournamentForm.get('startDate')?.valueChanges.subscribe(() => {
-      this.tournamentForm.get('registrationDeadline')?.updateValueAndValidity({ onlySelf: true });
-    });
+      this.tournamentForm.get('registrationDeadline')?.valueChanges.subscribe(() => {
+        if (isValidationRunning) return;
+        isValidationRunning = true;
+        this.tournamentForm.get('startDate')?.updateValueAndValidity({ onlySelf: true });
+        isValidationRunning = false;
+      });
+
+      this.tournamentForm.get('startDate')?.valueChanges.subscribe(() => {
+        if (isValidationRunning) return;
+        isValidationRunning = true;
+        this.tournamentForm.get('registrationDeadline')?.updateValueAndValidity({ onlySelf: true });
+        isValidationRunning = false;
+      });
   }
 
-  // Helper methods for template validation checks
+
   hasFieldError(fieldName: string, errorType: string): boolean {
     const field = this.tournamentForm.get(fieldName);
     return !!(field?.hasError(errorType) && (field?.dirty || field?.touched));

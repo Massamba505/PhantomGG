@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PhantomGG.Repository.Data;
 using PhantomGG.Repository.Implementations;
 using PhantomGG.Repository.Interfaces;
-using PhantomGG.Service.Config;
+using PhantomGG.Common.Config;
 using PhantomGG.Service.Implementations;
 using PhantomGG.Service.Interfaces;
 
@@ -26,7 +26,6 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Repository services
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ITournamentRepository, TournamentRepository>();
@@ -35,7 +34,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayerRepository, PlayerRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();
 
-        // Business services
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITournamentService, TournamentService>();
@@ -43,7 +41,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayerService, PlayerService>();
         services.AddScoped<IMatchService, MatchService>();
 
-        // Infrastructure services
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
         services.AddScoped<ICookieService, CookieService>();
