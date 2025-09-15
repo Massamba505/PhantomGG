@@ -9,8 +9,6 @@ public partial class Match
 
     public Guid TournamentId { get; set; }
 
-    public string? Venue { get; set; }
-
     public Guid HomeTeamId { get; set; }
 
     public Guid AwayTeamId { get; set; }

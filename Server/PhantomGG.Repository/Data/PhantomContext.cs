@@ -26,7 +26,7 @@ public partial class PhantomContext : DbContext
 
     public virtual DbSet<Tournament> Tournaments { get; set; }
 
-    public virtual DbSet<TournamentFormat> TournamentFormats { get; set; }
+    public virtual DbSet<TournamentTeam> TournamentTeams { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -39,13 +39,12 @@ public partial class PhantomContext : DbContext
             entity.HasIndex(e => e.TournamentId, "IX_Matches_TournamentId");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.AwayScore).HasDefaultValue(0);
+            entity.Property(e => e.HomeScore).HasDefaultValue(0);
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasDefaultValue("Scheduled");
-            entity.Property(e => e.Venue)
-                .HasMaxLength(200)
-                .IsUnicode(false);
 
             entity.HasOne(d => d.AwayTeam).WithMany(p => p.MatchAwayTeams)
                 .HasForeignKey(d => d.AwayTeamId)
@@ -67,19 +66,18 @@ public partial class PhantomContext : DbContext
             entity.HasIndex(e => e.MatchId, "IX_MatchEvents_MatchId");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.Description)
-                .HasMaxLength(500)
-                .IsUnicode(false);
             entity.Property(e => e.EventType)
                 .HasMaxLength(20)
-                .IsUnicode(false);
-            entity.Property(e => e.PlayerName)
-                .HasMaxLength(100)
                 .IsUnicode(false);
 
             entity.HasOne(d => d.Match).WithMany(p => p.MatchEvents)
                 .HasForeignKey(d => d.MatchId)
                 .HasConstraintName("FK_MatchEvents_Match");
+
+            entity.HasOne(d => d.Player).WithMany(p => p.MatchEvents)
+                .HasForeignKey(d => d.PlayerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MatchEvents_Player");
 
             entity.HasOne(d => d.Team).WithMany(p => p.MatchEvents)
                 .HasForeignKey(d => d.TeamId)
@@ -89,8 +87,6 @@ public partial class PhantomContext : DbContext
 
         modelBuilder.Entity<Player>(entity =>
         {
-            entity.HasIndex(e => e.IsActive, "IX_Players_IsActive");
-
             entity.HasIndex(e => new { e.FirstName, e.LastName }, "IX_Players_Name");
 
             entity.HasIndex(e => e.Position, "IX_Players_Position");
@@ -105,7 +101,6 @@ public partial class PhantomContext : DbContext
             entity.Property(e => e.FirstName)
                 .HasMaxLength(100)
                 .IsUnicode(false);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.LastName)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -136,56 +131,31 @@ public partial class PhantomContext : DbContext
 
         modelBuilder.Entity<Team>(entity =>
         {
-            entity.HasIndex(e => e.IsActive, "IX_Teams_IsActive");
-
-            entity.HasIndex(e => e.ManagerName, "IX_Teams_ManagerName");
-
             entity.HasIndex(e => e.Name, "IX_Teams_Name");
-
-            entity.HasIndex(e => e.RegistrationStatus, "IX_Teams_RegistrationStatus");
 
             entity.HasIndex(e => e.ShortName, "IX_Teams_ShortName");
 
-            entity.HasIndex(e => e.TournamentId, "IX_Teams_TournamentId");
-
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.LogoUrl).IsUnicode(false);
-            entity.Property(e => e.ManagerEmail)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.ManagerName)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.ManagerPhone)
-                .HasMaxLength(10)
-                .IsUnicode(false);
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
                 .IsUnicode(false);
-            entity.Property(e => e.RegistrationDate).HasDefaultValueSql("(sysutcdatetime())");
-            entity.Property(e => e.RegistrationStatus)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasDefaultValue("Pending");
             entity.Property(e => e.ShortName)
                 .HasMaxLength(10)
                 .IsUnicode(false);
-            entity.Property(e => e.TeamPhotoUrl).IsUnicode(false);
 
-            entity.HasOne(d => d.Tournament).WithMany(p => p.Teams)
-                .HasForeignKey(d => d.TournamentId)
-                .HasConstraintName("FK_Teams_Tournament");
+            entity.HasOne(d => d.User).WithMany(p => p.Teams)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Teams_User");
         });
 
         modelBuilder.Entity<Tournament>(entity =>
         {
-            entity.HasIndex(e => e.FormatId, "IX_Tournaments_FormatId");
-
-            entity.HasIndex(e => e.IsActive, "IX_Tournaments_IsActive");
-
             entity.HasIndex(e => e.IsPublic, "IX_Tournaments_IsPublic");
+
+            entity.HasIndex(e => e.Name, "IX_Tournaments_Name");
 
             entity.HasIndex(e => e.OrganizerId, "IX_Tournaments_Organizer");
 
@@ -195,40 +165,24 @@ public partial class PhantomContext : DbContext
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.BannerUrl).IsUnicode(false);
-            entity.Property(e => e.ContactEmail)
-                .HasMaxLength(100)
-                .IsUnicode(false);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
-            entity.Property(e => e.Description).HasColumnType("text");
-            entity.Property(e => e.EntryFee)
-                .HasDefaultValue(0.00m)
-                .HasColumnType("decimal(10, 2)");
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.Description)
+                .HasMaxLength(200)
+                .IsUnicode(false);
             entity.Property(e => e.IsPublic).HasDefaultValue(true);
             entity.Property(e => e.Location)
                 .HasMaxLength(200)
                 .IsUnicode(false);
             entity.Property(e => e.LogoUrl).IsUnicode(false);
-            entity.Property(e => e.MatchDuration).HasDefaultValue(90);
-            entity.Property(e => e.MaxPlayersPerTeam).HasDefaultValue(11);
             entity.Property(e => e.MaxTeams).HasDefaultValue(16);
-            entity.Property(e => e.MinPlayersPerTeam).HasDefaultValue(7);
             entity.Property(e => e.MinTeams).HasDefaultValue(2);
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
                 .IsUnicode(false);
-            entity.Property(e => e.PrizePool)
-                .HasDefaultValue(0.00m)
-                .HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasDefaultValue("Draft");
-
-            entity.HasOne(d => d.Format).WithMany(p => p.Tournaments)
-                .HasForeignKey(d => d.FormatId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Tournaments_Format");
 
             entity.HasOne(d => d.Organizer).WithMany(p => p.Tournaments)
                 .HasForeignKey(d => d.OrganizerId)
@@ -236,21 +190,29 @@ public partial class PhantomContext : DbContext
                 .HasConstraintName("FK_Tournaments_Organizer");
         });
 
-        modelBuilder.Entity<TournamentFormat>(entity =>
+        modelBuilder.Entity<TournamentTeam>(entity =>
         {
-            entity.HasIndex(e => e.IsActive, "IX_TournamentFormats_IsActive");
+            entity.HasIndex(e => e.Status, "IX_TournamentTeams_Status");
+
+            entity.HasIndex(e => e.TeamId, "IX_TournamentTeams_Team");
+
+            entity.HasIndex(e => e.TournamentId, "IX_TournamentTeams_Tournament");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
-            entity.Property(e => e.Description)
-                .HasMaxLength(500)
-                .IsUnicode(false);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.MaxTeams).HasDefaultValue(32);
-            entity.Property(e => e.MinTeams).HasDefaultValue(2);
-            entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+            entity.Property(e => e.RequestedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasDefaultValue("Pending");
+
+            entity.HasOne(d => d.Team).WithMany(p => p.TournamentTeams)
+                .HasForeignKey(d => d.TeamId)
+                .HasConstraintName("FK_TournamentTeams_Team");
+
+            entity.HasOne(d => d.Tournament).WithMany(p => p.TournamentTeams)
+                .HasForeignKey(d => d.TournamentId)
+                .HasConstraintName("FK_TournamentTeams_Tournament");
         });
 
         modelBuilder.Entity<User>(entity =>

@@ -9,33 +9,15 @@ public partial class Team
 
     public string Name { get; set; } = null!;
 
-    public string? ShortName { get; set; }
-
-    public string ManagerName { get; set; } = null!;
-
-    public string ManagerEmail { get; set; } = null!;
-
-    public string? ManagerPhone { get; set; }
+    public string ShortName { get; set; } = null!;
 
     public string? LogoUrl { get; set; }
 
-    public string? TeamPhotoUrl { get; set; }
-
-    public Guid TournamentId { get; set; }
-
-    public string RegistrationStatus { get; set; } = null!;
-
-    public DateTime RegistrationDate { get; set; }
-
-    public DateTime? ApprovedDate { get; set; }
-
-    public int NumberOfPlayers { get; set; }
+    public Guid UserId { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
-
-    public bool IsActive { get; set; }
 
     public virtual ICollection<Match> MatchAwayTeams { get; set; } = new List<Match>();
 
@@ -45,5 +27,7 @@ public partial class Team
 
     public virtual ICollection<Player> Players { get; set; } = new List<Player>();
 
-    public virtual Tournament Tournament { get; set; } = null!;
+    public virtual ICollection<TournamentTeam> TournamentTeams { get; set; } = new List<TournamentTeam>();
+
+    public virtual User User { get; set; } = null!;
 }

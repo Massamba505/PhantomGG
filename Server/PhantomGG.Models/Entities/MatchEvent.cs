@@ -15,11 +15,11 @@ public partial class MatchEvent
 
     public Guid TeamId { get; set; }
 
-    public string? PlayerName { get; set; }
-
-    public string? Description { get; set; }
+    public Guid PlayerId { get; set; }
 
     public virtual Match Match { get; set; } = null!;
+
+    public virtual Player Player { get; set; } = null!;
 
     public virtual Team Team { get; set; } = null!;
 }
