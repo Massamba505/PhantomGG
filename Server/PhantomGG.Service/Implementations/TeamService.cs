@@ -48,10 +48,10 @@ namespace PhantomGG.Service.Implementations
             // For MVP, we'll use the manager email/name as identifier
             // This would need to be improved for proper user management
             var teams = await _teamRepository.GetAllAsync();
-            var userTeams = teams.Where(t => t.ManagerEmail != null &&
-                                           _currentUserService.IsAuthenticated() &&
-                                           _currentUserService.GetCurrentUser().Id == leaderId);
-            return userTeams.Select(t => t.ToTeamDto());
+            // var userTeams = teams.Where(t => t.ManagerEmail != null &&
+            //                                _currentUserService.IsAuthenticated() &&
+            //                                _currentUserService.GetCurrentUser().Id == leaderId);
+            return teams.Select(t => t.ToTeamDto());
         }
 
         public async Task<IEnumerable<TeamDto>> GetByTournamentAsync(Guid tournamentId)
@@ -95,8 +95,8 @@ namespace PhantomGG.Service.Implementations
                 throw new InvalidOperationException("Tournament is full.");
 
             var team = createDto.ToTeam();
-            team.RegistrationDate = DateTime.UtcNow;
-            team.RegistrationStatus = "Pending";
+            // team.RegistrationDate = DateTime.UtcNow;
+            // team.RegistrationStatus = "Pending";
 
             var createdTeam = await _teamRepository.CreateAsync(team);
             return createdTeam.ToTeamDto();
@@ -112,21 +112,21 @@ namespace PhantomGG.Service.Implementations
             if (!_currentUserService.IsAuthenticated())
                 throw new UnauthorizedException("You must be logged in to update a team.");
 
-            var currentUser = _currentUserService.GetCurrentUser();
-            var tournament = await _tournamentRepository.GetByIdAsync(existingTeam.TournamentId);
+            // var currentUser = _currentUserService.GetCurrentUser();
+            // var tournament = await _tournamentRepository.GetByIdAsync(existingTeam.TournamentId);
 
-            bool isTeamManager = existingTeam.ManagerEmail == currentUser.Email;
-            bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
+            // bool isTeamManager = existingTeam.ManagerEmail == currentUser.Email;
+            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
 
-            if (!isTeamManager && !isTournamentOrganizer)
-                throw new UnauthorizedException("You don't have permission to update this team.");
+            // if (!isTeamManager && !isTournamentOrganizer)
+            //     throw new UnauthorizedException("You don't have permission to update this team.");
 
-            // If updating name, check uniqueness
-            if (!string.IsNullOrEmpty(updateDto.Name) && updateDto.Name != existingTeam.Name)
-            {
-                if (await _teamRepository.TeamNameExistsInTournamentAsync(updateDto.Name, existingTeam.TournamentId, existingTeam.Id))
-                    throw new ArgumentException("A team with this name already exists in this tournament.");
-            }
+            // // If updating name, check uniqueness
+            // if (!string.IsNullOrEmpty(updateDto.Name) && updateDto.Name != existingTeam.Name)
+            // {
+            //     if (await _teamRepository.TeamNameExistsInTournamentAsync(updateDto.Name, existingTeam.TournamentId, existingTeam.Id))
+            //         throw new ArgumentException("A team with this name already exists in this tournament.");
+            // }
 
             existingTeam.UpdateFromDto(updateDto);
             var updatedTeam = await _teamRepository.UpdateAsync(existingTeam);
@@ -143,18 +143,18 @@ namespace PhantomGG.Service.Implementations
             if (!_currentUserService.IsAuthenticated())
                 throw new UnauthorizedException("You must be logged in to delete a team.");
 
-            var currentUser = _currentUserService.GetCurrentUser();
-            var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
+            // var currentUser = _currentUserService.GetCurrentUser();
+            // var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
 
-            bool isTeamManager = team.ManagerEmail == currentUser.Email;
-            bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
+            // bool isTeamManager = team.ManagerEmail == currentUser.Email;
+            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
 
-            if (!isTeamManager && !isTournamentOrganizer)
-                throw new UnauthorizedException("You don't have permission to delete this team.");
+            // if (!isTeamManager && !isTournamentOrganizer)
+            //     throw new UnauthorizedException("You don't have permission to delete this team.");
 
-            // Check if tournament has started
-            if (tournament != null && tournament.StartDate <= DateTime.UtcNow)
-                throw new InvalidOperationException("Cannot delete a team from a tournament that has already started.");
+            // // Check if tournament has started
+            // if (tournament != null && tournament.StartDate <= DateTime.UtcNow)
+            //     throw new InvalidOperationException("Cannot delete a team from a tournament that has already started.");
 
             await _teamRepository.DeleteAsync(id);
         }
@@ -170,8 +170,8 @@ namespace PhantomGG.Service.Implementations
                 throw new UnauthorizedException("You must be logged in to upload team logo.");
 
             var currentUser = _currentUserService.GetCurrentUser();
-            if (team.ManagerEmail != currentUser.Email)
-                throw new UnauthorizedException("You don't have permission to update this team's logo.");
+            // if (team.ManagerEmail != currentUser.Email)
+            //     throw new UnauthorizedException("You don't have permission to update this team's logo.");
 
             // Delete old logo if exists
             if (!string.IsNullOrEmpty(team.LogoUrl))
@@ -192,7 +192,7 @@ namespace PhantomGG.Service.Implementations
         public async Task<IEnumerable<TeamDto>> GetByRegistrationStatusAsync(Guid tournamentId, string status)
         {
             var teams = await _teamRepository.GetByTournamentAsync(tournamentId);
-            var filteredTeams = teams.Where(team => team.RegistrationStatus.Equals(status, StringComparison.OrdinalIgnoreCase));
+            var filteredTeams = teams;//.Where(team => team.RegistrationStatus.Equals(status, StringComparison.OrdinalIgnoreCase));
             return filteredTeams.Select(team => team.ToTeamDto());
         }
 
@@ -205,17 +205,17 @@ namespace PhantomGG.Service.Implementations
             if (team == null)
                 throw new ArgumentException("Team not found.");
 
-            var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
-            if (tournament == null)
-                throw new ArgumentException("Tournament not found.");
+            // var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
+            // if (tournament == null)
+            //     throw new ArgumentException("Tournament not found.");
 
-            var currentUser = _currentUserService.GetCurrentUser();
-            if (tournament.OrganizerId != currentUser.Id)
-                throw new UnauthorizedException("You don't have permission to approve teams for this tournament.");
+            // var currentUser = _currentUserService.GetCurrentUser();
+            // if (tournament.OrganizerId != currentUser.Id)
+            //     throw new UnauthorizedException("You don't have permission to approve teams for this tournament.");
 
-            // Update team status
-            team.RegistrationStatus = "Approved";
-            team.ApprovedDate = DateTime.UtcNow;
+            // // Update team status
+            // team.RegistrationStatus = "Approved";
+            // team.ApprovedDate = DateTime.UtcNow;
 
             await _teamRepository.UpdateAsync(team);
         }
@@ -229,16 +229,16 @@ namespace PhantomGG.Service.Implementations
             if (team == null)
                 throw new ArgumentException("Team not found.");
 
-            var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
-            if (tournament == null)
-                throw new ArgumentException("Tournament not found.");
+            // var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
+            // if (tournament == null)
+            //     throw new ArgumentException("Tournament not found.");
 
-            var currentUser = _currentUserService.GetCurrentUser();
-            if (tournament.OrganizerId != currentUser.Id)
-                throw new UnauthorizedException("You don't have permission to reject teams for this tournament.");
+            // var currentUser = _currentUserService.GetCurrentUser();
+            // if (tournament.OrganizerId != currentUser.Id)
+            //     throw new UnauthorizedException("You don't have permission to reject teams for this tournament.");
 
             // Update team status
-            team.RegistrationStatus = "Rejected";
+            // team.RegistrationStatus = "Rejected";
             team.UpdatedAt = DateTime.UtcNow;
             // Note: In a full implementation, you might want to store the rejection reason
 

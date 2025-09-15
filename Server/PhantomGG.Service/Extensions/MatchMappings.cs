@@ -19,7 +19,7 @@ public static class MatchMappings
             AwayTeamName = match.AwayTeam?.Name ?? "TBD",
             AwayTeamLogo = match.AwayTeam?.LogoUrl,
             MatchDate = match.MatchDate,
-            Venue = match.Venue,
+            // Venue = match.Venue,
             Status = match.Status,
             HomeScore = match.HomeScore,
             AwayScore = match.AwayScore
@@ -35,7 +35,7 @@ public static class MatchMappings
             HomeTeamId = createDto.HomeTeamId,
             AwayTeamId = createDto.AwayTeamId,
             MatchDate = createDto.MatchDate,
-            Venue = createDto.Venue,
+            // Venue = createDto.Venue,
             Status = "Scheduled"
         };
     }
@@ -43,7 +43,7 @@ public static class MatchMappings
     public static void UpdateFromDto(this Match match, UpdateMatchDto updateDto)
     {
         match.MatchDate = updateDto.MatchDate;
-        match.Venue = updateDto.Venue;
+        // match.Venue = updateDto.Venue;
         match.Status = updateDto.Status;
     }
 

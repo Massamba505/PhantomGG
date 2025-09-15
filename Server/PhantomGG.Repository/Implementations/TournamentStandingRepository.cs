@@ -17,14 +17,11 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
             .ToListAsync();
 
         var teams = await _context.Teams
-            .Where(t => t.TournamentId == tournamentId && t.IsActive)
             .Select(t => new
             {
                 t.Id,
                 t.Name,
                 t.LogoUrl,
-                TournamentId = t.Tournament.Id,
-                TournamentName = t.Tournament.Name
             })
             .ToListAsync();
 
@@ -59,8 +56,6 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
                 TeamId = team.Id,
                 TeamName = team.Name,
                 TeamLogo = team.LogoUrl,
-                TournamentId = team.TournamentId,
-                TournamentName = team.TournamentName,
                 MatchesPlayed = teamMatches.Count,
                 Wins = wins,
                 Draws = draws,
@@ -101,13 +96,11 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
 
         var goalGroups = await _context.MatchEvents
             .Where(me => me.Match.TournamentId == tournamentId &&
-                         me.EventType == "Goal" &&
-                         !string.IsNullOrEmpty(me.PlayerName))
-            .GroupBy(me => new { me.PlayerName, me.TeamId })
+                         me.EventType == "Goal")
+            .GroupBy(me => new { me.TeamId })
             .Select(g => new
             {
                 PlayerId = Guid.Empty,
-                PlayerName = g.Key.PlayerName,
                 TeamId = g.Key.TeamId,
                 Goals = g.Count()
             })
@@ -129,7 +122,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
             return new PlayerGoalStandingDto
             {
                 PlayerId = g.PlayerId,
-                PlayerName = g.PlayerName ?? string.Empty,
+                PlayerName = string.Empty,
                 PlayerPhoto = player?.PhotoUrl,
                 TeamId = g.TeamId,
                 TeamName = team.Name,
@@ -156,12 +149,10 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
         // Get assist providers from match events
         var assistStandings = await _context.MatchEvents
             .Where(me => me.Match.TournamentId == tournamentId &&
-                        me.EventType == "Assist" &&
-                        !string.IsNullOrEmpty(me.PlayerName))
-            .GroupBy(me => new { me.PlayerName, me.TeamId })
+                        me.EventType == "Assist")
+            .GroupBy(me => new { me.TeamId })
             .Select(g => new
             {
-                PlayerName = g.Key.PlayerName,
                 TeamId = g.Key.TeamId,
                 Assists = g.Count()
             })
@@ -171,7 +162,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
                 (assists, team) => new PlayerAssistStandingDto
                 {
                     PlayerId = Guid.Empty, // We don't have player IDs in events, using player name
-                    PlayerName = assists.PlayerName ?? string.Empty,
+                    PlayerName = string.Empty,
                     TeamId = assists.TeamId,
                     TeamName = team.Name,
                     TeamLogo = team.LogoUrl,

@@ -14,14 +14,13 @@ namespace PhantomGG.Repository.Implementations
         {
             return await _context.Players
                 .Include(p => p.Team)
-                .FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<IEnumerable<Player>> GetAllAsync()
         {
             return await _context.Players
                 .Include(p => p.Team)
-                .Where(p => p.IsActive)
                 .OrderBy(p => p.FirstName)
                 .ThenBy(p => p.LastName)
                 .ToListAsync();
@@ -30,7 +29,7 @@ namespace PhantomGG.Repository.Implementations
         public async Task<IEnumerable<Player>> GetByTeamAsync(Guid teamId)
         {
             return await _context.Players
-                .Where(p => p.TeamId == teamId && p.IsActive)
+                .Where(p => p.TeamId == teamId)
                 .OrderBy(p => p.FirstName)
                 .ThenBy(p => p.LastName)
                 .ToListAsync();
@@ -45,7 +44,6 @@ namespace PhantomGG.Repository.Implementations
 
         public async Task<Player> UpdateAsync(Player player)
         {
-            player.UpdatedAt = DateTime.UtcNow;
             _context.Players.Update(player);
             await _context.SaveChangesAsync();
             return player;
@@ -63,25 +61,23 @@ namespace PhantomGG.Repository.Implementations
 
         public async Task<bool> ExistsAsync(Guid id)
         {
-            return await _context.Players.AnyAsync(p => p.Id == id && p.IsActive);
+            return await _context.Players.AnyAsync(p => p.Id == id);
         }
 
         public async Task<int> GetTeamPlayerCountAsync(Guid teamId)
         {
             return await _context.Players
-                .CountAsync(p => p.TeamId == teamId && p.IsActive);
+                .CountAsync(p => p.TeamId == teamId);
         }
 
         public async Task<IEnumerable<Player>> GetByTournamentAsync(Guid tournamentId)
         {
             var teamIds = await _context.Teams
-                .Where(t => t.TournamentId == tournamentId && t.IsActive)
                 .Select(t => t.Id)
                 .ToListAsync();
 
             return await _context.Players
                 .Include(p => p.Team)
-                .Where(p => teamIds.Contains(p.TeamId) && p.IsActive)
                 .OrderBy(p => p.Team.Name)
                 .ThenBy(p => p.FirstName)
                 .ThenBy(p => p.LastName)
@@ -92,7 +88,7 @@ namespace PhantomGG.Repository.Implementations
         {
             var query = _context.Players
                 .Include(p => p.Team)
-                .Where(p => p.IsActive);
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchDto.SearchTerm))
             {
@@ -104,15 +100,6 @@ namespace PhantomGG.Repository.Implementations
             if (searchDto.TeamId.HasValue)
             {
                 query = query.Where(p => p.TeamId == searchDto.TeamId.Value);
-            }
-
-            if (searchDto.TournamentId.HasValue)
-            {
-                var teamIds = await _context.Teams
-                    .Where(t => t.TournamentId == searchDto.TournamentId.Value && t.IsActive)
-                    .Select(t => t.Id)
-                    .ToListAsync();
-                query = query.Where(p => teamIds.Contains(p.TeamId));
             }
 
             if (searchDto.Position.HasValue)
@@ -129,7 +116,7 @@ namespace PhantomGG.Repository.Implementations
         public async Task<int> GetPlayerCountByTeamAsync(Guid teamId)
         {
             return await _context.Players
-                .CountAsync(p => p.TeamId == teamId && p.IsActive);
+                .CountAsync(p => p.TeamId == teamId);
         }
     }
 }

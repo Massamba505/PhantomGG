@@ -99,17 +99,17 @@ namespace PhantomGG.Service.Implementations
 
             // Check permissions - team manager or tournament organizer can add players
             var currentUser = _currentUserService.GetCurrentUser();
-            var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
+            var tournament = await _tournamentRepository.GetByIdAsync(team.Id);//team.TournamentId
 
-            bool isTeamManager = team.ManagerEmail == currentUser.Email;
-            bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
+            // bool isTeamManager = team.ManagerEmail == currentUser.Email;
+            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
 
-            if (!isTeamManager && !isTournamentOrganizer)
-                throw new UnauthorizedException("You don't have permission to add players to this team.");
+            // if (!isTeamManager && !isTournamentOrganizer)
+            //     throw new UnauthorizedException("You don't have permission to add players to this team.");
 
             // Check team player limit
             var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(createDto.TeamId);
-            if (tournament != null && currentPlayerCount >= tournament.MaxPlayersPerTeam)
+            if (tournament != null)// && currentPlayerCount >= tournament.MaxPlayersPerTeam
                 throw new InvalidOperationException("Team has reached maximum player limit.");
 
             var player = createDto.ToPlayer();
@@ -133,13 +133,13 @@ namespace PhantomGG.Service.Implementations
             if (team == null)
                 throw new ArgumentException("Team not found.");
 
-            var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
+            var tournament = await _tournamentRepository.GetByIdAsync(team.Id);//team.TournamentId
 
-            bool isTeamManager = team.ManagerEmail == currentUser.Email;
-            bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
+            // bool isTeamManager = team.ManagerEmail == currentUser.Email;
+            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
 
-            if (!isTeamManager && !isTournamentOrganizer)
-                throw new UnauthorizedException("You don't have permission to update this player.");
+            // if (!isTeamManager && !isTournamentOrganizer)
+            //     throw new UnauthorizedException("You don't have permission to update this player.");
 
             existingPlayer.UpdateFromDto(updateDto);
             var updatedPlayer = await _playerRepository.UpdateAsync(existingPlayer);
@@ -162,17 +162,17 @@ namespace PhantomGG.Service.Implementations
             if (team == null)
                 throw new ArgumentException("Team not found.");
 
-            var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
+            // var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
 
-            bool isTeamManager = team.ManagerEmail == currentUser.Email;
-            bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
+            // bool isTeamManager = team.ManagerEmail == currentUser.Email;
+            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
 
-            if (!isTeamManager && !isTournamentOrganizer)
-                throw new UnauthorizedException("You don't have permission to delete this player.");
+            // if (!isTeamManager && !isTournamentOrganizer)
+            //     throw new UnauthorizedException("You don't have permission to delete this player.");
 
-            // Check if tournament has started
-            if (tournament != null && tournament.StartDate <= DateTime.UtcNow)
-                throw new InvalidOperationException("Cannot delete players from a tournament that has already started.");
+            // // Check if tournament has started
+            // if (tournament != null && tournament.StartDate <= DateTime.UtcNow)
+            //     throw new InvalidOperationException("Cannot delete players from a tournament that has already started.");
 
             await _playerRepository.DeleteAsync(id);
         }
@@ -187,7 +187,7 @@ namespace PhantomGG.Service.Implementations
             var currentUser = _currentUserService.GetCurrentUser();
             var team = await _teamRepository.GetByIdAsync(player.TeamId);
 
-            return team?.ManagerEmail == currentUser.Email;
+            return team?.Name == currentUser.Email;
         }
 
         public async Task<string> UploadPlayerPhotoAsync(Guid playerId, IFormFile file, Guid userId)

@@ -15,11 +15,10 @@ public class TournamentService(
     ITournamentRepository tournamentRepository,
     ITeamRepository teamRepository,
     ICurrentUserService currentUserService,
-    IImageService imageService,
-    ITournamentFormatRepository tournamentFormatRepository) : ITournamentService
+    IImageService imageService) : ITournamentService
 {
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
-    private ITournamentFormatRepository _tournamentFormatRepository = tournamentFormatRepository;
+    // private ITournamentFormatRepository _tournamentFormatRepository = tournamentFormatRepository;
     private readonly ITeamRepository _teamRepository = teamRepository;
     private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly IImageService _imageService = imageService;
@@ -27,7 +26,7 @@ public class TournamentService(
 
     public async Task<IEnumerable<TournamentFormatDto>> GetAllFormatsAsync()
     {
-        var formats = await _tournamentFormatRepository.GetAllAsync();
+        var formats = await _tournamentRepository.GetAllAsync();
         return formats.Select(f => new TournamentFormatDto
         {
             Id = f.Id,
@@ -207,22 +206,22 @@ public class TournamentService(
             throw new ArgumentException("Team not found");
 
         var currentUser = _currentUserService.GetCurrentUser();
-        if (team.ManagerEmail != currentUser.Email)
-            throw new UnauthorizedException("You don't have permission to register this team");
+        // if (team.ManagerEmail != currentUser.Email)
+        //     throw new UnauthorizedException("You don't have permission to register this team");
 
-        if (team.TournamentId == tournamentId)
-            throw new InvalidOperationException("Team is already registered for this tournament");
+        // if (team.TournamentId == tournamentId)
+        //     throw new InvalidOperationException("Team is already registered for this tournament");
 
-        if (team.TournamentId != Guid.Empty && team.TournamentId != tournamentId)
-            throw new InvalidOperationException("Team is already registered for another tournament");
+        // if (team.TournamentId != Guid.Empty && team.TournamentId != tournamentId)
+        //     throw new InvalidOperationException("Team is already registered for another tournament");
 
-        var currentTeamCount = await GetRegisteredTeamCountAsync(tournamentId);
-        if (currentTeamCount >= tournament.MaxTeams)
-            throw new InvalidOperationException("Tournament is full");
+        // var currentTeamCount = await GetRegisteredTeamCountAsync(tournamentId);
+        // if (currentTeamCount >= tournament.MaxTeams)
+        //     throw new InvalidOperationException("Tournament is full");
 
-        team.TournamentId = tournamentId;
-        team.RegistrationStatus = TeamRegistrationStatus.Pending.ToString();
-        team.RegistrationDate = DateTime.UtcNow;
+        // team.TournamentId = tournamentId;
+        // team.RegistrationStatus = TeamRegistrationStatus.Pending.ToString();
+        // team.RegistrationDate = DateTime.UtcNow;
 
         await _teamRepository.UpdateAsync(team);
     }
@@ -237,19 +236,19 @@ public class TournamentService(
         if (team == null)
             throw new ArgumentException("Team not found");
 
-        var currentUser = _currentUserService.GetCurrentUser();
-        if (team.ManagerEmail != currentUser.Email)
-            throw new UnauthorizedException("You don't have permission to unregister this team");
+        // var currentUser = _currentUserService.GetCurrentUser();
+        // if (team.ManagerEmail != currentUser.Email)
+        //     throw new UnauthorizedException("You don't have permission to unregister this team");
 
-        if (team.TournamentId != tournamentId)
-            throw new InvalidOperationException("Team is not registered for this tournament");
+        // if (team.TournamentId != tournamentId)
+        //     throw new InvalidOperationException("Team is not registered for this tournament");
 
-        if (tournament.Status == TournamentStatus.InProgress.ToString())
-            throw new InvalidOperationException("Cannot leave tournament after it has started");
+        // if (tournament.Status == TournamentStatus.InProgress.ToString())
+        //     throw new InvalidOperationException("Cannot leave tournament after it has started");
 
-        team.TournamentId = Guid.Empty;
-        team.RegistrationStatus = TeamRegistrationStatus.Withdrawn.ToString();
-        team.ApprovedDate = null;
+        // team.TournamentId = Guid.Empty;
+        // team.RegistrationStatus = TeamRegistrationStatus.Withdrawn.ToString();
+        // team.ApprovedDate = null;
 
         await _teamRepository.UpdateAsync(team);
     }

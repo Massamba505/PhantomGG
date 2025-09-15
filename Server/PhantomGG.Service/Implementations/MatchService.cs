@@ -90,8 +90,8 @@ public class MatchService : IMatchService
         if (homeTeam == null || awayTeam == null)
             throw new ArgumentException("One or both teams not found");
 
-        if (homeTeam.TournamentId != createDto.TournamentId || awayTeam.TournamentId != createDto.TournamentId)
-            throw new ArgumentException("Teams must be part of the tournament");
+        // if (homeTeam.TournamentId != createDto.TournamentId || awayTeam.TournamentId != createDto.TournamentId)
+        //     throw new ArgumentException("Teams must be part of the tournament");
 
         // Check for scheduling conflicts
         if (await _matchRepository.TeamsHaveMatchOnDateAsync(createDto.HomeTeamId, createDto.AwayTeamId, createDto.MatchDate))
@@ -162,7 +162,7 @@ public class MatchService : IMatchService
             throw new UnauthorizedException("You don't have permission to generate fixtures for this tournament");
 
         var teams = await _teamRepository.GetByTournamentAsync(generateDto.TournamentId);
-        var teamsList = teams.Where(t => t.RegistrationStatus == "Approved").ToList();
+        var teamsList = teams.ToList();//.Where(t => t.RegistrationStatus == "Approved")
 
         if (teamsList.Count < tournament.MinTeams)
             throw new InvalidOperationException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
@@ -183,7 +183,7 @@ public class MatchService : IMatchService
                     AwayTeamId = teamsList[j].Id,
                     MatchDate = matchDate,
                     Status = "Scheduled",
-                    Venue = generateDto.DefaultVenue
+                    // Venue = generateDto.DefaultVenue
                 };
 
                 matches.Add(match);
@@ -206,7 +206,7 @@ public class MatchService : IMatchService
                         AwayTeamId = teamsList[i].Id,
                         MatchDate = matchDate,
                         Status = "Scheduled",
-                        Venue = generateDto.DefaultVenue
+                        // Venue = generateDto.DefaultVenue
                     };
 
                     matches.Add(returnMatch);
@@ -236,7 +236,7 @@ public class MatchService : IMatchService
             throw new UnauthorizedException("You don't have permission to generate fixtures for this tournament");
 
         var teams = await _teamRepository.GetByTournamentAsync(generateDto.TournamentId);
-        var teamsList = teams.Where(t => t.RegistrationStatus == "Approved").ToList();
+        var teamsList = teams.ToList();//.Where(t => t.RegistrationStatus == "Approved")
 
         if (teamsList.Count < tournament.MinTeams)
             throw new InvalidOperationException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
@@ -283,7 +283,7 @@ public class MatchService : IMatchService
                 AwayTeamId = awayTeam.Id,
                 MatchDate = matchDate,
                 Status = "Scheduled",
-                Venue = generateDto.DefaultVenue
+                // Venue = generateDto.DefaultVenue
             };
 
             matches.Add(match);
@@ -307,7 +307,7 @@ public class MatchService : IMatchService
                     AwayTeamId = Guid.Empty, // TBD based on previous round results
                     MatchDate = matchDate,
                     Status = "Pending", // Will be scheduled once teams are determined
-                    Venue = generateDto.DefaultVenue
+                    // Venue = generateDto.DefaultVenue
                 };
 
                 matches.Add(match);

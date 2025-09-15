@@ -19,7 +19,7 @@ public static class PlayerMappings
             TeamId = player.TeamId,
             TeamName = player.Team?.Name ?? "Unknown",
             CreatedAt = player.CreatedAt,
-            UpdatedAt = player.UpdatedAt
+            // UpdatedAt = player.UpdatedAt
         };
     }
 
@@ -44,6 +44,6 @@ public static class PlayerMappings
         player.Position = dto.Position;
         player.Email = dto.Email;
         player.PhotoUrl = dto.PhotoUrl;
-        player.UpdatedAt = DateTime.UtcNow;
+        // player.UpdatedAt = DateTime.UtcNow;
     }
 }

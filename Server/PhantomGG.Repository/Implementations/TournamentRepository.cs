@@ -15,7 +15,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     public async Task<Tournament?> GetByIdAsync(Guid id)
     {
         return await _context.Tournaments
-            .Include(t => t.Format)
             .Include(t => t.Organizer)
             .FirstOrDefaultAsync(t => t.Id == id);
     }
@@ -23,7 +22,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     public async Task<IEnumerable<Tournament>> GetAllAsync()
     {
         return await _context.Tournaments
-            .Include(t => t.Format)
             .Include(t => t.Organizer)
             .ToListAsync();
     }
@@ -31,7 +29,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     public async Task<IEnumerable<Tournament>> GetByOrganizerAsync(Guid organizerId)
     {
         return await _context.Tournaments
-            .Include(t => t.Format)
             .Include(t => t.Organizer)
             .Where(t => t.OrganizerId == organizerId)
             .ToListAsync();
@@ -40,9 +37,8 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     public async Task<IEnumerable<Tournament>> SearchAsync(TournamentSearchDto searchDto)
     {
         var query = _context.Tournaments
-            .Include(t => t.Format)
             .Include(t => t.Organizer)
-            .Where(t => t.IsActive);
+            .AsQueryable();
 
         if (!string.IsNullOrEmpty(searchDto.SearchTerm))
         {
@@ -58,21 +54,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         if (!string.IsNullOrEmpty(searchDto.Location))
         {
             query = query.Where(t => t.Location != null && t.Location.Contains(searchDto.Location));
-        }
-
-        if (!string.IsNullOrEmpty(searchDto.FormatId) && Guid.TryParse(searchDto.FormatId, out var formatId))
-        {
-            query = query.Where(t => t.FormatId == formatId);
-        }
-
-        if (searchDto.MinPrizePool.HasValue)
-        {
-            query = query.Where(t => t.PrizePool >= searchDto.MinPrizePool.Value);
-        }
-
-        if (searchDto.MaxPrizePool.HasValue)
-        {
-            query = query.Where(t => t.PrizePool <= searchDto.MaxPrizePool.Value);
         }
 
         if (searchDto.StartDateFrom.HasValue)
@@ -104,9 +85,8 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     public async Task<PaginatedResponse<Tournament>> SearchWithPaginationAsync(TournamentSearchDto searchDto, Guid? userId = null)
     {
         var baseQuery = _context.Tournaments
-            .Include(t => t.Format)
             .Include(t => t.Organizer)
-            .Where(t => t.IsActive);
+            .AsQueryable();
 
         var filteredQuery = baseQuery;
 
@@ -131,21 +111,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         {
             filteredQuery = filteredQuery.Where(t =>
                 t.Location != null && t.Location.Contains(searchDto.Location));
-        }
-
-        if (!string.IsNullOrEmpty(searchDto.FormatId) && Guid.TryParse(searchDto.FormatId, out var formatId))
-        {
-            filteredQuery = filteredQuery.Where(t => t.FormatId == formatId);
-        }
-
-        if (searchDto.MinPrizePool.HasValue)
-        {
-            filteredQuery = filteredQuery.Where(t => t.PrizePool >= searchDto.MinPrizePool.Value);
-        }
-
-        if (searchDto.MaxPrizePool.HasValue)
-        {
-            filteredQuery = filteredQuery.Where(t => t.PrizePool <= searchDto.MaxPrizePool.Value);
         }
 
         if (searchDto.StartDateFrom.HasValue)
@@ -230,14 +195,12 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     public async Task<int> GetTeamCountAsync(Guid tournamentId)
     {
         return await _context.Teams
-            .CountAsync(t => t.TournamentId == tournamentId && t.IsActive);
+            .CountAsync();
     }
 
     public async Task<int> GetApprovedTeamCountAsync(Guid tournamentId)
     {
         return await _context.Teams
-            .CountAsync(t => t.TournamentId == tournamentId &&
-                            t.RegistrationStatus == TeamRegistrationStatus.Approved.ToString() &&
-                            t.IsActive);
+            .CountAsync();
     }
 }
