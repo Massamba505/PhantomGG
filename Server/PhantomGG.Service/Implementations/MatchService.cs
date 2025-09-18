@@ -2,10 +2,9 @@ using PhantomGG.Service.Interfaces;
 using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Models.DTOs.MatchEvent;
 using PhantomGG.Repository.Interfaces;
-
-using PhantomGG.API.Mappings;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Models.Entities;
+using PhantomGG.Service.Mappings;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -31,7 +30,7 @@ public class MatchService : IMatchService
     public async Task<IEnumerable<MatchDto>> GetAllAsync()
     {
         var matches = await _matchRepository.GetAllAsync();
-        return matches.Select(m => m.ToMatchDto());
+        return matches.Select(m => m.ToDto());
     }
 
     public async Task<MatchDto> GetByIdAsync(Guid id)
@@ -40,37 +39,79 @@ public class MatchService : IMatchService
         if (match == null)
             throw new ArgumentException("Match not found");
 
-        return match.ToMatchDto();
+        return match.ToDto();
     }
 
     public async Task<IEnumerable<MatchDto>> GetByTournamentAsync(Guid tournamentId)
     {
         var matches = await _matchRepository.GetByTournamentAsync(tournamentId);
-        return matches.Select(m => m.ToMatchDto());
+        return matches.Select(m => m.ToDto());
+    }
+
+    public async Task<MatchDto> UpdateResultAsync(Guid matchId, object resultDto, Guid organizerId)
+    {
+        var match = await _matchRepository.GetByIdAsync(matchId);
+        if (match == null)
+            throw new ArgumentException("Match not found");
+
+        // Validate that the organizer has permission to update this match
+        var tournament = await _tournamentRepository.GetByIdAsync(match.TournamentId);
+        if (tournament == null)
+            throw new ArgumentException("Tournament not found");
+
+        if (tournament.OrganizerId != organizerId)
+            throw new UnauthorizedException("You don't have permission to update this match");
+
+        if (resultDto is not MatchResultDto matchResult)
+            throw new ArgumentException("Invalid result data");
+
+        // Update match scores and status
+        match.HomeScore = matchResult.HomeScore;
+        match.AwayScore = matchResult.AwayScore;
+        match.Status = Common.Enums.MatchStatus.Completed.ToString();
+
+        var updatedMatch = await _matchRepository.UpdateAsync(match);
+        return updatedMatch.ToDto();
+    }
+
+    public async Task<IEnumerable<MatchDto>> GenerateTournamentBracketAsync(Guid tournamentId, Guid organizerId)
+    {
+        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+        if (tournament == null)
+            throw new ArgumentException("Tournament not found");
+
+        // Validate that the organizer has permission
+        if (tournament.OrganizerId != organizerId)
+            throw new UnauthorizedException("You don't have permission to generate brackets for this tournament");
+
+        // For now, return existing matches for this tournament
+        // TODO: Implement proper bracket generation logic in a future phase
+        var existingMatches = await _matchRepository.GetByTournamentAsync(tournamentId);
+        return existingMatches.Select(m => m.ToDto());
     }
 
     public async Task<IEnumerable<MatchDto>> GetByTeamAsync(Guid teamId)
     {
         var matches = await _matchRepository.GetByTeamAsync(teamId);
-        return matches.Select(m => m.ToMatchDto());
+        return matches.Select(m => m.ToDto());
     }
 
     public async Task<IEnumerable<MatchDto>> GetUpcomingMatchesAsync(Guid tournamentId)
     {
         var matches = await _matchRepository.GetUpcomingMatchesAsync(tournamentId);
-        return matches.Select(m => m.ToMatchDto());
+        return matches.Select(m => m.ToDto());
     }
 
     public async Task<IEnumerable<MatchDto>> GetCompletedMatchesAsync(Guid tournamentId)
     {
         var matches = await _matchRepository.GetCompletedMatchesAsync(tournamentId);
-        return matches.Select(m => m.ToMatchDto());
+        return matches.Select(m => m.ToDto());
     }
 
     public async Task<IEnumerable<MatchDto>> SearchAsync(MatchSearchDto searchDto)
     {
         var matches = await _matchRepository.SearchAsync(searchDto);
-        return matches.Select(m => m.ToMatchDto());
+        return matches.Select(m => m.ToDto());
     }
 
     public async Task<MatchDto> CreateAsync(CreateMatchDto createDto, Guid userId)
@@ -80,8 +121,6 @@ public class MatchService : IMatchService
         if (tournament == null)
             throw new ArgumentException("Tournament not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(createDto.TournamentId, userId))
-            throw new UnauthorizedException("You don't have permission to create matches for this tournament");
 
         // Validate teams exist and are part of the tournament
         var homeTeam = await _teamRepository.GetByIdAsync(createDto.HomeTeamId);
@@ -97,9 +136,9 @@ public class MatchService : IMatchService
         if (await _matchRepository.TeamsHaveMatchOnDateAsync(createDto.HomeTeamId, createDto.AwayTeamId, createDto.MatchDate))
             throw new InvalidOperationException("Teams already have a match scheduled on this date");
 
-        var match = createDto.ToMatch();
+        var match = createDto.ToEntity();
         var createdMatch = await _matchRepository.CreateAsync(match);
-        return createdMatch.ToMatchDto();
+        return createdMatch.ToDto();
     }
 
     public async Task<MatchDto> UpdateAsync(Guid id, UpdateMatchDto updateDto, Guid userId)
@@ -108,12 +147,10 @@ public class MatchService : IMatchService
         if (match == null)
             throw new ArgumentException("Match not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(id, userId))
-            throw new UnauthorizedException("You don't have permission to update this match");
 
-        match.UpdateFromDto(updateDto);
+        updateDto.UpdateEntity(match);
         var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToMatchDto();
+        return updatedMatch.ToDto();
     }
 
     public async Task<MatchDto> UpdateResultAsync(Guid id, MatchResultDto resultDto, Guid userId)
@@ -122,8 +159,6 @@ public class MatchService : IMatchService
         if (match == null)
             throw new ArgumentException("Match not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(id, userId))
-            throw new UnauthorizedException("You don't have permission to update this match result");
 
         // Update match result
         match.HomeScore = resultDto.HomeScore;
@@ -131,7 +166,7 @@ public class MatchService : IMatchService
         match.Status = "Completed";
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToMatchDto();
+        return updatedMatch.ToDto();
     }
 
     public async Task DeleteAsync(Guid id, Guid userId)
@@ -140,16 +175,10 @@ public class MatchService : IMatchService
         if (match == null)
             throw new ArgumentException("Match not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(id, userId))
-            throw new UnauthorizedException("You don't have permission to delete this match");
 
         await _matchRepository.DeleteAsync(id);
     }
 
-    public async Task<bool> IsMatchOwnedByUserAsync(Guid matchId, Guid userId)
-    {
-        return await _tournamentRepository.IsOrganizerAsync(matchId, userId);
-    }
 
     // Fixture generation - simplified for MVP
     public async Task<IEnumerable<MatchDto>> GenerateRoundRobinFixturesAsync(GenerateFixturesDto generateDto, Guid userId)
@@ -158,11 +187,9 @@ public class MatchService : IMatchService
         if (tournament == null)
             throw new ArgumentException("Tournament not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(generateDto.TournamentId, userId))
-            throw new UnauthorizedException("You don't have permission to generate fixtures for this tournament");
 
-        var teams = await _teamRepository.GetByTournamentAsync(generateDto.TournamentId);
-        var teamsList = teams.ToList();//.Where(t => t.RegistrationStatus == "Approved")
+        var teams = await _tournamentRepository.GetApprovedTeamsAsync(generateDto.TournamentId);
+        var teamsList = teams.ToList();
 
         if (teamsList.Count < tournament.MinTeams)
             throw new InvalidOperationException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
@@ -223,7 +250,7 @@ public class MatchService : IMatchService
             createdMatches.Add(createdMatch);
         }
 
-        return createdMatches.Select(m => m.ToMatchDto());
+        return createdMatches.Select(m => m.ToDto());
     }
 
     public async Task<IEnumerable<MatchDto>> GenerateKnockoutFixturesAsync(GenerateFixturesDto generateDto, Guid userId)
@@ -232,11 +259,9 @@ public class MatchService : IMatchService
         if (tournament == null)
             throw new ArgumentException("Tournament not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(generateDto.TournamentId, userId))
-            throw new UnauthorizedException("You don't have permission to generate fixtures for this tournament");
 
-        var teams = await _teamRepository.GetByTournamentAsync(generateDto.TournamentId);
-        var teamsList = teams.ToList();//.Where(t => t.RegistrationStatus == "Approved")
+        var teams = await _tournamentRepository.GetApprovedTeamsAsync(generateDto.TournamentId);
+        var teamsList = teams.ToList();
 
         if (teamsList.Count < tournament.MinTeams)
             throw new InvalidOperationException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
@@ -322,7 +347,7 @@ public class MatchService : IMatchService
             createdMatches.Add(createdMatch);
         }
 
-        return createdMatches.Select(m => m.ToMatchDto());
+        return createdMatches.Select(m => m.ToDto());
     }
 
     // Match status management
@@ -332,13 +357,11 @@ public class MatchService : IMatchService
         if (match == null)
             throw new ArgumentException("Match not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(matchId, userId))
-            throw new UnauthorizedException("You don't have permission to start this match");
 
         match.Status = "In Progress";
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToMatchDto();
+        return updatedMatch.ToDto();
     }
 
     public async Task<MatchDto> EndMatchAsync(Guid matchId, Guid userId)
@@ -347,13 +370,11 @@ public class MatchService : IMatchService
         if (match == null)
             throw new ArgumentException("Match not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(matchId, userId))
-            throw new UnauthorizedException("You don't have permission to end this match");
 
         match.Status = "Completed";
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToMatchDto();
+        return updatedMatch.ToDto();
     }
 
     public async Task<MatchDto> CancelMatchAsync(Guid matchId, string reason, Guid userId)
@@ -362,13 +383,11 @@ public class MatchService : IMatchService
         if (match == null)
             throw new ArgumentException("Match not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(matchId, userId))
-            throw new UnauthorizedException("You don't have permission to cancel this match");
 
         match.Status = "Cancelled";
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToMatchDto();
+        return updatedMatch.ToDto();
     }
 
     public async Task<MatchDto> PostponeMatchAsync(Guid matchId, DateTime newDate, string reason, Guid userId)
@@ -377,14 +396,12 @@ public class MatchService : IMatchService
         if (match == null)
             throw new ArgumentException("Match not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(matchId, userId))
-            throw new UnauthorizedException("You don't have permission to postpone this match");
 
         match.MatchDate = newDate;
         match.Status = "Postponed";
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToMatchDto();
+        return updatedMatch.ToDto();
     }
 
     // Match events - simplified for MVP
@@ -406,13 +423,6 @@ public class MatchService : IMatchService
         if (tournament == null)
             throw new ArgumentException("Tournament not found");
 
-        if (!await _tournamentRepository.IsOrganizerAsync(generateDto.TournamentId, userId))
-            throw new UnauthorizedException("You don't have permission to generate fixtures for this tournament");
-
-        // Check if we have enough teams
-        var approvedTeamCount = await _tournamentRepository.GetApprovedTeamCountAsync(generateDto.TournamentId);
-        if (approvedTeamCount < tournament.MinTeams)
-            throw new InvalidOperationException($"Tournament needs at least {tournament.MinTeams} approved teams to generate fixtures. Currently has {approvedTeamCount} teams.");
 
         // Create a GenerateFixturesDto from the AutoGenerateFixturesDto
         var fixtureDto = new GenerateFixturesDto
@@ -439,29 +449,14 @@ public class MatchService : IMatchService
         if (tournament == null)
             throw new ArgumentException("Tournament not found");
 
-        var approvedTeamCount = await _tournamentRepository.GetApprovedTeamCountAsync(tournamentId);
-
-        var canGenerate = approvedTeamCount >= tournament.MinTeams &&
-                         approvedTeamCount <= tournament.MaxTeams;
-
-        string message = "";
-        if (approvedTeamCount < tournament.MinTeams)
-            message = $"Need at least {tournament.MinTeams} approved teams. Currently have {approvedTeamCount}.";
-        else if (approvedTeamCount > tournament.MaxTeams)
-            message = $"Too many teams ({approvedTeamCount}). Maximum allowed is {tournament.MaxTeams}.";
-        else
-            message = "Ready to generate fixtures.";
 
         return new FixtureGenerationStatusDto
         {
             TournamentId = tournamentId,
             TournamentName = tournament.Name,
-            RegisteredTeams = approvedTeamCount,
             RequiredTeams = tournament.MinTeams,
             MaxTeams = tournament.MaxTeams,
             Status = tournament.Status,
-            CanGenerateFixtures = canGenerate,
-            Message = message
         };
     }
 

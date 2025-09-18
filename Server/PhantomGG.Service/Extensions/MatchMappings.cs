@@ -1,32 +1,32 @@
-using PhantomGG.Models.Entities;
 using PhantomGG.Models.DTOs.Match;
+using PhantomGG.Models.Entities;
 
-namespace PhantomGG.API.Mappings;
+namespace PhantomGG.Service.Mappings;
 
 public static class MatchMappings
 {
-    public static MatchDto ToMatchDto(this Match match)
+    public static MatchDto ToDto(this Match match)
     {
         return new MatchDto
         {
             Id = match.Id,
             TournamentId = match.TournamentId,
-            TournamentName = match.Tournament?.Name ?? string.Empty,
+            TournamentName = match.Tournament?.Name ?? "Unknown",
             HomeTeamId = match.HomeTeamId,
-            HomeTeamName = match.HomeTeam?.Name ?? "TBD",
+            HomeTeamName = match.HomeTeam?.Name ?? "Unknown",
             HomeTeamLogo = match.HomeTeam?.LogoUrl,
             AwayTeamId = match.AwayTeamId,
-            AwayTeamName = match.AwayTeam?.Name ?? "TBD",
+            AwayTeamName = match.AwayTeam?.Name ?? "Unknown",
             AwayTeamLogo = match.AwayTeam?.LogoUrl,
             MatchDate = match.MatchDate,
-            // Venue = match.Venue,
+            Venue = "",
             Status = match.Status,
             HomeScore = match.HomeScore,
             AwayScore = match.AwayScore
         };
     }
 
-    public static Match ToMatch(this CreateMatchDto createDto)
+    public static Match ToEntity(this CreateMatchDto createDto)
     {
         return new Match
         {
@@ -35,22 +35,16 @@ public static class MatchMappings
             HomeTeamId = createDto.HomeTeamId,
             AwayTeamId = createDto.AwayTeamId,
             MatchDate = createDto.MatchDate,
-            // Venue = createDto.Venue,
-            Status = "Scheduled"
+            Status = "Scheduled",
+            HomeScore = null,
+            AwayScore = null
         };
     }
 
-    public static void UpdateFromDto(this Match match, UpdateMatchDto updateDto)
+    public static void UpdateEntity(this UpdateMatchDto updateDto, Match match)
     {
         match.MatchDate = updateDto.MatchDate;
-        // match.Venue = updateDto.Venue;
-        match.Status = updateDto.Status;
-    }
-
-    public static void UpdateResult(this Match match, MatchResultDto resultDto)
-    {
-        match.HomeScore = resultDto.HomeScore;
-        match.AwayScore = resultDto.AwayScore;
-        match.Status = "Completed";
+        if (!string.IsNullOrEmpty(updateDto.Status))
+            match.Status = updateDto.Status;
     }
 }

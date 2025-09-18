@@ -1,11 +1,11 @@
 using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Models.Entities;
 
-namespace PhantomGG.API.Mappings;
+namespace PhantomGG.Service.Mappings;
 
 public static class TournamentMappings
 {
-    public static TournamentDto ToTournamentDto(this Tournament tournament)
+    public static TournamentDto ToDto(this Tournament tournament)
     {
         return new TournamentDto
         {
@@ -13,80 +13,69 @@ public static class TournamentMappings
             Name = tournament.Name,
             Description = tournament.Description,
             Location = tournament.Location,
-            // FormatId = tournament.FormatId,
-            // FormatName = tournament.Format?.Name ?? "Unknown",
             RegistrationStartDate = tournament.RegistrationStartDate,
             RegistrationDeadline = tournament.RegistrationDeadline,
             StartDate = tournament.StartDate,
+            EndDate = tournament.EndDate,
             MinTeams = tournament.MinTeams,
             MaxTeams = tournament.MaxTeams,
-            // MaxPlayersPerTeam = tournament.MaxPlayersPerTeam,
-            // MinPlayersPerTeam = tournament.MinPlayersPerTeam,
-            // EntryFee = tournament.EntryFee,
-            // PrizePool = tournament.PrizePool,
-            // ContactEmail = tournament.ContactEmail,
             BannerUrl = tournament.BannerUrl,
             LogoUrl = tournament.LogoUrl,
             Status = tournament.Status,
-            // MatchDuration = tournament.MatchDuration ?? 90,
             OrganizerId = tournament.OrganizerId,
-            OrganizerName = tournament.Organizer?.FirstName + " " + tournament.Organizer?.LastName ?? "Unknown",
+            OrganizerName = "Unknown", // We'll need to load organizer details if needed
             CreatedAt = tournament.CreatedAt,
             UpdatedAt = tournament.UpdatedAt,
-            // IsActive = tournament.IsActive,
             IsPublic = tournament.IsPublic,
-            // TeamCount = tournament.Teams?.Count ?? 0,
-            MatchCount = tournament.Matches?.Count ?? 0,
-            CompletedMatches = tournament.Matches?.Count(m => m.Status == "Completed") ?? 0
+            TeamCount = tournament.TournamentTeams?.Count ?? 0,
+            MatchCount = tournament.Matches?.Count ?? 0
         };
     }
 
-    public static Tournament ToTournament(this CreateTournamentDto dto, Guid organizerId)
+    public static Tournament ToEntity(this CreateTournamentDto createDto, Guid organizerId)
     {
         return new Tournament
         {
             Id = Guid.NewGuid(),
-            Name = dto.Name,
-            Description = dto.Description,
-            Location = dto.Location,
-            // FormatId = dto.FormatId,
-            RegistrationStartDate = dto.RegistrationStartDate,
-            RegistrationDeadline = dto.RegistrationDeadline,
-            StartDate = dto.StartDate,
-            MinTeams = dto.MinTeams,
-            MaxTeams = dto.MaxTeams,
-            // MaxPlayersPerTeam = dto.MaxPlayersPerTeam,
-            // MinPlayersPerTeam = dto.MinPlayersPerTeam,
-            // EntryFee = dto.EntryFee,
-            // PrizePool = dto.PrizePool,
-            // ContactEmail = dto.ContactEmail,
-            BannerUrl = dto.BannerUrl,
-            LogoUrl = dto.LogoUrl,
-            // MatchDuration = dto.MatchDuration,
-            IsPublic = dto.IsPublic,
+            Name = createDto.Name,
+            Description = createDto.Description,
+            Location = createDto.Location,
+            RegistrationStartDate = createDto.RegistrationStartDate,
+            RegistrationDeadline = createDto.RegistrationDeadline,
+            StartDate = createDto.StartDate,
+            EndDate = createDto.EndDate,
+            MinTeams = createDto.MinTeams,
+            MaxTeams = createDto.MaxTeams,
+            BannerUrl = createDto.BannerUrl,
+            LogoUrl = createDto.LogoUrl,
             Status = "Draft",
             OrganizerId = organizerId,
-            // IsActive = true
+            IsPublic = createDto.IsPublic,
+            CreatedAt = DateTime.UtcNow
         };
     }
 
-    public static void UpdateFromDto(this Tournament tournament, UpdateTournamentDto dto)
+    public static void UpdateEntity(this UpdateTournamentDto updateDto, Tournament tournament)
     {
-        tournament.Name = dto.Name;
-        tournament.Description = dto.Description;
-        tournament.Location = dto.Location;
-        tournament.RegistrationDeadline = dto.RegistrationDeadline;
-        tournament.StartDate = dto.StartDate;
-        tournament.MaxTeams = dto.MaxTeams;
-        // tournament.EntryFee = dto.EntryFee;
-        // tournament.PrizePool = dto.PrizePool;
-        // tournament.ContactEmail = dto.ContactEmail;
-        tournament.BannerUrl = dto.BannerUrl;
-        tournament.LogoUrl = dto.LogoUrl;
-        // tournament.MatchDuration = dto.MatchDuration;
-        tournament.IsPublic = dto.IsPublic;
-        if (!string.IsNullOrEmpty(dto.Status))
-            tournament.Status = dto.Status;
+        if (!string.IsNullOrEmpty(updateDto.Name))
+            tournament.Name = updateDto.Name;
+        if (!string.IsNullOrEmpty(updateDto.Description))
+            tournament.Description = updateDto.Description;
+        if (updateDto.Location != null)
+            tournament.Location = updateDto.Location;
+        if (updateDto.RegistrationDeadline.HasValue)
+            tournament.RegistrationDeadline = updateDto.RegistrationDeadline;
+        if (updateDto.StartDate.HasValue)
+            tournament.StartDate = updateDto.StartDate.Value;
+        if (updateDto.MaxTeams.HasValue)
+            tournament.MaxTeams = updateDto.MaxTeams.Value;
+        if (updateDto.BannerUrl != null)
+            tournament.BannerUrl = updateDto.BannerUrl;
+        if (updateDto.LogoUrl != null)
+            tournament.LogoUrl = updateDto.LogoUrl;
+        if (updateDto.IsPublic.HasValue)
+            tournament.IsPublic = updateDto.IsPublic.Value;
+
         tournament.UpdatedAt = DateTime.UtcNow;
     }
 }

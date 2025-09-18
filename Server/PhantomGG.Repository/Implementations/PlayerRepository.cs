@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using PhantomGG.Repository.Data;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Models.Entities;
-using PhantomGG.Models.DTOs.Player;
 
 namespace PhantomGG.Repository.Implementations
 {
@@ -15,15 +14,6 @@ namespace PhantomGG.Repository.Implementations
             return await _context.Players
                 .Include(p => p.Team)
                 .FirstOrDefaultAsync(p => p.Id == id);
-        }
-
-        public async Task<IEnumerable<Player>> GetAllAsync()
-        {
-            return await _context.Players
-                .Include(p => p.Team)
-                .OrderBy(p => p.FirstName)
-                .ThenBy(p => p.LastName)
-                .ToListAsync();
         }
 
         public async Task<IEnumerable<Player>> GetByTeamAsync(Guid teamId)
@@ -68,49 +58,6 @@ namespace PhantomGG.Repository.Implementations
         {
             return await _context.Players
                 .CountAsync(p => p.TeamId == teamId);
-        }
-
-        public async Task<IEnumerable<Player>> GetByTournamentAsync(Guid tournamentId)
-        {
-            var teamIds = await _context.Teams
-                .Select(t => t.Id)
-                .ToListAsync();
-
-            return await _context.Players
-                .Include(p => p.Team)
-                .OrderBy(p => p.Team.Name)
-                .ThenBy(p => p.FirstName)
-                .ThenBy(p => p.LastName)
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Player>> SearchAsync(PlayerSearchDto searchDto)
-        {
-            var query = _context.Players
-                .Include(p => p.Team)
-                .AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchDto.SearchTerm))
-            {
-                query = query.Where(p =>
-                    p.FirstName.Contains(searchDto.SearchTerm) ||
-                    p.LastName.Contains(searchDto.SearchTerm));
-            }
-
-            if (searchDto.TeamId.HasValue)
-            {
-                query = query.Where(p => p.TeamId == searchDto.TeamId.Value);
-            }
-
-            if (searchDto.Position.HasValue)
-            {
-                query = query.Where(p => p.Position == searchDto.Position.ToString());
-            }
-
-            return await query
-                .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
-                .Take(searchDto.PageSize)
-                .ToListAsync();
         }
 
         public async Task<int> GetPlayerCountByTeamAsync(Guid teamId)

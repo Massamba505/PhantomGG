@@ -1,248 +1,393 @@
 using PhantomGG.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
+using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Team;
+using PhantomGG.Models.DTOs.Player;
+using PhantomGG.Models.Entities;
 using PhantomGG.Repository.Interfaces;
-
-using PhantomGG.API.Mappings;
 using PhantomGG.Common.Enums;
 using PhantomGG.Service.Exceptions;
+using PhantomGG.Service.Mappings;
 
-namespace PhantomGG.Service.Implementations
+namespace PhantomGG.Service.Implementations;
+
+public class TeamService(
+    ITeamRepository teamRepository,
+    ITournamentRepository tournamentRepository,
+    ICurrentUserService currentUserService,
+    IImageService imageService,
+    IPlayerRepository playerRepository) : ITeamService
 {
-    public class TeamService : ITeamService
+    private readonly ITeamRepository _teamRepository = teamRepository;
+    private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
+    private readonly IImageService _imageService = imageService;
+    private readonly IPlayerRepository _playerRepository = playerRepository;
+
+    #region Guest Access - Public Team Information
+
+    public async Task<PaginatedResponse<TeamDto>> SearchAsync(TeamSearchDto searchDto)
     {
-        private readonly ITeamRepository _teamRepository;
-        private readonly ITournamentRepository _tournamentRepository;
-        private readonly ICurrentUserService _currentUserService;
-        private readonly IImageService _imageService;
+        var teams = await _teamRepository.GetAllAsync();
 
-        public TeamService(
-            ITeamRepository teamRepository,
-            ITournamentRepository tournamentRepository,
-            ICurrentUserService currentUserService,
-            IImageService imageService)
+        // Apply search filter
+        if (!string.IsNullOrEmpty(searchDto.SearchTerm))
         {
-            _teamRepository = teamRepository;
-            _tournamentRepository = tournamentRepository;
-            _currentUserService = currentUserService;
-            _imageService = imageService;
+            teams = teams.Where(t =>
+                t.Name.Contains(searchDto.SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (t.ShortName != null && t.ShortName.Contains(searchDto.SearchTerm, StringComparison.OrdinalIgnoreCase)));
         }
 
-        public async Task<IEnumerable<TeamDto>> GetAllAsync()
+        // Apply tournament filter
+        if (searchDto.TournamentId.HasValue)
         {
-            var teams = await _teamRepository.GetAllAsync();
-            return teams.Select(t => t.ToTeamDto());
+            var tournamentTeams = await _tournamentRepository.GetTournamentTeamsAsync(searchDto.TournamentId.Value);
+            var tournamentTeamIds = tournamentTeams.Select(t => t.Id).ToHashSet();
+            teams = teams.Where(t => tournamentTeamIds.Contains(t.Id));
         }
 
-        public async Task<TeamDto> GetByIdAsync(Guid id)
+        // Convert to DTOs
+        var teamDtos = teams.Select(t => t.ToDto()).ToList();
+
+        // Apply pagination
+        var totalCount = teamDtos.Count;
+        var paginatedTeams = teamDtos
+            .Skip((searchDto.Page - 1) * searchDto.PageSize)
+            .Take(searchDto.PageSize)
+            .ToList();
+
+        return new PaginatedResponse<TeamDto>
         {
-            var team = await _teamRepository.GetByIdAsync(id);
-            if (team == null)
-                throw new ArgumentException("Team not found.");
+            Data = paginatedTeams,
+            TotalRecords = totalCount,
+            PageNumber = searchDto.Page,
+            PageSize = searchDto.PageSize,
+            TotalPages = (int)Math.Ceiling((double)totalCount / searchDto.PageSize),
+            HasNextPage = searchDto.Page < (int)Math.Ceiling((double)totalCount / searchDto.PageSize),
+            HasPreviousPage = searchDto.Page > 1
+        };
+    }
 
-            return team.ToTeamDto();
-        }
+    public async Task<TeamDto> GetByIdAsync(Guid id)
+    {
+        var team = await _teamRepository.GetByIdAsync(id);
+        if (team == null)
+            throw new NotFoundException("Team not found");
 
-        public async Task<IEnumerable<TeamDto>> GetByLeaderAsync(Guid leaderId)
+        return team.ToDto();
+    }
+
+    public async Task<IEnumerable<PlayerDto>> GetTeamPlayersAsync(Guid teamId)
+    {
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+            throw new NotFoundException("Team not found");
+
+        var players = await _playerRepository.GetByTeamAsync(teamId);
+        return players.Select(p => p.ToDto());
+    }
+
+    #endregion
+
+    #region User Operations - Team Management
+
+    public async Task<IEnumerable<TeamDto>> GetMyTeamsAsync(Guid userId)
+    {
+        var teams = await _teamRepository.GetByUserAsync(userId);
+        return teams.Select(t => t.ToDto());
+    }
+
+    public async Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid leaderId)
+    {
+        if (!_currentUserService.IsAuthenticated())
+            throw new UnauthorizedException("You must be logged in to create a team");
+
+        // Validate tournament exists and registration is open
+        var tournament = await ValidateTournamentForRegistration(createDto.TournamentId);
+
+        // Check if team name is unique in the tournament
+        await ValidateTeamNameUniqueness(createDto.Name, createDto.TournamentId);
+
+        // Check if tournament has space
+        await ValidateTournamentCapacity(createDto.TournamentId, tournament.MaxTeams);
+
+        var team = createDto.ToEntity(leaderId);
+        var createdTeam = await _teamRepository.CreateAsync(team);
+
+        // Register team for tournament
+        await _teamRepository.RegisterForTournamentAsync(createdTeam.Id, createDto.TournamentId);
+
+        return createdTeam.ToDto();
+    }
+
+    public async Task<TeamDto> UpdateAsync(Guid id, UpdateTeamDto updateDto, Guid userId)
+    {
+        var team = await _teamRepository.GetByIdAsync(id);
+        if (team == null)
+            throw new NotFoundException("Team not found");
+
+        ValidateTeamOwnership(team, userId);
+
+        if (!string.IsNullOrEmpty(updateDto.Name) && updateDto.Name != team.Name)
         {
-            // For MVP, we'll use the manager email/name as identifier
-            // This would need to be improved for proper user management
-            var teams = await _teamRepository.GetAllAsync();
-            // var userTeams = teams.Where(t => t.ManagerEmail != null &&
-            //                                _currentUserService.IsAuthenticated() &&
-            //                                _currentUserService.GetCurrentUser().Id == leaderId);
-            return teams.Select(t => t.ToTeamDto());
-        }
-
-        public async Task<IEnumerable<TeamDto>> GetByTournamentAsync(Guid tournamentId)
-        {
-            var teams = await _teamRepository.GetByTournamentAsync(tournamentId);
-            return teams.Select(t => t.ToTeamDto());
-        }
-
-        public async Task<IEnumerable<TeamDto>> SearchAsync(TeamSearchDto searchDto)
-        {
-            var teams = await _teamRepository.SearchAsync(searchDto);
-            return teams.Select(t => t.ToTeamDto());
-        }
-
-        public async Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid leaderId)
-        {
-            // Validate user is authenticated
-            if (!_currentUserService.IsAuthenticated())
-                throw new UnauthorizedException("You must be logged in to create a team.");
-
-            // Validate tournament exists and registration is open
-            var tournament = await _tournamentRepository.GetByIdAsync(createDto.TournamentId);
-            if (tournament == null)
-                throw new ArgumentException("Tournament not found.");
-
-            // Check if registration is still open
-            if (tournament.RegistrationDeadline.HasValue && tournament.RegistrationDeadline <= DateTime.UtcNow)
-                throw new InvalidOperationException("Registration deadline has passed.");
-
-            // Check if tournament hasn't started
-            if (tournament.StartDate <= DateTime.UtcNow)
-                throw new InvalidOperationException("Cannot register for a tournament that has already started.");
-
-            // Check team name uniqueness in tournament
-            if (await _teamRepository.TeamNameExistsInTournamentAsync(createDto.Name, createDto.TournamentId))
-                throw new ArgumentException("A team with this name already exists in this tournament.");
-
-            // Check if tournament has space for more teams
-            var teamCount = await _tournamentRepository.GetTeamCountAsync(createDto.TournamentId);
-            if (teamCount >= tournament.MaxTeams)
-                throw new InvalidOperationException("Tournament is full.");
-
-            var team = createDto.ToTeam();
-            // team.RegistrationDate = DateTime.UtcNow;
-            // team.RegistrationStatus = "Pending";
-
-            var createdTeam = await _teamRepository.CreateAsync(team);
-            return createdTeam.ToTeamDto();
-        }
-
-        public async Task<TeamDto> UpdateAsync(Guid id, UpdateTeamDto updateDto, Guid userId)
-        {
-            var existingTeam = await _teamRepository.GetByIdAsync(id);
-            if (existingTeam == null)
-                throw new ArgumentException("Team not found.");
-
-            // Check permissions - team manager or tournament organizer can update
-            if (!_currentUserService.IsAuthenticated())
-                throw new UnauthorizedException("You must be logged in to update a team.");
-
-            // var currentUser = _currentUserService.GetCurrentUser();
-            // var tournament = await _tournamentRepository.GetByIdAsync(existingTeam.TournamentId);
-
-            // bool isTeamManager = existingTeam.ManagerEmail == currentUser.Email;
-            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
-
-            // if (!isTeamManager && !isTournamentOrganizer)
-            //     throw new UnauthorizedException("You don't have permission to update this team.");
-
-            // // If updating name, check uniqueness
-            // if (!string.IsNullOrEmpty(updateDto.Name) && updateDto.Name != existingTeam.Name)
-            // {
-            //     if (await _teamRepository.TeamNameExistsInTournamentAsync(updateDto.Name, existingTeam.TournamentId, existingTeam.Id))
-            //         throw new ArgumentException("A team with this name already exists in this tournament.");
-            // }
-
-            existingTeam.UpdateFromDto(updateDto);
-            var updatedTeam = await _teamRepository.UpdateAsync(existingTeam);
-            return updatedTeam.ToTeamDto();
-        }
-
-        public async Task DeleteAsync(Guid id, Guid userId)
-        {
-            var team = await _teamRepository.GetByIdAsync(id);
-            if (team == null)
-                return;
-
-            // Check permissions
-            if (!_currentUserService.IsAuthenticated())
-                throw new UnauthorizedException("You must be logged in to delete a team.");
-
-            // var currentUser = _currentUserService.GetCurrentUser();
-            // var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
-
-            // bool isTeamManager = team.ManagerEmail == currentUser.Email;
-            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
-
-            // if (!isTeamManager && !isTournamentOrganizer)
-            //     throw new UnauthorizedException("You don't have permission to delete this team.");
-
-            // // Check if tournament has started
-            // if (tournament != null && tournament.StartDate <= DateTime.UtcNow)
-            //     throw new InvalidOperationException("Cannot delete a team from a tournament that has already started.");
-
-            await _teamRepository.DeleteAsync(id);
-        }
-
-        public async Task<string> UploadTeamLogoAsync(Guid teamId, IFormFile file, Guid userId)
-        {
-            var team = await _teamRepository.GetByIdAsync(teamId);
-            if (team == null)
-                throw new ArgumentException("Team not found.");
-
-            // Check permissions
-            if (!_currentUserService.IsAuthenticated())
-                throw new UnauthorizedException("You must be logged in to upload team logo.");
-
-            var currentUser = _currentUserService.GetCurrentUser();
-            // if (team.ManagerEmail != currentUser.Email)
-            //     throw new UnauthorizedException("You don't have permission to update this team's logo.");
-
-            // Delete old logo if exists
-            if (!string.IsNullOrEmpty(team.LogoUrl))
+            var tournaments = await _teamRepository.GetTournamentsByTeamAsync(team.Id);
+            foreach (var tournament in tournaments)
             {
-                await _imageService.DeleteImageAsync(team.LogoUrl);
+                await ValidateTeamNameUniqueness(updateDto.Name, tournament.Id);
             }
-
-            // Upload new logo
-            var logoUrl = await _imageService.SaveImageAsync(file, ImageType.TeamLogo, teamId);
-
-            // Update team
-            team.LogoUrl = logoUrl;
-            await _teamRepository.UpdateAsync(team);
-
-            return logoUrl;
         }
 
-        public async Task<IEnumerable<TeamDto>> GetByRegistrationStatusAsync(Guid tournamentId, string status)
+        updateDto.UpdateEntity(team);
+        var updatedTeam = await _teamRepository.UpdateAsync(team);
+        return updatedTeam.ToDto();
+    }
+
+    public async Task DeleteAsync(Guid id, Guid userId)
+    {
+        var team = await _teamRepository.GetByIdAsync(id);
+        if (team == null)
+            return;
+
+        ValidateTeamOwnership(team, userId);
+        await ValidateTeamCanBeDeleted(team);
+
+        await _teamRepository.DeleteAsync(id);
+    }
+
+    public async Task<string> UploadLogoAsync(Guid teamId, IFormFile file, Guid userId)
+    {
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+            throw new NotFoundException("Team not found");
+
+        ValidateTeamOwnership(team, userId);
+
+        // Delete old logo if exists
+        if (!string.IsNullOrEmpty(team.LogoUrl))
         {
-            var teams = await _teamRepository.GetByTournamentAsync(tournamentId);
-            var filteredTeams = teams;//.Where(team => team.RegistrationStatus.Equals(status, StringComparison.OrdinalIgnoreCase));
-            return filteredTeams.Select(team => team.ToTeamDto());
+            await _imageService.DeleteImageAsync(team.LogoUrl);
         }
 
-        public async Task ApproveTeamAsync(Guid teamId, Guid organizerId)
+        // Upload new logo
+        var logoUrl = await _imageService.SaveImageAsync(file, ImageType.TeamLogo, teamId);
+
+        // Update team
+        team.LogoUrl = logoUrl;
+        await _teamRepository.UpdateAsync(team);
+
+        return logoUrl;
+    }
+
+    #endregion
+
+    #region User Player Management (from Controller)
+
+    public async Task<PlayerDto> AddPlayerToTeamAsync(Guid teamId, object playerDto, Guid userId)
+    {
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+            throw new NotFoundException("Team not found");
+
+        ValidateTeamOwnership(team, userId);
+
+        if (playerDto is not CreatePlayerDto createDto)
+            throw new ArgumentException("Invalid player data");
+
+        // Check team player limit
+        var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(teamId);
+        if (currentPlayerCount >= 11)
+            throw new InvalidOperationException("Team has reached maximum player limit (11 players).");
+
+        var player = createDto.ToEntity();
+        player.TeamId = teamId;
+        var createdPlayer = await _playerRepository.CreateAsync(player);
+
+        return createdPlayer.ToDto();
+    }
+
+    public async Task<PlayerDto> UpdateTeamPlayerAsync(Guid teamId, Guid playerId, UpdatePlayerDto updateDto, Guid userId)
+    {
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+            throw new NotFoundException("Team not found");
+
+        ValidateTeamOwnership(team, userId);
+
+        var player = await _playerRepository.GetByIdAsync(playerId);
+        if (player == null)
+            throw new NotFoundException("Player not found");
+
+        if (player.TeamId != teamId)
+            throw new ArgumentException("Player does not belong to this team");
+
+        updateDto.UpdateEntity(player);
+        var updatedPlayer = await _playerRepository.UpdateAsync(player);
+
+        return updatedPlayer.ToDto();
+    }
+
+    public async Task RemovePlayerFromTeamAsync(Guid teamId, Guid playerId, Guid userId)
+    {
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+            throw new NotFoundException("Team not found");
+
+        ValidateTeamOwnership(team, userId);
+
+        var player = await _playerRepository.GetByIdAsync(playerId);
+        if (player == null)
+            return; // Player doesn't exist, nothing to remove
+
+        if (player.TeamId != teamId)
+            throw new ArgumentException("Player does not belong to this team");
+
+        await _playerRepository.DeleteAsync(playerId);
+    }
+
+    public async Task<string> UploadPlayerPhotoAsync(Guid teamId, Guid playerId, IFormFile file, Guid userId)
+    {
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+            throw new NotFoundException("Team not found");
+
+        ValidateTeamOwnership(team, userId);
+
+        var player = await _playerRepository.GetByIdAsync(playerId);
+        if (player == null)
+            throw new NotFoundException("Player not found");
+
+        if (player.TeamId != teamId)
+            throw new ArgumentException("Player does not belong to this team");
+
+        // Delete old photo if exists
+        if (!string.IsNullOrEmpty(player.PhotoUrl))
         {
-            if (!_currentUserService.IsAuthenticated())
-                throw new UnauthorizedException("You must be logged in to approve teams.");
-
-            var team = await _teamRepository.GetByIdAsync(teamId);
-            if (team == null)
-                throw new ArgumentException("Team not found.");
-
-            // var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
-            // if (tournament == null)
-            //     throw new ArgumentException("Tournament not found.");
-
-            // var currentUser = _currentUserService.GetCurrentUser();
-            // if (tournament.OrganizerId != currentUser.Id)
-            //     throw new UnauthorizedException("You don't have permission to approve teams for this tournament.");
-
-            // // Update team status
-            // team.RegistrationStatus = "Approved";
-            // team.ApprovedDate = DateTime.UtcNow;
-
-            await _teamRepository.UpdateAsync(team);
+            await _imageService.DeleteImageAsync(player.PhotoUrl);
         }
 
-        public async Task RejectTeamAsync(Guid teamId, Guid organizerId, string? reason = null)
+        // Upload new photo
+        var photoUrl = await _imageService.SaveImageAsync(file, ImageType.PlayerPhoto, playerId);
+
+        // Update player
+        player.PhotoUrl = photoUrl;
+        await _playerRepository.UpdateAsync(player);
+
+        return photoUrl;
+    }
+
+    #endregion
+
+    #region Organizer Operations - Team Registration Management
+
+    public async Task<IEnumerable<TeamDto>> GetByRegistrationStatusAsync(Guid tournamentId, string status, Guid organizerId)
+    {
+        await ValidateOrganizerAccess(tournamentId, organizerId);
+        IEnumerable<Team> teams;
+        if (status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
         {
-            if (!_currentUserService.IsAuthenticated())
-                throw new UnauthorizedException("You must be logged in to reject teams.");
+            teams = await _tournamentRepository.GetPendingTeamsAsync(tournamentId);
+        }
+        else if (status.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+        {
+            teams = await _tournamentRepository.GetApprovedTeamsAsync(tournamentId);
+        }
+        else
+        {
+            teams = await _tournamentRepository.GetTournamentTeamsAsync(tournamentId);
+        }
+        return teams.Select(t => t.ToDto());
+    }
 
-            var team = await _teamRepository.GetByIdAsync(teamId);
-            if (team == null)
-                throw new ArgumentException("Team not found.");
+    public async Task ApproveTeamAsync(Guid teamId, Guid organizerId)
+    {
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+            throw new NotFoundException("Team not found");
 
-            // var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
-            // if (tournament == null)
-            //     throw new ArgumentException("Tournament not found.");
+        var tournaments = await _teamRepository.GetTournamentsByTeamAsync(teamId);
+        var tournament = tournaments.FirstOrDefault();
+        if (tournament == null)
+            throw new NotFoundException("Tournament not found for this team");
 
-            // var currentUser = _currentUserService.GetCurrentUser();
-            // if (tournament.OrganizerId != currentUser.Id)
-            //     throw new UnauthorizedException("You don't have permission to reject teams for this tournament.");
+        await ValidateOrganizerAccess(tournament.Id, organizerId);
+        await _teamRepository.UpdateTeamTournamentStatusAsync(tournament.Id, teamId, "Approved");
+    }
 
-            // Update team status
-            // team.RegistrationStatus = "Rejected";
-            team.UpdatedAt = DateTime.UtcNow;
-            // Note: In a full implementation, you might want to store the rejection reason
+    public async Task RejectTeamAsync(Guid teamId, Guid organizerId, string? reason = null)
+    {
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+            throw new NotFoundException("Team not found");
 
-            await _teamRepository.UpdateAsync(team);
+        var tournaments = await _teamRepository.GetTournamentsByTeamAsync(teamId);
+        var tournament = tournaments.FirstOrDefault();
+        if (tournament == null)
+            throw new NotFoundException("Tournament not found for this team");
+
+        await ValidateOrganizerAccess(tournament.Id, organizerId);
+        await _teamRepository.UpdateTeamTournamentStatusAsync(tournament.Id, teamId, "Rejected");
+    }
+
+    #endregion
+
+    #region Private Helper Methods
+
+    private async Task<Models.Entities.Tournament> ValidateTournamentForRegistration(Guid tournamentId)
+    {
+        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+        if (tournament == null)
+            throw new NotFoundException("Tournament not found");
+
+        if (tournament.RegistrationDeadline.HasValue && tournament.RegistrationDeadline <= DateTime.UtcNow)
+            throw new InvalidOperationException("Registration deadline has passed");
+
+        if (tournament.StartDate <= DateTime.UtcNow)
+            throw new InvalidOperationException("Cannot register for a tournament that has already started");
+
+        return tournament;
+    }
+
+    private async Task ValidateTeamNameUniqueness(string teamName, Guid tournamentId)
+    {
+        var existingTeams = await _tournamentRepository.GetTournamentTeamsAsync(tournamentId);
+        if (existingTeams.Any(t => t.Name.Equals(teamName, StringComparison.OrdinalIgnoreCase)))
+            throw new ConflictException("A team with this name is already registered for this tournament");
+    }
+
+    private async Task ValidateTournamentCapacity(Guid tournamentId, int maxTeams)
+    {
+        var currentTeamCount = await _teamRepository.GetTournamentTeamCountAsync(tournamentId);
+        if (currentTeamCount >= maxTeams)
+            throw new InvalidOperationException("Tournament is full");
+    }
+
+    private void ValidateTeamOwnership(Models.Entities.Team team, Guid userId)
+    {
+        if (team.UserId != userId)
+            throw new ForbiddenException("You don't have permission to modify this team");
+    }
+
+    private async Task ValidateTeamCanBeDeleted(Models.Entities.Team team)
+    {
+        var tournaments = await _teamRepository.GetTournamentsByTeamAsync(team.Id);
+        var activeTournaments = tournaments.Where(t => t.StartDate > DateTime.UtcNow).ToList();
+
+        if (activeTournaments.Any())
+        {
+            var tournamentNames = string.Join(", ", activeTournaments.Select(t => t.Name));
+            throw new InvalidOperationException($"Cannot delete team. Team is registered for upcoming tournaments: {tournamentNames}");
         }
     }
+
+    private async Task ValidateOrganizerAccess(Guid tournamentId, Guid organizerId)
+    {
+        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+        if (tournament == null)
+            throw new NotFoundException("Tournament not found");
+
+        if (tournament.OrganizerId != organizerId)
+            throw new ForbiddenException("You don't have permission to manage teams for this tournament");
+    }
+
+    #endregion
 }

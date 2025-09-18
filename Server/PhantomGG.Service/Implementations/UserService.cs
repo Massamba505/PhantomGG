@@ -1,10 +1,10 @@
 using PhantomGG.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
 using PhantomGG.Service.Exceptions;
-using PhantomGG.API.Mappings;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Models.DTOs.User;
 using PhantomGG.Common.Enums;
+using PhantomGG.Service.Mappings;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -25,7 +25,7 @@ public class UserService(
             throw new NotFoundException("User not found");
         }
 
-        return user.ToUserDto();
+        return user.ToDto();
     }
 
     public async Task<UserDto> UpdateProfileAsync(Guid userId, UpdateUserProfileRequest request)
@@ -50,7 +50,7 @@ public class UserService(
         user.Email = request.Email;
 
         await _userRepository.UpdateAsync(user);
-        return user.ToUserDto();
+        return user.ToDto();
     }
 
     public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request)

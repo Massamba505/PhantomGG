@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITeamRepository, TeamRepository>();
         services.AddScoped<IPlayerRepository, PlayerRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();
+        services.AddScoped<ITournamentStandingRepository, TournamentStandingRepository>();
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();

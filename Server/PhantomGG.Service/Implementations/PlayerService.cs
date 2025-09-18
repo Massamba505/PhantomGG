@@ -1,9 +1,10 @@
+using PhantomGG.Service.Mappings;
 using PhantomGG.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
 using PhantomGG.Models.DTOs.Player;
 using PhantomGG.Repository.Interfaces;
-using PhantomGG.API.Mappings;
 using PhantomGG.Service.Exceptions;
+using PhantomGG.Common.Enums;
 
 namespace PhantomGG.Service.Implementations
 {
@@ -13,23 +14,20 @@ namespace PhantomGG.Service.Implementations
         private readonly ITeamRepository _teamRepository;
         private readonly ITournamentRepository _tournamentRepository;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IImageService _imageService;
 
         public PlayerService(
             IPlayerRepository playerRepository,
             ITeamRepository teamRepository,
             ITournamentRepository tournamentRepository,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IImageService imageService)
         {
             _playerRepository = playerRepository;
             _teamRepository = teamRepository;
             _tournamentRepository = tournamentRepository;
             _currentUserService = currentUserService;
-        }
-
-        public async Task<IEnumerable<PlayerDto>> GetAllAsync()
-        {
-            var players = await _playerRepository.GetAllAsync();
-            return players.Select(p => p.ToPlayerDto());
+            _imageService = imageService;
         }
 
         public async Task<PlayerDto> GetByIdAsync(Guid id)
@@ -38,84 +36,34 @@ namespace PhantomGG.Service.Implementations
             if (player == null)
                 throw new ArgumentException("Player not found.");
 
-            return player.ToPlayerDto();
+            return player.ToDto();
         }
 
-        public async Task<IEnumerable<PlayerDto>> GetByTeamAsync(Guid teamId)
-        {
-            var players = await _playerRepository.GetByTeamAsync(teamId);
-            return players.Select(p => p.ToPlayerDto());
-        }
-
-        public async Task<IEnumerable<PlayerDto>> GetByTournamentAsync(Guid tournamentId)
-        {
-            // Get all teams in the tournament, then get all players for those teams
-            var teams = await _teamRepository.GetByTournamentAsync(tournamentId);
-            var teamIds = teams.Select(t => t.Id).ToList();
-
-            var allPlayers = await _playerRepository.GetAllAsync();
-            var tournamentPlayers = allPlayers.Where(p => teamIds.Contains(p.TeamId));
-
-            return tournamentPlayers.Select(p => p.ToPlayerDto());
-        }
-
-        public async Task<IEnumerable<PlayerDto>> SearchAsync(PlayerSearchDto searchDto)
-        {
-            // For MVP, implement basic search
-            var allPlayers = await _playerRepository.GetAllAsync();
-            var filteredPlayers = allPlayers.AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchDto.SearchTerm))
-            {
-                filteredPlayers = filteredPlayers.Where(p =>
-                    p.FirstName.Contains(searchDto.SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                    p.LastName.Contains(searchDto.SearchTerm, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (searchDto.TeamId.HasValue)
-            {
-                filteredPlayers = filteredPlayers.Where(p => p.TeamId == searchDto.TeamId.Value);
-            }
-
-            if (searchDto.Position != null)
-            {
-                var positionString = searchDto.Position.ToString();
-                filteredPlayers = filteredPlayers.Where(p => p.Position == positionString);
-            }
-
-            return filteredPlayers.Select(p => p.ToPlayerDto());
-        }
-
-        public async Task<PlayerDto> CreateAsync(CreatePlayerDto createDto, Guid userId)
+        public async Task<PlayerDto> CreateAsync(CreatePlayerDto createDto, Guid teamId, Guid userId)
         {
             // Validate user is authenticated
             if (!_currentUserService.IsAuthenticated())
                 throw new UnauthorizedException("You must be logged in to create a player.");
 
             // Validate team exists
-            var team = await _teamRepository.GetByIdAsync(createDto.TeamId);
+            var team = await _teamRepository.GetByIdAsync(teamId);
             if (team == null)
                 throw new ArgumentException("Team not found.");
 
-            // Check permissions - team manager or tournament organizer can add players
-            var currentUser = _currentUserService.GetCurrentUser();
-            var tournament = await _tournamentRepository.GetByIdAsync(team.Id);//team.TournamentId
+            // Check permissions - only team owner can add players
+            if (team.UserId != userId)
+                throw new UnauthorizedException("You don't have permission to add players to this team.");
 
-            // bool isTeamManager = team.ManagerEmail == currentUser.Email;
-            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
+            // Check team player limit (assuming max 11 players per team for now)
+            var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(teamId);
+            if (currentPlayerCount >= 11)
+                throw new InvalidOperationException("Team has reached maximum player limit (11 players).");
 
-            // if (!isTeamManager && !isTournamentOrganizer)
-            //     throw new UnauthorizedException("You don't have permission to add players to this team.");
-
-            // Check team player limit
-            var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(createDto.TeamId);
-            if (tournament != null)// && currentPlayerCount >= tournament.MaxPlayersPerTeam
-                throw new InvalidOperationException("Team has reached maximum player limit.");
-
-            var player = createDto.ToPlayer();
+            var player = createDto.ToEntity();
+            player.TeamId = teamId; // Ensure the player is associated with the correct team
             var createdPlayer = await _playerRepository.CreateAsync(player);
 
-            return createdPlayer.ToPlayerDto();
+            return createdPlayer.ToDto();
         }
 
         public async Task<PlayerDto> UpdateAsync(Guid id, UpdatePlayerDto updateDto, Guid userId)
@@ -128,23 +76,18 @@ namespace PhantomGG.Service.Implementations
             if (!_currentUserService.IsAuthenticated())
                 throw new UnauthorizedException("You must be logged in to update a player.");
 
-            var currentUser = _currentUserService.GetCurrentUser();
             var team = await _teamRepository.GetByIdAsync(existingPlayer.TeamId);
             if (team == null)
                 throw new ArgumentException("Team not found.");
 
-            var tournament = await _tournamentRepository.GetByIdAsync(team.Id);//team.TournamentId
+            // Only team owner can update players
+            if (team.UserId != userId)
+                throw new UnauthorizedException("You don't have permission to update this player.");
 
-            // bool isTeamManager = team.ManagerEmail == currentUser.Email;
-            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
-
-            // if (!isTeamManager && !isTournamentOrganizer)
-            //     throw new UnauthorizedException("You don't have permission to update this player.");
-
-            existingPlayer.UpdateFromDto(updateDto);
+            updateDto.UpdateEntity(existingPlayer);
             var updatedPlayer = await _playerRepository.UpdateAsync(existingPlayer);
 
-            return updatedPlayer.ToPlayerDto();
+            return updatedPlayer.ToDto();
         }
 
         public async Task DeleteAsync(Guid id, Guid userId)
@@ -157,22 +100,13 @@ namespace PhantomGG.Service.Implementations
             if (!_currentUserService.IsAuthenticated())
                 throw new UnauthorizedException("You must be logged in to delete a player.");
 
-            var currentUser = _currentUserService.GetCurrentUser();
             var team = await _teamRepository.GetByIdAsync(player.TeamId);
             if (team == null)
                 throw new ArgumentException("Team not found.");
 
-            // var tournament = await _tournamentRepository.GetByIdAsync(team.TournamentId);
-
-            // bool isTeamManager = team.ManagerEmail == currentUser.Email;
-            // bool isTournamentOrganizer = tournament?.OrganizerId == currentUser.Id;
-
-            // if (!isTeamManager && !isTournamentOrganizer)
-            //     throw new UnauthorizedException("You don't have permission to delete this player.");
-
-            // // Check if tournament has started
-            // if (tournament != null && tournament.StartDate <= DateTime.UtcNow)
-            //     throw new InvalidOperationException("Cannot delete players from a tournament that has already started.");
+            // Only team owner can delete players
+            if (team.UserId != userId)
+                throw new UnauthorizedException("You don't have permission to delete this player.");
 
             await _playerRepository.DeleteAsync(id);
         }
@@ -184,10 +118,11 @@ namespace PhantomGG.Service.Implementations
 
             if (!_currentUserService.IsAuthenticated()) return false;
 
-            var currentUser = _currentUserService.GetCurrentUser();
             var team = await _teamRepository.GetByIdAsync(player.TeamId);
+            if (team == null) return false;
 
-            return team?.Name == currentUser.Email;
+            // Check if the current user owns the team that the player belongs to
+            return team.UserId == userId;
         }
 
         public async Task<string> UploadPlayerPhotoAsync(Guid playerId, IFormFile file, Guid userId)
@@ -200,9 +135,20 @@ namespace PhantomGG.Service.Implementations
             if (!await IsPlayerOwnedByUserAsync(playerId, userId))
                 throw new UnauthorizedException("You don't have permission to update this player's photo.");
 
-            // For MVP, return a placeholder URL
-            // TODO: Implement actual file upload service
-            return "/images/player-photos/placeholder.png";
+            // Delete old photo if exists
+            if (!string.IsNullOrEmpty(player.PhotoUrl))
+            {
+                await _imageService.DeleteImageAsync(player.PhotoUrl);
+            }
+
+            // Upload new photo
+            var photoUrl = await _imageService.SaveImageAsync(file, ImageType.PlayerPhoto, playerId);
+
+            // Update player
+            player.PhotoUrl = photoUrl;
+            await _playerRepository.UpdateAsync(player);
+
+            return photoUrl;
         }
 
         public async Task<IEnumerable<PlayerDto>> GetTopScorersAsync(Guid tournamentId, int limit = 10)

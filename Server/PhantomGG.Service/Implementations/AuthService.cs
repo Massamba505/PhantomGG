@@ -1,14 +1,13 @@
 using PhantomGG.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
 using PhantomGG.Service.Exceptions;
-using PhantomGG.API.Mappings;
 using PhantomGG.Repository.Interfaces;
-
 using PhantomGG.Common.Enums;
 using PhantomGG.Common.Helpers;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Models.Entities;
 using System.Text.RegularExpressions;
+using PhantomGG.Service.Mappings;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -136,7 +135,7 @@ public class AuthService(
         var result = new AuthDto
         {
             AccessToken = accessToken.Token,
-            User = user.ToUserDto()
+            User = user.ToDto()
         };
 
         _cookieService.SetRefreshToken(_httpContextAccessor.HttpContext!.Response, refreshToken.Token, rememberMe);

@@ -26,14 +26,14 @@ public class PlayersController(
     /// <response code="200">Returns the list of players</response>
     [HttpGet]
     [ProducesResponseType(typeof(ApiResponse), 200)]
-    public async Task<ActionResult<ApiResponse>> GetPlayers()
+    public ActionResult<ApiResponse> GetPlayers()
     {
-        var players = await _playerService.GetAllAsync();
+        // Players are managed through teams - redirect to teams endpoint
         return Ok(new ApiResponse
         {
-            Success = true,
-            Data = players,
-            Message = "Players retrieved successfully"
+            Success = false,
+            Data = null,
+            Message = "Players are managed through teams. Use /api/teams/{teamId}/players instead."
         });
     }
 
@@ -68,14 +68,14 @@ public class PlayersController(
     [HttpGet("team/{teamId:guid}")]
     [ProducesResponseType(typeof(ApiResponse), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<ApiResponse>> GetPlayersByTeam(Guid teamId)
+    public ActionResult<ApiResponse> GetPlayersByTeam(Guid teamId)
     {
-        var players = await _playerService.GetByTeamAsync(teamId);
+        // Players are managed through teams - redirect to teams endpoint
         return Ok(new ApiResponse
         {
-            Success = true,
-            Data = players,
-            Message = "Team players retrieved successfully"
+            Success = false,
+            Data = null,
+            Message = $"Use /api/teams/{teamId}/players instead."
         });
     }
 
@@ -89,14 +89,14 @@ public class PlayersController(
     [HttpGet("tournament/{tournamentId:guid}")]
     [ProducesResponseType(typeof(ApiResponse), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<ApiResponse>> GetPlayersByTournament(Guid tournamentId)
+    public ActionResult<ApiResponse> GetPlayersByTournament(Guid tournamentId)
     {
-        var players = await _playerService.GetByTournamentAsync(tournamentId);
+        // Tournament players are accessed through teams
         return Ok(new ApiResponse
         {
-            Success = true,
-            Data = players,
-            Message = "Tournament players retrieved successfully"
+            Success = false,
+            Data = null,
+            Message = $"Tournament players are accessed through teams. Use /api/teams?tournamentId={tournamentId} to get teams, then /api/teams/{{teamId}}/players for each team."
         });
     }
 
@@ -116,7 +116,7 @@ public class PlayersController(
     [HttpGet("search")]
     [ProducesResponseType(typeof(ApiResponse), 200)]
     [ProducesResponseType(400)]
-    public async Task<ActionResult<ApiResponse>> SearchPlayers(
+    public ActionResult<ApiResponse> SearchPlayers(
         [FromQuery] string? searchTerm = null,
         [FromQuery] Guid? teamId = null,
         [FromQuery] Guid? tournamentId = null,
@@ -125,22 +125,12 @@ public class PlayersController(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 10)
     {
-        var searchDto = new PlayerSearchDto
-        {
-            SearchTerm = searchTerm,
-            TeamId = teamId,
-            TournamentId = tournamentId,
-            Position = !string.IsNullOrEmpty(position) && Enum.TryParse<PlayerPosition>(position, true, out var pos) ? pos : null,
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        };
-
-        var players = await _playerService.SearchAsync(searchDto);
+        // Player search is available through teams
         return Ok(new ApiResponse
         {
-            Success = true,
-            Data = players,
-            Message = "Search completed successfully"
+            Success = false,
+            Data = null,
+            Message = "Player search is available through teams. Use /api/teams search with specific team filtering."
         });
     }
 
@@ -155,14 +145,14 @@ public class PlayersController(
     [HttpGet("tournament/{tournamentId:guid}/top-scorers")]
     [ProducesResponseType(typeof(ApiResponse), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<ApiResponse>> GetTopScorers(Guid tournamentId, [FromQuery] int limit = 10)
+    public ActionResult<ApiResponse> GetTopScorers(Guid tournamentId, [FromQuery] int limit = 10)
     {
-        var players = await _playerService.GetTopScorersAsync(tournamentId, limit);
+        // Statistics features will be implemented in future phases
         return Ok(new ApiResponse
         {
-            Success = true,
-            Data = players,
-            Message = "Top scorers retrieved successfully"
+            Success = false,
+            Data = null,
+            Message = "Player statistics features will be implemented in a future phase"
         });
     }
 
@@ -177,14 +167,14 @@ public class PlayersController(
     [HttpGet("tournament/{tournamentId:guid}/top-assists")]
     [ProducesResponseType(typeof(ApiResponse), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<ApiResponse>> GetTopAssists(Guid tournamentId, [FromQuery] int limit = 10)
+    public ActionResult<ApiResponse> GetTopAssists(Guid tournamentId, [FromQuery] int limit = 10)
     {
-        var players = await _playerService.GetTopAssistsAsync(tournamentId, limit);
+        // Statistics features will be implemented in future phases
         return Ok(new ApiResponse
         {
-            Success = true,
-            Data = players,
-            Message = "Top assists retrieved successfully"
+            Success = false,
+            Data = null,
+            Message = "Player statistics features will be implemented in a future phase"
         });
     }
 
@@ -206,7 +196,7 @@ public class PlayersController(
     public async Task<ActionResult<ApiResponse>> CreatePlayer([FromBody] CreatePlayerDto createDto)
     {
         var user = _currentUserService.GetCurrentUser();
-        var player = await _playerService.CreateAsync(createDto, user.Id);
+        var player = await _playerService.CreateAsync(createDto, createDto.TeamId, user.Id);
         return CreatedAtAction(
             nameof(GetPlayer),
             new { id = player.Id },

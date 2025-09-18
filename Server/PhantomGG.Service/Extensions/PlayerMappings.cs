@@ -1,11 +1,11 @@
 using PhantomGG.Models.DTOs.Player;
 using PhantomGG.Models.Entities;
 
-namespace PhantomGG.API.Mappings;
+namespace PhantomGG.Service.Mappings;
 
 public static class PlayerMappings
 {
-    public static PlayerDto ToPlayerDto(this Player player)
+    public static PlayerDto ToDto(this Player player)
     {
         return new PlayerDto
         {
@@ -19,31 +19,37 @@ public static class PlayerMappings
             TeamId = player.TeamId,
             TeamName = player.Team?.Name ?? "Unknown",
             CreatedAt = player.CreatedAt,
-            // UpdatedAt = player.UpdatedAt
+            UpdatedAt = null,
+            IsActive = true
         };
     }
 
-    public static Player ToPlayer(this CreatePlayerDto dto)
+    public static Player ToEntity(this CreatePlayerDto createDto)
     {
         return new Player
         {
             Id = Guid.NewGuid(),
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            Position = dto.Position,
-            Email = dto.Email,
-            PhotoUrl = dto.PhotoUrl,
-            TeamId = dto.TeamId
+            FirstName = createDto.FirstName,
+            LastName = createDto.LastName,
+            Position = createDto.Position,
+            Email = createDto.Email,
+            PhotoUrl = createDto.PhotoUrl,
+            TeamId = createDto.TeamId,
+            CreatedAt = DateTime.UtcNow
         };
     }
 
-    public static void UpdateFromDto(this Player player, UpdatePlayerDto dto)
+    public static void UpdateEntity(this UpdatePlayerDto updateDto, Player player)
     {
-        player.FirstName = dto.FirstName;
-        player.LastName = dto.LastName;
-        player.Position = dto.Position;
-        player.Email = dto.Email;
-        player.PhotoUrl = dto.PhotoUrl;
-        // player.UpdatedAt = DateTime.UtcNow;
+        if (!string.IsNullOrEmpty(updateDto.FirstName))
+            player.FirstName = updateDto.FirstName;
+        if (!string.IsNullOrEmpty(updateDto.LastName))
+            player.LastName = updateDto.LastName;
+        if (updateDto.Position != null)
+            player.Position = updateDto.Position;
+        if (updateDto.Email != null)
+            player.Email = updateDto.Email;
+        if (updateDto.PhotoUrl != null)
+            player.PhotoUrl = updateDto.PhotoUrl;
     }
 }

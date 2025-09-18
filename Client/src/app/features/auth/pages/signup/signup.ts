@@ -16,6 +16,7 @@ import { getPasswordScore } from '@/app/shared/utils/PasswordScore';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { RegisterRequest } from '@/app/api/models';
+import { Roles } from '@/app/shared/constants/roles';
 
 @Component({
   selector: 'app-signup',
@@ -45,6 +46,7 @@ export class Signup {
         '',
         [Validators.required, Validators.email, strictEmailValidator],
       ],
+      role:[Roles.Organizer],
       password: ['', [Validators.required, passwordStrengthValidator]],
       confirmPassword: ['', Validators.required],
     },

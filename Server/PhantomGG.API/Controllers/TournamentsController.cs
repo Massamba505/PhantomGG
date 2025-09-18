@@ -1,75 +1,43 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 
+/// <summary>
+/// Tournament management controller with role-based access
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class TournamentsController(
     ITournamentService tournamentService,
-    ITeamService teamService,
     ICurrentUserService currentUserService) : ControllerBase
 {
     private readonly ITournamentService _tournamentService = tournamentService;
-    private readonly ITeamService _teamService = teamService;
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
+    #region Public Tournament Operations (Guest + User)
+
     /// <summary>
-    /// Get all tournaments with optional filtering and pagination
+    /// Get all public tournaments with search and filtering
     /// </summary>
-    /// <param name="pageNumber">Page number for pagination</param>
-    /// <param name="pageSize">Number of items per page</param>
-    /// <param name="status">Filter by tournament status</param>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse>> GetTournaments(
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10,
-        [FromQuery] string? status = null)
+    public async Task<ActionResult<ApiResponse>> GetTournaments([FromQuery] TournamentSearchDto searchDto)
     {
-        var tournaments = await _tournamentService.GetAllAsync();
-
-        // Filter by status if provided
-        if (!string.IsNullOrEmpty(status))
-        {
-            tournaments = tournaments.Where(t => t.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
-        }
-
-        var pagedTournaments = tournaments
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
-
+        var tournaments = await _tournamentService.SearchAsync(searchDto);
         return Ok(new ApiResponse
         {
             Success = true,
-            Data = new { tournaments = pagedTournaments, totalCount = tournaments.Count() },
-            Message = "Tournaments retrieved successfully"
+            Data = tournaments,
+            Message = "Tournament search completed"
         });
     }
 
     /// <summary>
-    /// Get all tournament formats
+    /// Get tournament details by ID
     /// </summary>
-    [HttpGet("formats")]
-    public async Task<ActionResult<ApiResponse>> GetAllFormats()
-    {
-        var formats = await _tournamentService.GetAllFormatsAsync();
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = formats,
-            Message = "All formats retrieved successfully"
-        });
-    }
-
-    /// <summary>
-    /// Get a specific tournament by ID
-    /// </summary>
-    /// <param name="id">The tournament ID</param>
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ApiResponse>> GetTournament(Guid id)
     {
@@ -83,29 +51,102 @@ public class TournamentsController(
     }
 
     /// <summary>
-    /// Search tournaments with various filters
+    /// Get tournament teams (registered teams)
     /// </summary>
-    [HttpGet("search")]
-    public async Task<ActionResult<ApiResponse>> SearchTournaments([FromQuery] TournamentSearchDto searchDto)
+    [HttpGet("{id:guid}/teams")]
+    public async Task<ActionResult<ApiResponse>> GetTournamentTeams(Guid id)
     {
-        var tournaments = await _tournamentService.SearchWithPaginationAsync(searchDto);
+        // Not implemented yet - requires team registration system
+        await Task.CompletedTask;
         return Ok(new ApiResponse
         {
             Success = true,
-            Data = tournaments,
-            Message = "Search completed successfully"
+            Data = new List<object>(),
+            Message = "Tournament teams feature not yet implemented"
         });
     }
 
     /// <summary>
-    /// Get tournaments organized by the current user
+    /// Get tournament matches/brackets
+    /// </summary>
+    [HttpGet("{id:guid}/matches")]
+    public async Task<ActionResult<ApiResponse>> GetTournamentMatches(Guid id)
+    {
+        // Not implemented yet - advanced feature
+        await Task.CompletedTask;
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = new List<object>(),
+            Message = "Tournament matches feature not yet implemented"
+        });
+    }
+
+    /// <summary>
+    /// Get tournament standings/results
+    /// </summary>
+    [HttpGet("{id:guid}/standings")]
+    public async Task<ActionResult<ApiResponse>> GetTournamentStandings(Guid id)
+    {
+        // Not implemented yet - advanced feature
+        await Task.CompletedTask;
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = new List<object>(),
+            Message = "Tournament standings feature not yet implemented"
+        });
+    }
+
+    #endregion
+
+    #region User Operations (Registered User)
+
+    /// <summary>
+    /// Register team for tournament
+    /// </summary>
+    [HttpPost("{id:guid}/register")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse>> RegisterForTournament(Guid id, [FromBody] JoinTournamentDto registrationDto)
+    {
+        // Not implemented yet - team registration feature
+        await Task.CompletedTask;
+        return Ok(new ApiResponse
+        {
+            Success = false,
+            Message = "Tournament registration feature not yet implemented"
+        });
+    }
+
+    /// <summary>
+    /// Withdraw team from tournament
+    /// </summary>
+    [HttpPost("{id:guid}/withdraw")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse>> WithdrawFromTournament(Guid id, [FromBody] LeaveTournamentDto withdrawDto)
+    {
+        // Not implemented yet - team withdrawal feature
+        await Task.CompletedTask;
+        return Ok(new ApiResponse
+        {
+            Success = false,
+            Message = "Tournament withdrawal feature not yet implemented"
+        });
+    }
+
+    #endregion
+
+    #region Organizer Operations (Tournament Management)
+
+    /// <summary>
+    /// Get organizer's tournaments
     /// </summary>
     [HttpGet("my-tournaments")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse>> GetMyTournaments()
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<ApiResponse>> GetMyTournaments([FromQuery] TournamentSearchDto searchDto)
     {
-        var user = _currentUserService.GetCurrentUser();
-        var tournaments = await _tournamentService.GetByOrganizerAsync(user.Id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var tournaments = await _tournamentService.GetMyTournamentsAsync(searchDto, currentUser.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -115,15 +156,14 @@ public class TournamentsController(
     }
 
     /// <summary>
-    /// Create a new tournament
+    /// Create new tournament
     /// </summary>
-    /// <param name="createDto">Tournament creation data</param>
     [HttpPost]
-    [Authorize]
+    [Authorize(Roles = "Organizer")]
     public async Task<ActionResult<ApiResponse>> CreateTournament([FromBody] CreateTournamentDto createDto)
     {
-        var user = _currentUserService.GetCurrentUser();
-        var tournament = await _tournamentService.CreateAsync(createDto, user.Id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var tournament = await _tournamentService.CreateAsync(createDto, currentUser.Id);
         return CreatedAtAction(
             nameof(GetTournament),
             new { id = tournament.Id },
@@ -136,16 +176,14 @@ public class TournamentsController(
     }
 
     /// <summary>
-    /// Update an existing tournament
+    /// Update tournament details
     /// </summary>
-    /// <param name="id">The tournament ID</param>
-    /// <param name="updateDto">Tournament update data</param>
     [HttpPut("{id:guid}")]
-    [Authorize]
+    [Authorize(Roles = "Organizer")]
     public async Task<ActionResult<ApiResponse>> UpdateTournament(Guid id, [FromBody] UpdateTournamentDto updateDto)
     {
-        var user = _currentUserService.GetCurrentUser();
-        var tournament = await _tournamentService.UpdateAsync(id, updateDto, user.Id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var tournament = await _tournamentService.UpdateAsync(id, updateDto, currentUser.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -154,12 +192,15 @@ public class TournamentsController(
         });
     }
 
+    /// <summary>
+    /// Delete tournament
+    /// </summary>
     [HttpDelete("{id:guid}")]
-    [Authorize]
+    [Authorize(Roles = "Organizer")]
     public async Task<ActionResult<ApiResponse>> DeleteTournament(Guid id)
     {
-        var user = _currentUserService.GetCurrentUser();
-        await _tournamentService.DeleteAsync(id, user.Id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        await _tournamentService.DeleteAsync(id, currentUser.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -167,96 +208,128 @@ public class TournamentsController(
         });
     }
 
-    [HttpPost("{id:guid}/banner")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse>> UploadTournamentBanner(Guid id, IFormFile file)
+    /// <summary>
+    /// Upload tournament logo/image
+    /// </summary>
+    [HttpPost("{id:guid}/image")]
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<ApiResponse>> UploadTournamentImage(Guid id, IFormFile file)
     {
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = "No file provided"
-            });
-        }
-
-        var user = _currentUserService.GetCurrentUser();
-        var bannerUrl = await _tournamentService.UploadTournamentBannerAsync(id, file, user.Id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var imageUrl = await _tournamentService.UploadImageAsync(id, file, currentUser.Id);
         return Ok(new ApiResponse
         {
             Success = true,
-            Data = new { bannerUrl },
-            Message = "Tournament banner uploaded successfully"
+            Data = new { imageUrl },
+            Message = "Tournament image uploaded successfully"
+        });
+    }
+
+    #endregion
+
+    #region Organizer Team Management
+
+    /// <summary>
+    /// Get teams pending approval for tournament
+    /// </summary>
+    [HttpGet("{id:guid}/teams/pending")]
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<ApiResponse>> GetPendingTeams(Guid id)
+    {
+        // Not implemented yet - team approval system
+        await Task.CompletedTask;
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = new List<object>(),
+            Message = "Team approval system not yet implemented"
         });
     }
 
     /// <summary>
-    /// Get active/upcoming tournaments
+    /// Approve team registration
     /// </summary>
-    [HttpGet("active")]
-    public async Task<ActionResult<ApiResponse>> GetActiveTournaments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    [HttpPost("{tournamentId:guid}/teams/{teamId:guid}/approve")]
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<ApiResponse>> ApproveTeam(Guid tournamentId, Guid teamId)
     {
-        var searchDto = new TournamentSearchDto
-        {
-            Status = "InProgress",
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        };
-
-        var activeTournaments = await _tournamentService.SearchAsync(searchDto);
+        var currentUser = _currentUserService.GetCurrentUser();
+        // Not implemented yet - team approval system
+        await Task.CompletedTask;
         return Ok(new ApiResponse
         {
-            Success = true,
-            Data = activeTournaments,
-            Message = "Active tournaments retrieved successfully"
+            Success = false,
+            Message = "Team approval system not yet implemented"
         });
     }
 
     /// <summary>
-    /// Get tournament statistics
+    /// Reject team registration
     /// </summary>
-    [HttpGet("{id:guid}/statistics")]
-    public async Task<ActionResult<ApiResponse>> GetTournamentStatistics(Guid id)
+    [HttpPost("{tournamentId:guid}/teams/{teamId:guid}/reject")]
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<ApiResponse>> RejectTeam(Guid tournamentId, Guid teamId, [FromBody] RejectTeamDto rejectDto)
     {
-        var tournament = await _tournamentService.GetByIdAsync(id);
-
-        // Basic statistics for MVP
-        var statistics = new
-        {
-            tournament.Id,
-            tournament.Name,
-            tournament.Status,
-            tournament.MaxTeams,
-            tournament.PrizePool,
-            tournament.TeamCount,
-            tournament.MatchCount,
-            tournament.CompletedMatches,
-            tournament.RegistrationStartDate,
-            tournament.RegistrationDeadline,
-            tournament.StartDate,
-            tournament.CreatedAt
-        };
-
+        // Not implemented yet - team rejection system
+        await Task.CompletedTask;
         return Ok(new ApiResponse
         {
-            Success = true,
-            Data = statistics,
-            Message = "Tournament statistics retrieved successfully"
+            Success = false,
+            Message = "Team rejection system not yet implemented"
         });
     }
 
     /// <summary>
-    /// Get tournament teams
+    /// Remove team from tournament
     /// </summary>
-    [HttpGet("{id:guid}/teams")]
-    public async Task<ActionResult<ApiResponse>> GetTournamentTeams(Guid id)
+    [HttpDelete("{tournamentId:guid}/teams/{teamId:guid}")]
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<ApiResponse>> RemoveTeam(Guid tournamentId, Guid teamId)
     {
-        var teams = await _teamService.GetByTournamentAsync(id);
+        // Not implemented yet - team removal system
+        await Task.CompletedTask;
         return Ok(new ApiResponse
         {
-            Success = true,
-            Data = teams,
-            Message = "Tournament teams retrieved successfully"
+            Success = false,
+            Message = "Team removal system not yet implemented"
         });
     }
+
+    #endregion
+
+    #region Organizer Match Management
+
+    /// <summary>
+    /// Create tournament bracket/matches
+    /// </summary>
+    [HttpPost("{id:guid}/bracket")]
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<ApiResponse>> CreateTournamentBracket(Guid id)
+    {
+        // Not implemented yet - bracket generation system
+        await Task.CompletedTask;
+        return Ok(new ApiResponse
+        {
+            Success = false,
+            Message = "Bracket generation system not yet implemented"
+        });
+    }
+
+    /// <summary>
+    /// Update match result
+    /// </summary>
+    [HttpPut("{tournamentId:guid}/matches/{matchId:guid}")]
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<ApiResponse>> UpdateMatchResult(Guid tournamentId, Guid matchId, [FromBody] object resultDto)
+    {
+        // Not implemented yet - match result system
+        await Task.CompletedTask;
+        return Ok(new ApiResponse
+        {
+            Success = false,
+            Message = "Match result system not yet implemented"
+        });
+    }
+
+    #endregion
 }
