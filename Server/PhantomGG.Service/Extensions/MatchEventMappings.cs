@@ -39,5 +39,6 @@ public static class MatchEventMappings
         matchEvent.Minute = updateDto.Minute;
         // matchEvent.PlayerName = updateDto.PlayerName;
         // matchEvent.Description = updateDto.Description;
+        
     }
 }
