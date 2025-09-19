@@ -1,3 +1,5 @@
+using PhantomGG.Models.DTOs.User;
+
 namespace PhantomGG.Models.DTOs.Tournament;
 
 public class TournamentDto
@@ -16,7 +18,7 @@ public class TournamentDto
     public string? LogoUrl { get; set; }
     public string Status { get; set; } = string.Empty;
     public Guid OrganizerId { get; set; }
-    public string OrganizerName { get; set; } = string.Empty;
+    public UserDto? Organizer { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public bool IsPublic { get; set; }

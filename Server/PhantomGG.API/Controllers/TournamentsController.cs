@@ -7,7 +7,7 @@ using PhantomGG.Service.Interfaces;
 namespace PhantomGG.API.Controllers;
 
 /// <summary>
-/// Tournament management controller with role-based access
+/// Tournament management controller
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -18,7 +18,7 @@ public class TournamentsController(
     private readonly ITournamentService _tournamentService = tournamentService;
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
-    #region Public Tournament Operations (Guest + User)
+    #region Public Tournament Operations
 
     /// <summary>
     /// Get all public tournaments with search and filtering
@@ -142,7 +142,7 @@ public class TournamentsController(
     /// Get organizer's tournaments
     /// </summary>
     [HttpGet("my-tournaments")]
-    [Authorize(Roles = "Organizer")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse>> GetMyTournaments([FromQuery] TournamentSearchDto searchDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
@@ -201,11 +201,7 @@ public class TournamentsController(
     {
         var currentUser = _currentUserService.GetCurrentUser();
         await _tournamentService.DeleteAsync(id, currentUser.Id);
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Message = "Tournament deleted successfully"
-        });
+        return NoContent();
     }
 
     /// <summary>

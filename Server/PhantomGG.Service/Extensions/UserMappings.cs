@@ -18,6 +18,18 @@ public static class UserMappings
         };
     }
 
+    public static UserDto ToOrganizerDto(this User user)
+    {
+        return new UserDto
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            ProfilePictureUrl = user.ProfilePictureUrl
+        };
+    }
+
     public static void UpdateEntity(this UpdateUserProfileRequest updateDto, User existingUser)
     {
         if (!string.IsNullOrEmpty(updateDto.FirstName))

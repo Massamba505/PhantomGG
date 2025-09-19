@@ -14,7 +14,7 @@ public interface ITournamentRepository
     #endregion
 
     #region Tournament Search & Filtering
-    Task<PaginatedResponse<Tournament>> SearchAsync(TournamentSearchDto searchDto);
+    Task<PaginatedResponse<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId = null);
     #endregion
 
     #region Tournament CRUD Operations

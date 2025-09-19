@@ -1,3 +1,4 @@
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Models.Entities;
 
@@ -23,7 +24,7 @@ public static class TournamentMappings
             LogoUrl = tournament.LogoUrl,
             Status = tournament.Status,
             OrganizerId = tournament.OrganizerId,
-            OrganizerName = "Unknown", // We'll need to load organizer details if needed
+            Organizer = tournament.Organizer?.ToOrganizerDto(),
             CreatedAt = tournament.CreatedAt,
             UpdatedAt = tournament.UpdatedAt,
             IsPublic = tournament.IsPublic,
@@ -46,9 +47,9 @@ public static class TournamentMappings
             EndDate = createDto.EndDate,
             MinTeams = createDto.MinTeams,
             MaxTeams = createDto.MaxTeams,
-            BannerUrl = createDto.BannerUrl,
-            LogoUrl = createDto.LogoUrl,
-            Status = "Draft",
+            BannerUrl = createDto.BannerUrl ?? $"https://placehold.co/1200x400?text={createDto.Name}",
+            LogoUrl = createDto.LogoUrl ?? "https://placehold.co/200x200",
+            Status = TournamentStatus.Draft.ToString(),
             OrganizerId = organizerId,
             IsPublic = createDto.IsPublic,
             CreatedAt = DateTime.UtcNow

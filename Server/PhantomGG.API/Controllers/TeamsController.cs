@@ -74,7 +74,7 @@ public class TeamsController(
     /// Get current user's teams
     /// </summary>
     [HttpGet("my-teams")]
-    [Authorize]
+    [Authorize(Roles = "User")]
     public async Task<ActionResult<ApiResponse>> GetMyTeams()
     {
         var currentUser = _currentUserService.GetCurrentUser();

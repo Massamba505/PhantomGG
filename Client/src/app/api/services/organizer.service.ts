@@ -33,7 +33,7 @@ export class OrganizerService {
   }
 
   searchTournaments(params: TournamentSearch): Observable<PaginatedResponse<Tournament>> {
-    return this.apiClient.getPaginated<Tournament>(API_ENDPOINTS.ORGANIZERS.TOURNAMENTS.SEARCH, params);
+    return this.apiClient.getPaginated<Tournament>(API_ENDPOINTS.TOURNAMENTS.LIST, params);
   }
 
   createTournament(tournament: CreateTournament): Observable<Tournament> {

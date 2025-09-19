@@ -24,21 +24,9 @@ public class TournamentService(
     private readonly IImageService _imageService = imageService;
 
     #region Public Tournament Operations (Guest Access)
-
-    public async Task<IEnumerable<TournamentDto>> GetPublicTournamentsAsync()
-    {
-        var tournaments = await _tournamentRepository.GetAllAsync();
-        return tournaments.Where(t => t.IsPublic)
-                         .Select(t => t.ToDto())
-                         .OrderByDescending(t => t.CreatedAt);
-    }
-
     public async Task<TournamentDto> GetByIdAsync(Guid id)
     {
-        var tournament = await _tournamentRepository.GetByIdAsync(id);
-        if (tournament == null)
-            throw new ArgumentException("Tournament not found");
-
+        var tournament = await ValidateTournamentExistsAsync(id);
         return tournament.ToDto();
     }
 
@@ -64,14 +52,13 @@ public class TournamentService(
     public async Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid tournamentId)
     {
         await ValidateTournamentExistsAsync(tournamentId);
-        // For MVP, return empty standings - this would be calculated based on matches
+
         return new List<TournamentStandingDto>();
     }
 
     public async Task<IEnumerable<MatchDto>> GetTournamentMatchesAsync(Guid tournamentId)
     {
         await ValidateTournamentExistsAsync(tournamentId);
-        // For MVP, return empty matches - this would come from Match repository
         return new List<MatchDto>();
     }
 
@@ -93,7 +80,7 @@ public class TournamentService(
         // Validate team exists and user owns it
         var team = await _teamRepository.GetByIdAsync(joinDto.TeamId);
         if (team == null)
-            throw new ArgumentException("Team not found");
+            throw new NotFoundException("Team not found");
 
         if (team.UserId != userId)
             throw new UnauthorizedException("You don't have permission to register this team");
@@ -121,7 +108,7 @@ public class TournamentService(
         // Validate team exists and user owns it
         var team = await _teamRepository.GetByIdAsync(leaveDto.TeamId);
         if (team == null)
-            throw new ArgumentException("Team not found");
+            throw new NotFoundException("Team not found");
 
         if (team.UserId != userId)
             throw new UnauthorizedException("You don't have permission to withdraw this team");
@@ -144,26 +131,14 @@ public class TournamentService(
 
     public async Task<PaginatedResponse<TournamentDto>> GetMyTournamentsAsync(TournamentSearchDto searchDto, Guid organizerId)
     {
-        var tournaments = await _tournamentRepository.GetByOrganizerAsync(organizerId);
-        var filteredTournaments = tournaments.OrderByDescending(t => t.CreatedAt);
+        var paginatedTournaments = await _tournamentRepository.SearchAsync(searchDto, organizerId:organizerId);
 
-        var totalCount = filteredTournaments.Count();
-        var pagedTournaments = filteredTournaments
-            .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
-            .Take(searchDto.PageSize)
-            .Select(t => t.ToDto())
-            .ToList();
-
-        return new PaginatedResponse<TournamentDto>
-        {
-            Data = pagedTournaments,
-            TotalRecords = totalCount,
-            PageNumber = searchDto.PageNumber,
-            PageSize = searchDto.PageSize,
-            TotalPages = (int)Math.Ceiling(totalCount / (double)searchDto.PageSize),
-            HasNextPage = searchDto.PageNumber < (int)Math.Ceiling(totalCount / (double)searchDto.PageSize),
-            HasPreviousPage = searchDto.PageNumber > 1
-        };
+        return new PaginatedResponse<TournamentDto>(
+            paginatedTournaments.Data.Select(t => t.ToDto()),
+            paginatedTournaments.PageNumber,
+            paginatedTournaments.PageSize,
+            paginatedTournaments.TotalRecords
+        );
     }
 
     public async Task<TournamentDto> CreateAsync(CreateTournamentDto createDto, Guid organizerId)
@@ -200,16 +175,13 @@ public class TournamentService(
     {
         var tournament = await ValidateOrganizerAccessAsync(tournamentId, organizerId);
 
-        // Delete old banner if exists
         if (!string.IsNullOrEmpty(tournament.BannerUrl))
         {
             await _imageService.DeleteImageAsync(tournament.BannerUrl);
         }
 
-        // Upload new banner image
         var bannerUrl = await _imageService.SaveImageAsync(file, Common.Enums.ImageType.TournamentBanner, tournamentId);
 
-        // Update tournament
         tournament.BannerUrl = bannerUrl;
         await _tournamentRepository.UpdateAsync(tournament);
 
@@ -269,7 +241,7 @@ public class TournamentService(
     {
         var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
         if (tournament == null)
-            throw new ArgumentException("Tournament not found");
+            throw new NotFoundException("Tournament not found");
         return tournament;
     }
 

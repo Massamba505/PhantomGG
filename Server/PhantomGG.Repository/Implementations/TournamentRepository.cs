@@ -24,7 +24,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         return await _context.Tournaments
             .Include(t => t.Organizer)
-            .Where(t => t.IsPublic) // Only return public tournaments for general queries
+            .Where(t => t.IsPublic)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
     }
@@ -40,7 +40,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
 
     public async Task<IEnumerable<Tournament>> GetMyTournamentsAsync(Guid userId)
     {
-        // Get tournaments where user is organizer OR has a registered team
         var organizerTournaments = _context.Tournaments
             .Include(t => t.Organizer)
             .Where(t => t.OrganizerId == userId);
@@ -62,16 +61,22 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
 
     #region Tournament Search & Filtering
 
-    public async Task<PaginatedResponse<Tournament>> SearchAsync(TournamentSearchDto searchDto)
+    public async Task<PaginatedResponse<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId)
     {
         var query = _context.Tournaments
             .Include(t => t.Organizer)
             .AsQueryable();
 
-        // For public search, only show public tournaments
-        query = query.Where(t => t.IsPublic);
+        if (organizerId.HasValue)
+        {
+            query = query.Where(t => t.OrganizerId == organizerId.Value);
+        }
 
-        // Apply filters
+        if (searchDto.IsPublic.HasValue)
+        {
+            query = query.Where(t => t.IsPublic == searchDto.IsPublic);
+        }
+
         if (!string.IsNullOrEmpty(searchDto.SearchTerm))
         {
             query = query.Where(t => t.Name.Contains(searchDto.SearchTerm) ||
@@ -98,10 +103,8 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
             query = query.Where(t => t.StartDate <= searchDto.StartDateTo.Value);
         }
 
-        // Get total count
         var totalRecords = await query.CountAsync();
 
-        // Apply sorting and pagination
         var tournaments = await query
             .OrderByDescending(t => t.CreatedAt)
             .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
@@ -122,10 +125,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
 
     public async Task<Tournament> CreateAsync(Tournament tournament)
     {
-        tournament.Id = Guid.NewGuid();
-        tournament.CreatedAt = DateTime.UtcNow;
-        tournament.Status = "Draft";
-
         _context.Tournaments.Add(tournament);
         await _context.SaveChangesAsync();
         return tournament;
