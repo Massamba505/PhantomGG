@@ -49,17 +49,6 @@ namespace PhantomGG.Repository.Implementations
             }
         }
 
-        public async Task<bool> ExistsAsync(Guid id)
-        {
-            return await _context.Players.AnyAsync(p => p.Id == id);
-        }
-
-        public async Task<int> GetTeamPlayerCountAsync(Guid teamId)
-        {
-            return await _context.Players
-                .CountAsync(p => p.TeamId == teamId);
-        }
-
         public async Task<int> GetPlayerCountByTeamAsync(Guid teamId)
         {
             return await _context.Players

@@ -9,18 +9,12 @@ using PhantomGG.Service.Mappings;
 
 namespace PhantomGG.Service.Implementations
 {
-    public class PlayerService : IPlayerService
+    public class PlayerService(
+        IPlayerRepository playerRepository,
+        IImageService imageService) : IPlayerService
     {
-        private readonly IPlayerRepository _playerRepository;
-        private readonly IImageService _imageService;
-
-        public PlayerService(
-            IPlayerRepository playerRepository,
-            IImageService imageService)
-        {
-            _playerRepository = playerRepository;
-            _imageService = imageService;
-        }
+        private readonly IPlayerRepository _playerRepository = playerRepository;
+        private readonly IImageService _imageService = imageService;
 
         public async Task<PlayerDto> GetByIdAsync(Guid playerId)
         {
@@ -34,8 +28,7 @@ namespace PhantomGG.Service.Implementations
             var player = createDto.ToEntity();
             if(createDto.PhotoUrl != null)
             {
-                var photoUrl = await UploadPlayerPhotoAsync(player, createDto.PhotoUrl);
-                player.PhotoUrl = photoUrl;
+                player.PhotoUrl = await UploadPlayerPhotoAsync(player, createDto.PhotoUrl);
             }
 
             var createdPlayer = await _playerRepository.CreateAsync(player);
@@ -59,11 +52,28 @@ namespace PhantomGG.Service.Implementations
             return updatedPlayer.ToDto();
         }
 
-        public async Task DeleteAsync(Guid playerId)
+        public async Task DeleteAsync(Guid teamId, Guid playerId)
         {
             var player = await ValidatePlayerExistsAsync(playerId);
 
+            if (player.TeamId != teamId)
+            {
+                throw new ArgumentException("Player does not belong to this team");
+            }
+
+            if (!string.IsNullOrEmpty(player.PhotoUrl))
+            {
+                await _imageService.DeleteImageAsync(player.PhotoUrl);
+            }
+
             await _playerRepository.DeleteAsync(player.Id);
+        }
+
+        public async Task<IEnumerable<PlayerDto>> GetByTeamAsync(Guid teamId)
+        {
+            var players = await _playerRepository.GetByTeamAsync(teamId);
+
+            return players.Select(p => p.ToDto());
         }
 
         private async Task<string> UploadPlayerPhotoAsync(Player player, IFormFile photo)

@@ -281,7 +281,7 @@ public class PlayersController(
     {
         var user = _currentUserService.GetCurrentUser();
         //validate user is owner of the team the player belongs to
-        await _playerService.DeleteAsync(id);
+        //await _playerService.DeleteAsync(id);
         return Ok(new ApiResponse
         {
             Success = true,
