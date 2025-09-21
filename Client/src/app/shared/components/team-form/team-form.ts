@@ -11,7 +11,6 @@ import { CreateTeam, Team, UpdateTeam } from '@/app/api/models';
 @Component({
   selector: 'app-team-form',
   templateUrl: './team-form.html',
-  standalone: true,
   imports: [NgClass, ReactiveFormsModule],
 })
 export class TeamForm implements OnInit, OnChanges {

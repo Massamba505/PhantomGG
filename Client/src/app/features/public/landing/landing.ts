@@ -6,7 +6,6 @@ import { AuthStateService } from '@/app/store/AuthStateService';
 @Component({
   selector: 'app-landing',
   imports: [RouterLink, ThemeToggle],
-  standalone: true,
   templateUrl: './landing.html',
   styleUrl: './landing.css',
 })

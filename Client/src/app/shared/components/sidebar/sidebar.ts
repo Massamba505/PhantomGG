@@ -24,7 +24,6 @@ interface MenuItem {
 
 @Component({
   selector: 'app-sidebar',
-  standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './sidebar.html',
 })

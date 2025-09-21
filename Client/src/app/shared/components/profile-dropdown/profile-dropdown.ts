@@ -17,7 +17,6 @@ import { LucideIcons } from '../ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-profile-dropdown',
-  standalone: true,
   imports: [CommonModule, LucideAngularModule, RouterLink],
   templateUrl: './profile-dropdown.html',
 })

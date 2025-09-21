@@ -20,7 +20,6 @@ import { Roles } from '@/app/shared/constants/roles';
 
 @Component({
   selector: 'app-signup',
-  standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './signup.html',
 })

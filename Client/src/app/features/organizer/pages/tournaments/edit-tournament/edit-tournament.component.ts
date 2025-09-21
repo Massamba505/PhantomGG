@@ -9,7 +9,6 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-edit-tournament',
-  standalone: true,
   imports: [CommonModule, TournamentFormComponent, LucideAngularModule],
   templateUrl: './edit-tournament.component.html',
   styleUrl: './edit-tournament.component.css'

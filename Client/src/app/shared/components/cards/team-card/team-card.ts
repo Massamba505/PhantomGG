@@ -8,7 +8,6 @@ import { Team } from '@/app/api/models';
   selector: 'app-team-card',
   templateUrl: './team-card.html',
   styleUrls: ['./team-card.css'],
-  standalone: true,
   imports: [CommonModule, LucideAngularModule],
 })
 export class TeamCard {

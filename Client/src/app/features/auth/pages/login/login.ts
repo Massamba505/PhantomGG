@@ -11,7 +11,6 @@ import { LoginRequest } from '@/app/api/models';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './login.html',
 })

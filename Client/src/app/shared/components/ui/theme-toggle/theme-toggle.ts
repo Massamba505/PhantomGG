@@ -6,7 +6,6 @@ import { LucideIcons } from '../icons/lucide-icons';
 
 @Component({
   selector: 'app-theme-toggle',
-  standalone: true,
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './theme-toggle.html',
 })

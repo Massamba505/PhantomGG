@@ -8,7 +8,6 @@ import { dateNotInPastValidator, registrationDeadlineValidator, tournamentStartD
 
 @Component({
   selector: 'app-tournament-form',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './tournament-form.component.html',
   styleUrl: './tournament-form.component.css'

@@ -9,7 +9,6 @@ import { CreateTournament, Tournament, UpdateTournament } from '@/app/api/models
   selector: 'app-tournament-form',
   templateUrl: './tournament-form.html',
   styleUrls: ['./tournament-form.css'],
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
 })
 export class TournamentForm implements OnInit, OnChanges {

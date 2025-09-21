@@ -11,7 +11,6 @@ import { TournamentService } from '@/app/api/services';
 
 @Component({
   selector: 'app-tournament-list',
-  standalone: true,
   imports: [
     CommonModule,
     TournamentCardComponent,

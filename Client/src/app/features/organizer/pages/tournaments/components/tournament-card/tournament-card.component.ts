@@ -6,7 +6,6 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-tournament-card',
-  standalone: true,
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './tournament-card.component.html',
   styleUrl: './tournament-card.component.css'

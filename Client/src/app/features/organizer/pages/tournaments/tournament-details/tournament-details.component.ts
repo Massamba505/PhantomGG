@@ -11,7 +11,6 @@ import { ToastService } from '@/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-tournament-details',
-  standalone: true,
   imports: [CommonModule, LucideAngularModule, LineBreaksPipe, ConfirmDeleteModal],
   templateUrl: './tournament-details.component.html',
   styleUrl: './tournament-details.component.css'
