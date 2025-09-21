@@ -76,7 +76,7 @@ export class Signup {
     }
 
     const credentials = this.signupForm.value as RegisterRequest;
-    this.authState.signup(credentials).subscribe({
+    this.authState.register(credentials).subscribe({
       next: () => {
         this.toast.success('Account created successfully!');
         if (this.authState.isAuthenticated()) {

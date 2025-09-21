@@ -7,7 +7,7 @@ import { TournamentCardComponent } from '../components/tournament-card/tournamen
 import { TournamentSearchComponent } from '../components/tournament-search/tournament-search.component';
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
 import { ToastService } from '@/app/shared/services/toast.service';
-import { OrganizerService } from '@/app/api/services';
+import { TournamentService } from '@/app/api/services';
 
 @Component({
   selector: 'app-tournament-list',
@@ -22,7 +22,7 @@ import { OrganizerService } from '@/app/api/services';
   styleUrl: './tournament-list.component.css'
 })
 export class TournamentListComponent implements OnInit {
-  private organizerService = inject(OrganizerService);
+  private tournamentService = inject(TournamentService);
   private router = inject(Router);
   private toastService = inject(ToastService);
 
@@ -63,7 +63,7 @@ export class TournamentListComponent implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.organizerService.searchTournaments(this.searchCriteria()).subscribe({
+    this.tournamentService.getTournaments(this.searchCriteria()).subscribe({
       next: (response) => {
         this.tournaments.set(response.data);
         this.paginationData.set(response);
@@ -134,7 +134,7 @@ export class TournamentListComponent implements OnInit {
     if (!tournament) return;
 
     this.isDeleting.set(true);
-    this.organizerService.deleteTournament(tournament.id).subscribe({
+    this.tournamentService.deleteTournament(tournament.id).subscribe({
       next: () => {
         this.toastService.success('Tournament deleted successfully');
         this.loadTournaments();

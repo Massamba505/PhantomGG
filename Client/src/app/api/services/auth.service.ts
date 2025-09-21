@@ -15,7 +15,7 @@ import {
 export class AuthService {
   private apiClient = inject(ApiClient);
 
-  signup(request: RegisterRequest): Observable<Auth> {
+  register(request: RegisterRequest): Observable<Auth> {
     return this.apiClient.post<Auth>(API_ENDPOINTS.AUTH.REGISTER, request);
   }
 

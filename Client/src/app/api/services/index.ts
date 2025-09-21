@@ -3,8 +3,6 @@ export { TournamentService } from './tournament.service';
 export { TeamService } from './team.service';
 export { UserService } from './user.service';
 export { MatchService } from './match.service';
-export { PlayerService } from './player.service';
-export { OrganizerService } from './organizer.service';
 export { ApiClient } from '../base/api-client.service';
 export { API_ENDPOINTS } from '../base/api-endpoints';
 export * from '../models';
