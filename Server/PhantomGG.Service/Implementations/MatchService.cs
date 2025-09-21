@@ -188,7 +188,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Tournament not found");
 
 
-        var teams = await _tournamentRepository.GetApprovedTeamsAsync(generateDto.TournamentId);
+        var teams = await _tournamentRepository.GetTournamentTeamsAsync(generateDto.TournamentId);
         var teamsList = teams.ToList();
 
         if (teamsList.Count < tournament.MinTeams)
@@ -260,7 +260,7 @@ public class MatchService : IMatchService
             throw new ArgumentException("Tournament not found");
 
 
-        var teams = await _tournamentRepository.GetApprovedTeamsAsync(generateDto.TournamentId);
+        var teams = await _tournamentRepository.GetTournamentTeamsAsync(generateDto.TournamentId);
         var teamsList = teams.ToList();
 
         if (teamsList.Count < tournament.MinTeams)

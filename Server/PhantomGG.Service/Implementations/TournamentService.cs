@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Models.DTOs.Team;
@@ -15,16 +15,13 @@ namespace PhantomGG.Service.Implementations;
 
 public class TournamentService(
     ITournamentRepository tournamentRepository,
-    ITeamRepository teamRepository,
-    ICurrentUserService currentUserService,
+    ITeamService teamService,
     IImageService imageService) : ITournamentService
 {
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
-    private readonly ITeamRepository _teamRepository = teamRepository;
-    private readonly ICurrentUserService _currentUserService = currentUserService;
+    private readonly ITeamService _teamService = teamService;
     private readonly IImageService _imageService = imageService;
 
-    #region Public Tournament Operations
     public async Task<TournamentDto> GetByIdAsync(Guid id)
     {
         var tournament = await ValidateTournamentExistsAsync(id);
@@ -33,13 +30,13 @@ public class TournamentService(
 
     public async Task<PaginatedResponse<TournamentDto>> SearchAsync(TournamentSearchDto searchDto)
     {
-        var paginatedTournaments = await _tournamentRepository.SearchAsync(searchDto);
+        var tournaments = await _tournamentRepository.SearchAsync(searchDto);
 
         return new PaginatedResponse<TournamentDto>(
-            paginatedTournaments.Data.Select(t => t.ToDto()),
-            paginatedTournaments.PageNumber,
-            paginatedTournaments.PageSize,
-            paginatedTournaments.TotalRecords
+            tournaments.Select(t => t.ToDto()),
+            searchDto.PageNumber,
+            searchDto.PageSize,
+            totalRecords: tournaments.Count()
         );
     }
 
@@ -63,90 +60,15 @@ public class TournamentService(
         return new List<MatchDto>();
     }
 
-    #endregion
-
-
-    //if (tournament.Status != TournamentStatus.RegistrationOpen.ToString()) { 
-    //    throw new InvalidOperationException("Tournament registration is not open");
-    //}
-
-    // Check if tournament has space
-    //await ValidateTournamentCapacity(createDto.TournamentId, tournament.MaxTeams);
-
-    #region User Operations (from Controller)
-
-    public async Task RegisterForTournamentAsync(Guid tournamentId, object registrationDto, Guid userId)
-    {
-        var tournament = await ValidateTournamentExistsAsync(tournamentId);
-
-        if (registrationDto is not JoinTournamentDto joinDto)
-            throw new ArgumentException("Invalid registration data");
-
-        // Validate tournament is open for registration
-        if (tournament.RegistrationDeadline.HasValue && DateTime.UtcNow > tournament.RegistrationDeadline.Value)
-            throw new InvalidOperationException("Registration deadline has passed");
-
-        // Validate team exists and user owns it
-        var team = await _teamRepository.GetByIdAsync(joinDto.TeamId);
-        if (team == null)
-            throw new NotFoundException("Team not found");
-
-        if (team.UserId != userId)
-            throw new UnauthorizedException("You don't have permission to register this team");
-
-        // Check if team is already registered
-        if (await _tournamentRepository.IsTeamRegisteredAsync(tournamentId, joinDto.TeamId))
-            throw new InvalidOperationException("Team is already registered for this tournament");
-
-        // Check tournament capacity
-        var approvedCount = await _tournamentRepository.GetApprovedTeamCountAsync(tournamentId);
-        if (approvedCount >= tournament.MaxTeams)
-            throw new InvalidOperationException("Tournament is full");
-
-        // Register team for tournament (status will be "Pending" or "Approved" based on tournament settings)
-        //await _teamRepository.RegisterForTournamentAsync(joinDto.TeamId, tournamentId);
-    }
-
-    public async Task WithdrawFromTournamentAsync(Guid tournamentId, object withdrawDto, Guid userId)
-    {
-        var tournament = await ValidateTournamentExistsAsync(tournamentId);
-
-        if (withdrawDto is not LeaveTournamentDto leaveDto)
-            throw new ArgumentException("Invalid withdrawal data");
-
-        // Validate team exists and user owns it
-        var team = await _teamRepository.GetByIdAsync(leaveDto.TeamId);
-        if (team == null)
-            throw new NotFoundException("Team not found");
-
-        if (team.UserId != userId)
-            throw new UnauthorizedException("You don't have permission to withdraw this team");
-
-        // Check if team is registered
-        if (!await _tournamentRepository.IsTeamRegisteredAsync(tournamentId, leaveDto.TeamId))
-            throw new InvalidOperationException("Team is not registered for this tournament");
-
-        // Don't allow withdrawal if tournament has started or matches exist
-        if (DateTime.UtcNow >= tournament.StartDate)
-            throw new InvalidOperationException("Cannot withdraw from tournament that has already started");
-
-        // Remove team from tournament
-        //await _teamRepository.RemoveFromTournamentAsync(tournamentId, leaveDto.TeamId);
-    }
-
-    #endregion
-
-    #region Organizer Tournament Management
-
     public async Task<PaginatedResponse<TournamentDto>> GetMyTournamentsAsync(TournamentSearchDto searchDto, Guid organizerId)
     {
-        var paginatedTournaments = await _tournamentRepository.SearchAsync(searchDto, organizerId:organizerId);
+        var tournaments = await _tournamentRepository.SearchAsync(searchDto, organizerId: organizerId);
 
         return new PaginatedResponse<TournamentDto>(
-            paginatedTournaments.Data.Select(t => t.ToDto()),
-            paginatedTournaments.PageNumber,
-            paginatedTournaments.PageSize,
-            paginatedTournaments.TotalRecords
+            tournaments.Select(t => t.ToDto()),
+            searchDto.PageNumber,
+            searchDto.PageSize,
+            totalRecords: tournaments.Count()
         );
     }
 
@@ -164,6 +86,16 @@ public class TournamentService(
         var tournament = await ValidateOrganizerAccessAsync(id, organizerId);
 
         updateDto.UpdateEntity(tournament);
+        if (updateDto.BannerUrl != null)
+        {
+            tournament.BannerUrl = await UploadImageAsync(tournament, updateDto.BannerUrl);
+        }
+
+        if (updateDto.LogoUrl != null)
+        {
+            tournament.LogoUrl = await UploadLogoImageAsync(tournament, updateDto.LogoUrl);
+        }
+
         await _tournamentRepository.UpdateAsync(tournament);
         return tournament.ToDto();
     }
@@ -172,34 +104,101 @@ public class TournamentService(
     {
         var tournament = await ValidateOrganizerAccessAsync(id, organizerId);
 
-        // Don't allow deletion if teams are registered
         var teamCount = await _tournamentRepository.GetTournamentTeamCountAsync(id);
         if (teamCount > 0)
+        {
             throw new InvalidOperationException("Cannot delete tournament with registered teams");
+        }
 
         await _tournamentRepository.DeleteAsync(id);
     }
 
-    public async Task<string> UploadImageAsync(Guid tournamentId, IFormFile file, Guid organizerId)
+    public async Task<string> UploadImageAsync(Tournament tournament, IFormFile file)
     {
-        var tournament = await ValidateOrganizerAccessAsync(tournamentId, organizerId);
-
         if (!string.IsNullOrEmpty(tournament.BannerUrl))
         {
             await _imageService.DeleteImageAsync(tournament.BannerUrl);
         }
 
-        var bannerUrl = await _imageService.SaveImageAsync(file, Common.Enums.ImageType.TournamentBanner, tournamentId);
+        var bannerUrl = await _imageService.SaveImageAsync(file, ImageType.TournamentBanner, tournament.Id);
 
-        tournament.BannerUrl = bannerUrl;
-        await _tournamentRepository.UpdateAsync(tournament);
+        return bannerUrl;
+    }
+    
+    public async Task<string> UploadLogoImageAsync(Tournament tournament, IFormFile file)
+    {
+        if (!string.IsNullOrEmpty(tournament.BannerUrl))
+        {
+            await _imageService.DeleteImageAsync(tournament.BannerUrl);
+        }
+
+        var bannerUrl = await _imageService.SaveImageAsync(file, ImageType.TournamentLogo, tournament.Id);
 
         return bannerUrl;
     }
 
-    #endregion
+    public async Task RegisterForTournamentAsync(Guid tournamentId, JoinTournamentDto registrationDto, Guid userId)
+    {
+        var tournament = await ValidateTournamentExistsAsync(tournamentId);
 
-    #region Team Registration Management
+        if (tournament.Status == TournamentStatus.RegistrationClosed.ToString())
+        {
+            throw new InvalidOperationException("Tournament registration is closed");
+        }
+
+        var team = await _teamService.GetByIdAsync(registrationDto.TeamId);
+
+        if (team.UserId != userId)
+        {
+            throw new UnauthorizedException("You don't have permission to register this team");
+        }
+
+        if (await _tournamentRepository.IsTeamRegisteredAsync(tournamentId, team.Id))
+        {
+            throw new InvalidOperationException("Team is already registered for this tournament");
+        }
+
+        var approvedCount = await _tournamentRepository.GetApprovedTeamCountAsync(tournamentId);
+        if (approvedCount >= tournament.MaxTeams)
+        {
+            throw new InvalidOperationException("Tournament has reached maximum team capacity");
+        }
+
+        var registration = new TournamentTeam
+        {
+            TournamentId = tournamentId,
+            TeamId = team.Id,
+            Status = TeamRegistrationStatus.Pending.ToString(),
+            RequestedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _tournamentRepository.RegisterTeamForTournamentAsync(registration);
+    }
+
+    public async Task WithdrawFromTournamentAsync(Guid tournamentId, LeaveTournamentDto withdrawDto, Guid userId)
+    {
+        var tournament = await ValidateTournamentExistsAsync(tournamentId);
+
+        if (tournament.Status == TournamentStatus.InProgress.ToString())
+        {
+            throw new InvalidOperationException("Cannot withdraw from tournament that is in progress");
+        }
+
+        var team = await _teamService.GetByIdAsync(withdrawDto.TeamId);
+
+        if (team.UserId != userId)
+        {
+            throw new UnauthorizedException("You don't have permission to register this team");
+        }
+
+        if (!await _tournamentRepository.IsTeamRegisteredAsync(tournamentId, team.Id))
+        {
+            throw new InvalidOperationException("Team is not registered for this tournament");
+        }
+
+        await _tournamentRepository.RemoveTeamFromTournamentAsync(tournamentId, team.Id);
+    }
 
     public async Task<IEnumerable<TeamDto>> GetPendingTeamsAsync(Guid tournamentId, Guid organizerId)
     {
@@ -210,20 +209,42 @@ public class TournamentService(
 
     public async Task ApproveTeamAsync(Guid tournamentId, Guid teamId, Guid organizerId)
     {
-        await ValidateOrganizerAccessAsync(tournamentId, organizerId);
-        //await _teamRepository.UpdateTeamTournamentStatusAsync(tournamentId, teamId, "Approved");
+        var tournament = await ValidateOrganizerAccessAsync(tournamentId, organizerId);
+
+        var registration = await _tournamentRepository.GetTeamRegistrationAsync(tournamentId, teamId);
+        if (registration == null)
+        {
+            throw new NotFoundException("Team registration not found");
+        }
+        if (registration.Status != TeamRegistrationStatus.Pending.ToString())
+        {
+            throw new InvalidOperationException("Only pending registrations can be approved");
+        }
+
+        var approvedCount = await _tournamentRepository.GetApprovedTeamCountAsync(tournamentId);
+        if (approvedCount >= tournament.MaxTeams)
+        {
+            throw new InvalidOperationException("Tournament has reached maximum team capacity");
+        }
+
+        await _tournamentRepository.ApproveTeamAsync(tournamentId, teamId);
     }
 
-    public async Task RejectTeamAsync(Guid tournamentId, Guid teamId, PhantomGG.Models.DTOs.Team.RejectTeamDto rejectDto, Guid organizerId)
+    public async Task RejectTeamAsync(Guid tournamentId, Guid teamId, Guid organizerId)
     {
-        await ValidateOrganizerAccessAsync(tournamentId, organizerId);
-        //await _teamRepository.UpdateTeamTournamentStatusAsync(tournamentId, teamId, "Rejected");
-    }
+        var tournament = await ValidateOrganizerAccessAsync(tournamentId, organizerId);
 
-    public async Task RemoveTeamAsync(Guid tournamentId, Guid teamId, Guid organizerId)
-    {
-        await ValidateOrganizerAccessAsync(tournamentId, organizerId);
-        //await _teamRepository.RemoveFromTournamentAsync(tournamentId, teamId);
+        var registration = await _tournamentRepository.GetTeamRegistrationAsync(tournamentId, teamId);
+        if (registration == null)
+        {
+            throw new NotFoundException("Team registration not found");
+        }
+        if (registration.Status != TeamRegistrationStatus.Pending.ToString())
+        {
+            throw new InvalidOperationException("Only pending registrations can be rejected");
+        }
+
+        await _tournamentRepository.RejectTeamAsync(tournamentId, teamId);
     }
 
     public async Task CreateTournamentBracketAsync(Guid tournamentId, Guid organizerId)
@@ -242,10 +263,6 @@ public class TournamentService(
         throw new NotImplementedException("Match result update not yet implemented");
     }
 
-    #endregion
-
-    #region Private Helper Methods
-
     private async Task<Tournament> ValidateTournamentExistsAsync(Guid tournamentId)
     {
         var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
@@ -259,6 +276,7 @@ public class TournamentService(
         var tournament = await ValidateTournamentExistsAsync(tournamentId);
         if (tournament.OrganizerId != organizerId)
             throw new UnauthorizedException("You don't have permission to access this tournament");
+
         return tournament;
     }
 
@@ -273,6 +291,4 @@ public class TournamentService(
         if (createDto.RegistrationDeadline.HasValue && createDto.RegistrationDeadline >= createDto.StartDate)
             throw new ArgumentException("Registration deadline must be before tournament start date");
     }
-
-    #endregion
 }

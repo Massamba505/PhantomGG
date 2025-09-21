@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using PhantomGG.Repository.Data;
-using PhantomGG.Models.Entities;
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Tournament;
+using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Data;
 using PhantomGG.Repository.Interfaces;
 
 namespace PhantomGG.Repository.Implementations;
@@ -10,8 +11,6 @@ namespace PhantomGG.Repository.Implementations;
 public class TournamentRepository(PhantomContext context) : ITournamentRepository
 {
     private readonly PhantomContext _context = context;
-
-    #region Tournament Query Operations
 
     public async Task<Tournament?> GetByIdAsync(Guid id)
     {
@@ -57,7 +56,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         return allTournaments;
     }
 
-    #endregion
     public async Task<IEnumerable<Tournament>> GetTournamentsByTeamAsync(Guid teamId)
     {
         return await _context.Tournaments
@@ -67,9 +65,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
             .ToListAsync();
     }
 
-    #region Tournament Search & Filtering
-
-    public async Task<PaginatedResponse<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId)
+    public async Task<IEnumerable<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId)
     {
         var query = _context.Tournaments
             .Include(t => t.Organizer)
@@ -119,17 +115,8 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
             .Take(searchDto.PageSize)
             .ToListAsync();
 
-        return new PaginatedResponse<Tournament>(
-            tournaments,
-            searchDto.PageNumber,
-            searchDto.PageSize,
-            totalRecords
-        );
+        return tournaments;
     }
-
-    #endregion
-
-    #region Tournament CRUD Operations
 
     public async Task<Tournament> CreateAsync(Tournament tournament)
     {
@@ -142,7 +129,9 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         var existing = await _context.Tournaments.FindAsync(tournament.Id);
         if (existing == null)
+        {
             throw new ArgumentException("Tournament not found");
+        }
 
         tournament.UpdatedAt = DateTime.UtcNow;
         _context.Entry(existing).CurrentValues.SetValues(tournament);
@@ -159,15 +148,12 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         await _context.SaveChangesAsync();
     }
 
-    #endregion
-
-    #region Team Management Operations
-
     public async Task<IEnumerable<Team>> GetTournamentTeamsAsync(Guid tournamentId)
     {
         return await _context.Teams
             .Include(t => t.User)
-            .Where(t => t.TournamentTeams.Any(tt => tt.TournamentId == tournamentId))
+            .Where(t => t.TournamentTeams.Any(tt => tt.TournamentId == tournamentId &&
+                        tt.Status == TeamRegistrationStatus.Approved.ToString()))
             .OrderBy(t => t.Name)
             .ToListAsync();
     }
@@ -176,17 +162,9 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         return await _context.Teams
             .Include(t => t.User)
-            .Where(t => t.TournamentTeams.Any(tt => tt.TournamentId == tournamentId && tt.Status == "Pending"))
+            .Where(t => t.TournamentTeams.Any(tt => tt.TournamentId == tournamentId &&
+                        tt.Status == TeamRegistrationStatus.Pending.ToString()))
             .OrderBy(t => t.CreatedAt)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Team>> GetApprovedTeamsAsync(Guid tournamentId)
-    {
-        return await _context.Teams
-            .Include(t => t.User)
-            .Where(t => t.TournamentTeams.Any(tt => tt.TournamentId == tournamentId && tt.Status == "Approved"))
-            .OrderBy(t => t.Name)
             .ToListAsync();
     }
 
@@ -201,54 +179,69 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         return await _context.TournamentTeams
             .Include(tt => tt.Team)
             .Include(tt => tt.Tournament)
-            .FirstOrDefaultAsync(tt => tt.TournamentId == tournamentId && tt.TeamId == teamId);
+            .FirstOrDefaultAsync(tt => tt.TournamentId == tournamentId &&
+                                       tt.TeamId == teamId);
     }
 
-    public async Task UpdateTeamRegistrationStatusAsync(Guid tournamentId, Guid teamId, string status, string? reason = null)
-    {
-        var registration = await _context.TournamentTeams
-            .FirstOrDefaultAsync(tt => tt.TournamentId == tournamentId && tt.TeamId == teamId);
-
-        if (registration == null)
-            throw new ArgumentException("Team registration not found");
-
-        registration.Status = status;
-        if (status == "Approved")
-        {
-            registration.AcceptedAt = DateTime.UtcNow;
-        }
-        // Note: TournamentTeam entity doesn't have UpdatedAt field
-        // If you need to track reason, consider adding a Reason field to the entity
-
-        await _context.SaveChangesAsync();
-    }
-    
     public async Task<int> GetTournamentTeamCountAsync(Guid tournamentId)
     {
         return await _context.TournamentTeams
             .CountAsync(tt => tt.TournamentId == tournamentId);
     }
 
-    #endregion
-
-    #region Validation Operations
-
-    public async Task<bool> ExistsAsync(Guid id)
+    public async Task RegisterTeamForTournamentAsync(TournamentTeam tournamentTeam)
     {
-        return await _context.Tournaments.AnyAsync(t => t.Id == id);
+        _context.TournamentTeams.Add(tournamentTeam);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> IsOrganizerAsync(Guid tournamentId, Guid userId)
+    public async Task ApproveTeamAsync(Guid tournamentId, Guid teamId)
     {
-        return await _context.Tournaments
-            .AnyAsync(t => t.Id == tournamentId && t.OrganizerId == userId);
+        var registration = await _context.TournamentTeams
+            .FirstOrDefaultAsync(tt => tt.TournamentId == tournamentId &&
+                                       tt.TeamId == teamId);
+
+        if (registration == null)
+        {
+            throw new ArgumentException("Team registration not found");
+        }
+
+        registration.Status = TeamRegistrationStatus.Approved.ToString();
+        registration.AcceptedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RejectTeamAsync(Guid tournamentId, Guid teamId)
+    {
+        var registration = await _context.TournamentTeams
+            .FirstOrDefaultAsync(tt => tt.TournamentId == tournamentId && tt.TeamId == teamId);
+
+        if (registration == null)
+        {
+            throw new ArgumentException("Team registration not found");
+        }
+
+        registration.Status = TeamRegistrationStatus.Rejected.ToString();
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemoveTeamFromTournamentAsync(Guid tournamentId, Guid teamId)
+    {
+        var registration = await _context.TournamentTeams
+            .FirstOrDefaultAsync(tt => tt.TournamentId == tournamentId && tt.TeamId == teamId);
+
+        if (registration != null)
+        {
+            _context.TournamentTeams.Remove(registration);
+            await _context.SaveChangesAsync();
+        }
     }
 
     public async Task<int> GetApprovedTeamCountAsync(Guid tournamentId)
     {
         return await _context.TournamentTeams
-            .CountAsync(tt => tt.TournamentId == tournamentId && tt.Status == "Approved");
+            .CountAsync(tt => tt.TournamentId == tournamentId && tt.Status == TeamRegistrationStatus.Approved.ToString());
     }
-
-    #endregion
 }

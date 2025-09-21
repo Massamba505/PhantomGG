@@ -70,10 +70,10 @@ public static class TournamentMappings
             tournament.StartDate = updateDto.StartDate.Value;
         if (updateDto.MaxTeams.HasValue)
             tournament.MaxTeams = updateDto.MaxTeams.Value;
-        if (updateDto.BannerUrl != null)
-            tournament.BannerUrl = updateDto.BannerUrl;
-        if (updateDto.LogoUrl != null)
-            tournament.LogoUrl = updateDto.LogoUrl;
+        //if (updateDto.BannerUrl != null)
+        //    tournament.BannerUrl = updateDto.BannerUrl;
+        //if (updateDto.LogoUrl != null)
+        //    tournament.LogoUrl = updateDto.LogoUrl;
         if (updateDto.IsPublic.HasValue)
             tournament.IsPublic = updateDto.IsPublic.Value;
 

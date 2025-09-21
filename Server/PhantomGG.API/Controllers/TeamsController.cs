@@ -3,13 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Models.DTOs.Player;
+using PhantomGG.Models.Entities;
 using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 
-/// <summary>
-/// Team management controller with role-based access
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class TeamsController(
@@ -18,8 +16,6 @@ public class TeamsController(
 {
     private readonly ITeamService _teamService = teamService;
     private readonly ICurrentUserService _currentUserService = currentUserService;
-
-    #region Public Team Operations (Guest + User)
 
     /// <summary>
     /// Get all teams with search and filtering
@@ -66,15 +62,11 @@ public class TeamsController(
         });
     }
 
-    #endregion
-
-    #region User Operations (Team Management)
-
     /// <summary>
     /// Get current user's teams
     /// </summary>
     [HttpGet("my-teams")]
-    [Authorize(Roles = "User")]
+    [Authorize]
     public async Task<ActionResult<ApiResponse>> GetMyTeams()
     {
         var currentUser = _currentUserService.GetCurrentUser();
@@ -148,7 +140,18 @@ public class TeamsController(
     public async Task<ActionResult<ApiResponse>> UploadTeamLogo(Guid id, IFormFile file)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        var logoUrl = "";//await _teamService.UploadLogoAsync(id, file, currentUser.Id);
+        var team = await _teamService.GetByIdAsync(id);
+
+        var teamEntity = new Team
+        {
+            Id = team.Id,
+            Name = team.Name,
+            UserId = team.UserId,
+            LogoUrl = team.LogoUrl
+        };
+
+        var logoUrl = await _teamService.UploadLogoAsync(teamEntity, file);
+
         return Ok(new ApiResponse
         {
             Success = true,
@@ -156,10 +159,6 @@ public class TeamsController(
             Message = "Team logo uploaded successfully"
         });
     }
-
-    #endregion
-
-    #region User Player Management (Team Members)
 
     /// <summary>
     /// Add player to team
@@ -213,23 +212,4 @@ public class TeamsController(
             Message = "Player removed from team successfully"
         });
     }
-
-    /// <summary>
-    /// Upload player photo
-    /// </summary>
-    [HttpPost("{teamId:guid}/players/{playerId:guid}/photo")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse>> UploadPlayerPhoto(Guid teamId, Guid playerId, IFormFile file)
-    {
-        var currentUser = _currentUserService.GetCurrentUser();
-        var photoUrl = "";// await _teamService.UploadPlayerPhotoAsync(teamId, playerId, file, currentUser.Id);
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = new { photoUrl },
-            Message = "Player photo uploaded successfully"
-        });
-    }
-
-    #endregion
 }
