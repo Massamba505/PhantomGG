@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Player;
+using PhantomGG.Models.Entities;
+using PhantomGG.Service.Exceptions;
+using PhantomGG.Service.Implementations;
 using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.API.Controllers;
@@ -196,7 +199,20 @@ public class PlayersController(
     public async Task<ActionResult<ApiResponse>> CreatePlayer([FromBody] CreatePlayerDto createDto)
     {
         var user = _currentUserService.GetCurrentUser();
-        var player = await _playerService.CreateAsync(createDto, createDto.TeamId, user.Id);
+
+        //var team = await _teamService.GetByIdAsync(teamId);
+
+        //if (team.UserId != userId)
+        //{
+        //    throw new UnauthorizedException("You don't have permission to add players to this team.");
+        //}
+
+        //var currentTeamPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(teamId);
+        //if (currentTeamPlayerCount >= 11)
+        //{
+        //    throw new InvalidOperationException("Team has reached maximum player limit (11 players).");
+        //}
+        var player = await _playerService.CreateAsync(createDto);
         return CreatedAtAction(
             nameof(GetPlayer),
             new { id = player.Id },
@@ -229,7 +245,15 @@ public class PlayersController(
     public async Task<ActionResult<ApiResponse>> UpdatePlayer(Guid id, [FromBody] UpdatePlayerDto updateDto)
     {
         var user = _currentUserService.GetCurrentUser();
-        var player = await _playerService.UpdateAsync(id, updateDto, user.Id);
+
+        //var team = await _teamRepository.GetByIdAsync(existingPlayer.TeamId);
+        //if (team == null)
+        //    throw new ArgumentException("Team not found.");
+
+        //// Only team owner can update players
+        //if (team.UserId != userId)
+        //    throw new UnauthorizedException("You don't have permission to update this player.");
+        var player = await _playerService.UpdateAsync(updateDto, user.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -256,7 +280,8 @@ public class PlayersController(
     public async Task<ActionResult<ApiResponse>> DeletePlayer(Guid id)
     {
         var user = _currentUserService.GetCurrentUser();
-        await _playerService.DeleteAsync(id, user.Id);
+        //validate user is owner of the team the player belongs to
+        await _playerService.DeleteAsync(id);
         return Ok(new ApiResponse
         {
             Success = true,

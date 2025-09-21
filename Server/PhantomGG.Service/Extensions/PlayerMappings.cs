@@ -12,15 +12,12 @@ public static class PlayerMappings
             Id = player.Id,
             FirstName = player.FirstName,
             LastName = player.LastName,
-            FullName = $"{player.FirstName} {player.LastName}",
             Position = player.Position,
             Email = player.Email,
             PhotoUrl = player.PhotoUrl,
             TeamId = player.TeamId,
             TeamName = player.Team?.Name ?? "Unknown",
-            CreatedAt = player.CreatedAt,
-            UpdatedAt = null,
-            IsActive = true
+            JoinedAt = player.CreatedAt
         };
     }
 
@@ -33,7 +30,6 @@ public static class PlayerMappings
             LastName = createDto.LastName,
             Position = createDto.Position,
             Email = createDto.Email,
-            PhotoUrl = createDto.PhotoUrl,
             TeamId = createDto.TeamId,
             CreatedAt = DateTime.UtcNow
         };
@@ -49,7 +45,5 @@ public static class PlayerMappings
             player.Position = updateDto.Position;
         if (updateDto.Email != null)
             player.Email = updateDto.Email;
-        if (updateDto.PhotoUrl != null)
-            player.PhotoUrl = updateDto.PhotoUrl;
     }
 }

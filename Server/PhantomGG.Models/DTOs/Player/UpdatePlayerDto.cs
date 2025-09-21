@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.Models.DTOs.Player;
@@ -18,5 +19,5 @@ public class UpdatePlayerDto
     [StringLength(100)]
     public string? Email { get; set; }
 
-    public string? PhotoUrl { get; set; }
+    public IFormFile? PhotoUrl { get; set; }
 }
