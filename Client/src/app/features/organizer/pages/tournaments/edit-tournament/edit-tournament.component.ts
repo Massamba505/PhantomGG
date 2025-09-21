@@ -40,12 +40,10 @@ export class EditTournamentComponent implements OnInit {
     this.tournamentService.getTournament(this.tournamentId()).subscribe({
       next: (tournament) => {
         this.tournament.set(tournament);
+      },
+      complete:()=>{
         this.loading.set(false);
       },
-      error: (error) => {
-        console.error('Failed to load tournament:', error);
-        this.loading.set(false);
-      }
     });
   }
 
@@ -58,11 +56,9 @@ export class EditTournamentComponent implements OnInit {
         // Navigate to tournament details page
         this.router.navigate(['..'], { relativeTo: this.route });
       },
-      error: (error) => {
-        console.error('Failed to update tournament:', error);
+      complete:()=>{
         this.saving.set(false);
-        alert('Failed to update tournament. Please try again.');
-      }
+      },
     });
   }
 

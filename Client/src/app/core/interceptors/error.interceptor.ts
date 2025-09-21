@@ -18,8 +18,6 @@ export function errorInterceptor(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 0) {
         toast.warn('Network error. Please check your internet.');
-      } else if (error.status === 403) {
-        toast.error('You do not have permission for this action.');
       } else if (error.status >= 500) {
         toast.error('Server error. Please try again later.');
       } else if (error.status >= 400) {

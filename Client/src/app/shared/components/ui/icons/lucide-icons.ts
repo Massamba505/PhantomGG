@@ -41,7 +41,9 @@ import {
   UserCircle,
   Play,
   Mail,
-  Activity
+  Activity,
+  MenuIcon,
+  Bell
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -87,5 +89,7 @@ export const LucideIcons = {
   UserCircle,
   Play,
   Mail,
-  Activity
+  Activity,
+  MenuIcon,
+  Bell
 };

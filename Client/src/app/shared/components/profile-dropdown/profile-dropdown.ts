@@ -45,7 +45,6 @@ export class ProfileDropdown {
         this.router.navigate(['/']);
       },
       error: (error) => {
-        console.error('Logout error:', error);
         this.router.navigate(['/']);
       }
     });

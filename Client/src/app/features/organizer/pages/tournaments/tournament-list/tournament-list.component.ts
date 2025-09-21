@@ -28,7 +28,6 @@ export class TournamentListComponent implements OnInit {
 
   tournaments = signal<Tournament[]>([]);
   isLoading = signal(false);
-  error = signal<string | null>(null);
   isDeleteModalOpen = signal(false);
   tournamentToDelete = signal<Tournament | null>(null);
   isDeleting = signal(false);
@@ -58,18 +57,15 @@ export class TournamentListComponent implements OnInit {
 
   loadTournaments() {
     this.isLoading.set(true);
-    this.error.set(null);
 
     this.tournamentService.getTournaments(this.searchCriteria()).subscribe({
       next: (response) => {
         this.tournaments.set(response.data);
         this.paginationData.set(response);
+      },
+      complete:()=>{
         this.isLoading.set(false);
       },
-      error: (error) => {
-        this.error.set('Failed to load tournaments');
-        this.isLoading.set(false);
-      }
     });
   }
 

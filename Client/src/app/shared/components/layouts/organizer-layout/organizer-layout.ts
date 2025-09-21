@@ -27,7 +27,7 @@ export class OrganizerLayout implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private authState = inject(AuthStateService);
 
-  sidebarOpen = signal(window.innerWidth > 768);
+  sidebarOpen = signal(window.innerWidth > 900);
   pageTitle = signal('Dashboard');
   userRole = computed<Roles>(() => {
     const role = this.authState.user()?.role as Roles;
@@ -58,7 +58,7 @@ export class OrganizerLayout implements OnInit, OnDestroy {
   }
 
   handleResize = () => {
-    this.sidebarOpen.set(window.innerWidth > 768);
+    this.sidebarOpen.set(window.innerWidth > 900);
   };
 
   toggleSidebar() {

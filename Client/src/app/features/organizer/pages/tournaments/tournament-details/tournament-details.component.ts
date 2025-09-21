@@ -45,12 +45,10 @@ export class TournamentDetailsComponent implements OnInit {
     this.tournamentService.getTournament(this.tournamentId()).subscribe({
       next: (tournament: any) => {
         this.tournament.set(tournament);
+      },
+      complete:()=>{
         this.loading.set(false);
       },
-      error: (error: any) => {
-        console.error('Failed to load tournament:', error);
-        this.loading.set(false);
-      }
     });
   }
 
@@ -82,7 +80,6 @@ export class TournamentDetailsComponent implements OnInit {
         this.router.navigate(['/organizer/tournaments']);
       },
       error: (error: any) => {
-        console.error('Failed to delete tournament:', error);
         this.isDeleting.set(false);
       }
     });

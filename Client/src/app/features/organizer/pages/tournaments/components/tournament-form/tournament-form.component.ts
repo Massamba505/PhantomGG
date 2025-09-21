@@ -72,11 +72,13 @@ export class TournamentFormComponent implements OnInit {
 
 
   getTournamentFormats(){
+    debugger;
     this.tournamentService.getTournamentFormats().subscribe({
         next:(data: any)=>{
             this.formats.set(data) 
         }
-    })
+    });
+
   }
 
   ngOnInit() {
