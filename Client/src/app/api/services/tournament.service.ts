@@ -9,7 +9,8 @@ import {
   UpdateTournament,
   TournamentSearch,
   TournamentStatistics,
-  TournamentFormat
+  TournamentFormat,
+  getTournamentFormats
 } from '../models/tournament.models';
 
 @Injectable({
@@ -76,5 +77,12 @@ export class TournamentService {
 
   removeTeam(tournamentId: string, teamId: string): Observable<void> {
     return this.apiClient.delete<void>(API_ENDPOINTS.TOURNAMENTS.REMOVE_TEAM(tournamentId, teamId));
+  }
+
+  getTournamentFormats(): Observable<TournamentFormat[]> {
+    return new Observable(observer => {
+      observer.next(getTournamentFormats());
+      observer.complete();
+    });
   }
 }

@@ -47,7 +47,6 @@ export class TournamentFormComponent implements OnInit {
     name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
     description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(2000)]],
     location: ['', [Validators.maxLength(200)]],
-    formatId: ['', [Validators.required]],
     registrationStartDate: ['', [
       Validators.required, 
       dateNotInPastValidator
@@ -62,23 +61,19 @@ export class TournamentFormComponent implements OnInit {
       dateNotInPastValidator,
       tournamentStartDateValidator
     ]],
+    endDate: ['', [Validators.required]],
     minTeams: [2, [Validators.required, Validators.min(2), Validators.max(64)]],
     maxTeams: [16, [Validators.required, Validators.min(4), Validators.max(128)]],
-    maxPlayersPerTeam: [11, [Validators.required, Validators.min(7), Validators.max(25)]],
-    minPlayersPerTeam: [7, [Validators.required, Validators.min(7), Validators.max(25)]],
-    entryFee: [0, [Validators.min(0)]],
-    prizePool: [0, [Validators.min(0)]],
-    bannerUrl: ["", Validators.required],
-    logoUrl: ["", Validators.required],
-    contactEmail: ['', [Validators.required, Validators.email]],
-    matchDuration: [90, [Validators.required, Validators.min(60), Validators.max(120)]],
+    bannerUrl: [""],
+    logoUrl: [""],
+    contactEmail: ['', [Validators.email]],
     isPublic: [true]
   });
 
 
   getTournamentFormats(){
     this.tournamentService.getTournamentFormats().subscribe({
-        next:(data)=>{
+        next:(data: any)=>{
             this.formats.set(data) 
         }
     })
@@ -157,22 +152,17 @@ export class TournamentFormComponent implements OnInit {
       name: this.tournament.name,
       description: this.tournament.description,
       location: this.tournament.location,
-      formatId: this.tournament.formatId,
       registrationStartDate: this.tournament.registrationStartDate ? 
         new Date(this.tournament.registrationStartDate).toISOString().slice(0, 16) : '',
       registrationDeadline: this.tournament.registrationDeadline ? 
         new Date(this.tournament.registrationDeadline).toISOString().slice(0, 16) : '',
       startDate: new Date(this.tournament.startDate).toISOString().slice(0, 16),
+      endDate: new Date(this.tournament.endDate).toISOString().slice(0, 16),
       minTeams: this.tournament.minTeams,
       maxTeams: this.tournament.maxTeams,
-      maxPlayersPerTeam: this.tournament.maxPlayersPerTeam,
-      minPlayersPerTeam: this.tournament.minPlayersPerTeam,
       bannerUrl: this.tournament.bannerUrl || "",
       logoUrl: this.tournament.logoUrl || "",
-      entryFee: this.tournament.entryFee || 0,
-      prizePool: this.tournament.prizePool || 0,
-      contactEmail: this.tournament.contactEmail,
-      matchDuration: this.tournament.matchDuration,
+      contactEmail: this.tournament.organizer?.email || '',
       isPublic: this.tournament.isPublic
     });
   }
@@ -194,20 +184,15 @@ export class TournamentFormComponent implements OnInit {
       name: formValue.name || undefined,
       description: formValue.description || undefined,
       location: formValue.location || undefined,
-      formatId: formValue.formatId || undefined,
       registrationStartDate: formValue.registrationStartDate || undefined,
       registrationDeadline: formValue.registrationDeadline || undefined,
       startDate: formValue.startDate || undefined,
+      endDate: formValue.endDate || undefined,
       minTeams: formValue.minTeams || undefined,
       maxTeams: formValue.maxTeams || undefined,
-      maxPlayersPerTeam: formValue.maxPlayersPerTeam || undefined,
-      minPlayersPerTeam: formValue.minPlayersPerTeam || undefined,
-      entryFee: formValue.entryFee || undefined,
-      prizePool: formValue.prizePool || undefined,
       bannerUrl: formValue.bannerUrl || undefined,
       logoUrl: formValue.logoUrl || undefined,
       contactEmail: formValue.contactEmail || undefined,
-      matchDuration: formValue.matchDuration || undefined,
       isPublic: formValue.isPublic ?? undefined
     };
 
@@ -219,18 +204,13 @@ export class TournamentFormComponent implements OnInit {
       name: formValue.name!,
       description: formValue.description!,
       location: formValue.location || undefined,
-      formatId: formValue.formatId!,
       registrationStartDate: formValue.registrationStartDate || undefined,
       registrationDeadline: formValue.registrationDeadline || undefined,
       startDate: formValue.startDate!,
+      endDate: formValue.endDate!,
       minTeams: formValue.minTeams!,
       maxTeams: formValue.maxTeams!,
-      maxPlayersPerTeam: formValue.maxPlayersPerTeam!,
-      minPlayersPerTeam: formValue.minPlayersPerTeam!,
-      entryFee: formValue.entryFee || undefined,
-      prizePool: formValue.prizePool || undefined,
       contactEmail: formValue.contactEmail || undefined,
-      matchDuration: formValue.matchDuration!,
       isPublic: formValue.isPublic ?? true
     };
 
@@ -260,9 +240,9 @@ export class TournamentFormComponent implements OnInit {
     }
 
     this.uploadingBanner.set(true);
-    this.tournamentService.uploadOrganizerTournamentBanner(this.tournament.id, file).subscribe({
-      next: (response) => {
-        this.currentBannerUrl.set(response.bannerUrl);
+    this.tournamentService.uploadTournamentBanner(this.tournament.id, file).subscribe({
+      next: (response: any) => {
+        this.currentBannerUrl.set(response.imageUrl);
         this.tournamentForm.patchValue({bannerUrl:this.currentBannerUrl()})
         this.toastService.success('Banner uploaded successfully');
         this.uploadingBanner.set(false);
@@ -278,8 +258,8 @@ export class TournamentFormComponent implements OnInit {
 
     this.uploadingLogo.set(true);
     this.tournamentService.uploadTournamentLogo(this.tournament.id, file).subscribe({
-      next: (response) => {
-        this.currentLogoUrl.set(response.logoUrl);
+      next: (response: any) => {
+        this.currentLogoUrl.set(response.imageUrl);
         this.tournamentForm.patchValue({logoUrl:this.currentLogoUrl()})
         this.toastService.success('Logo uploaded successfully');
         this.uploadingLogo.set(false);

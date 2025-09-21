@@ -46,14 +46,11 @@
     <div class="flex flex-col items-start justify-between gap-1 text-sm">
       <div class="flex items-center gap-1">
         <lucide-angular [img]="icons.Users" size="14" />
-        <span>
-          {{ team().numberOfPlayers }}
-          {{ team().numberOfPlayers === 1 ? "Player" : "Players" }}
-        </span>
+        <span> 11 Players (Standard) </span>
       </div>
       <div class="flex items-center gap-1">
         <lucide-angular [img]="icons.UserCircle2" size="14" />
-        <span class="truncate max-w-[10rem]">{{ team().managerName }}</span>
+        <span class="truncate max-w-[10rem]">Team Manager</span>
       </div>
       <div class="flex items-center gap-1 text-xs whitespace-nowrap">
         <lucide-angular [img]="icons.Calendar" size="12" />

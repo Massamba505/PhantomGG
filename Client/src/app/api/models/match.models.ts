@@ -43,25 +43,38 @@ export interface MatchSearch {
 }
 
 export interface MatchResult {
-  matchId: string;
   homeScore: number;
   awayScore: number;
 }
 
 export interface AutoGenerateFixtures {
   tournamentId: string;
+  tournamentFormat: string; // "RoundRobin" or "SingleElimination"
   startDate: string;
-  matchDurationMinutes: number;
-  timeBetweenMatches: number;
-  venue?: string;
+  daysBetweenRounds?: number;
+  defaultVenue?: string;
+  includeReturnMatches?: boolean;
+  autoAdvanceTeams?: boolean;
+  timeOfDay?: string;
 }
 
 export interface GenerateFixtures {
   tournamentId: string;
-  fixtures: {
-    homeTeamId: string;
-    awayTeamId: string;
-    matchDate: string;
-    venue?: string;
-  }[];
+  startDate: string;
+  daysBetweenMatches?: number;
+  defaultVenue?: string;
+  includeReturnMatches?: boolean;
+}
+
+export interface FixtureGenerationStatus {
+  tournamentId: string;
+  tournamentName: string;
+  fixturesGeneratedAt?: string;
+  fixturesGeneratedBy?: string;
+  registeredTeams: number;
+  requiredTeams: number;
+  maxTeams: number;
+  status: string;
+  canGenerateFixtures: boolean;
+  message?: string;
 }

@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Tournament } from '@/app/api/models/tournament.models';
 import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { CurrencyFormatPipe } from '@/app/shared/pipe/currency-format.pipe';
 
 @Component({
   selector: 'app-tournament-card',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, CurrencyFormatPipe],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './tournament-card.component.html',
   styleUrl: './tournament-card.component.css'
 })

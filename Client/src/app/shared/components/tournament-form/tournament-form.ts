@@ -59,11 +59,9 @@ export class TournamentForm implements OnInit, OnChanges {
       location: [tournament?.location || '', [Validators.required]],
       registrationDeadline: [tournament?.registrationDeadline || '', [Validators.required]],
       startDate: [tournament?.startDate || '', [Validators.required]],
-      endDate: [tournament?.registrationDeadline || '', [Validators.required]],
+      endDate: [tournament?.endDate || '', [Validators.required]],
       maxTeams: [tournament?.maxTeams || 16, [Validators.required]],
-      entryFee: [tournament?.entryFee || 0],
-      prize: [tournament?.prizePool || 0],
-      contactEmail: [tournament?.contactEmail || '', [Validators.required, Validators.email]],
+      contactEmail: [tournament?.organizer?.email || '', [Validators.email]],
     }, { validators: [this.dateRangeValidator, this.deadlineValidator] });
 
     if (tournament?.bannerUrl) {
@@ -147,8 +145,6 @@ export class TournamentForm implements OnInit, OnChanges {
         startDate: this.tournamentForm.value.startDate,
         registrationStartDate: this.tournamentForm.value.endDate,
         maxTeams: parseInt(this.tournamentForm.value.maxTeams, 10),
-        entryFee: this.tournamentForm.value.entryFee || 0,
-        prizePool: this.tournamentForm.value.prize || 0,
         contactEmail: this.tournamentForm.value.contactEmail,
         bannerUrl: this.bannerPreview() || undefined,
       };
@@ -160,17 +156,12 @@ export class TournamentForm implements OnInit, OnChanges {
         location: this.tournamentForm.value.location,
         registrationDeadline: this.tournamentForm.value.registrationDeadline,
         startDate: this.tournamentForm.value.startDate,
+        endDate: this.tournamentForm.value.endDate,
         registrationStartDate: this.tournamentForm.value.endDate,
         maxTeams: parseInt(this.tournamentForm.value.maxTeams, 10),
-        entryFee: this.tournamentForm.value.entryFee || 0,
-        prizePool: this.tournamentForm.value.prize || 0,
         contactEmail: this.tournamentForm.value.contactEmail,
         bannerUrl: this.bannerPreview() || undefined,
-        formatId: '1', // Default to single elimination for now
         minTeams: 2,
-        maxPlayersPerTeam: 11,
-        minPlayersPerTeam: 7,
-        matchDuration: 90,
         isPublic: true
       };
       this.tournamentSaved.emit(createData);

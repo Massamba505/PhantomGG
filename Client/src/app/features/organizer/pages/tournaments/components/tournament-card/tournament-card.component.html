@@ -29,7 +29,7 @@
           <lucide-angular [img]="icons.LayoutGrid" [size]="16"></lucide-angular>
           <span>Format:</span>
         </div>
-        <span>{{ tournament.formatName }}</span>
+        <span>Standard Tournament</span>
       </div>
 
       <div class="flex items-center justify-between">
@@ -55,22 +55,6 @@
           <span>Reg. Deadline:</span>
         </div>
         <span>{{ formatDate(tournament.registrationDeadline) }}</span>
-      </div>
-      } @if (tournament.entryFee) {
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2 opacity-75">
-          <lucide-angular [img]="icons.CreditCard" [size]="16"></lucide-angular>
-          <span>Entry Fee:</span>
-        </div>
-        <span>{{ tournament.entryFee | appCurrencyFormat }}</span>
-      </div>
-      } @if (tournament.prizePool) {
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2 opacity-75">
-          <lucide-angular [img]="icons.Trophy" [size]="16"></lucide-angular>
-          <span>Prize Pool:</span>
-        </div>
-        <span>{{ tournament.prizePool | appCurrencyFormat }}</span>
       </div>
       } @if (tournament.location) {
       <div class="flex items-center justify-between">

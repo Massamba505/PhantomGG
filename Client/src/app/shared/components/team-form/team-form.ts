@@ -50,11 +50,11 @@ export class TeamForm implements OnInit, OnChanges {
         [Validators.required, Validators.minLength(2)],
       ],
       manager: [
-        team?.managerName || '',
+        '',
         [Validators.required, Validators.minLength(2)],
       ],
       numberOfPlayers: [
-        team?.numberOfPlayers || 1,
+        11,
         [Validators.required, Validators.min(1), Validators.max(30)],
       ],
       logo: [null], // file control - not required for editing
@@ -106,8 +106,8 @@ export class TeamForm implements OnInit, OnChanges {
     // Prepare payload as team request object
     const teamData: CreateTeam | UpdateTeam = {
       name: this.teamForm.value.name,
-      managerEmail: this.teamForm.value.manager,
-      logoUrl: this.logoPreview() || undefined,
+      managerName: this.teamForm.value.manager,
+      shortName: this.teamForm.value.name?.substring(0, 3).toUpperCase(),
       ...(this.tournamentId() ? { tournamentId: this.tournamentId()! } : {})
     };
 
