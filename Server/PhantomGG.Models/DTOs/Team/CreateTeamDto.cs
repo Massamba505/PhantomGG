@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.Models.DTOs.Team;
@@ -15,17 +16,9 @@ public class CreateTeamDto
     [StringLength(100, MinimumLength = 2)]
     public string ManagerName { get; set; } = string.Empty;
 
-    [Required]
-    [EmailAddress]
-    [StringLength(100)]
-    public string ManagerEmail { get; set; } = string.Empty;
+    public IFormFile? LogoUrl { get; set; }
 
-    [StringLength(10)]
-    public string? ManagerPhone { get; set; }
-
-    public string? LogoUrl { get; set; }
-
-    public string? TeamPhotoUrl { get; set; }
+    public IFormFile? TeamPhotoUrl { get; set; }
 
     [Required]
     public Guid TournamentId { get; set; }

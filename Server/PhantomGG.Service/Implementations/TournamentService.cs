@@ -1,14 +1,15 @@
-using PhantomGG.Service.Interfaces;
-using PhantomGG.Models.DTOs;
-using PhantomGG.Models.DTOs.Tournament;
-using PhantomGG.Models.DTOs.Team;
-using PhantomGG.Models.DTOs.Match;
-using PhantomGG.Models.DTOs.TournamentStanding;
-using PhantomGG.Service.Exceptions;
-using PhantomGG.Repository.Interfaces;
-using PhantomGG.Models.Entities;
-using PhantomGG.Service.Mappings;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using PhantomGG.Models.DTOs;
+using PhantomGG.Models.DTOs.Match;
+using PhantomGG.Models.DTOs.Team;
+using PhantomGG.Models.DTOs.Tournament;
+using PhantomGG.Models.DTOs.TournamentStanding;
+using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Interfaces;
+using PhantomGG.Service.Exceptions;
+using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Mappings;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -23,7 +24,7 @@ public class TournamentService(
     private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly IImageService _imageService = imageService;
 
-    #region Public Tournament Operations (Guest Access)
+    #region Public Tournament Operations
     public async Task<TournamentDto> GetByIdAsync(Guid id)
     {
         var tournament = await ValidateTournamentExistsAsync(id);
@@ -64,6 +65,14 @@ public class TournamentService(
 
     #endregion
 
+
+    //if (tournament.Status != TournamentStatus.RegistrationOpen.ToString()) { 
+    //    throw new InvalidOperationException("Tournament registration is not open");
+    //}
+
+    // Check if tournament has space
+    //await ValidateTournamentCapacity(createDto.TournamentId, tournament.MaxTeams);
+
     #region User Operations (from Controller)
 
     public async Task RegisterForTournamentAsync(Guid tournamentId, object registrationDto, Guid userId)
@@ -95,7 +104,7 @@ public class TournamentService(
             throw new InvalidOperationException("Tournament is full");
 
         // Register team for tournament (status will be "Pending" or "Approved" based on tournament settings)
-        await _teamRepository.RegisterForTournamentAsync(joinDto.TeamId, tournamentId);
+        //await _teamRepository.RegisterForTournamentAsync(joinDto.TeamId, tournamentId);
     }
 
     public async Task WithdrawFromTournamentAsync(Guid tournamentId, object withdrawDto, Guid userId)
@@ -122,7 +131,7 @@ public class TournamentService(
             throw new InvalidOperationException("Cannot withdraw from tournament that has already started");
 
         // Remove team from tournament
-        await _teamRepository.RemoveFromTournamentAsync(tournamentId, leaveDto.TeamId);
+        //await _teamRepository.RemoveFromTournamentAsync(tournamentId, leaveDto.TeamId);
     }
 
     #endregion
@@ -164,7 +173,7 @@ public class TournamentService(
         var tournament = await ValidateOrganizerAccessAsync(id, organizerId);
 
         // Don't allow deletion if teams are registered
-        var teamCount = await _teamRepository.GetTournamentTeamCountAsync(id);
+        var teamCount = await _tournamentRepository.GetTournamentTeamCountAsync(id);
         if (teamCount > 0)
             throw new InvalidOperationException("Cannot delete tournament with registered teams");
 
@@ -202,19 +211,19 @@ public class TournamentService(
     public async Task ApproveTeamAsync(Guid tournamentId, Guid teamId, Guid organizerId)
     {
         await ValidateOrganizerAccessAsync(tournamentId, organizerId);
-        await _teamRepository.UpdateTeamTournamentStatusAsync(tournamentId, teamId, "Approved");
+        //await _teamRepository.UpdateTeamTournamentStatusAsync(tournamentId, teamId, "Approved");
     }
 
     public async Task RejectTeamAsync(Guid tournamentId, Guid teamId, PhantomGG.Models.DTOs.Team.RejectTeamDto rejectDto, Guid organizerId)
     {
         await ValidateOrganizerAccessAsync(tournamentId, organizerId);
-        await _teamRepository.UpdateTeamTournamentStatusAsync(tournamentId, teamId, "Rejected");
+        //await _teamRepository.UpdateTeamTournamentStatusAsync(tournamentId, teamId, "Rejected");
     }
 
     public async Task RemoveTeamAsync(Guid tournamentId, Guid teamId, Guid organizerId)
     {
         await ValidateOrganizerAccessAsync(tournamentId, organizerId);
-        await _teamRepository.RemoveFromTournamentAsync(tournamentId, teamId);
+        //await _teamRepository.RemoveFromTournamentAsync(tournamentId, teamId);
     }
 
     public async Task CreateTournamentBracketAsync(Guid tournamentId, Guid organizerId)

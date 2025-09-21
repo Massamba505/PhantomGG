@@ -58,6 +58,14 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     }
 
     #endregion
+    public async Task<IEnumerable<Tournament>> GetTournamentsByTeamAsync(Guid teamId)
+    {
+        return await _context.Tournaments
+            .Include(t => t.TournamentTeams)
+            .Where(t => t.TournamentTeams.Any(tt => tt.TeamId == teamId))
+            .OrderBy(t => t.StartDate)
+            .ToListAsync();
+    }
 
     #region Tournament Search & Filtering
 
@@ -80,7 +88,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         if (!string.IsNullOrEmpty(searchDto.SearchTerm))
         {
             query = query.Where(t => t.Name.Contains(searchDto.SearchTerm) ||
-                                    (t.Description != null && t.Description.Contains(searchDto.SearchTerm)));
+                                    t.Description.Contains(searchDto.SearchTerm));
         }
 
         if (!string.IsNullOrEmpty(searchDto.Status))
@@ -213,6 +221,12 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         // If you need to track reason, consider adding a Reason field to the entity
 
         await _context.SaveChangesAsync();
+    }
+    
+    public async Task<int> GetTournamentTeamCountAsync(Guid tournamentId)
+    {
+        return await _context.TournamentTeams
+            .CountAsync(tt => tt.TournamentId == tournamentId);
     }
 
     #endregion

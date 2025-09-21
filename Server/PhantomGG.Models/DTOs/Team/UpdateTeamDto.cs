@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.Models.DTOs.Team;
@@ -23,7 +24,7 @@ public class UpdateTeamDto
     [StringLength(10)]
     public string? ManagerPhone { get; set; }
 
-    public string? LogoUrl { get; set; }
+    public IFormFile? LogoUrl { get; set; }
 
     public string? TeamPhotoUrl { get; set; }
 }

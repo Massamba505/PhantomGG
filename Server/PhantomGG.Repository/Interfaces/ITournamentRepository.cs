@@ -1,6 +1,7 @@
-using PhantomGG.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Tournament;
+using PhantomGG.Models.Entities;
 
 namespace PhantomGG.Repository.Interfaces;
 
@@ -17,6 +18,8 @@ public interface ITournamentRepository
     Task<PaginatedResponse<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId = null);
     #endregion
 
+    Task<IEnumerable<Tournament>> GetTournamentsByTeamAsync(Guid teamId);
+
     #region Tournament CRUD Operations
     Task<Tournament> CreateAsync(Tournament tournament);
     Task<Tournament> UpdateAsync(Tournament tournament);
@@ -30,6 +33,7 @@ public interface ITournamentRepository
     Task<bool> IsTeamRegisteredAsync(Guid tournamentId, Guid teamId);
     Task<TournamentTeam?> GetTeamRegistrationAsync(Guid tournamentId, Guid teamId);
     Task UpdateTeamRegistrationStatusAsync(Guid tournamentId, Guid teamId, string status, string? reason = null);
+    Task<int> GetTournamentTeamCountAsync(Guid tournamentId);
     #endregion
 
     #region Validation Operations

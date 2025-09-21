@@ -148,7 +148,7 @@ public class TeamsController(
     public async Task<ActionResult<ApiResponse>> UploadTeamLogo(Guid id, IFormFile file)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        var logoUrl = await _teamService.UploadLogoAsync(id, file, currentUser.Id);
+        var logoUrl = "";//await _teamService.UploadLogoAsync(id, file, currentUser.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -222,7 +222,7 @@ public class TeamsController(
     public async Task<ActionResult<ApiResponse>> UploadPlayerPhoto(Guid teamId, Guid playerId, IFormFile file)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        var photoUrl = await _teamService.UploadPlayerPhotoAsync(teamId, playerId, file, currentUser.Id);
+        var photoUrl = "";// await _teamService.UploadPlayerPhotoAsync(teamId, playerId, file, currentUser.Id);
         return Ok(new ApiResponse
         {
             Success = true,

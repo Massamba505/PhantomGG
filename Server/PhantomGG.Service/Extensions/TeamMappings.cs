@@ -26,7 +26,7 @@ public static class TeamMappings
             Id = Guid.NewGuid(),
             Name = createDto.Name,
             ShortName = createDto.ShortName ?? string.Empty,
-            LogoUrl = createDto.LogoUrl,
+            //LogoUrl = createDto.LogoUrl,
             UserId = userId,
             CreatedAt = DateTime.UtcNow
         };
@@ -38,8 +38,8 @@ public static class TeamMappings
             team.Name = updateDto.Name;
         if (!string.IsNullOrEmpty(updateDto.ShortName))
             team.ShortName = updateDto.ShortName;
-        if (updateDto.LogoUrl != null)
-            team.LogoUrl = updateDto.LogoUrl;
+        //if (updateDto.LogoUrl != null)
+        //    team.LogoUrl = updateDto.LogoUrl;
 
         team.UpdatedAt = DateTime.UtcNow;
     }
