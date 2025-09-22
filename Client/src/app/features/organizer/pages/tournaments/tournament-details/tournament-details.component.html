@@ -157,8 +157,6 @@
       </div>
     </div>
 
-    <!-- Contact email section removed - not supported in backend -->
-    @if (false) {
     <div class="card">
       <h3 class="font-semibold mb-4">Contact</h3>
       <div class="space-y-2">
@@ -167,10 +165,18 @@
             <lucide-angular [img]="icons.User" [size]="16"></lucide-angular>
             Organizer:
           </span>
-          <span
-            >{{ tournament()!.organizer?.firstName }}
-            {{ tournament()!.organizer?.lastName }}</span
-          >
+
+          <div class="flex items-center gap-3">
+            <span>
+              {{ tournament()!.organizer?.firstName }}
+              {{ tournament()!.organizer?.lastName }}
+            </span>
+            <img
+              [src]="tournament()!.organizer?.profilePictureUrl"
+              alt="Organizer's Profile Picture"
+              class="w-8 h-8 rounded-full object-cover"
+            />
+          </div>
         </div>
 
         <div class="flex justify-between">
@@ -187,7 +193,6 @@
         </div>
       </div>
     </div>
-    }
   </div>
 </div>
 }
