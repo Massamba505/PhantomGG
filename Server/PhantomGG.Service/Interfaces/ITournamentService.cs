@@ -12,7 +12,7 @@ public interface ITournamentService
 {
     Task<PaginatedResponse<TournamentDto>> SearchAsync(TournamentSearchDto searchDto);
     Task<TournamentDto> GetByIdAsync(Guid id);
-    Task<IEnumerable<TeamDto>> GetTournamentTeamsAsync(Guid tournamentId);
+    Task<IEnumerable<TournamentTeamDto>> GetTournamentTeamsAsync(Guid tournamentId);
     Task<IEnumerable<MatchDto>> GetTournamentMatchesAsync(Guid tournamentId);
     Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid tournamentId);
     Task RegisterForTournamentAsync(Guid tournamentId, JoinTournamentDto registrationDto, Guid userId);
@@ -27,7 +27,7 @@ public interface ITournamentService
     Task<string> UploadLogoImageAsync(Tournament tournamentId, IFormFile file);
 
     // Team Management
-    Task<IEnumerable<TeamDto>> GetPendingTeamsAsync(Guid tournamentId, Guid organizerId);
+    Task<IEnumerable<TournamentTeamDto>> GetPendingTeamsAsync(Guid tournamentId, Guid organizerId);
     Task ApproveTeamAsync(Guid tournamentId, Guid teamId, Guid organizerId);
     Task RejectTeamAsync(Guid tournamentId, Guid teamId, Guid organizerId);
 

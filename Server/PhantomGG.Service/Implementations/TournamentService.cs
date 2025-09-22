@@ -40,11 +40,11 @@ public class TournamentService(
         );
     }
 
-    public async Task<IEnumerable<TeamDto>> GetTournamentTeamsAsync(Guid tournamentId)
+    public async Task<IEnumerable<TournamentTeamDto>> GetTournamentTeamsAsync(Guid tournamentId)
     {
         var tournament = await ValidateTournamentExistsAsync(tournamentId);
-        var teams = await _tournamentRepository.GetTournamentTeamsAsync(tournamentId);
-        return teams.Select(t => t.ToDto());
+        var tournamentTeams = await _tournamentRepository.GetTournamentTeamsAsync(tournamentId);
+        return tournamentTeams.Select(tt => tt.ToDto());
     }
 
     public async Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid tournamentId)
@@ -200,11 +200,11 @@ public class TournamentService(
         await _tournamentRepository.RemoveTeamFromTournamentAsync(tournamentId, team.Id);
     }
 
-    public async Task<IEnumerable<TeamDto>> GetPendingTeamsAsync(Guid tournamentId, Guid organizerId)
+    public async Task<IEnumerable<TournamentTeamDto>> GetPendingTeamsAsync(Guid tournamentId, Guid organizerId)
     {
         await ValidateOrganizerAccessAsync(tournamentId, organizerId);
-        var teams = await _tournamentRepository.GetPendingTeamsAsync(tournamentId);
-        return teams.Select(t => t.ToDto());
+        var tournamentTeams = await _tournamentRepository.GetPendingTeamsAsync(tournamentId);
+        return tournamentTeams.Select(tt => tt.ToDto());
     }
 
     public async Task ApproveTeamAsync(Guid tournamentId, Guid teamId, Guid organizerId)

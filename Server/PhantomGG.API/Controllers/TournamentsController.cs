@@ -52,11 +52,11 @@ public class TournamentsController(
     [HttpGet("{id:guid}/teams")]
     public async Task<ActionResult<ApiResponse>> GetTournamentTeams(Guid id)
     {
-        var teams = await _tournamentService.GetTournamentTeamsAsync(id);
+        var tournamentTeams = await _tournamentService.GetTournamentTeamsAsync(id);
         return Ok(new ApiResponse
         {
             Success = true,
-            Data = teams,
+            Data = tournamentTeams,
             Message = "Tournament teams retrieved successfully"
         });
     }

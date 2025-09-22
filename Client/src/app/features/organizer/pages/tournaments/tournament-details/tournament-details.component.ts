@@ -8,10 +8,11 @@ import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
 import { TournamentService } from '@/app/api/services';
 import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 import { ToastService } from '@/app/shared/services/toast.service';
+import { TournamentTeamManagementComponent } from '../components/tournament-team-management/tournament-team-management.component';
 
 @Component({
   selector: 'app-tournament-details',
-  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, ConfirmDeleteModal],
+  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, ConfirmDeleteModal, TournamentTeamManagementComponent],
   templateUrl: './tournament-details.component.html',
   styleUrl: './tournament-details.component.css'
 })

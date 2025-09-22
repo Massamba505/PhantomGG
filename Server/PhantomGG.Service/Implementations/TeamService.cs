@@ -93,7 +93,7 @@ public class TeamService(
             foreach (var tournament in tournaments)
             {
                 var existingTeams = await _tournamentRepository.GetTournamentTeamsAsync(tournament.Id);
-                if (existingTeams.Any(t => t.Name.Equals(updateDto.Name, StringComparison.OrdinalIgnoreCase)))
+                if (existingTeams.Any(tt => tt.Team.Name.Equals(updateDto.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     throw new ConflictException($"A team with this name is already registered in the tournament '{tournament.Name}'");
                 }

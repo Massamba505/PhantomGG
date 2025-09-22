@@ -54,12 +54,14 @@
 
     <div class="card">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="font-semibold text-lg">Registered Teams</h2>
+        <h2 class="font-semibold text-lg">Team Management</h2>
         <span class="status-badge">
           {{ tournament()!.teamCount }}/{{ tournament()!.maxTeams }} Teams
         </span>
       </div>
-      <p class="opacity-75">Team management coming soon...</p>
+
+      <app-tournament-team-management [tournamentId]="tournament()!.id">
+      </app-tournament-team-management>
     </div>
   </div>
 

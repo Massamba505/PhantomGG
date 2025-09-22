@@ -148,23 +148,24 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Team>> GetTournamentTeamsAsync(Guid tournamentId)
+    public async Task<IEnumerable<TournamentTeam>> GetTournamentTeamsAsync(Guid tournamentId)
     {
-        return await _context.Teams
-            .Include(t => t.User)
-            .Where(t => t.TournamentTeams.Any(tt => tt.TournamentId == tournamentId &&
-                        tt.Status == TeamRegistrationStatus.Approved.ToString()))
-            .OrderBy(t => t.Name)
-            .ToListAsync();
+        return await _context.TournamentTeams
+                              .Include(tt => tt.Team)
+                              .ThenInclude(t => t.User)
+                              .Where(tt => tt.TournamentId == tournamentId)
+                              .OrderBy(tt => tt.Team.Name)
+                              .ToListAsync();
     }
 
-    public async Task<IEnumerable<Team>> GetPendingTeamsAsync(Guid tournamentId)
+    public async Task<IEnumerable<TournamentTeam>> GetPendingTeamsAsync(Guid tournamentId)
     {
-        return await _context.Teams
-            .Include(t => t.User)
-            .Where(t => t.TournamentTeams.Any(tt => tt.TournamentId == tournamentId &&
-                        tt.Status == TeamRegistrationStatus.Pending.ToString()))
-            .OrderBy(t => t.CreatedAt)
+        return await _context.TournamentTeams
+            .Include(tt => tt.Team)
+            .ThenInclude(t => t.User)
+            .Where(tt => tt.TournamentId == tournamentId &&
+                        tt.Status == TeamRegistrationStatus.Pending.ToString())
+            .OrderBy(tt => tt.RequestedAt)
             .ToListAsync();
     }
 

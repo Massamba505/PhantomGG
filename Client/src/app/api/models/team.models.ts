@@ -8,6 +8,17 @@ export interface Team {
   updatedAt?: string;
 }
 
+export interface TournamentTeam {
+  id: string;
+  name: string;
+  shortName?: string;
+  logoUrl?: string;
+  status: 'Approved' | 'Pending' | 'Rejected';
+  registeredAt: string;
+  managerName?: string;
+  managerId?: string;
+}
+
 export interface CreateTeam {
   name: string;
   shortName?: string;

@@ -14,8 +14,8 @@ public interface ITournamentRepository
     Task<Tournament> CreateAsync(Tournament tournament);
     Task<Tournament> UpdateAsync(Tournament tournament);
     Task DeleteAsync(Guid id);
-    Task<IEnumerable<Team>> GetTournamentTeamsAsync(Guid tournamentId);
-    Task<IEnumerable<Team>> GetPendingTeamsAsync(Guid tournamentId);
+    Task<IEnumerable<TournamentTeam>> GetTournamentTeamsAsync(Guid tournamentId);
+    Task<IEnumerable<TournamentTeam>> GetPendingTeamsAsync(Guid tournamentId);
     Task<bool> IsTeamRegisteredAsync(Guid tournamentId, Guid teamId);
     Task<TournamentTeam?> GetTeamRegistrationAsync(Guid tournamentId, Guid teamId);
     Task<int> GetTournamentTeamCountAsync(Guid tournamentId);

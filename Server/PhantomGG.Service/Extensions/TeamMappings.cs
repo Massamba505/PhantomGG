@@ -43,4 +43,20 @@ public static class TeamMappings
 
         team.UpdatedAt = DateTime.UtcNow;
     }
+
+    public static TournamentTeamDto ToDto(this TournamentTeam tournamentTeam)
+    {
+        return new TournamentTeamDto
+        {
+            Id = tournamentTeam.TeamId,
+            Name = tournamentTeam.Team.Name,
+            ShortName = tournamentTeam.Team.ShortName,
+            LogoUrl = tournamentTeam.Team.LogoUrl,
+            Status = tournamentTeam.Status,
+            RegisteredAt = tournamentTeam.RequestedAt,
+            AcceptedAt = tournamentTeam.AcceptedAt,
+            ManagerName = $"{tournamentTeam.Team.User.FirstName} {tournamentTeam.Team.User.LastName}".Trim(),
+            ManagerId = tournamentTeam.Team.UserId
+        };
+    }
 }

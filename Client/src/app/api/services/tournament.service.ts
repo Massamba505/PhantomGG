@@ -12,6 +12,7 @@ import {
   TournamentFormat,
   getTournamentFormats
 } from '../models/tournament.models';
+import { TournamentTeam } from '../models/team.models';
 
 @Injectable({
   providedIn: 'root'
@@ -27,8 +28,8 @@ export class TournamentService {
     return this.apiClient.get<Tournament>(API_ENDPOINTS.TOURNAMENTS.GET(id));
   }
 
-  getTournamentTeams(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.TEAMS(id));
+  getTournamentTeams(id: string): Observable<TournamentTeam[]> {
+    return this.apiClient.get<TournamentTeam[]>(API_ENDPOINTS.TOURNAMENTS.TEAMS(id));
   }
 
   getMyTournaments(params?: TournamentSearch): Observable<PaginatedResponse<Tournament>> {
@@ -63,8 +64,8 @@ export class TournamentService {
     return this.apiClient.uploadFile<{ imageUrl: string }>(API_ENDPOINTS.TOURNAMENTS.UPLOAD_LOGO(tournamentId), file);
   }
 
-  getPendingTeams(tournamentId: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.PENDING_TEAMS(tournamentId));
+  getPendingTeams(tournamentId: string): Observable<TournamentTeam[]> {
+    return this.apiClient.get<TournamentTeam[]>(API_ENDPOINTS.TOURNAMENTS.PENDING_TEAMS(tournamentId));
   }
 
   approveTeam(tournamentId: string, teamId: string): Observable<void> {

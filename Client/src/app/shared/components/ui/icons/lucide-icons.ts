@@ -43,7 +43,10 @@ import {
   Mail,
   Activity,
   MenuIcon,
-  Bell
+  Bell,
+  CheckCircle,
+  XCircle,
+  Check
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -91,5 +94,8 @@ export const LucideIcons = {
   Mail,
   Activity,
   MenuIcon,
-  Bell
+  Bell,
+  CheckCircle,
+  XCircle,
+  Check
 };
