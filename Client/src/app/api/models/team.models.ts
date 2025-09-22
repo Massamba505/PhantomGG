@@ -13,7 +13,7 @@ export interface TournamentTeam {
   name: string;
   shortName?: string;
   logoUrl?: string;
-  status: 'Approved' | 'Pending' | 'Rejected';
+  status: 'Approved' | 'Pending' | 'Rejected' | 'RegistrationOpen';
   registeredAt: string;
   managerName?: string;
   managerId?: string;

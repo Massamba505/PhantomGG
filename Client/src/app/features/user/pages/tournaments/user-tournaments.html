@@ -1,0 +1,194 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+      Available Tournaments
+    </h1>
+    <div class="text-sm text-gray-600 dark:text-gray-400">
+      {{ myTeams().length }} team{{ myTeams().length !== 1 ? "s" : "" }}
+      available
+    </div>
+  </div>
+
+  @if (myTeams().length === 0) {
+  <div
+    class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4"
+  >
+    <div class="flex items-center">
+      <lucide-angular
+        [img]="icons.AlertTriangle"
+        [size]="20"
+        class="text-yellow-600 dark:text-yellow-400 mr-2"
+      ></lucide-angular>
+      <div>
+        <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+          No teams found
+        </h3>
+        <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+          You need to create a team before you can join tournaments.
+          <a
+            routerLink="/user/teams/create"
+            class="underline font-medium hover:text-yellow-600 dark:hover:text-yellow-200"
+          >
+            Create your first team
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="text-center py-12">
+    <div
+      class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"
+    ></div>
+    <p class="text-gray-600 dark:text-gray-400">Loading tournaments...</p>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && tournaments().length === 0) {
+  <div class="text-center py-12">
+    <div class="text-gray-400 dark:text-gray-600 mb-3">
+      <lucide-angular
+        [img]="icons.Trophy"
+        [size]="64"
+        class="mx-auto"
+      ></lucide-angular>
+    </div>
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+      No tournaments found
+    </h3>
+    <p class="text-gray-600 dark:text-gray-400">
+      There are currently no tournaments available to join.
+    </p>
+  </div>
+  }
+
+  <!-- Tournaments Grid -->
+  @if (!isLoading() && tournaments().length > 0) {
+  <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (tournament of tournaments(); track tournament.id) {
+    <div class="card">
+      <!-- Tournament Banner -->
+      @if (tournament.bannerUrl) {
+      <div
+        class="h-32 bg-cover bg-center rounded-t-lg mb-4"
+        [style.background-image]="'url(' + tournament.bannerUrl + ')'"
+      ></div>
+      }
+
+      <div class="space-y-4">
+        <!-- Tournament Info -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {{ tournament.name }}
+          </h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+            {{ tournament.description }}
+          </p>
+        </div>
+
+        <!-- Tournament Details -->
+        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+          <div class="flex items-center space-x-2">
+            <lucide-angular [img]="icons.Calendar" [size]="14"></lucide-angular>
+            <span>{{ tournament.startDate | date : "medium" }}</span>
+          </div>
+
+          @if (tournament.location) {
+          <div class="flex items-center space-x-2">
+            <lucide-angular [img]="icons.MapPin" [size]="14"></lucide-angular>
+            <span>{{ tournament.location }}</span>
+          </div>
+          }
+
+          <div class="flex items-center space-x-2">
+            <lucide-angular [img]="icons.Users" [size]="14"></lucide-angular>
+            <span
+              >{{ tournament.teamCount }}/{{ tournament.maxTeams }} teams</span
+            >
+          </div>
+
+          @if (tournament.registrationDeadline) {
+          <div class="flex items-center space-x-2">
+            <lucide-angular [img]="icons.Clock" [size]="14"></lucide-angular>
+            <span
+              >Register by
+              {{ tournament.registrationDeadline | date : "short" }}</span
+            >
+          </div>
+          }
+        </div>
+
+        <!-- Tournament Status -->
+        <div class="flex items-center justify-between">
+          <span
+            class="px-2 py-1 text-xs font-medium rounded-full"
+            [ngClass]="{
+              'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200':
+                tournament.status === 'RegistrationOpen',
+              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200':
+                tournament.status === 'InProgress',
+              'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200':
+                tournament.status === 'Completed',
+              'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200':
+                tournament.status === 'Cancelled'
+            }"
+          >
+            {{ tournament.status }}
+          </span>
+
+          <span class="text-xs text-gray-500 dark:text-gray-400">
+            {{ getRegistrationStatus(tournament) }}
+          </span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div
+            class="bg-blue-600 h-2 rounded-full"
+            [style.width.%]="(tournament.teamCount / tournament.maxTeams) * 100"
+          ></div>
+        </div>
+
+        <!-- Join Button -->
+        <div class="pt-2">
+          @if (canJoinTournament(tournament)) {
+          <button
+            class="w-full btn btn-primary"
+            (click)="joinTournament(tournament)"
+            [disabled]="isTournamentJoining(tournament.id)"
+          >
+            @if (isTournamentJoining(tournament.id)) {
+            <div
+              class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
+            ></div>
+            } Join Tournament
+          </button>
+          } @else {
+          <button class="w-full btn btn-outline" disabled>
+            {{ getRegistrationStatus(tournament) }}
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>
+
+<app-team-selection-modal
+  [isOpen]="showTeamSelectionModal()"
+  [teams]="myTeams()"
+  [tournament]="selectedTournament()"
+  [isJoining]="
+    selectedTournament() ? isTournamentJoining(selectedTournament()!.id) : false
+  "
+  (teamSelected)="onTeamSelected($event)"
+  (modalClosed)="onTeamSelectionModalClosed()"
+  (createTeamClicked)="onCreateTeamFromModal()"
+></app-team-selection-modal>

@@ -19,7 +19,4 @@ public class CreateTeamDto
     public IFormFile? LogoUrl { get; set; }
 
     public IFormFile? TeamPhotoUrl { get; set; }
-
-    [Required]
-    public Guid TournamentId { get; set; }
 }

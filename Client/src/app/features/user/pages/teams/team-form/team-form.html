@@ -1,0 +1,121 @@
+<div class="flex items-center justify-between gap-4 mb-6">
+  <button class="btn btn-outline" (click)="goBack()">
+    <lucide-angular [img]="icons.ArrowLeft" [size]="20"></lucide-angular>
+    Back to Teams
+  </button>
+
+  <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+    {{ isEditMode() ? "Edit Team" : "Create New Team" }}
+  </h1>
+</div>
+
+@if (isLoading()) {
+<div class="text-center py-12">
+  <div
+    class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"
+  ></div>
+  <p class="text-gray-600 dark:text-gray-400">Loading team details...</p>
+</div>
+} @else {
+<div class="card max-w-2xl mx-auto">
+  <form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Team Name -->
+    <div>
+      <label
+        for="name"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
+        Team Name *
+      </label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        class="input-field"
+        [class.border-red-500]="isFieldInvalid('name')"
+        placeholder="Enter team name"
+        required
+      />
+      @if (getFieldError('name')) {
+      <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+        {{ getFieldError("name") }}
+      </p>
+      }
+    </div>
+
+    <!-- Short Name -->
+    <div>
+      <label
+        for="shortName"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
+        Short Name
+      </label>
+      <input
+        id="shortName"
+        type="text"
+        formControlName="shortName"
+        class="input-field"
+        [class.border-red-500]="isFieldInvalid('shortName')"
+        placeholder="Enter team abbreviation (max 5 characters)"
+        maxlength="5"
+      />
+      @if (getFieldError('shortName')) {
+      <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+        {{ getFieldError("shortName") }}
+      </p>
+      }
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        Optional: A short abbreviation for your team (e.g., "PHG" for PhantomGG)
+      </p>
+    </div>
+
+    <!-- Logo URL (temporary until file upload is implemented) -->
+    <div>
+      <label
+        for="logoUrl"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+      >
+        Logo URL
+      </label>
+      <input
+        id="logoUrl"
+        type="url"
+        formControlName="logoUrl"
+        class="input-field"
+        placeholder="Enter logo URL (optional)"
+      />
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        Optional: URL to your team's logo image
+      </p>
+    </div>
+
+    <!-- Form Actions -->
+    <div
+      class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700"
+    >
+      <button
+        type="button"
+        class="btn btn-outline"
+        (click)="goBack()"
+        [disabled]="isSubmitting()"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="teamForm.invalid || isSubmitting()"
+      >
+        @if (isSubmitting()) {
+        <div
+          class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
+        ></div>
+        }
+        {{ isEditMode() ? "Update Team" : "Create Team" }}
+      </button>
+    </div>
+  </form>
+</div>
+}

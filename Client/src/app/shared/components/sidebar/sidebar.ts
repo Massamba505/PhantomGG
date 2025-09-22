@@ -48,10 +48,28 @@ export class Sidebar implements OnInit, OnDestroy {
       roles: [Roles.Organizer],
     },
     {
+      title: 'Dashboard',
+      url: '/user/dashboard',
+      icon: this.icons.Home,
+      roles: [Roles.User],
+    },
+    {
       title: 'My Tournaments',
       url: '/organizer/tournaments',
       icon: this.icons.Trophy,
       roles: [Roles.Organizer],
+    },
+    {
+      title: 'My Teams',
+      url: '/user/teams',
+      icon: this.icons.Users,
+      roles: [Roles.User],
+    },
+    {
+      title: 'Tournaments',
+      url: '/user/tournaments',
+      icon: this.icons.Trophy,
+      roles: [Roles.User],
     },
     {
       title: 'Fixtures',
@@ -73,6 +91,12 @@ export class Sidebar implements OnInit, OnDestroy {
       url: '/organizer/tournaments/create',
       icon: this.icons.CirclePlus,
       roles: [Roles.Organizer],
+    },
+    {
+      title: 'Create Team',
+      url: '/user/teams/create',
+      icon: this.icons.UserPlus,
+      roles: [Roles.User],
     }
   ];
   
