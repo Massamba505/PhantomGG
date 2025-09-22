@@ -44,6 +44,13 @@ export class TournamentDetailsComponent implements OnInit {
     this.tournamentService.getTournament(this.tournamentId()).subscribe({
       next: (tournament: any) => {
         this.tournament.set(tournament);
+        const banner = this.tournament()!.bannerUrl?.split(" ").join("+");
+        const logo = this.tournament()!.logoUrl?.split(" ").join("+");
+        this.tournament.update(current => ({
+          ...current!,
+          bannerUrl: banner,
+          logoUrl: logo
+        }));
       },
       complete:()=>{
         this.loading.set(false);
