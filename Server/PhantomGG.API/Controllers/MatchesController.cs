@@ -295,7 +295,7 @@ public class MatchesController : ControllerBase
         {
             return Forbid(ex.Message);
         }
-        catch (InvalidOperationException ex)
+        catch (ForbiddenException ex)
         {
             return BadRequest(ex.Message);
         }
@@ -341,7 +341,7 @@ public class MatchesController : ControllerBase
         {
             return StatusCode(403, new { success = false, message = ex.Message });
         }
-        catch (InvalidOperationException ex)
+        catch (ForbiddenException ex)
         {
             return BadRequest(new { success = false, message = ex.Message });
         }

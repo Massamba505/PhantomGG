@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using PhantomGG.Common.Config;
+using PhantomGG.Service.Exceptions;
 using System.Text;
 
 namespace PhantomGG.API.Extensions;
@@ -14,7 +15,7 @@ public static class AuthenticationExtensions
 
         if (jwtSettings == null)
         {
-            throw new InvalidOperationException("JWT settings not found in configuration");
+            throw new ForbiddenException("JWT settings not found in configuration");
         }
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

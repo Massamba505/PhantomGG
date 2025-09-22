@@ -160,13 +160,14 @@
           <button
             class="w-full btn btn-primary"
             (click)="joinTournament(tournament)"
-            [disabled]="isTournamentJoining(tournament.id)"
+            [disabled]="isJoiningTournament() || !canJoinTournament(tournament)"
           >
-            @if (isTournamentJoining(tournament.id)) {
+            @if (isJoiningTournament() && selectedTournament()?.id ===
+            tournament.id) {
             <div
               class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
             ></div>
-            } Join Tournament
+            Joining... } @else { Join Tournament }
           </button>
           } @else {
           <button class="w-full btn btn-outline" disabled>
@@ -185,9 +186,7 @@
   [isOpen]="showTeamSelectionModal()"
   [teams]="myTeams()"
   [tournament]="selectedTournament()"
-  [isJoining]="
-    selectedTournament() ? isTournamentJoining(selectedTournament()!.id) : false
-  "
+  [isJoining]="isJoiningTournament()"
   (teamSelected)="onTeamSelected($event)"
   (modalClosed)="onTeamSelectionModalClosed()"
   (createTeamClicked)="onCreateTeamFromModal()"

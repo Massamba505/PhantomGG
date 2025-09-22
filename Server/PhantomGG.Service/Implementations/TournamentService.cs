@@ -107,7 +107,7 @@ public class TournamentService(
         var teamCount = await _tournamentRepository.GetTournamentTeamCountAsync(id);
         if (teamCount > 0)
         {
-            throw new InvalidOperationException("Cannot delete tournament with registered teams");
+            throw new ForbiddenException("Cannot delete tournament with registered teams");
         }
 
         await _tournamentRepository.DeleteAsync(id);
@@ -124,7 +124,7 @@ public class TournamentService(
 
         return bannerUrl;
     }
-    
+
     public async Task<string> UploadLogoImageAsync(Tournament tournament, IFormFile file)
     {
         if (!string.IsNullOrEmpty(tournament.BannerUrl))
@@ -143,7 +143,7 @@ public class TournamentService(
 
         if (tournament.Status == TournamentStatus.RegistrationClosed.ToString())
         {
-            throw new InvalidOperationException("Tournament registration is closed");
+            throw new ForbiddenException("Tournament registration is closed");
         }
 
         var team = await _teamService.GetByIdAsync(registrationDto.TeamId);
@@ -155,13 +155,13 @@ public class TournamentService(
 
         if (await _tournamentRepository.IsTeamRegisteredAsync(tournamentId, team.Id))
         {
-            throw new InvalidOperationException("Team is already registered for this tournament");
+            throw new ForbiddenException("Team is already registered for this tournament");
         }
 
         var approvedCount = await _tournamentRepository.GetApprovedTeamCountAsync(tournamentId);
         if (approvedCount >= tournament.MaxTeams)
         {
-            throw new InvalidOperationException("Tournament has reached maximum team capacity");
+            throw new ForbiddenException("Tournament has reached maximum team capacity");
         }
 
         var registration = new TournamentTeam
@@ -182,7 +182,7 @@ public class TournamentService(
 
         if (tournament.Status == TournamentStatus.InProgress.ToString())
         {
-            throw new InvalidOperationException("Cannot withdraw from tournament that is in progress");
+            throw new ForbiddenException("Cannot withdraw from tournament that is in progress");
         }
 
         var team = await _teamService.GetByIdAsync(withdrawDto.TeamId);
@@ -194,7 +194,7 @@ public class TournamentService(
 
         if (!await _tournamentRepository.IsTeamRegisteredAsync(tournamentId, team.Id))
         {
-            throw new InvalidOperationException("Team is not registered for this tournament");
+            throw new ForbiddenException("Team is not registered for this tournament");
         }
 
         await _tournamentRepository.RemoveTeamFromTournamentAsync(tournamentId, team.Id);
@@ -218,13 +218,13 @@ public class TournamentService(
         }
         if (registration.Status != TeamRegistrationStatus.Pending.ToString())
         {
-            throw new InvalidOperationException("Only pending registrations can be approved");
+            throw new ForbiddenException("Only pending registrations can be approved");
         }
 
         var approvedCount = await _tournamentRepository.GetApprovedTeamCountAsync(tournamentId);
         if (approvedCount >= tournament.MaxTeams)
         {
-            throw new InvalidOperationException("Tournament has reached maximum team capacity");
+            throw new ForbiddenException("Tournament has reached maximum team capacity");
         }
 
         await _tournamentRepository.ApproveTeamAsync(tournamentId, teamId);
@@ -241,7 +241,7 @@ public class TournamentService(
         }
         if (registration.Status != TeamRegistrationStatus.Pending.ToString())
         {
-            throw new InvalidOperationException("Only pending registrations can be rejected");
+            throw new ForbiddenException("Only pending registrations can be rejected");
         }
 
         await _tournamentRepository.RejectTeamAsync(tournamentId, teamId);

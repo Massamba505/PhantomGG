@@ -17,12 +17,6 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   ],
   template: `
     <div class="space-y-6">
-      <!-- Welcome Section -->
-      <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6">
-        <h1 class="text-2xl font-bold mb-2">Welcome to PhantomGG</h1>
-        <p class="text-blue-100">Manage your teams and join tournaments</p>
-      </div>
-
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- My Teams -->

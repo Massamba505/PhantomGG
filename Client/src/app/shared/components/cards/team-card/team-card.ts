@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Team, User } from '@/app/api/models';
-import { Roles } from '@/app/shared/constants/roles';
 
 export interface TeamCardConfig {
   isPublicView?: boolean;
@@ -42,7 +41,7 @@ export class TeamCard implements OnInit {
   readonly icons = LucideIcons;
 
   ngOnInit(): void {
-    this.isManager = this.config().Manager?.id == this.team().id
+    this.isManager = this.config().Manager?.id == this.team().userId
     
     this.pendingCard = this.config().type == 'pending';
     this.approveCard = this.config().type == 'approved';

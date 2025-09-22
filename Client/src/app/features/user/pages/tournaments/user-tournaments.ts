@@ -34,7 +34,7 @@ export class UserTournaments implements OnInit {
   tournaments = signal<Tournament[]>([]);
   myTeams = signal<Team[]>([]);
   isLoading = signal(false);
-  isJoining = signal<{ [key: string]: boolean }>({});
+  isJoiningTournament = signal(false);
   searchCriteria = signal<Partial<TournamentSearch>>({});
   
   showTeamSelectionModal = signal(false);
@@ -93,84 +93,48 @@ export class UserTournaments implements OnInit {
     const tournament = this.selectedTournament();
     if (!tournament) return;
     
-    this.setJoiningState(tournament.id, true);
+    this.isJoiningTournament.set(true);
     
     this.tournamentService.registerForTournament(tournament.id, {
       teamId: team.id
     }).subscribe({
       next: () => {
         this.toastService.success(`Successfully registered ${team.name} for ${tournament.name}`);
-        this.loadTournaments(); // Refresh to update registration status
+        this.loadTournaments();
+        this.closeTeamSelectionModal();
       },
       error: (error: any) => {
-        console.error('Failed to join tournament:', error);
-        this.toastService.error('Failed to join tournament. You may already be registered.');
+        this.isJoiningTournament.set(false);
       },
       complete: () => {
-        this.setJoiningState(tournament.id, false);
+        this.isJoiningTournament.set(false);
       }
     });
   }
 
   onTeamSelectionModalClosed() {
+    this.closeTeamSelectionModal();
+  }
+
+  private closeTeamSelectionModal() {
     this.showTeamSelectionModal.set(false);
     this.selectedTournament.set(null);
+    this.isJoiningTournament.set(false);
   }
 
   onCreateTeamFromModal() {
     this.router.navigate(['/user/teams/create']);
   }
 
-  private setJoiningState(tournamentId: string, joining: boolean) {
-    this.isJoining.update(current => ({
-      ...current,
-      [tournamentId]: joining
-    }));
-  }
-
-  isTournamentJoining(tournamentId: string): boolean {
-    const tournament = this.selectedTournament();
-    return tournament?.id === tournamentId && this.isJoining()[tournamentId] || false;
-  }
-
   canJoinTournament(tournament: Tournament): boolean {
-    const now = new Date();
-    const startDate = new Date(tournament.startDate);
-    const registrationDeadline = tournament.registrationDeadline 
-      ? new Date(tournament.registrationDeadline) 
-      : startDate;
-
     return (
       tournament.status === 'RegistrationOpen' &&
-      now < registrationDeadline &&
       tournament.teamCount < tournament.maxTeams &&
       this.myTeams().length > 0
     );
   }
 
   getRegistrationStatus(tournament: Tournament): string {
-    const now = new Date();
-    const startDate = new Date(tournament.startDate);
-    const registrationDeadline = tournament.registrationDeadline 
-      ? new Date(tournament.registrationDeadline) 
-      : startDate;
-
-    if (tournament.status !== 'RegistrationOpen') {
-      return 'Registration Closed';
-    }
-    
-    if (now >= registrationDeadline) {
-      return 'Registration Expired';
-    }
-    
-    if (tournament.teamCount >= tournament.maxTeams) {
-      return 'Tournament Full';
-    }
-    
-    if (this.myTeams().length === 0) {
-      return 'Need Team to Join';
-    }
-    
-    return 'Open for Registration';
+    return tournament.status;
   }
 }

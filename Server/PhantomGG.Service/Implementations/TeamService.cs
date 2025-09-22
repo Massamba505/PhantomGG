@@ -74,10 +74,10 @@ public class TeamService(
         }
         else
         {
-            team.LogoUrl = $"https://placehold.co/200x200?text={team.Name}"
+            team.LogoUrl = $"https://placehold.co/200x200?text={team.Name}";
         }
 
-            var createdTeam = await _teamRepository.CreateAsync(team);
+        var createdTeam = await _teamRepository.CreateAsync(team);
 
         return createdTeam.ToDto();
     }
@@ -143,11 +143,13 @@ public class TeamService(
         ValidateTeamOwnership(team, userId);
 
         var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(teamId);
-        if (currentPlayerCount >= 11) { 
+        if (currentPlayerCount >= 11)
+        {
             throw new ValidationException("Team already has the maximum number of players (11)");
         }
 
-        if (teamId != playerDto.TeamId) { 
+        if (teamId != playerDto.TeamId)
+        {
             throw new ValidationException("Player's TeamId does not match the specified team Id");
         }
 
@@ -201,7 +203,7 @@ public class TeamService(
         if (activeTournaments.Any())
         {
             var tournamentNames = string.Join(", ", activeTournaments.Select(t => t.Name));
-            throw new InvalidOperationException($"Cannot delete team. Team is registered in tournaments: {tournamentNames}");
+            throw new ForbiddenException($"Cannot delete team. Team is registered in tournaments: {tournamentNames}");
         }
     }
 

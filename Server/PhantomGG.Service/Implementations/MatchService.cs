@@ -134,7 +134,7 @@ public class MatchService : IMatchService
 
         // Check for scheduling conflicts
         if (await _matchRepository.TeamsHaveMatchOnDateAsync(createDto.HomeTeamId, createDto.AwayTeamId, createDto.MatchDate))
-            throw new InvalidOperationException("Teams already have a match scheduled on this date");
+            throw new ForbiddenException("Teams already have a match scheduled on this date");
 
         var match = createDto.ToEntity();
         var createdMatch = await _matchRepository.CreateAsync(match);
@@ -192,7 +192,7 @@ public class MatchService : IMatchService
         var teamsList = teams.ToList();
 
         if (teamsList.Count < tournament.MinTeams)
-            throw new InvalidOperationException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
+            throw new ForbiddenException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
 
         var matches = new List<Match>();
         var matchDate = generateDto.StartDate;
@@ -264,7 +264,7 @@ public class MatchService : IMatchService
         var teamsList = teams.ToList();
 
         if (teamsList.Count < tournament.MinTeams)
-            throw new InvalidOperationException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
+            throw new ForbiddenException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
 
         // For single elimination, we need a power of 2 number of teams
         var powerOfTwo = GetNextPowerOfTwo(teamsList.Count);
