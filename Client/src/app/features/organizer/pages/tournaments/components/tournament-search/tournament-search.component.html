@@ -72,7 +72,7 @@
           <label class="form-label">Tournament Format</label>
           <select
             class="form-select"
-            [value]="formatId() || ''"
+            [value]="format() || ''"
             (change)="onFormatChange($event)"
           >
             <option value="All">All Formats</option>
@@ -133,9 +133,9 @@
       <span class="ml-2 inline-block btn btn-outline text-xs">
         Location: {{ location() }}
       </span>
-      } @if (formatId()) {
+      } @if (format()) {
       <span class="ml-2 inline-block btn btn-outline text-xs">
-        Format: {{ formatId() }}
+        Format: {{ format() }}
       </span>
       } @if (isPublic() !== undefined) {
       <span class="ml-2 inline-block btn btn-outline text-xs">

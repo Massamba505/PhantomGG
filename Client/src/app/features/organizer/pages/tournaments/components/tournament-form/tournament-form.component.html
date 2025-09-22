@@ -23,7 +23,7 @@
         <label class="form-label"
           >Tournament Format <span class="required">*</span></label
         >
-        <select class="form-select" formControlName="formatId">
+        <select class="form-select" formControlName="format">
           <option value="">Select a format</option>
           @for (format of formats(); track format.id) {
           <option [value]="format.id">
@@ -31,8 +31,8 @@
           </option>
           }
         </select>
-        @if (tournamentForm.get('formatId')?.invalid &&
-        tournamentForm.get('formatId')?.touched) {
+        @if (tournamentForm.get('format')?.invalid &&
+        tournamentForm.get('format')?.touched) {
         <div class="error-message">Please select a tournament format</div>
         }
       </div>

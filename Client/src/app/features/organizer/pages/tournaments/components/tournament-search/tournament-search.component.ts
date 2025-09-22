@@ -18,7 +18,7 @@ export class TournamentSearchComponent implements OnInit {
   searchTerm = signal('');
   selectedStatus = signal<string | undefined>(undefined);
   location = signal('');
-  formatId = signal<string | undefined>(undefined);
+  format = signal<string | undefined>(undefined);
   formats = signal<TournamentFormat[]>([]);
   startDateFrom = signal<string | undefined>(undefined);
   startDateTo = signal<string | undefined>(undefined);
@@ -29,25 +29,22 @@ export class TournamentSearchComponent implements OnInit {
         searchTerm: this.searchTerm()?.trim() || undefined,
         status: this.selectedStatus() || undefined,
         location: this.location()?.trim() || undefined,
-        formatId: this.formatId() || undefined,
+        format: this.format() || undefined,
         startDateFrom: this.startDateFrom() || undefined,
         startDateTo: this.startDateTo() || undefined,
         isPublic: this.isPublic() || undefined,
       };
     });
 
-
   ngOnInit() {
     this.getTournamentFormats();
   }
 
-  getTournamentFormats(){
-    this.tournamentService.getTournamentFormats().subscribe({
-        next:(data)=>{
-            this.formats.set(data) 
-        }
-    })
+  getTournamentFormats() {
+    const formats = this.tournamentService.getTournamentFormats();
+    this.formats.set(formats);
   }
+
 
   onSearchInput(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -71,7 +68,7 @@ export class TournamentSearchComponent implements OnInit {
     if(value == "All") {
         value = undefined;
     }
-    this.formatId.set(value);
+    this.format.set(value);
   }
 
   onStartDateFromChange(event: Event) {
@@ -106,7 +103,7 @@ export class TournamentSearchComponent implements OnInit {
     this.searchTerm.set('');
     this.selectedStatus.set(undefined);
     this.location.set('');
-    this.formatId.set(undefined);
+    this.format.set(undefined);
     this.startDateFrom.set(undefined);
     this.startDateTo.set(undefined);
     this.isPublic.set(undefined);
@@ -117,7 +114,7 @@ export class TournamentSearchComponent implements OnInit {
     return this.searchTerm() !== '' || 
            this.selectedStatus() !== undefined || 
            this.location() !== '' ||
-           this.formatId() !== undefined ||
+           this.format() !== undefined ||
            this.startDateFrom() !== undefined ||
            this.startDateTo() !== undefined ||
            this.isPublic() !== undefined;

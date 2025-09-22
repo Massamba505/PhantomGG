@@ -69,15 +69,9 @@ export class TournamentFormComponent implements OnInit {
     isPublic: [true]
   });
 
-
-  getTournamentFormats(){
-    debugger;
-    this.tournamentService.getTournamentFormats().subscribe({
-        next:(data: any)=>{
-            this.formats.set(data) 
-        }
-    });
-
+  getTournamentFormats() {
+    const formats = this.tournamentService.getTournamentFormats();
+    this.formats.set(formats);
   }
 
   ngOnInit() {

@@ -79,10 +79,8 @@ export class TournamentService {
     return this.apiClient.delete<void>(API_ENDPOINTS.TOURNAMENTS.REMOVE_TEAM(tournamentId, teamId));
   }
 
-  getTournamentFormats(): Observable<TournamentFormat[]> {
-    return new Observable(observer => {
-      observer.next(getTournamentFormats());
-      observer.complete();
-    });
+  getTournamentFormats(): TournamentFormat[] {
+    return getTournamentFormats();
   }
+
 }
