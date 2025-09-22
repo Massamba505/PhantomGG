@@ -29,7 +29,7 @@
     }
 
     <nav class="space-y-1">
-      @for (item of menuItems; track item.title) {
+      @for (item of menuItems; track $index) {
       @if(item.roles.includes(userRole())) {
       <a
         [routerLink]="item.url"

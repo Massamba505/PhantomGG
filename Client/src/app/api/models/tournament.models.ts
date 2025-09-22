@@ -20,6 +20,7 @@ export interface Tournament {
   updatedAt?: string;
   isPublic: boolean;
   teamCount: number;
+  pendingTeamCount: number;
   matchCount: number;
 }
 

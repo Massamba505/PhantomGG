@@ -23,5 +23,6 @@ public class TournamentDto
     public DateTime? UpdatedAt { get; set; }
     public bool IsPublic { get; set; }
     public int TeamCount { get; set; }
+    public int PendingTeamCount { get; set; }
     public int MatchCount { get; set; }
 }

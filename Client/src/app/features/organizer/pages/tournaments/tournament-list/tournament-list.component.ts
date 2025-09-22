@@ -3,17 +3,19 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
 import { PaginatedResponse } from '@/app/api/models/api.models';
-import { TournamentCardComponent } from '../components/tournament-card/tournament-card.component';
+import { TournamentCard } from '@/app/shared/components/cards';
 import { TournamentSearchComponent } from '../components/tournament-search/tournament-search.component';
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
 import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentService } from '@/app/api/services';
+import { AuthStateService } from '@/app/store/AuthStateService';
+import { Roles } from '@/app/shared/constants/roles';
 
 @Component({
   selector: 'app-tournament-list',
   imports: [
     CommonModule,
-    TournamentCardComponent,
+    TournamentCard,
     TournamentSearchComponent,
     ConfirmDeleteModal
 ],
@@ -24,12 +26,20 @@ export class TournamentListComponent implements OnInit {
   private tournamentService = inject(TournamentService);
   private router = inject(Router);
   private toastService = inject(ToastService);
+  private authStateStore = inject(AuthStateService);
 
   tournaments = signal<Tournament[]>([]);
   isLoading = signal(false);
   isDeleteModalOpen = signal(false);
   tournamentToDelete = signal<Tournament | null>(null);
   isDeleting = signal(false);
+
+  isOrganizer = computed(()=>{
+    if(!this.authStateStore.isAuthenticated()){
+      return false;
+    }
+    return this.authStateStore.user()!.role == Roles.Organizer;
+  })
   
   searchCriteria = signal<TournamentSearch>({
     searchTerm: undefined,
@@ -125,12 +135,15 @@ export class TournamentListComponent implements OnInit {
         this.router.navigate(['/organizer/tournaments', action.tournament.id]);
         break;
       case 'delete':
-        this.deleteTournament(action.tournament);
+        this.deleteTournament(action.tournament.id);
         break;
     }
   }
 
-  deleteTournament(tournament: Tournament) {
+  deleteTournament(tournamentId: string) {
+    const tournament = this.tournaments().find(t => t.id === tournamentId);
+    if (!tournament) return;
+    
     this.tournamentToDelete.set(tournament);
     this.isDeleteModalOpen.set(true);
   }

@@ -28,7 +28,8 @@ public static class TournamentMappings
             CreatedAt = tournament.CreatedAt,
             UpdatedAt = tournament.UpdatedAt,
             IsPublic = tournament.IsPublic,
-            TeamCount = tournament.TournamentTeams?.Count ?? 0,
+            TeamCount = tournament.TournamentTeams?.Where(t => t.Status == TeamRegistrationStatus.Approved.ToString()).Count() ?? 0,
+            PendingTeamCount = tournament.TournamentTeams?.Where(t => t.Status == TeamRegistrationStatus.Pending.ToString()).Count() ?? 0,
             MatchCount = tournament.Matches?.Count ?? 0
         };
     }

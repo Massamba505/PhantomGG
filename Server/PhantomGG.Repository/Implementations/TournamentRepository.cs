@@ -16,6 +16,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         return await _context.Tournaments
             .Include(t => t.Organizer)
+            .Include(t => t.TournamentTeams)
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
@@ -23,6 +24,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         return await _context.Tournaments
             .Include(t => t.Organizer)
+            .Include(t => t.TournamentTeams)
             .Where(t => t.IsPublic)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
@@ -32,6 +34,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         return await _context.Tournaments
             .Include(t => t.Organizer)
+            .Include(t => t.TournamentTeams)
             .Where(t => t.OrganizerId == organizerId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
@@ -41,10 +44,12 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         var organizerTournaments = _context.Tournaments
             .Include(t => t.Organizer)
+            .Include(t => t.TournamentTeams)
             .Where(t => t.OrganizerId == userId);
 
         var participantTournaments = _context.Tournaments
             .Include(t => t.Organizer)
+            .Include(t => t.TournamentTeams)
             .Where(t => t.TournamentTeams.Any(tt => tt.Team.UserId == userId));
 
         var allTournaments = await organizerTournaments
@@ -60,6 +65,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         return await _context.Tournaments
             .Include(t => t.TournamentTeams)
+            .Include(t => t.TournamentTeams)
             .Where(t => t.TournamentTeams.Any(tt => tt.TeamId == teamId))
             .OrderBy(t => t.StartDate)
             .ToListAsync();
@@ -69,6 +75,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         var query = _context.Tournaments
             .Include(t => t.Organizer)
+            .Include(t => t.TournamentTeams)
             .AsQueryable();
 
         if (organizerId.HasValue)

@@ -72,8 +72,12 @@ public class TeamService(
             var logoUrl = await UploadLogoAsync(team, createDto.LogoUrl);
             team.LogoUrl = logoUrl;
         }
+        else
+        {
+            team.LogoUrl = $"https://placehold.co/200x200?text={team.Name}"
+        }
 
-        var createdTeam = await _teamRepository.CreateAsync(team);
+            var createdTeam = await _teamRepository.CreateAsync(team);
 
         return createdTeam.ToDto();
     }

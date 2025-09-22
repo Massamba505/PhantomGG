@@ -64,7 +64,7 @@ export class TournamentDetailsComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['../..'], { relativeTo: this.route });
+    this.router.navigate(['/organizer/tournaments']);
   }
 
   deleteTournament() {
