@@ -11,7 +11,7 @@ public interface ITeamService
     Task<PaginatedResponse<TeamDto>> SearchAsync(TeamSearchDto searchDto);
     Task<TeamDto> GetByIdAsync(Guid id);
     Task<IEnumerable<PlayerDto>> GetTeamPlayersAsync(Guid teamId);
-    Task<IEnumerable<TeamDto>> GetMyTeamsAsync(Guid userId);
+    Task<PaginatedResponse<TeamDto>> GetMyTeamsAsync(TeamSearchDto searchDto, Guid userId);
     Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid userId);
     Task<TeamDto> UpdateAsync(Guid id, UpdateTeamDto updateDto, Guid userId);
     Task DeleteAsync(Guid id, Guid userId);

@@ -28,8 +28,8 @@ export class TeamService {
     return this.apiClient.get<any[]>(API_ENDPOINTS.TEAMS.PLAYERS(id));
   }
 
-  getMyTeams(): Observable<Team[]> {
-    return this.apiClient.get<Team[]>(API_ENDPOINTS.TEAMS.MY_TEAMS);
+  getMyTeams(params?: TeamSearch): Observable<PaginatedResponse<Team>> {
+    return this.apiClient.getPaginated<Team>(API_ENDPOINTS.TEAMS.MY_TEAMS, params);
   }
 
   createTeam(team: CreateTeam): Observable<Team> {

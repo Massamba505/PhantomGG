@@ -67,10 +67,11 @@ public class TeamsController(
     /// </summary>
     [HttpGet("my-teams")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> GetMyTeams()
+    public async Task<ActionResult<ApiResponse>> GetMyTeams([FromQuery] TeamSearchDto searchDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        var teams = await _teamService.GetMyTeamsAsync(currentUser.Id);
+        var teams = await _teamService.GetMyTeamsAsync(searchDto, currentUser.Id);
+
         return Ok(new ApiResponse
         {
             Success = true,

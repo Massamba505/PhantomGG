@@ -154,8 +154,8 @@ export class UserDashboard implements OnInit {
 
   loadMyTeams() {
     this.teamService.getMyTeams().subscribe({
-      next: (teams) => {
-        this.myTeams.set(teams);
+      next: (response) => {
+        this.myTeams.set(response.data);
       },
       error: (error) => {
         console.error('Failed to load teams:', error);

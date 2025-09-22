@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
+import { Component, signal, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -8,9 +8,11 @@ import { TeamService } from '@/app/api/services/team.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
 import { Team } from '@/app/api/models/team.models';
+import { PaginatedResponse } from '@/app/api/models/api.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamSelectionModalComponent } from './components/team-selection-modal/team-selection-modal.component';
 import { TournamentCard } from '@/app/shared/components/cards/tournament-card/tournament-card';
+import { TournamentSearchComponent } from './components/tournament-search/tournament-search.component';
 
 @Component({
   selector: 'app-user-tournaments',
@@ -20,7 +22,8 @@ import { TournamentCard } from '@/app/shared/components/cards/tournament-card/to
     FormsModule,
     LucideAngularModule,
     TeamSelectionModalComponent,
-    TournamentCard
+    TournamentCard,
+    TournamentSearchComponent
   ],
   templateUrl: './user-tournaments.html',
   styleUrl: './user-tournaments.css'
@@ -37,7 +40,26 @@ export class UserTournaments implements OnInit {
   myTeams = signal<Team[]>([]);
   isLoading = signal(false);
   isJoiningTournament = signal(false);
-  searchCriteria = signal<Partial<TournamentSearch>>({});
+  
+  searchCriteria = signal<TournamentSearch>({
+    searchTerm: undefined,
+    status: undefined,
+    location: undefined,
+    startDateFrom: undefined,
+    startDateTo: undefined,
+    isPublic: undefined,
+    pageNumber: 1,
+    pageSize: 6
+  });
+
+  paginationData = signal<PaginatedResponse<Tournament> | null>(null);
+  
+  // Computed properties for pagination
+  totalRecords = computed(() => this.paginationData()?.totalRecords ?? 0);
+  totalPages = computed(() => this.paginationData()?.totalPages ?? 0);
+  currentPage = computed(() => this.paginationData()?.pageNumber ?? 1);
+  hasNextPage = computed(() => this.paginationData()?.hasNextPage ?? false);
+  hasPreviousPage = computed(() => this.paginationData()?.hasPreviousPage ?? false);
   
   showTeamSelectionModal = signal(false);
   selectedTournament = signal<Tournament | null>(null);
@@ -53,6 +75,7 @@ export class UserTournaments implements OnInit {
     this.tournamentService.getTournaments(this.searchCriteria()).subscribe({
       next: (response) => {
         this.tournaments.set(response.data);
+        this.paginationData.set(response);
       },
       error: (error) => {
         console.error('Failed to load tournaments:', error);
@@ -66,8 +89,8 @@ export class UserTournaments implements OnInit {
 
   loadMyTeams() {
     this.teamService.getMyTeams().subscribe({
-      next: (teams) => {
-        this.myTeams.set(teams);
+      next: (response) => {
+        this.myTeams.set(response.data);
       },
       error: (error) => {
         console.error('Failed to load teams:', error);
@@ -76,8 +99,64 @@ export class UserTournaments implements OnInit {
   }
 
   onSearchChange(searchCriteria: Partial<TournamentSearch>) {
-    this.searchCriteria.set(searchCriteria);
+    this.searchCriteria.update(current => ({
+      ...current,
+      ...searchCriteria,
+      pageNumber: 1  // Reset to first page on new search
+    }));
     this.loadTournaments();
+  }
+
+  onClearSearch() {
+    this.searchCriteria.set({
+      searchTerm: undefined,
+      status: undefined,
+      location: undefined,
+      startDateFrom: undefined,
+      startDateTo: undefined,
+      isPublic: undefined,
+      pageNumber: 1,
+      pageSize: 6
+    });
+    this.loadTournaments();
+  }
+
+  onPageChange(pageNumber: number) {
+    this.searchCriteria.update(current => ({
+      ...current,
+      pageNumber
+    }));
+    this.loadTournaments();
+  }
+
+  onPageSizeChange(pageSize: number) {
+    this.searchCriteria.update(current => ({
+      ...current,
+      pageSize,
+      pageNumber: 1  // Reset to first page
+    }));
+    this.loadTournaments();
+  }
+
+  onPageSizeSelectChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.onPageSizeChange(+target.value);
+  }
+
+  getPageNumbers(): number[] {
+    const current = this.currentPage();
+    const total = this.totalPages();
+    const delta = 2;
+    
+    const range: number[] = [];
+    const start = Math.max(1, current - delta);
+    const end = Math.min(total, current + delta);
+    
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    
+    return range;
   }
 
   joinTournament(tournament: Tournament) {

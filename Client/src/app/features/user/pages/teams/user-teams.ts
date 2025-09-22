@@ -9,6 +9,7 @@ import { Team, TeamSearch } from '@/app/api/models/team.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamCard, TeamCardConfig } from '@/app/shared/components/cards/team-card/team-card';
 import { AuthStateService } from '@/app/store/AuthStateService';
+import { TeamSearchComponent } from './components/team-search/team-search.component';
 
 @Component({
   selector: 'app-user-teams',
@@ -17,7 +18,8 @@ import { AuthStateService } from '@/app/store/AuthStateService';
     RouterModule,
     FormsModule,
     LucideAngularModule,
-    TeamCard
+    TeamCard,
+    TeamSearchComponent
   ],
   templateUrl: './user-teams.html',
   styleUrl: './user-teams.css'
@@ -29,8 +31,13 @@ export class UserTeams implements OnInit {
   private authStateStore = inject(AuthStateService);
   
   readonly icons = LucideIcons;
+  readonly Math = Math;
   
   teams = signal<Team[]>([]);
+  totalCount = signal(0);
+  currentPage = signal(1);
+  pageSize = signal(6);
+  totalPages = signal(0);
   isLoading = signal(false);
   searchCriteria = signal<Partial<TeamSearch>>({});
 
@@ -50,9 +57,21 @@ export class UserTeams implements OnInit {
   loadMyTeams() {
     this.isLoading.set(true);
     
-    this.teamService.getMyTeams().subscribe({
-      next: (teams) => {
-        this.teams.set(teams);
+    const searchParams: TeamSearch = {
+      pageNumber: this.currentPage(),
+      pageSize: this.pageSize(),
+      ...this.searchCriteria()
+    };
+    
+    this.teamService.getMyTeams(searchParams).subscribe({
+      next: (response) => {
+        this.teams.set(response.data);
+        this.totalCount.set(response.totalRecords);
+        this.totalPages.set(response.totalPages);
+      },
+      error: (error) => {
+        console.error('Failed to load teams:', error);
+        this.toastService.error('Failed to load teams');
       },
       complete: () => {
         this.isLoading.set(false);
@@ -62,25 +81,81 @@ export class UserTeams implements OnInit {
 
   onSearchChange(searchCriteria: Partial<TeamSearch>) {
     this.searchCriteria.set(searchCriteria);
-    this.searchTeams();
+    this.currentPage.set(1); 
+    this.loadMyTeams();
   }
 
   onClearSearch() {
     this.searchCriteria.set({});
+    this.currentPage.set(1);
     this.loadMyTeams();
   }
 
-  private searchTeams() {
-    this.isLoading.set(true);
+  // Pagination methods
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.loadMyTeams();
+    }
+  }
+
+  onPageChange(page: number) {
+    this.goToPage(page);
+  }
+
+  onPageSizeSelectChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    const newPageSize = parseInt(target.value);
+    this.pageSize.set(newPageSize);
+    this.currentPage.set(1); // Reset to first page when changing page size
+    this.loadMyTeams();
+  }
+
+  hasPreviousPage(): boolean {
+    return this.currentPage() > 1;
+  }
+
+  hasNextPage(): boolean {
+    return this.currentPage() < this.totalPages();
+  }
+
+  previousPage() {
+    if (this.hasPreviousPage()) {
+      this.onPageChange(this.currentPage() - 1);
+    }
+  }
+
+  nextPage() {
+    if (this.hasNextPage()) {
+      this.onPageChange(this.currentPage() + 1);
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
     
-    this.teamService.getTeams(this.searchCriteria()).subscribe({
-      next: (response) => {
-        this.teams.set(response.data);
-      },
-      complete: () => {
-        this.isLoading.set(false);
+    if (total <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
       }
-    });
+    } else {
+      // Show smart pagination
+      const start = Math.max(1, current - 2);
+      const end = Math.min(total, current + 2);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  }
+
+  get pageNumbers(): number[] {
+    return this.getPageNumbers();
   }
 
   onTeamEdit(team: Team) {

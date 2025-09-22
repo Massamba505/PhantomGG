@@ -56,10 +56,22 @@ public class TeamService(
         return players.Select(p => p.ToDto());
     }
 
-    public async Task<IEnumerable<TeamDto>> GetMyTeamsAsync(Guid userId)
+    public async Task<PaginatedResponse<TeamDto>> GetMyTeamsAsync(TeamSearchDto searchDto, Guid userId)
     {
-        var teams = await _teamRepository.GetByUserAsync(userId);
-        return teams.Select(t => t.ToDto());
+        var teams = await _teamRepository.SearchAsync(searchDto, userId:userId);
+        var teamDtos = teams.Select(t => t.ToDto());
+        var totalCount = teamDtos.Count();
+
+        return new PaginatedResponse<TeamDto>
+        {
+            Data = teamDtos,
+            TotalRecords = totalCount,
+            PageNumber = searchDto.Page,
+            PageSize = searchDto.PageSize
+        };
+
+        //var teams = await _teamRepository.GetByUserAsync(userId);
+        //return teams.Select(t => t.ToDto());
     }
 
     public async Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid managerId)

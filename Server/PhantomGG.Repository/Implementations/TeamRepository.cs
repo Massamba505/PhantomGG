@@ -59,12 +59,17 @@ public class TeamRepository(PhantomContext context) : ITeamRepository
         }
     }
 
-    public async Task<IEnumerable<Team>> SearchAsync(TeamSearchDto searchDto)
+    public async Task<IEnumerable<Team>> SearchAsync(TeamSearchDto searchDto, Guid? userId)
     {
         var query = _context.Teams
             .Include(t => t.Players)
             .OrderByDescending(t => t.CreatedAt)
             .AsQueryable();
+
+        if (userId.HasValue)
+        {
+            query = query.Where(t => t.UserId == userId.Value);
+        }
 
         if (!string.IsNullOrEmpty(searchDto.SearchTerm))
         {
