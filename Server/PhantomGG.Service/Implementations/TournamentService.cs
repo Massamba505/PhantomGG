@@ -275,7 +275,9 @@ public class TournamentService(
     {
         var tournament = await ValidateTournamentExistsAsync(tournamentId);
         if (tournament.OrganizerId != organizerId)
-            throw new UnauthorizedException("You don't have permission to access this tournament");
+        {
+            throw new UnauthorizedException("You don't have permission to this tournament");
+        }
 
         return tournament;
     }

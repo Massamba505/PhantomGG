@@ -57,7 +57,7 @@ export class TournamentListComponent implements OnInit {
   loadTournaments() {
     this.isLoading.set(true);
 
-    this.tournamentService.getTournaments(this.searchCriteria()).subscribe({
+    this.tournamentService.getMyTournaments(this.searchCriteria()).subscribe({
       next: (response) => {
         this.tournaments.set(response.data);
         this.paginationData.set(response);
@@ -147,6 +147,7 @@ export class TournamentListComponent implements OnInit {
         this.closeDeleteModal();
       },
       error: (error) => {
+        debugger;
         this.closeDeleteModal()
         this.isDeleting.set(false);
       }
