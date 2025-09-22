@@ -10,6 +10,7 @@ import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models
 import { Team } from '@/app/api/models/team.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamSelectionModalComponent } from './components/team-selection-modal/team-selection-modal.component';
+import { TournamentCard } from '@/app/shared/components/cards/tournament-card/tournament-card';
 
 @Component({
   selector: 'app-user-tournaments',
@@ -18,7 +19,8 @@ import { TeamSelectionModalComponent } from './components/team-selection-modal/t
     RouterModule,
     FormsModule,
     LucideAngularModule,
-    TeamSelectionModalComponent
+    TeamSelectionModalComponent,
+    TournamentCard
   ],
   templateUrl: './user-tournaments.html',
   styleUrl: './user-tournaments.css'
@@ -136,5 +138,19 @@ export class UserTournaments implements OnInit {
 
   getRegistrationStatus(tournament: Tournament): string {
     return tournament.status;
+  }
+
+  // Tournament card event handlers
+  onTournamentJoin(tournament: Tournament) {
+    this.joinTournament(tournament);
+  }
+
+  onTournamentView(tournament: Tournament) {
+    this.router.navigate(['/user/tournaments', tournament.id]);
+  }
+
+  onTournamentLeave(tournament: Tournament) {
+    // Implementation for leaving tournament if needed
+    console.log('Leave tournament:', tournament);
   }
 }
