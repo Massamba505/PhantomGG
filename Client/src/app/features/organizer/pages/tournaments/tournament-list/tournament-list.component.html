@@ -4,7 +4,10 @@
   </button>
 </div>
 
-<app-tournament-search (searchChange)="onSearchChange($event)" />
+<app-tournament-search
+  (clearFiltersSearch)="onClearSearh()"
+  (searchChange)="onSearchChange($event)"
+/>
 
 @if (isLoading()) {
 <div class="text-center py-12">
@@ -18,10 +21,7 @@
   <h3 class="text-lg font-semibold mb-2">No tournaments found</h3>
   @if (searchCriteria().searchTerm || searchCriteria().status) {
   <p class="opacity-75 mb-4">No tournaments match your search criteria.</p>
-  <button
-    class="btn btn-secondary mr-2"
-    (click)="onSearchChange({ searchTerm: '', status: undefined })"
-  >
+  <button class="btn btn-secondary mr-2" (click)="onClearSearh()">
     Clear Filters
   </button>
   } @else {

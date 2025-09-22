@@ -62,7 +62,7 @@
           <input
             type="text"
             class="input-field"
-            placeholder="Venue..."
+            placeholder="location..."
             [value]="location()"
             (input)="onLocationInput($event)"
           />
@@ -96,31 +96,6 @@
             <option value="false">Private Only</option>
           </select>
         </div>
-
-        <div>
-          <label class="form-label">Min Prize Pool (R)</label>
-          <input
-            type="number"
-            class="input-field"
-            placeholder="0"
-            min="0"
-            [value]="minPrizePool() || ''"
-            (input)="onMinPrizePoolInput($event)"
-          />
-        </div>
-
-        <div>
-          <label class="form-label">Max Prize Pool (R)</label>
-          <input
-            type="number"
-            class="input-field"
-            placeholder="No limit"
-            min="0"
-            [value]="maxPrizePool() || ''"
-            (input)="onMaxPrizePoolInput($event)"
-          />
-        </div>
-
         <div>
           <label class="form-label">Start Date From</label>
           <input
@@ -161,14 +136,6 @@
       } @if (formatId()) {
       <span class="ml-2 inline-block btn btn-outline text-xs">
         Format: {{ formatId() }}
-      </span>
-      } @if (minPrizePool()) {
-      <span class="ml-2 inline-block btn btn-outline text-xs">
-        Min Prize: R{{ minPrizePool() }}
-      </span>
-      } @if (maxPrizePool()) {
-      <span class="ml-2 inline-block btn btn-outline text-xs">
-        Max Prize: R{{ maxPrizePool() }}
       </span>
       } @if (isPublic() !== undefined) {
       <span class="ml-2 inline-block btn btn-outline text-xs">

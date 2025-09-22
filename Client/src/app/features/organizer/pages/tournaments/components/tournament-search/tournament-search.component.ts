@@ -12,6 +12,7 @@ import { TournamentService } from '@/app/api/services';
 })
 export class TournamentSearchComponent implements OnInit {
   @Output() searchChange = new EventEmitter<Partial<TournamentSearch>>();
+  @Output() clearFiltersSearch = new EventEmitter<void>();
   private tournamentService = inject(TournamentService);
 
   searchTerm = signal('');
@@ -19,8 +20,6 @@ export class TournamentSearchComponent implements OnInit {
   location = signal('');
   formatId = signal<string | undefined>(undefined);
   formats = signal<TournamentFormat[]>([]);
-  minPrizePool = signal<number | undefined>(undefined);
-  maxPrizePool = signal<number | undefined>(undefined);
   startDateFrom = signal<string | undefined>(undefined);
   startDateTo = signal<string | undefined>(undefined);
   isPublic = signal<boolean | undefined>(undefined);
@@ -31,8 +30,6 @@ export class TournamentSearchComponent implements OnInit {
         status: this.selectedStatus() || undefined,
         location: this.location()?.trim() || undefined,
         formatId: this.formatId() || undefined,
-        minPrizePool: this.minPrizePool() || undefined,
-        maxPrizePool: this.maxPrizePool() || undefined,
         startDateFrom: this.startDateFrom() || undefined,
         startDateTo: this.startDateTo() || undefined,
         isPublic: this.isPublic() || undefined,
@@ -77,18 +74,6 @@ export class TournamentSearchComponent implements OnInit {
     this.formatId.set(value);
   }
 
-  onMinPrizePoolInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const value = target.value ? +target.value : undefined;
-    this.minPrizePool.set(value);
-  }
-
-  onMaxPrizePoolInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const value = target.value ? +target.value : undefined;
-    this.maxPrizePool.set(value);
-  }
-
   onStartDateFromChange(event: Event) {
     const target = event.target as HTMLInputElement;
     const value = target.value || undefined;
@@ -122,11 +107,10 @@ export class TournamentSearchComponent implements OnInit {
     this.selectedStatus.set(undefined);
     this.location.set('');
     this.formatId.set(undefined);
-    this.minPrizePool.set(undefined);
-    this.maxPrizePool.set(undefined);
     this.startDateFrom.set(undefined);
     this.startDateTo.set(undefined);
     this.isPublic.set(undefined);
+    this.clearFiltersSearch.emit();
   }
 
   hasFilters(): boolean {
@@ -134,8 +118,6 @@ export class TournamentSearchComponent implements OnInit {
            this.selectedStatus() !== undefined || 
            this.location() !== '' ||
            this.formatId() !== undefined ||
-           this.minPrizePool() !== undefined ||
-           this.maxPrizePool() !== undefined ||
            this.startDateFrom() !== undefined ||
            this.startDateTo() !== undefined ||
            this.isPublic() !== undefined;

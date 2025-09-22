@@ -77,6 +77,20 @@ export class TournamentListComponent implements OnInit {
     this.loadTournaments();
   }
 
+  onClearSearh(){
+    this.searchCriteria.set({
+      searchTerm: undefined,
+      status: undefined,
+      location: undefined,
+      startDateFrom: undefined,
+      startDateTo: undefined,
+      isPublic: undefined,
+      pageNumber: 1,
+      pageSize: 6
+    });
+    this.loadTournaments();
+  }
+
   onPageChange(pageNumber: number) {
     this.searchCriteria.update(current => ({
       ...current,
