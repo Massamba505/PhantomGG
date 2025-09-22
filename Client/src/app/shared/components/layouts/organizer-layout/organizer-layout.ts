@@ -3,8 +3,8 @@ import {
   signal,
   computed,
   OnInit,
-  OnDestroy,
   inject,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -22,12 +22,12 @@ import { map } from 'rxjs';
   templateUrl: './organizer-layout.html',
   styleUrls: ['./organizer-layout.css'],
 })
-export class OrganizerLayout implements OnInit, OnDestroy {
+export class OrganizerLayout implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private authState = inject(AuthStateService);
 
-  sidebarOpen = signal(window.innerWidth > 900);
+  sidebarOpen = signal(false);
   pageTitle = signal('Dashboard');
   userRole = computed<Roles>(() => {
     const role = this.authState.user()?.role as Roles;
@@ -35,8 +35,6 @@ export class OrganizerLayout implements OnInit, OnDestroy {
   });
 
   ngOnInit() {
-    window.addEventListener('resize', this.handleResize);
-
     this.router.events
       .pipe(
         map(() => {
@@ -53,15 +51,7 @@ export class OrganizerLayout implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
-    window.removeEventListener('resize', this.handleResize);
-  }
-
-  handleResize = () => {
-    this.sidebarOpen.set(window.innerWidth > 900);
-  };
-
-  toggleSidebar() {
-    this.sidebarOpen.update((prev) => !prev);
+  onSidebarStateChange(state: boolean) {
+    this.sidebarOpen.set(state);
   }
 }

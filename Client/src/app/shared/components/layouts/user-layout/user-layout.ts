@@ -3,7 +3,6 @@ import {
   signal,
   computed,
   OnInit,
-  OnDestroy,
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -22,12 +21,12 @@ import { map } from 'rxjs';
   templateUrl: './user-layout.html',
   styleUrls: ['./user-layout.css'],
 })
-export class UserLayout implements OnInit, OnDestroy {
+export class UserLayout implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private authState = inject(AuthStateService);
 
-  sidebarOpen = signal(window.innerWidth > 900);
+  sidebarOpen = signal(true);
   pageTitle = signal('Dashboard');
   userRole = computed<Roles>(() => {
     const role = this.authState.user()?.role as Roles;
@@ -35,8 +34,6 @@ export class UserLayout implements OnInit, OnDestroy {
   });
 
   ngOnInit() {
-    window.addEventListener('resize', this.handleResize);
-
     this.router.events
       .pipe(
         map(() => {
@@ -53,15 +50,7 @@ export class UserLayout implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
-    window.removeEventListener('resize', this.handleResize);
-  }
-
-  handleResize = () => {
-    this.sidebarOpen.set(window.innerWidth > 900);
-  };
-
-  toggleSidebar() {
-    this.sidebarOpen.update((prev) => !prev);
+  onSidebarStateChange(state: boolean) {
+    this.sidebarOpen.set(state);
   }
 }

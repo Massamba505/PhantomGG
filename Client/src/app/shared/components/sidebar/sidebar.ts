@@ -2,10 +2,9 @@ import {
   Component,
   input,
   output,
+  signal,
   OnInit,
   OnDestroy,
-  signal,
-  computed,
   effect,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -28,18 +27,16 @@ interface MenuItem {
   templateUrl: './sidebar.html',
 })
 export class Sidebar implements OnInit, OnDestroy {
-  isOpen = input<boolean>(true);
   userRole = input.required<Roles>();
   toggle = output<void>();
+  stateChange = output<boolean>();
+  
   readonly icons = LucideIcons;
 
-  private internalOpen = signal(true);
-  
-  actuallyOpen = computed(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth > 900 ? this.isOpen() : this.internalOpen();
-    }
-    return this.isOpen();
+  isOpen = signal(window.innerWidth > 900);
+
+  private stateEffect = effect(() => {
+    this.stateChange.emit(this.isOpen());
   });
 
   readonly MenuIcon = this.icons.MenuIcon;
@@ -88,6 +85,11 @@ export class Sidebar implements OnInit, OnDestroy {
   }
 
   handleResize = () => {
-    this.internalOpen.set(window.innerWidth > 900);
+    this.isOpen.set(window.innerWidth > 900);
   };
+
+  onToggle() {
+    this.isOpen.update(prev => !prev);
+    this.toggle.emit();
+  }
 }

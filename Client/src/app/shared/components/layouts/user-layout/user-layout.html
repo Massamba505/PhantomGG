@@ -1,8 +1,7 @@
 <div class="flex h-screen overflow-hidden">
   <app-sidebar
-    [isOpen]="sidebarOpen()"
     [userRole]="userRole()"
-    (toggle)="toggleSidebar()"
+    (stateChange)="onSidebarStateChange($event)"
   ></app-sidebar>
 
   <div
