@@ -35,6 +35,7 @@ export const routes: Routes = [
   {
     path: 'user',
     canActivate: [authGuard],
+    data: { roles: [Roles.User] },
     children: userRoutes,
   },
   {
