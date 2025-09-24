@@ -33,12 +33,13 @@ export class TeamForm implements OnInit {
   isEditMode = signal(false);
   teamId = signal<string | null>(null);
   team = signal<Team | null>(null);
+  logoPreview = signal<string | null>(null);
 
   constructor() {
     this.teamForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      shortName: ['', [Validators.maxLength(5)]],
-      logoUrl: ['']
+      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(200)]],
+      shortName: ['', [Validators.maxLength(10)]],
+      logo: [null]
     });
   }
 
@@ -60,8 +61,12 @@ export class TeamForm implements OnInit {
         this.teamForm.patchValue({
           name: team.name,
           shortName: team.shortName,
-          logoUrl: team.logoUrl
+          logo: null // Don't set existing logo file
         });
+        // Set logo preview if team has logoUrl
+        if (team.logoUrl) {
+          this.logoPreview.set(team.logoUrl);
+        }
       },
       error: (error) => {
         console.error('Failed to load team:', error);
@@ -94,10 +99,8 @@ export class TeamForm implements OnInit {
     const createDto: CreateTeam = {
       name: formValue.name,
       shortName: formValue.shortName || undefined,
-      managerName: '', // This will be set from current user on backend
-      logoUrl: formValue.logoUrl ? new File([], '') : undefined, // Handle file upload separately
-      teamPhotoUrl: undefined,
-      tournamentId: '' // Not needed for team creation
+      logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
+      teamPhotoUrl: undefined
     };
 
     this.teamService.createTeam(createDto).subscribe({
@@ -120,7 +123,8 @@ export class TeamForm implements OnInit {
     const updateDto: UpdateTeam = {
       name: formValue.name,
       shortName: formValue.shortName || undefined,
-      logoUrl: formValue.logoUrl
+      logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
+      teamPhotoUrl: undefined
     };
 
     this.teamService.updateTeam(this.teamId()!, updateDto).subscribe({
@@ -140,6 +144,21 @@ export class TeamForm implements OnInit {
 
   goBack() {
     this.router.navigate(['/user/teams']);
+  }
+
+  // Handle file upload
+  onLogoChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      const file = target.files[0];
+      this.teamForm.patchValue({ logo: file });
+      this.teamForm.get('logo')?.updateValueAndValidity();
+
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = () => this.logoPreview.set(reader.result as string);
+      reader.readAsDataURL(file);
+    }
   }
 
   // Form field helper methods

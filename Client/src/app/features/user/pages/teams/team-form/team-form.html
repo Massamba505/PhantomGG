@@ -57,8 +57,8 @@
         formControlName="shortName"
         class="input-field"
         [class.border-red-500]="isFieldInvalid('shortName')"
-        placeholder="Enter team abbreviation (max 5 characters)"
-        maxlength="5"
+        placeholder="Enter team abbreviation (max 10 characters)"
+        maxlength="10"
       />
       @if (getFieldError('shortName')) {
       <p class="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -70,23 +70,40 @@
       </p>
     </div>
 
-    <!-- Logo URL (temporary until file upload is implemented) -->
+    <!-- Team Logo -->
     <div>
       <label
-        for="logoUrl"
+        for="logo"
         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
       >
-        Logo URL
+        Team Logo
       </label>
+
+      @if (logoPreview()) {
+      <div class="mb-4">
+        <img
+          [src]="logoPreview()"
+          alt="Team Logo"
+          class="h-32 w-32 object-contain rounded-lg shadow mx-auto"
+        />
+      </div>
+      }
+
       <input
-        id="logoUrl"
-        type="url"
-        formControlName="logoUrl"
+        id="logo"
+        type="file"
+        accept="image/*"
+        (change)="onLogoChange($event)"
         class="input-field"
-        placeholder="Enter logo URL (optional)"
+        [class.border-red-500]="isFieldInvalid('logo')"
       />
+      @if (getFieldError('logo')) {
+      <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+        {{ getFieldError("logo") }}
+      </p>
+      }
       <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        Optional: URL to your team's logo image
+        Optional: Upload your team's logo image (JPEG, PNG)
       </p>
     </div>
 

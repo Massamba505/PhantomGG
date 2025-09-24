@@ -12,10 +12,6 @@ public class CreateTeamDto
     [StringLength(10)]
     public string? ShortName { get; set; }
 
-    [Required]
-    [StringLength(100, MinimumLength = 2)]
-    public string ManagerName { get; set; } = string.Empty;
-
     public IFormFile? LogoUrl { get; set; }
 
     public IFormFile? TeamPhotoUrl { get; set; }

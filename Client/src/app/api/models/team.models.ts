@@ -22,16 +22,15 @@ export interface TournamentTeam {
 export interface CreateTeam {
   name: string;
   shortName?: string;
-  managerName: string;
   logoUrl?: File;
   teamPhotoUrl?: File;
-  tournamentId: string;
 }
 
 export interface UpdateTeam {
-  name?: string;
+  name: string;
   shortName?: string;
-  logoUrl?: string;
+  logoUrl?: File;
+  teamPhotoUrl?: File;
 }
 
 export interface TeamSearch {

@@ -1,14 +1,10 @@
 <div class="mb-2">
   <button class="btn btn-outline" (click)="goBack()">
     <lucide-angular [img]="icons.ArrowLeft" [size]="20"></lucide-angular>
-    Back to Teams
+    Back
   </button>
 </div>
 
-<div class="max-w-4xl">
-  <app-team-form
-    [loadingState]="saving()"
-    (formSubmit)="onSubmit($event)"
-    (formCancel)="goBack()"
-  />
+<div class="max-w-xl">
+  <app-team-form (formSubmit)="onSubmit($event)" (formCancel)="goBack()" />
 </div>

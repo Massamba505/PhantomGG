@@ -71,4 +71,14 @@ export class ApiClient {
     return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData)
       .pipe(map(response => response.data!));
   }
+
+  postFormData<T>(endpoint: string, formData: FormData): Observable<T> {
+    return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData)
+      .pipe(map(response => response.data!));
+  }
+
+  putFormData<T>(endpoint: string, formData: FormData): Observable<T> {
+    return this.http.put<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData)
+      .pipe(map(response => response.data!));
+  }
 }

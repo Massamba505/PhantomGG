@@ -85,7 +85,7 @@ public class TeamsController(
     /// </summary>
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> CreateTeam([FromBody] CreateTeamDto createDto)
+    public async Task<ActionResult<ApiResponse>> CreateTeam([FromForm] CreateTeamDto createDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
         var team = await _teamService.CreateAsync(createDto, currentUser.Id);
@@ -105,7 +105,7 @@ public class TeamsController(
     /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> UpdateTeam(Guid id, [FromBody] UpdateTeamDto updateDto)
+    public async Task<ActionResult<ApiResponse>> UpdateTeam(Guid id, [FromForm] UpdateTeamDto updateDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
         var team = await _teamService.UpdateAsync(id, updateDto, currentUser.Id);

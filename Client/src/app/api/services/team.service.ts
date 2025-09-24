@@ -33,11 +33,35 @@ export class TeamService {
   }
 
   createTeam(team: CreateTeam): Observable<Team> {
-    return this.apiClient.post<Team>(API_ENDPOINTS.TEAMS.CREATE, team);
+    const formData = new FormData();
+    formData.append('Name', team.name);
+    if (team.shortName) {
+      formData.append('ShortName', team.shortName);
+    }
+    if (team.logoUrl) {
+      formData.append('LogoUrl', team.logoUrl);
+    }
+    if (team.teamPhotoUrl) {
+      formData.append('TeamPhotoUrl', team.teamPhotoUrl);
+    }
+    
+    return this.apiClient.postFormData<Team>(API_ENDPOINTS.TEAMS.CREATE, formData);
   }
 
   updateTeam(id: string, updates: UpdateTeam): Observable<Team> {
-    return this.apiClient.put<Team>(API_ENDPOINTS.TEAMS.UPDATE(id), updates);
+    const formData = new FormData();
+    formData.append('Name', updates.name);
+    if (updates.shortName) {
+      formData.append('ShortName', updates.shortName);
+    }
+    if (updates.logoUrl) {
+      formData.append('LogoUrl', updates.logoUrl);
+    }
+    if (updates.teamPhotoUrl) {
+      formData.append('TeamPhotoUrl', updates.teamPhotoUrl);
+    }
+    
+    return this.apiClient.putFormData<Team>(API_ENDPOINTS.TEAMS.UPDATE(id), formData);
   }
 
   deleteTeam(id: string): Observable<void> {

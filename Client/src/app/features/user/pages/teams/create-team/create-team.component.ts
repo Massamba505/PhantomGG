@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TeamFormComponent } from '../components/team-form/team-form.component';
 import { TeamService } from '@/app/api/services/team.service';
-import { CreateTeam } from '@/app/api/models/team.models';
+import { CreateTeam, UpdateTeam } from '@/app/api/models/team.models';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LucideAngularModule } from 'lucide-angular';
@@ -26,10 +26,13 @@ export class CreateTeamComponent {
   saving = signal(false);
   icons = LucideIcons;
 
-  onSubmit(teamData: CreateTeam) {
+  onSubmit(teamData: CreateTeam | UpdateTeam) {
     this.saving.set(true);
     
-    this.teamService.createTeam(teamData).subscribe({
+    // For create team component, we expect CreateTeam data
+    const createTeamData = teamData as CreateTeam;
+    
+    this.teamService.createTeam(createTeamData).subscribe({
       next: (team) => {
         this.toastService.success('Team created successfully!');
         this.router.navigate(['/user/teams']);
