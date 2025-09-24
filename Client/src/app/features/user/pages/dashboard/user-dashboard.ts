@@ -86,7 +86,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
               <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <div class="flex items-center space-x-3">
                   @if (team.logoUrl) {
-                    <img [src]="team.logoUrl" [alt]="team.name + ' logo'" class="w-10 h-10 rounded-lg object-cover">
+                    <img [src]="team.logoUrl" [alt]="team.name + ' logo'" class="w-10 h-10 rounded-lg object-contain">
                   } @else {
                     <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
                       {{ team.name.charAt(0).toUpperCase() }}
