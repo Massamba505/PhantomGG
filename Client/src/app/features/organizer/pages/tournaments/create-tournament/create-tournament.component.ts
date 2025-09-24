@@ -27,9 +27,15 @@ export class CreateTournamentComponent {
   onSubmit(tournamentData: CreateTournament) {
     this.saving.set(true);
     
+    console.log('Tournament data being sent:', tournamentData);
+    
     this.tournamentService.createTournament(tournamentData).subscribe({
       next: (tournament) => {
         this.router.navigate(['/organizer/tournaments', tournament.id]);
+        this.saving.set(false);
+      },
+      error: (error) => {
+        console.error('Error creating tournament:', error);
         this.saving.set(false);
       }
     });

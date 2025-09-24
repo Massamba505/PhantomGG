@@ -77,7 +77,27 @@ public class TournamentService(
         ValidateCreateTournament(createDto);
 
         var tournament = createDto.ToEntity(organizerId);
+
+        // Save tournament first to ensure it has a proper database ID
         await _tournamentRepository.CreateAsync(tournament);
+
+        // Then upload images and update the tournament with the image URLs
+        if (createDto.BannerUrl != null)
+        {
+            tournament.BannerUrl = await UploadImageAsync(tournament, createDto.BannerUrl);
+        }
+
+        if (createDto.LogoUrl != null)
+        {
+            tournament.LogoUrl = await UploadLogoImageAsync(tournament, createDto.LogoUrl);
+        }
+
+        // Update tournament with image URLs if any files were uploaded
+        if (createDto.BannerUrl != null || createDto.LogoUrl != null)
+        {
+            await _tournamentRepository.UpdateAsync(tournament);
+        }
+
         return tournament.ToDto();
     }
 
@@ -120,21 +140,23 @@ public class TournamentService(
             await _imageService.DeleteImageAsync(tournament.BannerUrl);
         }
 
+        Console.WriteLine($"Uploading banner for tournament ID: {tournament.Id}");
         var bannerUrl = await _imageService.SaveImageAsync(file, ImageType.TournamentBanner, tournament.Id);
+        Console.WriteLine($"Generated banner URL: {bannerUrl}");
 
         return bannerUrl;
     }
 
     public async Task<string> UploadLogoImageAsync(Tournament tournament, IFormFile file)
     {
-        if (!string.IsNullOrEmpty(tournament.BannerUrl))
+        if (!string.IsNullOrEmpty(tournament.LogoUrl))
         {
-            await _imageService.DeleteImageAsync(tournament.BannerUrl);
+            await _imageService.DeleteImageAsync(tournament.LogoUrl);
         }
 
-        var bannerUrl = await _imageService.SaveImageAsync(file, ImageType.TournamentLogo, tournament.Id);
+        var logoUrl = await _imageService.SaveImageAsync(file, ImageType.TournamentLogo, tournament.Id);
 
-        return bannerUrl;
+        return logoUrl;
     }
 
     public async Task RegisterForTournamentAsync(Guid tournamentId, JoinTournamentDto registrationDto, Guid userId)

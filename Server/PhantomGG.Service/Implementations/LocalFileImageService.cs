@@ -23,6 +23,9 @@ public class LocalFileImageService(
         var folderName = GetFolderName(imageType);
         var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", folderName);
 
+        Console.WriteLine($"Uploads path: {uploadsPath}");
+        Console.WriteLine($"Entity ID: {entityId}");
+
         if (!Directory.Exists(uploadsPath))
         {
             Directory.CreateDirectory(uploadsPath);
@@ -31,10 +34,16 @@ public class LocalFileImageService(
         var fileName = GenerateFileName(file.FileName, entityId);
         var filePath = Path.Combine(uploadsPath, fileName);
 
+        Console.WriteLine($"Generated file name: {fileName}");
+        Console.WriteLine($"Full file path: {filePath}");
+
         using var stream = new FileStream(filePath, FileMode.Create);
         await file.CopyToAsync(stream);
 
-        return GenerateImageUrl(folderName, fileName);
+        var imageUrl = GenerateImageUrl(folderName, fileName);
+        Console.WriteLine($"Generated image URL: {imageUrl}");
+
+        return imageUrl;
     }
 
     public async Task<bool> DeleteImageAsync(string imageUrl)

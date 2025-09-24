@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.Models.DTOs.Tournament;
@@ -34,9 +35,9 @@ public class CreateTournamentDto
     [EmailAddress]
     public string? ContactEmail { get; set; }
 
-    public string? BannerUrl { get; set; }
+    public IFormFile? BannerUrl { get; set; }
 
-    public string? LogoUrl { get; set; }
+    public IFormFile? LogoUrl { get; set; }
 
     public bool IsPublic { get; set; } = true;
 }

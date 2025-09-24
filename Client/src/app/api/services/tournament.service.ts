@@ -45,11 +45,87 @@ export class TournamentService {
   }
 
   createTournament(tournament: CreateTournament): Observable<Tournament> {
-    return this.apiClient.post<Tournament>(API_ENDPOINTS.TOURNAMENTS.CREATE, tournament);
+    console.log('Creating tournament with data:', tournament);
+    
+    const formData = new FormData();
+    formData.append('Name', tournament.name);
+    formData.append('Description', tournament.description);
+    if (tournament.location) {
+      formData.append('Location', tournament.location);
+    }
+    if (tournament.registrationStartDate) {
+      formData.append('RegistrationStartDate', new Date(tournament.registrationStartDate).toISOString());
+    }
+    if (tournament.registrationDeadline) {
+      formData.append('RegistrationDeadline', new Date(tournament.registrationDeadline).toISOString());
+    }
+    formData.append('StartDate', new Date(tournament.startDate).toISOString());
+    formData.append('EndDate', new Date(tournament.endDate).toISOString());
+    formData.append('MinTeams', tournament.minTeams.toString());
+    formData.append('MaxTeams', tournament.maxTeams.toString());
+    if (tournament.contactEmail) {
+      formData.append('ContactEmail', tournament.contactEmail);
+    }
+    if (tournament.bannerUrl) {
+      formData.append('BannerUrl', tournament.bannerUrl);
+    }
+    if (tournament.logoUrl) {
+      formData.append('LogoUrl', tournament.logoUrl);
+    }
+    formData.append('IsPublic', tournament.isPublic.toString());
+    
+    // Debug: Log FormData entries
+    console.log('FormData entries:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+    
+    return this.apiClient.postFormData<Tournament>(API_ENDPOINTS.TOURNAMENTS.CREATE, formData);
   }
 
   updateTournament(id: string, updates: UpdateTournament): Observable<Tournament> {
-    return this.apiClient.put<Tournament>(API_ENDPOINTS.TOURNAMENTS.UPDATE(id), updates);
+    const formData = new FormData();
+    if (updates.name) {
+      formData.append('Name', updates.name);
+    }
+    if (updates.description) {
+      formData.append('Description', updates.description);
+    }
+    if (updates.location) {
+      formData.append('Location', updates.location);
+    }
+    if (updates.registrationStartDate) {
+      formData.append('RegistrationStartDate', updates.registrationStartDate);
+    }
+    if (updates.registrationDeadline) {
+      formData.append('RegistrationDeadline', updates.registrationDeadline);
+    }
+    if (updates.startDate) {
+      formData.append('StartDate', updates.startDate);
+    }
+    if (updates.endDate) {
+      formData.append('EndDate', updates.endDate);
+    }
+    if (updates.minTeams !== undefined) {
+      formData.append('MinTeams', updates.minTeams.toString());
+    }
+    if (updates.maxTeams !== undefined) {
+      formData.append('MaxTeams', updates.maxTeams.toString());
+    }
+    if (updates.contactEmail) {
+      formData.append('ContactEmail', updates.contactEmail);
+    }
+    if (updates.bannerUrl) {
+      formData.append('BannerUrl', updates.bannerUrl);
+    }
+    if (updates.logoUrl) {
+      formData.append('LogoUrl', updates.logoUrl);
+    }
+    if (updates.isPublic !== undefined) {
+      formData.append('IsPublic', updates.isPublic.toString());
+    }
+    
+    return this.apiClient.putFormData<Tournament>(API_ENDPOINTS.TOURNAMENTS.UPDATE(id), formData);
   }
 
   deleteTournament(id: string): Observable<void> {

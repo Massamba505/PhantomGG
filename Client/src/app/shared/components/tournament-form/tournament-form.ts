@@ -24,6 +24,7 @@ export class TournamentForm implements OnInit, OnChanges {
   isSubmitted = signal(false);
   isSubmitting = signal(false);
   bannerPreview = signal<string | null>(null);
+  logoPreview = signal<string | null>(null);
   isDragging = signal(false);
   readonly icons = LucideIcons;
 
@@ -61,10 +62,22 @@ export class TournamentForm implements OnInit, OnChanges {
       endDate: [tournament?.endDate || '', [Validators.required]],
       maxTeams: [tournament?.maxTeams || 16, [Validators.required]],
       contactEmail: [tournament?.organizer?.email || '', [Validators.email]],
+      banner: [null], // file control for banner - optional
+      logo: [null], // file control for logo - optional
     }, { validators: [this.dateRangeValidator, this.deadlineValidator] });
 
+    // Set banner preview if tournament has bannerUrl
     if (tournament?.bannerUrl) {
       this.bannerPreview.set(tournament.bannerUrl);
+    } else {
+      this.bannerPreview.set(null);
+    }
+
+    // Set logo preview if tournament has logoUrl
+    if (tournament?.logoUrl) {
+      this.logoPreview.set(tournament.logoUrl);
+    } else {
+      this.logoPreview.set(null);
     }
   }
 
@@ -91,7 +104,14 @@ export class TournamentForm implements OnInit, OnChanges {
   onBannerChange(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.handleFileSelect(input.files[0]);
+      this.handleBannerFileSelect(input.files[0]);
+    }
+  }
+
+  onLogoChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.handleLogoFileSelect(input.files[0]);
     }
   }
 
@@ -110,18 +130,36 @@ export class TournamentForm implements OnInit, OnChanges {
     this.isDragging.set(false);
     
     if (event.dataTransfer?.files && event.dataTransfer.files[0]) {
-      this.handleFileSelect(event.dataTransfer.files[0]);
+      this.handleBannerFileSelect(event.dataTransfer.files[0]);
     }
   }
 
-  private handleFileSelect(file: File) {
+  private handleBannerFileSelect(file: File) {
     if (!file.type.startsWith('image/')) {
       return;
     }
 
+    this.tournamentForm.patchValue({ banner: file });
+    this.tournamentForm.get('banner')?.updateValueAndValidity();
+
     const reader = new FileReader();
     reader.onload = () => {
       this.bannerPreview.set(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  private handleLogoFileSelect(file: File) {
+    if (!file.type.startsWith('image/')) {
+      return;
+    }
+
+    this.tournamentForm.patchValue({ logo: file });
+    this.tournamentForm.get('logo')?.updateValueAndValidity();
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.logoPreview.set(reader.result as string);
     };
     reader.readAsDataURL(file);
   }
@@ -135,31 +173,36 @@ export class TournamentForm implements OnInit, OnChanges {
 
     this.isSubmitting.set(true);
 
+    const formValue = this.tournamentForm.value;
+
     if (this.isEditMode()) {
       const updateData: UpdateTournament = {
-        name: this.tournamentForm.value.name,
-        description: this.tournamentForm.value.description,
-        location: this.tournamentForm.value.location,
-        registrationDeadline: this.tournamentForm.value.registrationDeadline,
-        startDate: this.tournamentForm.value.startDate,
-        registrationStartDate: this.tournamentForm.value.endDate,
-        maxTeams: parseInt(this.tournamentForm.value.maxTeams, 10),
-        contactEmail: this.tournamentForm.value.contactEmail,
-        bannerUrl: this.bannerPreview() || undefined,
+        name: formValue.name,
+        description: formValue.description,
+        location: formValue.location,
+        registrationDeadline: formValue.registrationDeadline,
+        startDate: formValue.startDate,
+        endDate: formValue.endDate,
+        maxTeams: parseInt(formValue.maxTeams, 10),
+        contactEmail: formValue.contactEmail,
+        bannerUrl: formValue.banner instanceof File ? formValue.banner : undefined,
+        logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
+        minTeams: 2,
+        isPublic: true
       };
       this.tournamentUpdated.emit(updateData);
     } else {
       const createData: CreateTournament = {
-        name: this.tournamentForm.value.name,
-        description: this.tournamentForm.value.description,
-        location: this.tournamentForm.value.location,
-        registrationDeadline: this.tournamentForm.value.registrationDeadline,
-        startDate: this.tournamentForm.value.startDate,
-        endDate: this.tournamentForm.value.endDate,
-        registrationStartDate: this.tournamentForm.value.endDate,
-        maxTeams: parseInt(this.tournamentForm.value.maxTeams, 10),
-        contactEmail: this.tournamentForm.value.contactEmail,
-        bannerUrl: this.bannerPreview() || undefined,
+        name: formValue.name,
+        description: formValue.description,
+        location: formValue.location,
+        registrationDeadline: formValue.registrationDeadline,
+        startDate: formValue.startDate,
+        endDate: formValue.endDate,
+        maxTeams: parseInt(formValue.maxTeams, 10),
+        contactEmail: formValue.contactEmail,
+        bannerUrl: formValue.banner instanceof File ? formValue.banner : undefined,
+        logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
         minTeams: 2,
         isPublic: true
       };
@@ -180,10 +223,9 @@ export class TournamentForm implements OnInit, OnChanges {
     this.isSubmitting.set(false);
     this.isSubmitted.set(false);
     this.bannerPreview.set(null);
+    this.logoPreview.set(null);
     this.tournamentForm.reset({
-      maxTeams: 16,
-      entryFee: 0,
-      prize: 0
+      maxTeams: 16
     });
   }
 }

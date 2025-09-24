@@ -35,8 +35,8 @@ export interface CreateTournament {
   minTeams: number;
   maxTeams: number;
   contactEmail?: string;
-  bannerUrl?: string;
-  logoUrl?: string;
+  bannerUrl?: File;
+  logoUrl?: File;
   isPublic: boolean;
 }
 
@@ -51,8 +51,8 @@ export interface UpdateTournament {
   minTeams?: number;
   maxTeams?: number;
   contactEmail?: string;
-  bannerUrl?: string;
-  logoUrl?: string;
+  bannerUrl?: File;
+  logoUrl?: File;
   isPublic?: boolean;
 }
 

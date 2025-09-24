@@ -83,7 +83,7 @@ public class TournamentsController(
     /// </summary>
     [HttpPost]
     [Authorize(Roles = "Organizer")]
-    public async Task<ActionResult<ApiResponse>> CreateTournament([FromBody] CreateTournamentDto createDto)
+    public async Task<ActionResult<ApiResponse>> CreateTournament([FromForm] CreateTournamentDto createDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
         var tournament = await _tournamentService.CreateAsync(createDto, currentUser.Id);
@@ -103,7 +103,7 @@ public class TournamentsController(
     /// </summary>
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Organizer")]
-    public async Task<ActionResult<ApiResponse>> UpdateTournament(Guid id, [FromBody] UpdateTournamentDto updateDto)
+    public async Task<ActionResult<ApiResponse>> UpdateTournament(Guid id, [FromForm] UpdateTournamentDto updateDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
         var tournament = await _tournamentService.UpdateAsync(id, updateDto, currentUser.Id);

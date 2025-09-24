@@ -35,6 +35,36 @@
     </div>
   </div>
 
+  <div>
+    <label class="block text-sm font-medium mb-2">Tournament Logo</label>
+
+    <div
+      class="relative border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition h-32 w-32"
+      (click)="logoFileInput.click()"
+    >
+      <input
+        type="file"
+        #logoFileInput
+        accept="image/*"
+        class="hidden"
+        (change)="onLogoChange($event)"
+      />
+
+      @if (!logoPreview()) {
+      <div class="text-center px-4">
+        <p class="text-xs">Click to upload logo</p>
+        <p class="text-xs mt-1">Recommended: 200x200px</p>
+      </div>
+      } @if (logoPreview()) {
+      <img
+        [src]="logoPreview()"
+        alt="Logo Preview"
+        class="absolute inset-0 w-full h-full object-contain rounded-xl"
+      />
+      }
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div class="md:col-span-2">
       <label for="name" class="block text-sm font-medium mb-2">
@@ -151,7 +181,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
       <label for="maxTeams" class="block text-sm font-medium mb-2">
         Maximum Teams <span class="required">*</span>
@@ -166,48 +196,21 @@
     </div>
 
     <div>
-      <label for="entryFee" class="block text-sm font-medium mb-2"
-        >Entry Fee</label
-      >
+      <label for="contactEmail" class="block text-sm font-medium mb-2">
+        Contact Email
+      </label>
       <input
-        type="number"
-        id="entryFee"
-        formControlName="entryFee"
+        type="email"
+        id="contactEmail"
+        formControlName="contactEmail"
+        placeholder="contact@example.com"
         class="input-field"
       />
+      @if (isSubmitted() &&
+      tournamentForm.get('contactEmail')?.errors?.['email']) {
+      <div class="text-sm error mt-1">Please enter a valid email</div>
+      }
     </div>
-
-    <div>
-      <label for="prize" class="block text-sm font-medium mb-2"
-        >Prize Pool</label
-      >
-      <input
-        type="number"
-        id="prize"
-        formControlName="prize"
-        class="input-field"
-      />
-    </div>
-  </div>
-
-  <div>
-    <label for="contactEmail" class="block text-sm font-medium mb-2">
-      Contact Email <span class="required">*</span>
-    </label>
-    <input
-      type="email"
-      id="contactEmail"
-      formControlName="contactEmail"
-      placeholder="contact@example.com"
-      class="input-field"
-    />
-    @if (isSubmitted() &&
-    tournamentForm.get('contactEmail')?.errors?.['required']) {
-    <div class="text-sm error mt-1">Contact email is required</div>
-    } @if (isSubmitted() &&
-    tournamentForm.get('contactEmail')?.errors?.['email']) {
-    <div class="text-sm error mt-1">Please enter a valid email</div>
-    }
   </div>
 
   <div class="flex gap-4">

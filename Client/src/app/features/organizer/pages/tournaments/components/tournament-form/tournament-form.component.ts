@@ -1,10 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { CreateTournament, UpdateTournament, Tournament, TournamentFormat } from '@/app/api/models/tournament.models';
-import { TournamentService } from '@/app/api/services';
-import { ToastService } from '@/app/shared/services/toast.service';
-import { dateNotInPastValidator, registrationDeadlineValidator, tournamentStartDateValidator } from '@/app/shared/validators/date.validator';
+import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
+import { CreateTournament, UpdateTournament, Tournament } from '@/app/api/models/tournament.models';
 
 @Component({
   selector: 'app-tournament-form',
@@ -12,7 +9,7 @@ import { dateNotInPastValidator, registrationDeadlineValidator, tournamentStartD
   templateUrl: './tournament-form.component.html',
   styleUrl: './tournament-form.component.css'
 })
-export class TournamentFormComponent implements OnInit {
+export class TournamentFormComponent implements OnInit, OnChanges {
   @Input() tournament: Tournament | null = null;
   @Input() set loadingState(value: boolean) {
     this.loading.set(value);
@@ -20,21 +17,16 @@ export class TournamentFormComponent implements OnInit {
   @Output() formSubmit = new EventEmitter<CreateTournament>();
   @Output() formUpdate = new EventEmitter<UpdateTournament>();
   @Output() formCancel = new EventEmitter<void>();
-  private readonly tournamentService = inject(TournamentService);
-  private readonly toastService = inject(ToastService);
 
   private fb = inject(FormBuilder);
   
+  tournamentForm!: FormGroup;
   loading = signal(false);
-  isEdit = signal(false);
-  uploadingBanner = signal(false);
-  uploadingLogo = signal(false);
+  submitted = signal(false);
   bannerPreview = signal<string | null>(null);
   logoPreview = signal<string | null>(null);
-  
-  formats = signal<TournamentFormat[]>([]);
-  currentBannerUrl = signal<string | null>(null);
-  currentLogoUrl = signal<string | null>(null);
+
+  isEditMode = computed(() => this.tournament !== null);
   
   get todayDateTime(): string {
     const now = new Date();
@@ -42,265 +34,159 @@ export class TournamentFormComponent implements OnInit {
     return now.toISOString().slice(0, 16);
   }
 
-  tournamentForm = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-    description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(2000)]],
-    location: ['', [Validators.maxLength(200)]],
-    registrationStartDate: ['', [
-      Validators.required, 
-      dateNotInPastValidator
-    ]],
-    registrationDeadline: ['', [
-      Validators.required, 
-      dateNotInPastValidator,
-      registrationDeadlineValidator
-    ]],
-    startDate: ['', [
-      Validators.required, 
-      dateNotInPastValidator,
-      tournamentStartDateValidator
-    ]],
-    endDate: ['', [Validators.required]],
-    minTeams: [2, [Validators.required, Validators.min(2), Validators.max(64)]],
-    maxTeams: [16, [Validators.required, Validators.min(4), Validators.max(128)]],
-    bannerUrl: [""],
-    logoUrl: [""],
-    contactEmail: ['', [Validators.email]],
-    isPublic: [true]
-  });
-
-  getTournamentFormats() {
-    const formats = this.tournamentService.getTournamentFormats();
-    this.formats.set(formats);
-  }
-
   ngOnInit() {
-    this.setupCrossFieldValidation();
+    this.initializeForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['tournament'] && this.tournamentForm) {
+      this.initializeForm();
+    }
+  }
+
+  private initializeForm() {
+    const tournament = this.tournament;
     
-    if (this.tournament) {
-      this.isEdit.set(true);
-      this.populateForm();
-      this.currentBannerUrl.set(this.tournament.bannerUrl || null);
-      this.currentLogoUrl.set(this.tournament.logoUrl || null);
-    }
-    this.getTournamentFormats();
-  }
-
-  private setupCrossFieldValidation() {
-      let isValidationRunning = false;
-
-      this.tournamentForm.get('registrationStartDate')?.valueChanges.subscribe(() => {
-        if (isValidationRunning) return;
-        isValidationRunning = true;
-        this.tournamentForm.get('registrationDeadline')?.updateValueAndValidity({ onlySelf: true });
-        isValidationRunning = false;
-      });
-
-      this.tournamentForm.get('registrationDeadline')?.valueChanges.subscribe(() => {
-        if (isValidationRunning) return;
-        isValidationRunning = true;
-        this.tournamentForm.get('startDate')?.updateValueAndValidity({ onlySelf: true });
-        isValidationRunning = false;
-      });
-
-      this.tournamentForm.get('startDate')?.valueChanges.subscribe(() => {
-        if (isValidationRunning) return;
-        isValidationRunning = true;
-        this.tournamentForm.get('registrationDeadline')?.updateValueAndValidity({ onlySelf: true });
-        isValidationRunning = false;
-      });
-  }
-
-
-  hasFieldError(fieldName: string, errorType: string): boolean {
-    const field = this.tournamentForm.get(fieldName);
-    return !!(field?.hasError(errorType) && (field?.dirty || field?.touched));
-  }
-
-  getFieldError(fieldName: string): string {
-    const field = this.tournamentForm.get(fieldName);
-    if (!field || !field.errors || !field.touched) return '';
-
-    if (field.hasError('required')) {
-      return `${fieldName.replace(/([A-Z])/g, ' $1').toLowerCase()} is required`;
-    }
-    if (field.hasError('dateInPast')) {
-      return 'Date cannot be in the past';
-    }
-    if (field.hasError('deadlineBeforeStart')) {
-      return 'Registration deadline must be after registration start';
-    }
-    if (field.hasError('deadlineAfterTournamentStart')) {
-      return 'Registration deadline must be before tournament start';
-    }
-    if (field.hasError('startBeforeDeadline')) {
-      return 'Tournament start must be after registration deadline';
-    }
-    
-    return '';
-  }
-
-  populateForm() {
-    if (!this.tournament) return;
-
-    this.tournamentForm.patchValue({
-      name: this.tournament.name,
-      description: this.tournament.description,
-      location: this.tournament.location,
-      registrationStartDate: this.tournament.registrationStartDate ? 
-        new Date(this.tournament.registrationStartDate).toISOString().slice(0, 16) : '',
-      registrationDeadline: this.tournament.registrationDeadline ? 
-        new Date(this.tournament.registrationDeadline).toISOString().slice(0, 16) : '',
-      startDate: new Date(this.tournament.startDate).toISOString().slice(0, 16),
-      endDate: new Date(this.tournament.endDate).toISOString().slice(0, 16),
-      minTeams: this.tournament.minTeams,
-      maxTeams: this.tournament.maxTeams,
-      bannerUrl: this.tournament.bannerUrl || "",
-      logoUrl: this.tournament.logoUrl || "",
-      contactEmail: this.tournament.organizer?.email || '',
-      isPublic: this.tournament.isPublic
+    this.tournamentForm = this.fb.group({
+      name: [
+        tournament?.name || '',
+        [Validators.required, Validators.minLength(3), Validators.maxLength(200)],
+      ],
+      description: [
+        tournament?.description || '',
+        [Validators.required, Validators.minLength(10), Validators.maxLength(2000)],
+      ],
+      location: [
+        tournament?.location || '',
+        [Validators.maxLength(200)],
+      ],
+      registrationStartDate: [
+        tournament?.registrationStartDate ? 
+          new Date(tournament.registrationStartDate).toISOString().slice(0, 16) : '',
+        [Validators.required],
+      ],
+      registrationDeadline: [
+        tournament?.registrationDeadline ? 
+          new Date(tournament.registrationDeadline).toISOString().slice(0, 16) : '',
+        [Validators.required],
+      ],
+      startDate: [
+        tournament?.startDate ? 
+          new Date(tournament.startDate).toISOString().slice(0, 16) : '',
+        [Validators.required],
+      ],
+      endDate: [
+        tournament?.endDate ? 
+          new Date(tournament.endDate).toISOString().slice(0, 16) : '',
+        [Validators.required],
+      ],
+      minTeams: [tournament?.minTeams || 2, [Validators.required, Validators.min(2), Validators.max(64)]],
+      maxTeams: [tournament?.maxTeams || 16, [Validators.required, Validators.min(4), Validators.max(128)]],
+      contactEmail: [tournament?.organizer?.email || '', [Validators.email]],
+      isPublic: [tournament?.isPublic ?? true],
+      banner: [null], // file control for banner - optional
+      logo: [null], // file control for logo - optional
     });
+
+    // Set previews if tournament has existing images
+    if (tournament?.bannerUrl) {
+      this.bannerPreview.set(tournament.bannerUrl);
+    } else {
+      this.bannerPreview.set(null);
+    }
+
+    if (tournament?.logoUrl) {
+      this.logoPreview.set(tournament.logoUrl);
+    } else {
+      this.logoPreview.set(null);
+    }
+  }
+
+  // Handle banner file select
+  onBannerChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      const file = target.files[0];
+      this.tournamentForm.patchValue({ banner: file });
+      this.tournamentForm.get('banner')?.updateValueAndValidity();
+
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = () => this.bannerPreview.set(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Handle logo file select
+  onLogoChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      const file = target.files[0];
+      this.tournamentForm.patchValue({ logo: file });
+      this.tournamentForm.get('logo')?.updateValueAndValidity();
+
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = () => this.logoPreview.set(reader.result as string);
+      reader.readAsDataURL(file);
+    }
   }
 
   onSubmit() {
-    if (this.tournamentForm.valid) {
-      const formValue = this.tournamentForm.value;
-      
-      if (this.isEdit()) {
-        this.saveUpdates(formValue)
-      } else {
-        this.saveNewTournament(formValue);
-      }
+    this.submitted.set(true);
+    if (this.tournamentForm.invalid) {
+      return;
     }
-  }
 
-  saveUpdates(formValue:any){
-    const updateData: UpdateTournament = {
-      name: formValue.name || undefined,
-      description: formValue.description || undefined,
-      location: formValue.location || undefined,
-      registrationStartDate: formValue.registrationStartDate || undefined,
-      registrationDeadline: formValue.registrationDeadline || undefined,
-      startDate: formValue.startDate || undefined,
-      endDate: formValue.endDate || undefined,
-      minTeams: formValue.minTeams || undefined,
-      maxTeams: formValue.maxTeams || undefined,
-      bannerUrl: formValue.bannerUrl || undefined,
-      logoUrl: formValue.logoUrl || undefined,
-      contactEmail: formValue.contactEmail || undefined,
-      isPublic: formValue.isPublic ?? undefined
-    };
+    const formValue = this.tournamentForm.value;
 
-    this.formUpdate.emit(updateData);
-  }
+    if (this.isEditMode()) {
+      // For edit mode
+      const updateData: UpdateTournament = {
+        name: formValue.name,
+        description: formValue.description,
+        location: formValue.location || undefined,
+        registrationStartDate: formValue.registrationStartDate || undefined,
+        registrationDeadline: formValue.registrationDeadline || undefined,
+        startDate: formValue.startDate || undefined,
+        endDate: formValue.endDate || undefined,
+        minTeams: formValue.minTeams || undefined,
+        maxTeams: formValue.maxTeams || undefined,
+        contactEmail: formValue.contactEmail || undefined,
+        isPublic: formValue.isPublic ?? undefined,
+        bannerUrl: formValue.banner instanceof File ? formValue.banner : undefined,
+        logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
+      };
 
-  saveNewTournament(formValue:any){
-    const createData: CreateTournament = {
-      name: formValue.name!,
-      description: formValue.description!,
-      location: formValue.location || undefined,
-      registrationStartDate: formValue.registrationStartDate || undefined,
-      registrationDeadline: formValue.registrationDeadline || undefined,
-      startDate: formValue.startDate!,
-      endDate: formValue.endDate!,
-      minTeams: formValue.minTeams!,
-      maxTeams: formValue.maxTeams!,
-      contactEmail: formValue.contactEmail || undefined,
-      isPublic: formValue.isPublic ?? true
-    };
+      this.formUpdate.emit(updateData);
+    } else {
+      // For create mode
+      const createData: CreateTournament = {
+        name: formValue.name,
+        description: formValue.description,
+        location: formValue.location || undefined,
+        registrationStartDate: formValue.registrationStartDate || undefined,
+        registrationDeadline: formValue.registrationDeadline || undefined,
+        startDate: formValue.startDate,
+        endDate: formValue.endDate,
+        minTeams: formValue.minTeams,
+        maxTeams: formValue.maxTeams,
+        contactEmail: formValue.contactEmail || undefined,
+        isPublic: formValue.isPublic ?? true,
+        bannerUrl: formValue.banner instanceof File ? formValue.banner : undefined,
+        logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
+      };
 
-    this.formSubmit.emit(createData);
+      this.formSubmit.emit(createData);
+    }
   }
 
   onCancel() {
     this.formCancel.emit();
   }
 
-  onBannerSelected(files: File[]) {
-    if (files.length > 0 && this.tournament?.id) {
-      this.uploadBanner(files[0]);
-    }
-  }
-
-  onLogoSelected(files: File[]) {
-    if (files.length > 0 && this.tournament?.id) {
-      this.uploadLogo(files[0]);
-    }
-  }
-
-  private uploadBanner(file: File) {
-    if (!this.tournament?.id) {
-      this.toastService.error('Tournament ID is required for banner upload');
-      return;
-    }
-
-    this.uploadingBanner.set(true);
-    this.tournamentService.uploadTournamentBanner(this.tournament.id, file).subscribe({
-      next: (response: any) => {
-        this.currentBannerUrl.set(response.imageUrl);
-        this.tournamentForm.patchValue({bannerUrl:this.currentBannerUrl()})
-        this.toastService.success('Banner uploaded successfully');
-        this.uploadingBanner.set(false);
-      }
-    });
-  }
-
-  private uploadLogo(file: File) {
-    if (!this.tournament?.id) {
-      this.toastService.error('Tournament ID is required for logo upload');
-      return;
-    }
-
-    this.uploadingLogo.set(true);
-    this.tournamentService.uploadTournamentLogo(this.tournament.id, file).subscribe({
-      next: (response: any) => {
-        this.currentLogoUrl.set(response.imageUrl);
-        this.tournamentForm.patchValue({logoUrl:this.currentLogoUrl()})
-        this.toastService.success('Logo uploaded successfully');
-        this.uploadingLogo.set(false);
-      }
-    });
-  }
-
-  onBannerUploadError(event: { file: File; error: string }) {
-    this.toastService.error(`Banner upload error: ${event.error}`);
-  }
-
-  onLogoUploadError(event: { file: File; error: string }) {
-    this.toastService.error(`Logo upload error: ${event.error}`);
-  }
-
-  onBannerChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.bannerPreview.set(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      if (this.tournament?.id) {
-        this.uploadBanner(file);
-      }
-    }
-  }
-
-  onLogoChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.logoPreview.set(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      if (this.tournament?.id) {
-        this.uploadLogo(file);
-      }
-    }
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.tournamentForm.get(fieldName);
+    return !!(field && field.invalid && this.submitted());
   }
 }

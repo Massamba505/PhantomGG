@@ -16,6 +16,10 @@ export function errorInterceptor(
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        return throwError(() => error);
+      }
+      
       if (error.status === 0) {
         toast.warn('Network error. Please check your internet.');
       } else if (error.status >= 500) {
