@@ -35,4 +35,11 @@ public interface ITournamentService
     Task CreateTournamentBracketAsync(Guid tournamentId, Guid organizerId);
     Task UpdateMatchResultAsync(Guid tournamentId, Guid matchId, object resultDto, Guid organizerId);
     #endregion
+
+    #region Public Operations (no authentication required)
+    Task<TournamentDto> GetPublicTournamentByIdAsync(Guid id);
+    Task<IEnumerable<TournamentTeamDto>> GetPublicTournamentTeamsAsync(Guid tournamentId);
+    Task<IEnumerable<MatchDto>> GetPublicTournamentMatchesAsync(Guid tournamentId);
+    Task<TournamentStatisticsDto> GetPublicTournamentStatisticsAsync(Guid tournamentId);
+    #endregion
 }

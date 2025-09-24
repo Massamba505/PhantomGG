@@ -166,7 +166,7 @@ public class TeamsController(
     /// </summary>
     [HttpPost("{id:guid}/players")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> AddPlayerToTeam(Guid id, [FromBody] CreatePlayerDto playerDto)
+    public async Task<ActionResult<ApiResponse>> AddPlayerToTeam(Guid id, [FromForm] CreatePlayerDto playerDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
         var player = await _teamService.AddPlayerToTeamAsync(id, playerDto, currentUser.Id);
@@ -186,7 +186,7 @@ public class TeamsController(
     /// </summary>
     [HttpPut("{teamId:guid}/players/{playerId:guid}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> UpdateTeamPlayer(Guid teamId, Guid playerId, [FromBody] UpdatePlayerDto updateDto)
+    public async Task<ActionResult<ApiResponse>> UpdateTeamPlayer(Guid teamId, Guid playerId, [FromForm] UpdatePlayerDto updateDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
         var player = await _teamService.UpdateTeamPlayerAsync(teamId, playerId, updateDto, currentUser.Id);

@@ -299,4 +299,82 @@ public class TournamentsController(
             Message = "Team removed from tournament successfully"
         });
     }
+
+    // Public endpoints for browsing tournaments without authentication
+
+    /// <summary>
+    /// Get public tournaments (no authentication required)
+    /// </summary>
+    [HttpGet("public")]
+    public async Task<ActionResult<ApiResponse>> GetPublicTournaments([FromQuery] TournamentSearchDto searchDto)
+    {
+        searchDto.IsPublic = true; // Ensure only public tournaments are returned
+        var tournaments = await _tournamentService.SearchAsync(searchDto);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = tournaments,
+            Message = "Public tournaments retrieved successfully"
+        });
+    }
+
+    /// <summary>
+    /// Get public tournament details by ID (no authentication required)
+    /// </summary>
+    [HttpGet("public/{id:guid}")]
+    public async Task<ActionResult<ApiResponse>> GetPublicTournament(Guid id)
+    {
+        var tournament = await _tournamentService.GetPublicTournamentByIdAsync(id);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = tournament,
+            Message = "Public tournament retrieved successfully"
+        });
+    }
+
+    /// <summary>
+    /// Get public tournament teams (no authentication required)
+    /// </summary>
+    [HttpGet("public/{id:guid}/teams")]
+    public async Task<ActionResult<ApiResponse>> GetPublicTournamentTeams(Guid id)
+    {
+        var tournamentTeams = await _tournamentService.GetPublicTournamentTeamsAsync(id);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = tournamentTeams,
+            Message = "Public tournament teams retrieved successfully"
+        });
+    }
+
+    /// <summary>
+    /// Get public tournament matches (no authentication required)
+    /// </summary>
+    [HttpGet("public/{id:guid}/matches")]
+    public async Task<ActionResult<ApiResponse>> GetPublicTournamentMatches(Guid id)
+    {
+        var matches = await _tournamentService.GetPublicTournamentMatchesAsync(id);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = matches,
+            Message = "Public tournament matches retrieved successfully"
+        });
+    }
+
+    /// <summary>
+    /// Get public tournament statistics (no authentication required)
+    /// </summary>
+    [HttpGet("public/{id:guid}/statistics")]
+    public async Task<ActionResult<ApiResponse>> GetPublicTournamentStatistics(Guid id)
+    {
+        var statistics = await _tournamentService.GetPublicTournamentStatisticsAsync(id);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Data = statistics,
+            Message = "Public tournament statistics retrieved successfully"
+        });
+    }
 }

@@ -29,7 +29,13 @@ export const API_ENDPOINTS = {
     PENDING_TEAMS: (tournamentId: string) => `tournaments/${tournamentId}/teams/pending`,
     APPROVE_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/approve`,
     REJECT_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/reject`,
-    REMOVE_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}`
+    REMOVE_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}`,
+    // Public endpoints
+    PUBLIC: 'tournaments/public',
+    PUBLIC_DETAILS: (tournamentId: string) => `tournaments/public/${tournamentId}`,
+    PUBLIC_TEAMS: (tournamentId: string) => `tournaments/public/${tournamentId}/teams`,
+    PUBLIC_STATISTICS: (tournamentId: string) => `tournaments/public/${tournamentId}/statistics`,
+    PUBLIC_MATCHES: (tournamentId: string) => `tournaments/public/${tournamentId}/matches`
   },
 
   TEAMS: {

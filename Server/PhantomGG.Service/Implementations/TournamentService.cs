@@ -315,4 +315,86 @@ public class TournamentService(
         if (createDto.RegistrationDeadline.HasValue && createDto.RegistrationDeadline >= createDto.StartDate)
             throw new ArgumentException("Registration deadline must be before tournament start date");
     }
+
+    #region Public Methods (no authentication required)
+
+    public async Task<TournamentDto> GetPublicTournamentByIdAsync(Guid id)
+    {
+        var tournament = await _tournamentRepository.GetByIdAsync(id);
+        if (tournament == null || !tournament.IsPublic)
+            throw new NotFoundException("Public tournament not found");
+
+        return tournament.ToDto();
+    }
+
+    public async Task<IEnumerable<TournamentTeamDto>> GetPublicTournamentTeamsAsync(Guid tournamentId)
+    {
+        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+        if (tournament == null || !tournament.IsPublic)
+            throw new NotFoundException("Public tournament not found");
+
+        var tournamentTeams = await _tournamentRepository.GetTournamentTeamsAsync(tournamentId);
+        // Only return approved teams for public view
+        return tournamentTeams
+            .Where(tt => tt.Status == "Approved")
+            .Select(tt => tt.ToDto());
+    }
+
+    public async Task<IEnumerable<MatchDto>> GetPublicTournamentMatchesAsync(Guid tournamentId)
+    {
+        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+        if (tournament == null || !tournament.IsPublic)
+            throw new NotFoundException("Public tournament not found");
+
+        var matches = await _tournamentRepository.GetTournamentMatchesAsync(tournamentId);
+        return matches.Select(m => m.ToDto());
+    }
+
+    public async Task<TournamentStatisticsDto> GetPublicTournamentStatisticsAsync(Guid tournamentId)
+    {
+        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+        if (tournament == null || !tournament.IsPublic)
+            throw new NotFoundException("Public tournament not found");
+
+        var tournamentTeams = await _tournamentRepository.GetTournamentTeamsAsync(tournamentId);
+        var matches = await _tournamentRepository.GetTournamentMatchesAsync(tournamentId);
+        var matchEvents = await _tournamentRepository.GetTournamentMatchEventsAsync(tournamentId);
+
+        var approvedTeams = tournamentTeams.Where(tt => tt.Status == "Approved");
+        var completedMatches = matches.Where(m => m.Status == "Completed");
+        var goalEvents = matchEvents.Where(me => me.EventType == "Goal");
+
+        // Calculate player statistics using Player entity navigation
+        var playerGoals = goalEvents
+            .GroupBy(ge => new { ge.PlayerId, PlayerName = ge.Player.FirstName + " " + ge.Player.LastName })
+            .Select(g => new { PlayerId = g.Key.PlayerId, PlayerName = g.Key.PlayerName, Goals = g.Count() })
+            .OrderByDescending(pg => pg.Goals)
+            .FirstOrDefault();
+
+        // For now, we'll use a simplified approach for assists since we don't have direct assist tracking
+        // In a real system, you might track assists as separate events or as part of goal events
+
+        return new TournamentStatisticsDto
+        {
+            TournamentId = tournamentId,
+            TournamentName = tournament.Name,
+            TotalTeams = approvedTeams.Count(),
+            ApprovedTeams = approvedTeams.Count(),
+            PendingTeams = tournamentTeams.Count(tt => tt.Status == "Pending"),
+            TotalMatches = matches.Count(),
+            CompletedMatches = completedMatches.Count(),
+            ScheduledMatches = matches.Count(m => m.Status == "Scheduled"),
+            TotalGoals = goalEvents.Count(),
+            TotalYellowCards = matchEvents.Count(me => me.EventType == "YellowCard"),
+            TotalRedCards = matchEvents.Count(me => me.EventType == "RedCard"),
+            AverageGoalsPerMatch = completedMatches.Any() ? (decimal)goalEvents.Count() / completedMatches.Count() : 0,
+            TopScorer = playerGoals?.PlayerName ?? "N/A",
+            TopScorerGoals = playerGoals?.Goals ?? 0,
+            TopAssist = "N/A", // Simplified for now
+            TopAssistCount = 0, // Simplified for now
+            LastUpdated = DateTime.UtcNow
+        };
+    }
+
+    #endregion
 }

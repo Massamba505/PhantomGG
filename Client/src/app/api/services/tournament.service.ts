@@ -160,4 +160,22 @@ export class TournamentService {
     return getTournamentFormats();
   }
 
+  // Public methods for browsing tournaments
+  getPublicTournaments(params?: TournamentSearch): Promise<PaginatedResponse<Tournament>> {
+    const searchParams = { ...params, isPublic: true };
+    return this.apiClient.getPaginated<Tournament>(API_ENDPOINTS.TOURNAMENTS.PUBLIC, searchParams).toPromise() as Promise<PaginatedResponse<Tournament>>;
+  }
+
+  getPublicTournament(id: string): Promise<Tournament> {
+    return this.apiClient.get<Tournament>(API_ENDPOINTS.TOURNAMENTS.PUBLIC_DETAILS(id)).toPromise() as Promise<Tournament>;
+  }
+
+  getPublicTournamentTeams(id: string): Promise<TournamentTeam[]> {
+    return this.apiClient.get<TournamentTeam[]>(API_ENDPOINTS.TOURNAMENTS.PUBLIC_TEAMS(id)).toPromise() as Promise<TournamentTeam[]>;
+  }
+
+  getPublicTournamentStatistics(id: string): Promise<TournamentStatistics> {
+    return this.apiClient.get<TournamentStatistics>(API_ENDPOINTS.TOURNAMENTS.PUBLIC_STATISTICS(id)).toPromise() as Promise<TournamentStatistics>;
+  }
+
 }

@@ -38,3 +38,32 @@ export interface TeamSearch {
   pageNumber?: number;
   pageSize?: number;
 }
+
+export interface Player {
+  id: string;
+  firstName: string;
+  lastName: string;
+  position?: string;
+  email?: string;
+  photoUrl?: string;
+  teamId: string;
+  teamName: string;
+  joinedAt: string;
+}
+
+export interface CreatePlayer {
+  firstName: string;
+  lastName: string;
+  position?: string;
+  email?: string;
+  photoUrl?: File;
+  teamId: string;
+}
+
+export interface UpdatePlayer {
+  firstName: string;
+  lastName: string;
+  position?: string;
+  email?: string;
+  photoUrl?: File;
+}

@@ -24,4 +24,6 @@ public interface ITournamentRepository
     Task RejectTeamAsync(Guid tournamentId, Guid teamId);
     Task RemoveTeamFromTournamentAsync(Guid tournamentId, Guid teamId);
     Task<int> GetApprovedTeamCountAsync(Guid tournamentId);
+    Task<IEnumerable<Match>> GetTournamentMatchesAsync(Guid tournamentId);
+    Task<IEnumerable<MatchEvent>> GetTournamentMatchEventsAsync(Guid tournamentId);
 }

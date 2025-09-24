@@ -7,7 +7,10 @@ import {
   Team,
   CreateTeam,
   UpdateTeam,
-  TeamSearch
+  TeamSearch,
+  Player,
+  CreatePlayer,
+  UpdatePlayer
 } from '../models/team.models';
 
 @Injectable({
@@ -24,8 +27,8 @@ export class TeamService {
     return this.apiClient.get<Team>(API_ENDPOINTS.TEAMS.GET(id));
   }
 
-  getTeamPlayers(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TEAMS.PLAYERS(id));
+  getTeamPlayers(id: string): Observable<Player[]> {
+    return this.apiClient.get<Player[]>(API_ENDPOINTS.TEAMS.PLAYERS(id));
   }
 
   getMyTeams(params?: TeamSearch): Observable<PaginatedResponse<Team>> {
@@ -72,12 +75,39 @@ export class TeamService {
     return this.apiClient.uploadFile<{ logoUrl: string }>(API_ENDPOINTS.TEAMS.UPLOAD_LOGO(teamId), file);
   }
 
-  addPlayerToTeam(teamId: string, playerData: any): Observable<any> {
-    return this.apiClient.post<any>(API_ENDPOINTS.TEAMS.ADD_PLAYER(teamId), playerData);
+  addPlayerToTeam(teamId: string, playerData: CreatePlayer): Observable<Player> {
+    const formData = new FormData();
+    formData.append('FirstName', playerData.firstName);
+    formData.append('LastName', playerData.lastName);
+    if (playerData.position) {
+      formData.append('Position', playerData.position);
+    }
+    if (playerData.email) {
+      formData.append('Email', playerData.email);
+    }
+    if (playerData.photoUrl) {
+      formData.append('PhotoUrl', playerData.photoUrl);
+    }
+    formData.append('TeamId', playerData.teamId);
+    
+    return this.apiClient.postFormData<Player>(API_ENDPOINTS.TEAMS.ADD_PLAYER(teamId), formData);
   }
 
-  updateTeamPlayer(teamId: string, playerId: string, updates: any): Observable<any> {
-    return this.apiClient.put<any>(API_ENDPOINTS.TEAMS.UPDATE_PLAYER(teamId, playerId), updates);
+  updateTeamPlayer(teamId: string, playerId: string, updates: UpdatePlayer): Observable<Player> {
+    const formData = new FormData();
+    formData.append('FirstName', updates.firstName);
+    formData.append('LastName', updates.lastName);
+    if (updates.position) {
+      formData.append('Position', updates.position);
+    }
+    if (updates.email) {
+      formData.append('Email', updates.email);
+    }
+    if (updates.photoUrl) {
+      formData.append('PhotoUrl', updates.photoUrl);
+    }
+    
+    return this.apiClient.putFormData<Player>(API_ENDPOINTS.TEAMS.UPDATE_PLAYER(teamId, playerId), formData);
   }
 
   removePlayerFromTeam(teamId: string, playerId: string): Observable<void> {

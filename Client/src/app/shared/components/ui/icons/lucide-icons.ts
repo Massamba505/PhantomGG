@@ -46,7 +46,14 @@ import {
   Bell,
   CheckCircle,
   XCircle,
-  Check
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  RefreshCw,
+  Plus,
+  BarChart3,
+  Save
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -97,5 +104,12 @@ export const LucideIcons = {
   Bell,
   CheckCircle,
   XCircle,
-  Check
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  RefreshCw,
+  Plus,
+  BarChart3,
+  Save
 };

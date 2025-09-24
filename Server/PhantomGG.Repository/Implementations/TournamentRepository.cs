@@ -252,4 +252,28 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         return await _context.TournamentTeams
             .CountAsync(tt => tt.TournamentId == tournamentId && tt.Status == TeamRegistrationStatus.Approved.ToString());
     }
+
+    public async Task<IEnumerable<Match>> GetTournamentMatchesAsync(Guid tournamentId)
+    {
+        return await _context.Matches
+            .Include(m => m.HomeTeam)
+            .Include(m => m.AwayTeam)
+            .Include(m => m.MatchEvents)
+                .ThenInclude(me => me.Player)
+            .Where(m => m.TournamentId == tournamentId)
+            .OrderBy(m => m.MatchDate)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<MatchEvent>> GetTournamentMatchEventsAsync(Guid tournamentId)
+    {
+        return await _context.MatchEvents
+            .Include(me => me.Player)
+            .Include(me => me.Team)
+            .Include(me => me.Match)
+            .Where(me => me.Match.TournamentId == tournamentId)
+            .OrderBy(me => me.Match.MatchDate)
+            .ThenBy(me => me.Minute)
+            .ToListAsync();
+    }
 }
