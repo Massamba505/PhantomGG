@@ -14,7 +14,7 @@ import { Player, CreatePlayer, UpdatePlayer } from '@/app/api/models/team.models
 export class PlayerForm implements OnInit {
   private fb = inject(FormBuilder);
   
-  player = input<Player | null>(null); // null for create, Player for edit
+  player = input<Player | null>(null);
   teamId = input.required<string>();
   
   save = output<CreatePlayer | UpdatePlayer>();
@@ -27,7 +27,6 @@ export class PlayerForm implements OnInit {
   selectedFile = signal<File | null>(null);
   previewUrl = signal<string | null>(null);
 
-  // Computed preview data for the player card
   previewData = computed(() => {
     if (!this.form) return null;
     
@@ -48,7 +47,6 @@ export class PlayerForm implements OnInit {
     this.isEditMode = !!this.player();
     this.initializeForm();
     
-    // Set initial preview URL for existing player
     const currentPlayer = this.player();
     if (currentPlayer?.photoUrl) {
       this.previewUrl.set(currentPlayer.photoUrl);
@@ -114,22 +112,12 @@ export class PlayerForm implements OnInit {
     }
   }
 
-  getPlayerInitials(): string {
-    const preview = this.previewData();
-    if (!preview) return 'FL';
-    return `${preview.firstName.charAt(0)}${preview.lastName.charAt(0)}`.toUpperCase();
-  }
-
   getFullName(): string {
     const preview = this.previewData();
     if (!preview) return 'First Last';
     return `${preview.firstName} ${preview.lastName}`;
   }
-
-  getTitle(): string {
-    return this.isEditMode ? 'Edit Player' : 'Add New Player';
-  }
-
+  
   getSubmitText(): string {
     return this.isEditMode ? 'Update Player' : 'Add Player';
   }
