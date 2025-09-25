@@ -1,0 +1,71 @@
+import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AuthStateService } from '@/app/store/AuthStateService';
+import { ToastService } from '@/app/shared/services/toast.service';
+import { RoleSelection } from '@/app/shared/components/role-selection/role-selection';
+import { Roles } from '@/app/shared/constants/roles';
+import { RegisterRequest } from '@/app/api/models';
+import { LucideAngularModule } from 'lucide-angular';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+
+@Component({
+  selector: 'app-role-selection-page',
+  templateUrl: './role-selection-page.html',
+  imports: [CommonModule, RoleSelection, LucideAngularModule],
+})
+export class RoleSelectionPage {
+  private router = inject(Router);
+  private authState = inject(AuthStateService);
+  private toast = inject(ToastService);
+
+  readonly icons = LucideIcons;
+  readonly Roles = Roles;
+  selectedRole = signal<Roles | null>(null);
+  signupData: any = null;
+  loading = this.authState.loading;
+
+  constructor() {
+    // Get signup data from navigation state
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state?.['signupData']) {
+      this.signupData = navigation.extras.state['signupData'];
+    } else {
+      // If no signup data, redirect back to signup
+      this.router.navigate(['/auth/signup']);
+    }
+  }
+
+  onRoleSelected(role: Roles) {
+    this.selectedRole.set(role);
+  }
+
+  onContinue() {
+    if (!this.selectedRole() || !this.signupData) {
+      this.toast.error('Please select an account type');
+      return;
+    }
+
+    // Add the selected role to signup data and register
+    const credentials: RegisterRequest = {
+      ...this.signupData,
+      role: this.selectedRole()!
+    };
+
+    this.authState.register(credentials).subscribe({
+      next: () => {
+        this.toast.success('Account created successfully!');
+        if (this.authState.isAuthenticated()) {
+          this.router.navigate(['/dashboard']);
+        }
+      },
+      error: (error) => {
+        this.toast.error('Failed to create account. Please try again.');
+      }
+    });
+  }
+
+  onBack() {
+    this.router.navigate(['/auth/signup']);
+  }
+}

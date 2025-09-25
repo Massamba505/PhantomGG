@@ -12,6 +12,11 @@ export const authRoutes: Routes = [
     title: 'PhantomGG - Sign Up',
   },
   {
+    path: 'role-selection',
+    loadComponent: () => import('./pages/role-selection/role-selection-page').then((m) => m.RoleSelectionPage),
+    title: 'PhantomGG - Choose Your Role',
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',

@@ -45,7 +45,7 @@ export class Signup {
         '',
         [Validators.required, Validators.email, strictEmailValidator],
       ],
-      role:[Roles.Organizer],
+      role: [Roles.User],
       password: ['', [Validators.required, passwordStrengthValidator]],
       confirmPassword: ['', Validators.required],
     },
@@ -74,14 +74,8 @@ export class Signup {
       return;
     }
 
-    const credentials = this.signupForm.value as RegisterRequest;
-    this.authState.register(credentials).subscribe({
-      next: () => {
-        this.toast.success('Account created successfully!');
-        if (this.authState.isAuthenticated()) {
-          this.router.navigate(['/dashboard']);
-        }
-      }
+    this.router.navigate(['/auth/role-selection'], {
+      state: { signupData: this.signupForm.value }
     });
   }
 
