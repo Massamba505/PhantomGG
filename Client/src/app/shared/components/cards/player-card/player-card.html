@@ -1,0 +1,41 @@
+<div class="card relative">
+  <div class="flex items-start gap-3">
+    <img
+      [src]="player().photoUrl"
+      [alt]="player().firstName + ' ' + player().lastName"
+      class="w-16 h-16 rounded-full object-contain border-2 border-gray-100"
+    />
+
+    <div class="flex-1 min-w-0">
+      <h3 class="font-semibold text-lg truncate">
+        {{ player().firstName }} {{ player().lastName }}
+      </h3>
+      @if (player().position) {
+      <p class="text-sm text-gray-600 mb-1">{{ player().position }}</p>
+      } @if (player().email && config().isManager) {
+      <p class="text-sm text-gray-500 truncate">{{ player().email }}</p>
+      }
+      <p class="text-xs text-gray-400 mt-2">
+        Joined {{ player().joinedAt | date : "short" }}
+      </p>
+    </div>
+  </div>
+  @if (config().isManager && config().showActions) {
+  <div class="flex gap-2 absolute right-3 bottom-3">
+    <button
+      class="btn btn-outline p-2"
+      (click)="onEdit($event)"
+      title="Edit Player"
+    >
+      <lucide-angular [img]="icons.Edit" [size]="12"></lucide-angular>
+    </button>
+    <button
+      class="btn btn-destructive p-2"
+      (click)="onDelete($event)"
+      title="Remove Player"
+    >
+      <lucide-angular [img]="icons.Trash2" [size]="12"></lucide-angular>
+    </button>
+  </div>
+  }
+</div>

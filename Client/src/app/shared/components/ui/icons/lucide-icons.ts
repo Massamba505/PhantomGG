@@ -53,7 +53,8 @@ import {
   RefreshCw,
   Plus,
   BarChart3,
-  Save
+  Save,
+  Upload
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -111,5 +112,6 @@ export const LucideIcons = {
   RefreshCw,
   Plus,
   BarChart3,
-  Save
+  Save,
+  Upload
 };

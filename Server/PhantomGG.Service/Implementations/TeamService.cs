@@ -58,7 +58,7 @@ public class TeamService(
 
     public async Task<PaginatedResponse<TeamDto>> GetMyTeamsAsync(TeamSearchDto searchDto, Guid userId)
     {
-        var teams = await _teamRepository.SearchAsync(searchDto, userId:userId);
+        var teams = await _teamRepository.SearchAsync(searchDto, userId: userId);
         var teamDtos = teams.Select(t => t.ToDto());
         var totalCount = teamDtos.Count();
 
@@ -69,9 +69,6 @@ public class TeamService(
             PageNumber = searchDto.Page,
             PageSize = searchDto.PageSize
         };
-
-        //var teams = await _teamRepository.GetByUserAsync(userId);
-        //return teams.Select(t => t.ToDto());
     }
 
     public async Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid managerId)

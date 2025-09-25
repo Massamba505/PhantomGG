@@ -1,0 +1,270 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="player-form">
+  <div class="form-grid">
+    @if (previewData()!.photoUrl) {
+    <img
+      [src]="previewData()!.photoUrl"
+      [alt]="getFullName()"
+      class="w-32 h-32 rounded-full object-cover border-2 border-gray-100"
+    />
+    }
+
+    <div class="form-row">
+      <div class="flex flex-col gap-1">
+        <label class="form-label" for="firstName">First Name *</label>
+        <input
+          id="firstName"
+          type="text"
+          formControlName="firstName"
+          class="input-field"
+          [class.error]="getFieldError('firstName')"
+          placeholder="Enter first name"
+        />
+        @if (getFieldError('firstName')) {
+        <span class="error-message">{{ getFieldError("firstName") }}</span>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="form-label" for="lastName">Last Name *</label>
+        <input
+          id="lastName"
+          type="text"
+          formControlName="lastName"
+          class="input-field"
+          [class.error]="getFieldError('lastName')"
+          placeholder="Enter last name"
+        />
+        @if (getFieldError('lastName')) {
+        <span class="error-message">{{ getFieldError("lastName") }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="form-label" for="position">Position</label>
+      <input
+        id="position"
+        type="text"
+        formControlName="position"
+        class="input-field"
+        [class.error]="getFieldError('position')"
+        placeholder="e.g., Forward, Midfielder, Defender, Goalkeeper"
+      />
+      @if (getFieldError('position')) {
+      <span class="error-message">{{ getFieldError("position") }}</span>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="form-label" for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        class="input-field"
+        [class.error]="getFieldError('email')"
+        placeholder="player@example.com"
+      />
+      @if (getFieldError('email')) {
+      <span class="error-message">{{ getFieldError("email") }}</span>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="form-label" for="photo">Player Photo</label>
+      <div class="file-input-wrapper">
+        <input
+          id="photo"
+          type="file"
+          accept="image/*"
+          class="file-input"
+          (change)="onFileSelect($event)"
+        />
+        <div class="file-input-label">
+          <lucide-angular [img]="icons.Upload" [size]="16"></lucide-angular>
+          <span>Choose photo</span>
+        </div>
+      </div>
+      <p class="form-help">
+        Optional: Upload a player photo (JPG, PNG, max 5MB)
+      </p>
+    </div>
+  </div>
+
+  <div class="flex justify-center items-center gap-2">
+    <button type="button" class="btn btn-outline" (click)="onCancel()">
+      Cancel
+    </button>
+    <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+      <lucide-angular
+        [img]="isEditMode ? icons.Save : icons.Plus"
+        [size]="16"
+      ></lucide-angular>
+      {{ getSubmitText() }}
+    </button>
+  </div>
+</form>
+
+<!-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-8"> -->
+<!-- Form Section -->
+<!-- <div>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2" for="firstName">
+            First Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="getFieldError('firstName')"
+            placeholder="Enter first name"
+          />
+          @if (getFieldError('firstName')) {
+          <span class="text-sm text-red-600 mt-1">{{ getFieldError('firstName') }}</span>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2" for="lastName">
+            Last Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="lastName"
+            type="text"
+            formControlName="lastName"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="getFieldError('lastName')"
+            placeholder="Enter last name"
+          />
+          @if (getFieldError('lastName')) {
+          <span class="text-sm text-red-600 mt-1">{{ getFieldError('lastName') }}</span>
+          }
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2" for="position">
+          Position
+        </label>
+        <input
+          id="position"
+          type="text"
+          formControlName="position"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          [class.border-red-500]="getFieldError('position')"
+          placeholder="e.g., Forward, Midfielder, Defender, Goalkeeper"
+        />
+        @if (getFieldError('position')) {
+        <span class="text-sm text-red-600 mt-1">{{ getFieldError('position') }}</span>
+        }
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2" for="email">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          [class.border-red-500]="getFieldError('email')"
+          placeholder="player@example.com"
+        />
+        @if (getFieldError('email')) {
+        <span class="text-sm text-red-600 mt-1">{{ getFieldError('email') }}</span>
+        }
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+          Player Photo
+        </label>
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-blue-400 transition-colors">
+          <div class="space-y-1 text-center">
+            @if (previewUrl()) {
+            <div class="mb-4">
+              <img [src]="previewUrl()" class="mx-auto h-24 w-24 rounded-full object-cover border-2 border-gray-200" />
+            </div>
+            }
+            
+            <lucide-angular [img]="icons.Upload" [size]="24" class="mx-auto text-gray-400"></lucide-angular>
+            <div class="flex text-sm text-gray-600">
+              <label for="photo" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500">
+                <span>{{ previewUrl() ? 'Change photo' : 'Upload a photo' }}</span>
+                <input
+                  id="photo"
+                  name="photo"
+                  type="file"
+                  accept="image/*"
+                  class="sr-only"
+                  (change)="onFileSelect($event)"
+                />
+              </label>
+              <p class="pl-1">or drag and drop</p>
+            </div>
+            <p class="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button
+          type="button"
+          class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          (click)="onCancel()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="!form.valid"
+        >
+          <lucide-angular
+            [img]="isEditMode ? icons.Save : icons.Plus"
+            [size]="16"
+          ></lucide-angular>
+          {{ getSubmitText() }}
+        </button>
+      </div>
+    </form>
+  </div> -->
+
+<!-- Preview Section -->
+<!-- <div>
+  <h3 class="text-lg font-medium text-gray-900 mb-4">Preview</h3>
+  @if (previewData()) {
+  <div class="rounded-lg border border-gray-200 p-4 shadow-sm">
+    <div class="flex items-start gap-3">
+      @else {
+      <div
+        class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg border-2 border-gray-100"
+      >
+        {{ getPlayerInitials() }}
+      </div>
+      }
+
+      <div class="flex-1">
+        <h3 class="font-semibold text-lg text-gray-900">
+          {{ getFullName() }}
+        </h3>
+        @if (previewData()!.position) {
+        <p class="text-sm text-gray-600 mb-1">{{ previewData()!.position }}</p>
+        } @if (previewData()!.email) {
+        <p class="text-sm text-gray-500 truncate">{{ previewData()!.email }}</p>
+        }
+        <p class="text-xs text-gray-400 mt-2">
+          @if (isEditMode) { Joined
+          {{ previewData()!.joinedAt | date : "short" }}
+          } @else { Will join today }
+        </p>
+      </div>
+    </div>
+  </div>
+  }
+</div> -->
+<!-- </div> -->
