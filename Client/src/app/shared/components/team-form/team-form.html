@@ -1,6 +1,6 @@
 <form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="space-y-4">
   <div>
-    <label class="block text-sm font-medium mb-2">Team Logo *</label>
+    <label class="block text-sm font-medium mb-2">Team Logo (Optional)</label>
 
     <div
       class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition"
@@ -26,11 +26,8 @@
       />
       }
     </div>
-
-    @if (submitted() && teamForm.controls['logo'].invalid) {
-    <div class="error-message text-sm mt-1">Logo is required</div>
-    }
   </div>
+
   <div>
     <label class="block text-sm font-medium mb-2">Team Name *</label>
     <input
@@ -38,39 +35,31 @@
       formControlName="name"
       class="input-field w-full"
       [ngClass]="{ error: submitted() && teamForm.controls['name'].invalid }"
+      placeholder="Enter team name"
     />
     @if (submitted() && teamForm.controls['name'].invalid) {
     <div class="error-message text-sm mt-1">
-      Team name is required (min 2 chars)
+      Team name is required (2-200 characters)
     </div>
     }
   </div>
 
   <div>
-    <label class="block text-sm font-medium mb-2">Manager *</label>
+    <label class="block text-sm font-medium mb-2">Short Name (Optional)</label>
     <input
       type="text"
-      formControlName="manager"
-      class="input-field w-full"
-      [ngClass]="{ error: submitted() && teamForm.controls['manager'].invalid }"
-    />
-    @if (submitted() && teamForm.controls['manager'].invalid) {
-    <div class="error-message text-sm mt-1">Manager is required</div>
-    }
-  </div>
-
-  <div>
-    <label class="block text-sm font-medium mb-2">Number of Players *</label>
-    <input
-      type="number"
-      formControlName="numberOfPlayers"
+      formControlName="shortName"
       class="input-field w-full"
       [ngClass]="{
-        error: submitted() && teamForm.controls['numberOfPlayers'].invalid
+        error: submitted() && teamForm.controls['shortName'].invalid
       }"
+      placeholder="Enter team abbreviation (max 10 chars)"
+      maxlength="10"
     />
-    @if (submitted() && teamForm.controls['numberOfPlayers'].invalid) {
-    <div class="error-message text-sm mt-1">Must be between 1 and 30</div>
+    @if (submitted() && teamForm.controls['shortName'].invalid) {
+    <div class="error-message text-sm mt-1">
+      Short name must be 10 characters or less
+    </div>
     }
   </div>
 
@@ -83,7 +72,7 @@
       class="btn btn-primary flex-1"
       [disabled]="submitted() && teamForm.invalid"
     >
-      {{ team() ? "Update Team" : "Add Team" }}
+      {{ team() ? "Update Team" : "Create Team" }}
     </button>
   </div>
 </form>

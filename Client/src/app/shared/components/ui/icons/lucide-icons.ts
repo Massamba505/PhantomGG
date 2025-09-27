@@ -41,7 +41,20 @@ import {
   UserCircle,
   Play,
   Mail,
-  Activity
+  Activity,
+  MenuIcon,
+  Bell,
+  CheckCircle,
+  XCircle,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  RefreshCw,
+  Plus,
+  BarChart3,
+  Save,
+  Upload
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -87,5 +100,18 @@ export const LucideIcons = {
   UserCircle,
   Play,
   Mail,
-  Activity
+  Activity,
+  MenuIcon,
+  Bell,
+  CheckCircle,
+  XCircle,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  RefreshCw,
+  Plus,
+  BarChart3,
+  Save,
+  Upload
 };

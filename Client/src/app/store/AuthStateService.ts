@@ -52,9 +52,9 @@ export class AuthStateService {
     );
   }
 
-  signup(credentials: RegisterRequest) {
+  register(credentials: RegisterRequest) {
     return this.withLoading(
-      this.authService.signup(credentials).pipe(
+      this.authService.register(credentials).pipe(
         tap((res) => this.handleAuthSuccess(res)),
         catchError((error) => throwError(() => error))
       )

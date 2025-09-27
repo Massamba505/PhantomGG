@@ -1,0 +1,101 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  class="flex flex-col space-y-3"
+>
+  @if (previewData()!.photoUrl) {
+  <img
+    [src]="previewData()!.photoUrl"
+    [alt]="getFullName()"
+    class="w-32 h-32 rounded-full object-contain border-2 border-gray-100 mx-auto"
+  />
+  }
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    <div>
+      <label class="form-label" for="firstName">First Name *</label>
+      <input
+        id="firstName"
+        type="text"
+        formControlName="firstName"
+        class="input-field"
+        [class.error]="getFieldError('firstName')"
+        placeholder="Enter first name"
+      />
+      @if (getFieldError('firstName')) {
+      <span class="error-message">{{ getFieldError("firstName") }}</span>
+      }
+    </div>
+
+    <div>
+      <label class="form-label" for="lastName">Last Name *</label>
+      <input
+        id="lastName"
+        type="text"
+        formControlName="lastName"
+        class="input-field"
+        [class.error]="getFieldError('lastName')"
+        placeholder="Enter last name"
+      />
+      @if (getFieldError('lastName')) {
+      <span class="error-message">{{ getFieldError("lastName") }}</span>
+      }
+    </div>
+  </div>
+
+  <div>
+    <label class="form-label" for="position">Position</label>
+    <input
+      id="position"
+      type="text"
+      formControlName="position"
+      class="input-field"
+      [class.error]="getFieldError('position')"
+      placeholder="e.g., Forward, Midfielder, Defender, Goalkeeper"
+    />
+    @if (getFieldError('position')) {
+    <span class="error-message">{{ getFieldError("position") }}</span>
+    }
+  </div>
+
+  <div>
+    <label class="form-label" for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      formControlName="email"
+      class="input-field"
+      [class.error]="getFieldError('email')"
+      placeholder="player@example.com"
+    />
+    @if (getFieldError('email')) {
+    <span class="error-message">{{ getFieldError("email") }}</span>
+    }
+  </div>
+
+  <div>
+    <label class="form-label" for="photo">Player Photo</label>
+    <div class="">
+      <input
+        id="photo"
+        type="file"
+        accept="image/*"
+        class="input-field"
+        (change)="onFileSelect($event)"
+      />
+    </div>
+  </div>
+
+  <div class="flex justify-center items-center gap-2">
+    <button type="button" class="btn btn-outline" (click)="onCancel()">
+      Cancel
+    </button>
+    <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+      <lucide-angular
+        [img]="isEditMode ? icons.Save : icons.Plus"
+        [size]="16"
+      ></lucide-angular>
+      {{ getSubmitText() }}
+    </button>
+  </div>
+</form>

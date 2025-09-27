@@ -6,7 +6,6 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-not-found',
-  standalone: true,
   imports: [CommonModule, RouterLink, LucideAngularModule],
   templateUrl: './not-found.html',
 })

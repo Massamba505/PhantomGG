@@ -1,0 +1,108 @@
+<div class="tournament-browse-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <lucide-icon [img]="icons.Trophy" class="title-icon"></lucide-icon>
+        Browse Tournaments
+      </h1>
+      <p class="page-subtitle">
+        Discover exciting esports tournaments happening around the world
+      </p>
+    </div>
+  </div>
+
+  <!-- Simple Search -->
+  <div class="search-section">
+    <div class="search-input-container">
+      <lucide-icon [img]="icons.Search" class="search-icon"></lucide-icon>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search tournaments by name or description..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        (input)="onSearchChange()"
+      />
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <div class="loading-spinner">
+      <lucide-icon [img]="icons.Loader2" class="animate-spin"></lucide-icon>
+    </div>
+    <p class="loading-text">Loading tournaments...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error() && !loading()" class="error-container">
+    <lucide-icon [img]="icons.AlertCircle" class="error-icon"></lucide-icon>
+    <p class="error-text">{{ error() }}</p>
+    <button class="retry-button" (click)="loadTournaments()">
+      <lucide-icon [img]="icons.RefreshCw" class="button-icon"></lucide-icon>
+      Try Again
+    </button>
+  </div>
+
+  <!-- Tournament Grid -->
+  <div *ngIf="!loading() && !error()" class="tournaments-section">
+    <!-- Results Info -->
+    <div class="results-info">
+      <p class="results-text">
+        Showing {{ tournaments().length }} of {{ totalCount() }} tournaments
+      </p>
+    </div>
+
+    <!-- Tournament Cards Grid -->
+    <div *ngIf="tournaments().length > 0" class="tournaments-grid">
+      <app-tournament-card
+        *ngFor="let tournament of tournaments(); trackBy: trackByTournamentId"
+        [tournament]="tournament"
+        [isOrganizer]="false"
+        (view)="onTournamentView($event)"
+      >
+      </app-tournament-card>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="tournaments().length === 0" class="empty-state">
+      <lucide-icon [img]="icons.Search" class="empty-icon"></lucide-icon>
+      <h3 class="empty-title">No tournaments found</h3>
+      <p class="empty-text">
+        Try adjusting your search filters or check back later for new
+        tournaments.
+      </p>
+    </div>
+
+    <!-- Pagination -->
+    <div
+      *ngIf="tournaments().length > 0 && totalPages() > 1"
+      class="pagination-section"
+    >
+      <div class="pagination">
+        <button
+          class="pagination-button"
+          [disabled]="currentPage() <= 1"
+          (click)="onPageChange(currentPage() - 1)"
+        >
+          <lucide-icon [img]="icons.ChevronLeft"></lucide-icon>
+          Previous
+        </button>
+
+        <div class="pagination-info">
+          Page {{ currentPage() }} of {{ totalPages() }}
+        </div>
+
+        <button
+          class="pagination-button"
+          [disabled]="currentPage() >= totalPages()"
+          (click)="onPageChange(currentPage() + 1)"
+        >
+          Next
+          <lucide-icon [img]="icons.ChevronRight"></lucide-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

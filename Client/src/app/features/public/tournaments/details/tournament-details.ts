@@ -1,0 +1,159 @@
+import { Component, OnInit, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
+
+// import { TeamCard } from '@/app/shared/components/cards/team-card/team-card';
+import { Tournament, TournamentStatistics } from '@/app/api/models/tournament.models';
+import { TournamentTeam } from '@/app/api/models/team.models';
+import { TournamentService } from '@/app/api/services/tournament.service';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+
+@Component({
+  selector: 'app-tournament-details',
+  templateUrl: './tournament-details.html',
+  styleUrls: ['./tournament-details.css'],
+  imports: [
+    CommonModule,
+    LucideAngularModule
+  ],
+})
+export class TournamentDetails implements OnInit {
+  tournament = signal<Tournament | null>(null);
+  teams = signal<TournamentTeam[]>([]);
+  statistics = signal<TournamentStatistics | null>(null);
+  loading = signal(false);
+  error = signal<string | null>(null);
+
+  readonly icons = LucideIcons;
+
+  // Computed values
+  tournamentStatus = computed(() => {
+    const t = this.tournament();
+    if (!t) return 'Unknown';
+    
+    const now = new Date();
+    const startDate = new Date(t.startDate);
+    const endDate = new Date(t.endDate);
+    
+    if (now < startDate) return 'Upcoming';
+    if (now >= startDate && now <= endDate) return 'In Progress';
+    if (now > endDate) return 'Completed';
+    
+    return t.status;
+  });
+
+  daysUntilStart = computed(() => {
+    const t = this.tournament();
+    if (!t) return null;
+    
+    const now = new Date();
+    const startDate = new Date(t.startDate);
+    const diffTime = startDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays > 0 ? diffDays : null;
+  });
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private tournamentService: TournamentService
+  ) {}
+
+  ngOnInit() {
+    const tournamentId = this.route.snapshot.paramMap.get('id');
+    if (tournamentId) {
+      this.loadTournamentDetails(tournamentId);
+    } else {
+      this.router.navigate(['/public/tournaments']);
+    }
+  }
+
+  async loadTournamentDetails(tournamentId: string) {
+    this.loading.set(true);
+    this.error.set(null);
+    
+    try {
+      // Load tournament details, teams, and statistics in parallel
+      const [tournament, teams, statistics] = await Promise.all([
+        this.tournamentService.getPublicTournament(tournamentId),
+        this.tournamentService.getPublicTournamentTeams(tournamentId),
+        this.tournamentService.getPublicTournamentStatistics(tournamentId).catch(() => null) // Optional
+      ]);
+      
+      this.tournament.set(tournament);
+      this.teams.set(teams);
+      this.statistics.set(statistics);
+    } catch (error) {
+      console.error('Error loading tournament details:', error);
+      this.error.set('Failed to load tournament details. Please try again.');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  onTeamView(team: TournamentTeam) {
+    // Navigate to team details (if implemented)
+    console.log('View team:', team);
+  }
+
+  onBackToTournaments() {
+    this.router.navigate(['/public/tournaments']);
+  }
+
+  getStatusBadgeClass(status: string): string {
+    switch (status) {
+      case 'RegistrationOpen':
+      case 'Upcoming':
+        return 'status-badge status-success';
+      case 'InProgress':
+        return 'status-badge status-warning';
+      case 'Completed':
+        return 'status-badge status-secondary';
+      default:
+        return 'status-badge status-primary';
+    }
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  }
+
+  getProgressPercentage(): number {
+    const t = this.tournament();
+    if (!t) return 0;
+    return Math.min((t.teamCount / t.maxTeams) * 100, 100);
+  }
+
+  trackByTeamId(index: number, team: TournamentTeam): string {
+    return team.id;
+  }
+
+  getTeamInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  }
+
+  retryLoad() {
+    const tournamentId = this.route.snapshot.paramMap.get('id');
+    if (tournamentId) {
+      this.loadTournamentDetails(tournamentId);
+    }
+  }
+}

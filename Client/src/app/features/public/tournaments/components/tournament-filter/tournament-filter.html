@@ -1,0 +1,81 @@
+<div class="tournament-filter">
+  <div class="filter-header">
+    <h3 class="filter-title">
+      <lucide-icon [img]="icons.Funnel" class="filter-icon"></lucide-icon>
+      Search & Filter
+    </h3>
+  </div>
+
+  <div class="filter-form">
+    <!-- Search Input -->
+    <div class="form-group">
+      <label class="form-label">Search tournaments</label>
+      <div class="input-with-icon">
+        <lucide-icon [img]="icons.Search" class="input-icon"></lucide-icon>
+        <input
+          type="text"
+          class="form-input"
+          placeholder="Tournament name, description..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+        />
+      </div>
+    </div>
+
+    <div class="filter-grid">
+      <!-- Status Filter -->
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" [(ngModel)]="status" (change)="onSearch()">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Location Filter -->
+      <div class="form-group">
+        <label class="form-label">Location</label>
+        <div class="input-with-icon">
+          <lucide-icon [img]="icons.MapPin" class="input-icon"></lucide-icon>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="City, country..."
+            [(ngModel)]="location"
+            (input)="onSearch()"
+          />
+        </div>
+      </div>
+
+      <!-- Date Range -->
+      <div class="form-group">
+        <label class="form-label">Start Date From</label>
+        <input
+          type="date"
+          class="form-input"
+          [(ngModel)]="startDateFrom"
+          (change)="onSearch()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Start Date To</label>
+        <input
+          type="date"
+          class="form-input"
+          [(ngModel)]="startDateTo"
+          (change)="onSearch()"
+        />
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="filter-actions">
+      <button type="button" class="clear-button" (click)="onClear()">
+        <lucide-icon [img]="icons.X" class="button-icon"></lucide-icon>
+        Clear Filters
+      </button>
+    </div>
+  </div>
+</div>

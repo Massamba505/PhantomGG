@@ -7,7 +7,10 @@ import {
   Team,
   CreateTeam,
   UpdateTeam,
-  TeamSearch
+  TeamSearch,
+  Player,
+  CreatePlayer,
+  UpdatePlayer
 } from '../models/team.models';
 
 @Injectable({
@@ -16,91 +19,98 @@ import {
 export class TeamService {
   private apiClient = inject(ApiClient);
 
-  // Public team discovery and viewing
-  getPublicTeams(params?: TeamSearch): Observable<PaginatedResponse<Team>> {
-    return this.apiClient.getPaginated<Team>(API_ENDPOINTS.TOURNAMENTS.LIST, params);
+  getTeams(params?: TeamSearch): Observable<PaginatedResponse<Team>> {
+    return this.apiClient.getPaginated<Team>(API_ENDPOINTS.TEAMS.LIST, params);
   }
 
   getTeam(id: string): Observable<Team> {
-    return this.apiClient.get<Team>(API_ENDPOINTS.TOURNAMENTS.GET(id));
+    return this.apiClient.get<Team>(API_ENDPOINTS.TEAMS.GET(id));
   }
 
-  searchTeams(params: TeamSearch): Observable<PaginatedResponse<Team>> {
-    return this.apiClient.getPaginated<Team>(API_ENDPOINTS.TOURNAMENTS.SEARCH, params);
+  getTeamPlayers(id: string): Observable<Player[]> {
+    return this.apiClient.get<Player[]>(API_ENDPOINTS.TEAMS.PLAYERS(id));
   }
 
-  getTeamsByTournament(tournamentId: string): Observable<Team[]> {
-    return this.apiClient.get<Team[]>(API_ENDPOINTS.TOURNAMENTS.TEAMS(tournamentId));
-  }
-
-  getTeamStats(teamId: string): Observable<any> {
-    return this.apiClient.get<any>(API_ENDPOINTS.TOURNAMENTS.TEAM_STATS(teamId));
-  }
-
-  getTeamPlayers(tournamentId: string, teamId: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.TEAM_ROSTER(tournamentId, teamId));
-  }
-
-  getTeamMatches(tournamentId: string, teamId: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.TEAM_MATCHES(tournamentId, teamId));
-  }
-
-  // User team management operations
-  getMyTeams(): Observable<Team[]> {
-    return this.apiClient.get<Team[]>(API_ENDPOINTS.USERS.TEAMS.LIST);
+  getMyTeams(params?: TeamSearch): Observable<PaginatedResponse<Team>> {
+    return this.apiClient.getPaginated<Team>(API_ENDPOINTS.TEAMS.MY_TEAMS, params);
   }
 
   createTeam(team: CreateTeam): Observable<Team> {
-    return this.apiClient.post<Team>(API_ENDPOINTS.USERS.TEAMS.CREATE, team);
+    const formData = new FormData();
+    formData.append('Name', team.name);
+    if (team.shortName) {
+      formData.append('ShortName', team.shortName);
+    }
+    if (team.logoUrl) {
+      formData.append('LogoUrl', team.logoUrl);
+    }
+    if (team.teamPhotoUrl) {
+      formData.append('TeamPhotoUrl', team.teamPhotoUrl);
+    }
+    
+    return this.apiClient.postFormData<Team>(API_ENDPOINTS.TEAMS.CREATE, formData);
   }
 
-  updateMyTeam(id: string, updates: UpdateTeam): Observable<Team> {
-    return this.apiClient.put<Team>(API_ENDPOINTS.USERS.TEAMS.UPDATE(id), updates);
-  }
-
-  deleteMyTeam(id: string): Observable<void> {
-    return this.apiClient.delete<void>(API_ENDPOINTS.USERS.TEAMS.DELETE(id));
-  }
-
-  uploadTeamLogo(teamId: string, file: File): Observable<{ logoUrl: string }> {
-    return this.apiClient.uploadFile<{ logoUrl: string }>(API_ENDPOINTS.USERS.TEAMS.UPLOAD_LOGO(teamId), file);
-  }
-
-  getMyTeamStatistics(teamId: string): Observable<any> {
-    return this.apiClient.get<any>(API_ENDPOINTS.USERS.TEAMS.STATISTICS(teamId));
-  }
-
-  getMyTeamMatches(teamId: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.USERS.TEAMS.MATCHES(teamId));
-  }
-
-  getMyTeamUpcomingMatches(teamId: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.USERS.TEAMS.UPCOMING_MATCHES(teamId));
-  }
-
-  getMyTeamMatchHistory(teamId: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.USERS.TEAMS.MATCH_HISTORY(teamId));
-  }
-
-  // Tournament registration
-  registerForTournament(tournamentData: any): Observable<void> {
-    return this.apiClient.post<void>(API_ENDPOINTS.USERS.TOURNAMENTS.REGISTER, tournamentData);
-  }
-
-  withdrawFromTournament(tournamentId: string, teamId: string): Observable<void> {
-    return this.apiClient.delete<void>(API_ENDPOINTS.USERS.TOURNAMENTS.WITHDRAW(tournamentId, teamId));
-  }
-
-  getApplicationStatus(tournamentId: string, teamId: string): Observable<any> {
-    return this.apiClient.get<any>(API_ENDPOINTS.USERS.TOURNAMENTS.APPLICATION_STATUS(tournamentId, teamId));
-  }
-
-  // Legacy compatibility methods for existing components
   updateTeam(id: string, updates: UpdateTeam): Observable<Team> {
-    return this.updateMyTeam(id, updates);
+    const formData = new FormData();
+    formData.append('Name', updates.name);
+    if (updates.shortName) {
+      formData.append('ShortName', updates.shortName);
+    }
+    if (updates.logoUrl) {
+      formData.append('LogoUrl', updates.logoUrl);
+    }
+    if (updates.teamPhotoUrl) {
+      formData.append('TeamPhotoUrl', updates.teamPhotoUrl);
+    }
+    
+    return this.apiClient.putFormData<Team>(API_ENDPOINTS.TEAMS.UPDATE(id), formData);
   }
 
   deleteTeam(id: string): Observable<void> {
-    return this.deleteMyTeam(id);
+    return this.apiClient.delete<void>(API_ENDPOINTS.TEAMS.DELETE(id));
+  }
+
+  uploadTeamLogo(teamId: string, file: File): Observable<{ logoUrl: string }> {
+    return this.apiClient.uploadFile<{ logoUrl: string }>(API_ENDPOINTS.TEAMS.UPLOAD_LOGO(teamId), file);
+  }
+
+  addPlayerToTeam(teamId: string, playerData: CreatePlayer): Observable<Player> {
+    const formData = new FormData();
+    formData.append('FirstName', playerData.firstName);
+    formData.append('LastName', playerData.lastName);
+    if (playerData.position) {
+      formData.append('Position', playerData.position);
+    }
+    if (playerData.email) {
+      formData.append('Email', playerData.email);
+    }
+    if (playerData.photoUrl) {
+      formData.append('PhotoUrl', playerData.photoUrl);
+    }
+    formData.append('TeamId', playerData.teamId);
+    
+    return this.apiClient.postFormData<Player>(API_ENDPOINTS.TEAMS.ADD_PLAYER(teamId), formData);
+  }
+
+  updateTeamPlayer(teamId: string, playerId: string, updates: UpdatePlayer): Observable<Player> {
+    const formData = new FormData();
+    formData.append('FirstName', updates.firstName);
+    formData.append('LastName', updates.lastName);
+    if (updates.position) {
+      formData.append('Position', updates.position);
+    }
+    if (updates.email) {
+      formData.append('Email', updates.email);
+    }
+    if (updates.photoUrl) {
+      formData.append('PhotoUrl', updates.photoUrl);
+    }
+    
+    return this.apiClient.putFormData<Player>(API_ENDPOINTS.TEAMS.UPDATE_PLAYER(teamId, playerId), formData);
+  }
+
+  removePlayerFromTeam(teamId: string, playerId: string): Observable<void> {
+    return this.apiClient.delete<void>(API_ENDPOINTS.TEAMS.REMOVE_PLAYER(teamId, playerId));
   }
 }

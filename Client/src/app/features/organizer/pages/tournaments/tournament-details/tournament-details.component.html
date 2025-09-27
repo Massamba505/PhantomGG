@@ -54,12 +54,14 @@
 
     <div class="card">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="font-semibold text-lg">Registered Teams</h2>
+        <h2 class="font-semibold text-lg">Team Management</h2>
         <span class="status-badge">
           {{ tournament()!.teamCount }}/{{ tournament()!.maxTeams }} Teams
         </span>
       </div>
-      <p class="opacity-75">Team management coming soon...</p>
+
+      <app-tournament-team-management [tournamentId]="tournament()!.id">
+      </app-tournament-team-management>
     </div>
   </div>
 
@@ -83,7 +85,7 @@
             ></lucide-angular>
             Format:
           </span>
-          <span>{{ tournament()!.formatName }}</span>
+          <span>Standard Tournament</span>
         </div>
 
         <div class="flex justify-between">
@@ -94,26 +96,8 @@
           <span>{{ tournament()!.startDate | date : "short" }}</span>
         </div>
 
-        @if (tournament()!.entryFee) {
-        <div class="flex justify-between">
-          <span class="opacity-75 flex items-center gap-2">
-            <lucide-angular
-              [img]="icons.CreditCard"
-              [size]="16"
-            ></lucide-angular>
-            Entry Fee:
-          </span>
-          <span>{{ tournament()!.entryFee | appCurrencyFormat }}</span>
-        </div>
-        } @if (tournament()!.prizePool) {
-        <div class="flex justify-between">
-          <span class="opacity-75 flex items-center gap-2">
-            <lucide-angular [img]="icons.Trophy" [size]="16"></lucide-angular>
-            Prize Pool:
-          </span>
-          <span>{{ tournament()!.prizePool | appCurrencyFormat }}</span>
-        </div>
-        } @if (tournament()!.location) {
+        <!-- Entry fee and prize pool sections removed - not supported in backend -->
+        @if (tournament()!.location) {
         <div class="flex justify-between">
           <span class="opacity-75 flex items-center gap-2">
             <lucide-angular [img]="icons.MapPin" [size]="16"></lucide-angular>
@@ -170,16 +154,11 @@
             <lucide-angular [img]="icons.UserPlus" [size]="16"></lucide-angular>
             Players/Team:
           </span>
-          <span>
-            {{ tournament()!.minPlayersPerTeam }}-{{
-              tournament()!.maxPlayersPerTeam
-            }}
-          </span>
+          <span> 11 (Standard team size) </span>
         </div>
       </div>
     </div>
 
-    @if (tournament()!.contactEmail) {
     <div class="card">
       <h3 class="font-semibold mb-4">Contact</h3>
       <div class="space-y-2">
@@ -188,7 +167,18 @@
             <lucide-angular [img]="icons.User" [size]="16"></lucide-angular>
             Organizer:
           </span>
-          <span>{{ tournament()!.organizerName }}</span>
+
+          <div class="flex items-center gap-3">
+            <span>
+              {{ tournament()!.organizer?.firstName }}
+              {{ tournament()!.organizer?.lastName }}
+            </span>
+            <img
+              [src]="tournament()!.organizer?.profilePictureUrl"
+              alt="Organizer's Profile Picture"
+              class="w-8 h-8 rounded-full object-contain"
+            />
+          </div>
         </div>
 
         <div class="flex justify-between">
@@ -197,15 +187,14 @@
             Email:
           </span>
           <a
-            href="mailto:{{ tournament()!.contactEmail }}"
+            href="mailto:{{ tournament()!.organizer?.email }}"
             class="text-blue-500 hover:underline"
           >
-            {{ tournament()!.contactEmail }}
+            {{ tournament()!.organizer?.email }}
           </a>
         </div>
       </div>
     </div>
-    }
   </div>
 </div>
 }

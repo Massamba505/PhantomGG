@@ -27,7 +27,6 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => 
       import('./features/dashboard-selection/dashboard-selection.component').then((m) => m.DashboardSelectionComponent),
-    title: 'Dashboard',
   },
   {
     path: 'public',
@@ -36,12 +35,13 @@ export const routes: Routes = [
   {
     path: 'user',
     canActivate: [authGuard],
+    data: { roles: [Roles.User] },
     children: userRoutes,
   },
   {
     path: 'organizer',
     canActivate: [authGuard],
-    data: { roles: [Roles.Organizer, Roles.Admin] },
+    data: { roles: [Roles.Organizer] },
     children: organizerRoutes,
   },
   {

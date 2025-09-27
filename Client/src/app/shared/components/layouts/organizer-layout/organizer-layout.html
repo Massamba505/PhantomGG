@@ -1,12 +1,11 @@
-<div class="flex h-screen overflow-hidden">
+<div class="flex h-screen">
   <app-sidebar
-    [isOpen]="sidebarOpen()"
     [userRole]="userRole()"
-    (toggle)="toggleSidebar()"
+    (stateChange)="onSidebarStateChange($event)"
   ></app-sidebar>
 
   <div
-    class="flex flex-col flex-1 h-full transition-all duration-300 overflow-hidden"
+    class="flex flex-col flex-1 h-full transition-all duration-300"
     [ngClass]="sidebarOpen() ? 'ml-64' : 'ml-16'"
   >
     <header class="h-16 flex items-center justify-between px-6 shadow-sm">
@@ -18,7 +17,7 @@
       </div>
     </header>
 
-    <main class="flex-1 p-6 overflow-y-auto">
+    <main class="flex-1 p-6 overflow-y-auto h-full">
       <ng-content></ng-content>
     </main>
   </div>

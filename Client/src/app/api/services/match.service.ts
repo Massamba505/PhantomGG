@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../base/api-client.service';
 import { API_ENDPOINTS } from '../base/api-endpoints';
@@ -13,51 +13,74 @@ import { ApiResponse, PaginatedResponse } from '../models/api.models';
   providedIn: 'root'
 })
 export class MatchService {
-  constructor(private apiClient: ApiClient) {}
+  private apiClient = inject(ApiClient);
 
-  // Public match viewing in tournament context
-  getTournamentMatches(tournamentId: string): Observable<Match[]> {
-    return this.apiClient.get<Match[]>(API_ENDPOINTS.TOURNAMENTS.MATCHES(tournamentId));
+  // Note: Match-specific endpoints are not yet implemented in the backend controllers
+  // This service is prepared for future match management features
+  
+  // Tournament-related operations using available endpoints
+  getTournamentTeams(tournamentId: string): Observable<any[]> {
+    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.TEAMS(tournamentId));
   }
 
-  getTournamentMatchDetails(tournamentId: string, matchId: string): Observable<Match> {
-    return this.apiClient.get<Match>(API_ENDPOINTS.TOURNAMENTS.MATCH_DETAILS(tournamentId, matchId));
+  // Placeholder methods for future match functionality
+  // These will need to be implemented when match endpoints are added to the backend
+
+  /*
+  // Future match endpoints when implemented:
+  
+  getTournamentMatches(tournamentId: string): Observable<Match[]> {
+    return this.apiClient.get<Match[]>(`tournaments/${tournamentId}/matches`);
+  }
+
+  getMatch(tournamentId: string, matchId: string): Observable<Match> {
+    return this.apiClient.get<Match>(`tournaments/${tournamentId}/matches/${matchId}`);
+  }
+
+  createMatch(tournamentId: string, matchData: CreateMatch): Observable<Match> {
+    return this.apiClient.post<Match>(`tournaments/${tournamentId}/matches`, matchData);
+  }
+
+  updateMatch(tournamentId: string, matchId: string, updates: UpdateMatch): Observable<Match> {
+    return this.apiClient.put<Match>(`tournaments/${tournamentId}/matches/${matchId}`, updates);
+  }
+
+  deleteMatch(tournamentId: string, matchId: string): Observable<void> {
+    return this.apiClient.delete<void>(`tournaments/${tournamentId}/matches/${matchId}`);
+  }
+
+  updateMatchResult(tournamentId: string, matchId: string, result: any): Observable<Match> {
+    return this.apiClient.put<Match>(`tournaments/${tournamentId}/matches/${matchId}/result`, result);
+  }
+  */
+
+  // Legacy methods that return empty data until match endpoints are implemented
+  getTournamentMatches(tournamentId: string): Observable<Match[]> {
+    // Return empty array until match endpoints are implemented
+    return new Observable(observer => {
+      observer.next([]);
+      observer.complete();
+    });
   }
 
   getLiveMatches(tournamentId: string): Observable<Match[]> {
-    return this.apiClient.get<Match[]>(API_ENDPOINTS.TOURNAMENTS.LIVE_MATCHES(tournamentId));
+    return new Observable(observer => {
+      observer.next([]);
+      observer.complete();
+    });
   }
 
   getUpcomingMatches(tournamentId: string): Observable<Match[]> {
-    return this.apiClient.get<Match[]>(API_ENDPOINTS.TOURNAMENTS.UPCOMING_MATCHES(tournamentId));
+    return new Observable(observer => {
+      observer.next([]);
+      observer.complete();
+    });
   }
 
   getCompletedMatches(tournamentId: string): Observable<Match[]> {
-    return this.apiClient.get<Match[]>(API_ENDPOINTS.TOURNAMENTS.COMPLETED_MATCHES(tournamentId));
-  }
-
-  getTournamentResults(tournamentId: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.RESULTS(tournamentId));
-  }
-
-  getTournamentSchedule(tournamentId: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.SCHEDULE(tournamentId));
-  }
-
-  getTeamMatches(tournamentId: string, teamId: string): Observable<Match[]> {
-    return this.apiClient.get<Match[]>(API_ENDPOINTS.TOURNAMENTS.TEAM_MATCHES(tournamentId, teamId));
-  }
-
-  // User team match management
-  getMyTeamMatches(teamId: string): Observable<Match[]> {
-    return this.apiClient.get<Match[]>(API_ENDPOINTS.USERS.TEAMS.MATCHES(teamId));
-  }
-
-  getMyTeamUpcomingMatches(teamId: string): Observable<Match[]> {
-    return this.apiClient.get<Match[]>(API_ENDPOINTS.USERS.TEAMS.UPCOMING_MATCHES(teamId));
-  }
-
-  getMyTeamMatchHistory(teamId: string): Observable<Match[]> {
-    return this.apiClient.get<Match[]>(API_ENDPOINTS.USERS.TEAMS.MATCH_HISTORY(teamId));
+    return new Observable(observer => {
+      observer.next([]);
+      observer.complete();
+    });
   }
 }

@@ -1,15 +1,4 @@
-/**
- * API ENDPOINTS - ROLE-BASED SEPARATION
- * ====================================
- * Clear separation of endpoints based on user roles and responsibilities
- * 
- * ORGANIZER ENDPOINTS - Full tournament management, team approval/rejection, administrative control
- * USER ENDPOINTS - Team/player management, tournament registration, personal dashboard  
- * PUBLIC ENDPOINTS - Read-only tournament discovery and viewing
- */
-
 export const API_ENDPOINTS = {
-  // Authentication endpoints (shared across all roles)
   AUTH: {
     REGISTER: 'auth/register',
     LOGIN: 'auth/login',
@@ -18,169 +7,48 @@ export const API_ENDPOINTS = {
     LOGOUT: 'auth/logout'
   },
 
-  // ===== ORGANIZER ENDPOINTS =====
-  // Full tournament management, team approval/rejection, administrative control
-  ORGANIZERS: {
-    // Profile & Dashboard
-    PROFILE: 'organizers/profile',
-    DASHBOARD: 'organizers/dashboard',
-    STATISTICS: 'organizers/statistics',
-
-    // Tournament Management
-    TOURNAMENTS: {
-      LIST: 'organizers/tournaments',
-      GET: (id: string) => `organizers/tournaments/${id}`,
-      CREATE: 'organizers/tournaments',
-      UPDATE: (id: string) => `organizers/tournaments/${id}`,
-      DELETE: (id: string) => `organizers/tournaments/${id}`,
-      SEARCH: 'organizers/tournaments/search',
-      PUBLISH: (id: string) => `organizers/tournaments/${id}/publish`,
-      UNPUBLISH: (id: string) => `organizers/tournaments/${id}/unpublish`,
-      SETTINGS: (id: string) => `organizers/tournaments/${id}/settings`,
-      STATISTICS: (id: string) => `organizers/tournaments/${id}/statistics`,
-      UPLOAD_BANNER: (id: string) => `organizers/tournaments/${id}/banner`,
-      UPLOAD_LOGO: (id: string) => `organizers/tournaments/${id}/logo`,
-      DASHBOARD_DATA: (id: string) => `organizers/tournaments/${id}/dashboard`
-    },
-
-    // Team Management (Organizer perspective)
-    TEAMS: {
-      LIST: (tournamentId: string) => `organizers/tournaments/${tournamentId}/teams`,
-      GET: (tournamentId: string, teamId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}`,
-      APPROVE: (tournamentId: string, teamId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}/approve`,
-      REJECT: (tournamentId: string, teamId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}/reject`,
-      REMOVE: (tournamentId: string, teamId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}`,
-      UPDATE: (tournamentId: string, teamId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}`,
-      SEARCH: (tournamentId: string) => `organizers/tournaments/${tournamentId}/teams/search`,
-      BY_STATUS: (tournamentId: string, status: string) => `organizers/tournaments/${tournamentId}/teams/status/${status}`,
-      PENDING: (tournamentId: string) => `organizers/tournaments/${tournamentId}/teams/pending`,
-      APPROVED: (tournamentId: string) => `organizers/tournaments/${tournamentId}/teams/approved`,
-      REJECTED: (tournamentId: string) => `organizers/tournaments/${tournamentId}/teams/rejected`
-    },
-
-    // Player Management (Organizer perspective)
-    PLAYERS: {
-      LIST: (tournamentId: string) => `organizers/tournaments/${tournamentId}/players`,
-      BY_TEAM: (tournamentId: string, teamId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}/players`,
-      GET: (tournamentId: string, teamId: string, playerId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}/players/${playerId}`,
-      ADD: (tournamentId: string, teamId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}/players`,
-      UPDATE: (tournamentId: string, teamId: string, playerId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}/players/${playerId}`,
-      REMOVE: (tournamentId: string, teamId: string, playerId: string) => `organizers/tournaments/${tournamentId}/teams/${teamId}/players/${playerId}`,
-      SEARCH: (tournamentId: string) => `organizers/tournaments/${tournamentId}/players/search`,
-      STATISTICS: (tournamentId: string, playerId: string) => `organizers/tournaments/${tournamentId}/players/${playerId}/statistics`,
-      TOP_SCORERS: (tournamentId: string) => `organizers/tournaments/${tournamentId}/top-scorers`,
-      TOP_ASSISTS: (tournamentId: string) => `organizers/tournaments/${tournamentId}/top-assists`
-    },
-
-    // Match Management (Organizer perspective)
-    MATCHES: {
-      LIST: (tournamentId: string) => `organizers/tournaments/${tournamentId}/matches`,
-      GET: (tournamentId: string, matchId: string) => `organizers/tournaments/${tournamentId}/matches/${matchId}`,
-      CREATE: (tournamentId: string) => `organizers/tournaments/${tournamentId}/matches`,
-      UPDATE: (tournamentId: string, matchId: string) => `organizers/tournaments/${tournamentId}/matches/${matchId}`,
-      DELETE: (tournamentId: string, matchId: string) => `organizers/tournaments/${tournamentId}/matches/${matchId}`,
-      UPDATE_RESULT: (tournamentId: string, matchId: string) => `organizers/tournaments/${tournamentId}/matches/${matchId}/result`,
-      GENERATE_FIXTURES: (tournamentId: string) => `organizers/tournaments/${tournamentId}/matches/generate`,
-      AUTO_GENERATE: (tournamentId: string) => `organizers/tournaments/${tournamentId}/matches/auto-generate`,
-      FIXTURE_STATUS: (tournamentId: string) => `organizers/tournaments/${tournamentId}/matches/fixture-status`
-    }
-  },
-
-  // ===== USER ENDPOINTS =====
-  // Team/player management, tournament registration, personal dashboard
   USERS: {
-    // Profile & Dashboard
     PROFILE: 'users/profile',
     UPDATE_PROFILE: 'users/profile',
     CHANGE_PASSWORD: 'users/change-password',
-    UPLOAD_PROFILE_PICTURE: 'users/profile-picture',
-    DASHBOARD: 'users/dashboard',
-    STATISTICS: 'users/statistics',
-
-    // Team Management (User as team owner/manager)
-    TEAMS: {
-      LIST: 'users/teams',
-      GET: (id: string) => `users/teams/${id}`,
-      CREATE: 'users/teams',
-      UPDATE: (id: string) => `users/teams/${id}`,
-      DELETE: (id: string) => `users/teams/${id}`,
-      SEARCH: 'users/teams/search',
-      UPLOAD_LOGO: (id: string) => `users/teams/${id}/logo`,
-      STATISTICS: (id: string) => `users/teams/${id}/statistics`,
-      MATCHES: (id: string) => `users/teams/${id}/matches`,
-      UPCOMING_MATCHES: (id: string) => `users/teams/${id}/matches/upcoming`,
-      MATCH_HISTORY: (id: string) => `users/teams/${id}/matches/history`
-    },
-
-    // Player Management (User perspective)
-    PLAYERS: {
-      LIST: (teamId: string) => `users/teams/${teamId}/players`,
-      GET: (teamId: string, playerId: string) => `users/teams/${teamId}/players/${playerId}`,
-      ADD: (teamId: string) => `users/teams/${teamId}/players`,
-      UPDATE: (teamId: string, playerId: string) => `users/teams/${teamId}/players/${playerId}`,
-      REMOVE: (teamId: string, playerId: string) => `users/teams/${teamId}/players/${playerId}`,
-      SEARCH: (teamId: string) => `users/teams/${teamId}/players/search`,
-      PROFILE: (playerId: string) => `users/players/${playerId}/profile`,
-      STATISTICS: (playerId: string) => `users/players/${playerId}/statistics`
-    },
-
-    // Tournament Participation
-    TOURNAMENTS: {
-      REGISTER: 'users/tournaments/register',
-      APPLICATIONS: 'users/tournaments/applications',
-      UPCOMING: 'users/tournaments/upcoming',
-      HISTORY: 'users/tournaments/history',
-      CURRENT: 'users/tournaments/current',
-      WITHDRAW: (tournamentId: string, teamId: string) => `users/tournaments/${tournamentId}/teams/${teamId}/withdraw`,
-      APPLICATION_STATUS: (tournamentId: string, teamId: string) => `users/tournaments/${tournamentId}/teams/${teamId}/status`
-    }
+    UPLOAD_PROFILE_PICTURE: 'users/profile-picture'
   },
 
-  // ===== PUBLIC/BROWSER ENDPOINTS =====
-  // Read-only tournament discovery and viewing
   TOURNAMENTS: {
-    // Tournament Discovery
     LIST: 'tournaments',
-    SEARCH: 'tournaments/search',
-    FEATURED: 'tournaments/featured',
-    UPCOMING: 'tournaments/upcoming',
-    LIVE: 'tournaments/live',
-    RECENT: 'tournaments/recent',
-    BY_LOCATION: (location: string) => `tournaments/location/${location}`,
-    BY_FORMAT: (formatId: string) => `tournaments/format/${formatId}`,
-    FORMATS: 'tournaments/formats',
+    GET: (tournamentId: string) => `tournaments/${tournamentId}`,
+    TEAMS: (tournamentId: string) => `tournaments/${tournamentId}/teams`,
+    MY_TOURNAMENTS: 'tournaments/my-tournaments',
+    REGISTER: (tournamentId: string) => `tournaments/${tournamentId}/register`,
+    WITHDRAW: (tournamentId: string) => `tournaments/${tournamentId}/withdraw`,
+    CREATE: 'tournaments',
+    UPDATE: (tournamentId: string) => `tournaments/${tournamentId}`,
+    DELETE: (tournamentId: string) => `tournaments/${tournamentId}`,
+    UPLOAD_BANNER: (tournamentId: string) => `tournaments/${tournamentId}/image/banner`,
+    UPLOAD_LOGO: (tournamentId: string) => `tournaments/${tournamentId}/image/logo`,
+    PENDING_TEAMS: (tournamentId: string) => `tournaments/${tournamentId}/teams/pending`,
+    APPROVE_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/approve`,
+    REJECT_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/reject`,
+    REMOVE_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}`,
+    // Public endpoints
+    PUBLIC: 'tournaments/public',
+    PUBLIC_DETAILS: (tournamentId: string) => `tournaments/public/${tournamentId}`,
+    PUBLIC_TEAMS: (tournamentId: string) => `tournaments/public/${tournamentId}/teams`,
+    PUBLIC_STATISTICS: (tournamentId: string) => `tournaments/public/${tournamentId}/statistics`,
+    PUBLIC_MATCHES: (tournamentId: string) => `tournaments/public/${tournamentId}/matches`
+  },
 
-    // Tournament Information (Read-only)
-    GET: (id: string) => `tournaments/${id}`,
-    DETAILS: (id: string) => `tournaments/${id}/details`,
-    RULES: (id: string) => `tournaments/${id}/rules`,
-    STATISTICS: (id: string) => `tournaments/${id}/statistics`,
-    
-    // Tournament Structure (Read-only)
-    TEAMS: (id: string) => `tournaments/${id}/teams`,
-    STANDINGS: (id: string) => `tournaments/${id}/standings`,
-    SCHEDULE: (id: string) => `tournaments/${id}/schedule`,
-    MATCHES: (id: string) => `tournaments/${id}/matches`,
-    RESULTS: (id: string) => `tournaments/${id}/results`,
-    FIXTURES: (id: string) => `tournaments/${id}/fixtures`,
-    
-    // Tournament Statistics (Read-only)
-    TOP_SCORERS: (id: string) => `tournaments/${id}/players/top-scorers`,
-    TOP_ASSISTS: (id: string) => `tournaments/${id}/players/top-assists`,
-    BEST_PLAYERS: (id: string) => `tournaments/${id}/players/best`,
-    TEAM_STATS: (id: string) => `tournaments/${id}/teams/statistics`,
-    
-    // Specific Team/Player Info in Tournament Context
-    TEAM_DETAILS: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}`,
-    TEAM_ROSTER: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/players`,
-    TEAM_MATCHES: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/matches`,
-    PLAYER_DETAILS: (tournamentId: string, playerId: string) => `tournaments/${tournamentId}/players/${playerId}`,
-    PLAYER_STATS: (tournamentId: string, playerId: string) => `tournaments/${tournamentId}/players/${playerId}/statistics`,
-    
-    // Match Information (Read-only)
-    MATCH_DETAILS: (tournamentId: string, matchId: string) => `tournaments/${tournamentId}/matches/${matchId}`,
-    LIVE_MATCHES: (id: string) => `tournaments/${id}/matches/live`,
-    UPCOMING_MATCHES: (id: string) => `tournaments/${id}/matches/upcoming`,
-    COMPLETED_MATCHES: (id: string) => `tournaments/${id}/matches/completed`
+  TEAMS: {
+    LIST: 'teams',
+    GET: (teamId: string) => `teams/${teamId}`,
+    PLAYERS: (teamId: string) => `teams/${teamId}/players`,
+    MY_TEAMS: 'teams/my-teams',
+    CREATE: 'teams',
+    UPDATE: (teamId: string) => `teams/${teamId}`,
+    DELETE: (teamId: string) => `teams/${teamId}`,
+    UPLOAD_LOGO: (teamId: string) => `teams/${teamId}/logo`,
+    ADD_PLAYER: (teamId: string) => `teams/${teamId}/players`,
+    UPDATE_PLAYER: (teamId: string, playerId: string) => `teams/${teamId}/players/${playerId}`,
+    REMOVE_PLAYER: (teamId: string, playerId: string) => `teams/${teamId}/players/${playerId}`
   }
 } as const;

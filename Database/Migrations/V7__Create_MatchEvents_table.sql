@@ -1,0 +1,18 @@
+CREATE TABLE MatchEvents (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWID()),
+    MatchId UNIQUEIDENTIFIER NOT NULL,
+    EventType VARCHAR(20) NOT NULL,
+    Minute INT NOT NULL,
+    TeamId UNIQUEIDENTIFIER NOT NULL,
+    PlayerId UNIQUEIDENTIFIER NOT NULL,
+
+    CONSTRAINT PK_MatchEvents PRIMARY KEY (Id),
+    CONSTRAINT FK_MatchEvents_Match FOREIGN KEY (MatchId)
+        REFERENCES Matches (Id) ON DELETE CASCADE,
+    CONSTRAINT FK_MatchEvents_Team FOREIGN KEY (TeamId)
+        REFERENCES Teams (Id),
+    CONSTRAINT FK_MatchEvents_Player FOREIGN KEY (PlayerId)
+        REFERENCES Players (Id)
+);
+
+CREATE INDEX IX_MatchEvents_MatchId ON MatchEvents (MatchId);

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiResponse, PaginatedResponse } from '../models/api.models';
@@ -34,8 +34,17 @@ export class ApiClient {
   }
 
   delete<T>(endpoint: string): Observable<T> {
-    return this.http.delete<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`)
-      .pipe(map(response => response.data!));
+    return this.http.delete<T>(`${this.baseUrl}/${endpoint}`, {
+      observe: 'response'
+    }).pipe(
+      map(response => {
+        if (response.status === 204) {
+          return null as T;
+        }
+        
+        return response.body as T;
+      })
+    );
   }
 
   getPaginated<T>(endpoint: string, params?: any): Observable<PaginatedResponse<T>> {
@@ -60,6 +69,16 @@ export class ApiClient {
     formData.append('file', file);
 
     return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData)
+      .pipe(map(response => response.data!));
+  }
+
+  postFormData<T>(endpoint: string, formData: FormData): Observable<T> {
+    return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData)
+      .pipe(map(response => response.data!));
+  }
+
+  putFormData<T>(endpoint: string, formData: FormData): Observable<T> {
+    return this.http.put<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData)
       .pipe(map(response => response.data!));
   }
 }

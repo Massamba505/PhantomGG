@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PhantomGG.API.DTOs.Match;
-using PhantomGG.API.Services.Interfaces;
-using PhantomGG.API.Security.Interfaces;
-using PhantomGG.API.Exceptions;
+using PhantomGG.Models.DTOs;
+using PhantomGG.Models.DTOs.Match;
+using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Exceptions;
 
 namespace PhantomGG.API.Controllers;
 
@@ -30,10 +30,15 @@ public class MatchesController : ControllerBase
     /// <response code="200">Returns the list of matches</response>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<MatchDto>), 200)]
-    public async Task<ActionResult<IEnumerable<MatchDto>>> GetAllMatches()
+    public ActionResult<ApiResponse> GetAllMatches()
     {
-        var matches = await _matchService.GetAllAsync();
-        return Ok(matches);
+        // Matches are accessed through tournaments
+        return Ok(new ApiResponse
+        {
+            Success = false,
+            Data = null,
+            Message = "Matches are accessed through tournaments. Use /api/tournaments/{tournamentId}/matches instead."
+        });
     }
 
     /// <summary>
@@ -46,17 +51,15 @@ public class MatchesController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(MatchDto), 200)]
     [ProducesResponseType(404)]
-    public async Task<ActionResult<MatchDto>> GetMatch(Guid id)
+    public ActionResult<ApiResponse> GetMatch(Guid id)
     {
-        try
+        // Individual match access will be implemented in future phases
+        return Ok(new ApiResponse
         {
-            var match = await _matchService.GetByIdAsync(id);
-            return Ok(match);
-        }
-        catch (ArgumentException)
-        {
-            return NotFound();
-        }
+            Success = false,
+            Data = null,
+            Message = "Individual match access will be implemented in future phases. Use tournament matches endpoint instead."
+        });
     }
 
     /// <summary>
@@ -81,10 +84,15 @@ public class MatchesController : ControllerBase
     /// <response code="200">Returns the list of matches</response>
     [HttpGet("team/{teamId}")]
     [ProducesResponseType(typeof(IEnumerable<MatchDto>), 200)]
-    public async Task<ActionResult<IEnumerable<MatchDto>>> GetMatchesByTeam(Guid teamId)
+    public ActionResult<ApiResponse> GetMatchesByTeam(Guid teamId)
     {
-        var matches = await _matchService.GetByTeamAsync(teamId);
-        return Ok(matches);
+        // Team matches are accessed through tournaments
+        return Ok(new ApiResponse
+        {
+            Success = false,
+            Data = null,
+            Message = "Team matches are accessed through tournaments. Use /api/tournaments/{tournamentId}/matches and filter by team."
+        });
     }
 
     /// <summary>
@@ -95,10 +103,15 @@ public class MatchesController : ControllerBase
     /// <response code="200">Returns the filtered list of matches</response>
     [HttpGet("search")]
     [ProducesResponseType(typeof(IEnumerable<MatchDto>), 200)]
-    public async Task<ActionResult<IEnumerable<MatchDto>>> SearchMatches([FromQuery] MatchSearchDto searchDto)
+    public ActionResult<ApiResponse> SearchMatches([FromQuery] MatchSearchDto searchDto)
     {
-        var matches = await _matchService.SearchAsync(searchDto);
-        return Ok(matches);
+        // Match search will be implemented in future phases
+        return Ok(new ApiResponse
+        {
+            Success = false,
+            Data = null,
+            Message = "Match search will be implemented in future phases"
+        });
     }
 
     /// <summary>
@@ -282,7 +295,7 @@ public class MatchesController : ControllerBase
         {
             return Forbid(ex.Message);
         }
-        catch (InvalidOperationException ex)
+        catch (ForbiddenException ex)
         {
             return BadRequest(ex.Message);
         }
@@ -328,7 +341,7 @@ public class MatchesController : ControllerBase
         {
             return StatusCode(403, new { success = false, message = ex.Message });
         }
-        catch (InvalidOperationException ex)
+        catch (ForbiddenException ex)
         {
             return BadRequest(new { success = false, message = ex.Message });
         }

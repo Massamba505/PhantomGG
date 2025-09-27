@@ -11,7 +11,6 @@ import { CreateTeam, Team, UpdateTeam } from '@/app/api/models';
 @Component({
   selector: 'app-team-form',
   templateUrl: './team-form.html',
-  standalone: true,
   imports: [NgClass, ReactiveFormsModule],
 })
 export class TeamForm implements OnInit, OnChanges {
@@ -47,17 +46,13 @@ export class TeamForm implements OnInit, OnChanges {
     this.teamForm = this.fb.group({
       name: [
         team?.name || '',
-        [Validators.required, Validators.minLength(2)],
+        [Validators.required, Validators.minLength(2), Validators.maxLength(200)],
       ],
-      manager: [
-        team?.managerName || '',
-        [Validators.required, Validators.minLength(2)],
+      shortName: [
+        team?.shortName || '',
+        [Validators.maxLength(10)],
       ],
-      numberOfPlayers: [
-        team?.numberOfPlayers || 1,
-        [Validators.required, Validators.min(1), Validators.max(30)],
-      ],
-      logo: [null], // file control - not required for editing
+      logo: [null], // file control - optional
     });
 
     // Set logo preview if team has logoUrl
@@ -103,15 +98,29 @@ export class TeamForm implements OnInit, OnChanges {
       return;
     }
 
-    // Prepare payload as team request object
-    const teamData: CreateTeam | UpdateTeam = {
-      name: this.teamForm.value.name,
-      managerEmail: this.teamForm.value.manager,
-      logoUrl: this.logoPreview() || undefined,
-      ...(this.tournamentId() ? { tournamentId: this.tournamentId()! } : {})
-    };
+    const formValue = this.teamForm.value;
 
-    this.save.emit(teamData);
+    if (this.isEditMode()) {
+      // For edit mode
+      const updateData: UpdateTeam = {
+        name: formValue.name,
+        shortName: formValue.shortName || undefined,
+        logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
+        teamPhotoUrl: undefined
+      };
+
+      this.save.emit(updateData);
+    } else {
+      // For create mode
+      const createData: CreateTeam = {
+        name: formValue.name,
+        shortName: formValue.shortName || undefined,
+        logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
+        teamPhotoUrl: undefined
+      };
+
+      this.save.emit(createData);
+    }
   }
 
   onCancel() {

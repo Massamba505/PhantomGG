@@ -2,48 +2,68 @@ export interface Team {
   id: string;
   name: string;
   shortName?: string;
-  managerName: string;
-  managerEmail: string;
-  managerPhone?: string;
   logoUrl?: string;
-  teamPhotoUrl?: string;
-  tournamentId: string;
-  tournamentName: string;
-  registrationStatus: string;
-  registrationDate: string;
-  approvedDate?: string | null;
-  numberOfPlayers: number;
+  userId: string;
   createdAt: string;
-  updatedAt?: string | null;
-  isActive: boolean;
+  updatedAt?: string;
+}
+
+export interface TournamentTeam {
+  id: string;
+  name: string;
+  shortName?: string;
+  logoUrl?: string;
+  status: 'Approved' | 'Pending' | 'Rejected' | 'RegistrationOpen';
+  registeredAt: string;
+  managerName?: string;
+  managerId?: string;
 }
 
 export interface CreateTeam {
   name: string;
   shortName?: string;
-  managerName: string;
-  managerEmail: string;
-  managerPhone?: string;
-  logoUrl?: string;
-  teamPhotoUrl?: string;
-  tournamentId: string;
+  logoUrl?: File;
+  teamPhotoUrl?: File;
 }
 
 export interface UpdateTeam {
-  name?: string;
+  name: string;
   shortName?: string;
-  managerName?: string;
-  managerEmail?: string;
-  managerPhone?: string;
-  logoUrl?: string;
-  teamPhotoUrl?: string;
+  logoUrl?: File;
+  teamPhotoUrl?: File;
 }
 
 export interface TeamSearch {
   searchTerm?: string;
-  tournamentId?: string;
-  registrationStatus?: string;
-  isActive?: boolean;
   pageNumber?: number;
   pageSize?: number;
+}
+
+export interface Player {
+  id: string;
+  firstName: string;
+  lastName: string;
+  position?: string;
+  email?: string;
+  photoUrl?: string;
+  teamId: string;
+  teamName: string;
+  joinedAt: string;
+}
+
+export interface CreatePlayer {
+  firstName: string;
+  lastName: string;
+  position?: string;
+  email?: string;
+  photoUrl?: File;
+  teamId: string;
+}
+
+export interface UpdatePlayer {
+  firstName: string;
+  lastName: string;
+  position?: string;
+  email?: string;
+  photoUrl?: File;
 }

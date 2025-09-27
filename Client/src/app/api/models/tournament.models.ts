@@ -1,53 +1,42 @@
+import { User } from './auth.models';
+
 export interface Tournament {
   id: string;
   name: string;
   description: string;
   location?: string;
-  formatId: string;
-  formatName: string;
   registrationStartDate?: string;
   registrationDeadline?: string;
   startDate: string;
+  endDate: string;
   minTeams: number;
   maxTeams: number;
-  maxPlayersPerTeam: number;
-  minPlayersPerTeam: number;
-  entryFee?: number;
-  prizePool?: number;
-  contactEmail?: string;
   bannerUrl?: string;
   logoUrl?: string;
   status: string;
-  matchDuration: number;
   organizerId: string;
-  organizerName: string;
+  organizer?: User;
   createdAt: string;
   updatedAt?: string;
-  isActive: boolean;
   isPublic: boolean;
   teamCount: number;
+  pendingTeamCount: number;
   matchCount: number;
-  completedMatches: number;
 }
 
 export interface CreateTournament {
   name: string;
   description: string;
   location?: string;
-  formatId: string;
   registrationStartDate?: string;
   registrationDeadline?: string;
   startDate: string;
+  endDate: string;
   minTeams: number;
   maxTeams: number;
-  maxPlayersPerTeam: number;
-  minPlayersPerTeam: number;
-  entryFee?: number;
-  prizePool?: number;
   contactEmail?: string;
-  bannerUrl?: string;
-  logoUrl?: string;
-  matchDuration: number;
+  bannerUrl?: File;
+  logoUrl?: File;
   isPublic: boolean;
 }
 
@@ -55,20 +44,15 @@ export interface UpdateTournament {
   name?: string;
   description?: string;
   location?: string;
-  formatId?: string;
   registrationStartDate?: string;
   registrationDeadline?: string;
   startDate?: string;
+  endDate?: string;
   minTeams?: number;
   maxTeams?: number;
-  maxPlayersPerTeam?: number;
-  minPlayersPerTeam?: number;
-  entryFee?: number;
-  prizePool?: number;
   contactEmail?: string;
-  bannerUrl?: string;
-  logoUrl?: string;
-  matchDuration?: number;
+  bannerUrl?: File;
+  logoUrl?: File;
   isPublic?: boolean;
 }
 
@@ -76,14 +60,22 @@ export interface TournamentSearch {
   searchTerm?: string;
   status?: string;
   location?: string;
-  formatId?: string;
-  minPrizePool?: number;
-  maxPrizePool?: number;
   startDateFrom?: string;
   startDateTo?: string;
   isPublic?: boolean;
   pageNumber?: number;
   pageSize?: number;
+}
+
+export interface JoinTournament {
+  tournamentId: string;
+  teamId: string;
+}
+
+export interface TournamentFormat {
+  id: string;
+  name: string;
+  description: string;
 }
 
 export interface TournamentStatistics {
@@ -105,19 +97,17 @@ export interface TournamentStatistics {
   };
 }
 
-export interface JoinTournament {
-  tournamentId: string;
-  teamId: string;
-}
-
-export interface LeaveTournament {
-  tournamentId: string;
-  teamId: string;
-  reason?: string;
-}
-
-export interface TournamentFormat {
-  id: string;
-  name: string;
-  description: string;
+export function getTournamentFormats(): TournamentFormat[] {
+  return [
+    {
+      id: '1',
+      name: 'Round Robin',
+      description: 'Every team plays every other team once'
+    },
+    {
+      id: '2', 
+      name: 'Single Elimination',
+      description: 'Teams are eliminated after losing one match'
+    }
+  ];
 }

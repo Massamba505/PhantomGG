@@ -1,0 +1,17 @@
+CREATE TABLE Players (
+    Id UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWID()),
+    FirstName VARCHAR(100) NOT NULL,
+    LastName VARCHAR(100) NOT NULL,
+    PhotoUrl VARCHAR(MAX) NULL,
+    Position VARCHAR(30) NULL,
+    Email VARCHAR(100) NULL,
+    TeamId UNIQUEIDENTIFIER NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    CONSTRAINT PK_Players PRIMARY KEY (Id),
+    CONSTRAINT FK_Players_Team FOREIGN KEY (TeamId)
+        REFERENCES Teams (Id) ON DELETE CASCADE
+);
+
+CREATE INDEX IX_Players_TeamId ON Players (TeamId);
+CREATE INDEX IX_Players_Position ON Players (Position);
+CREATE INDEX IX_Players_Name ON Players (FirstName, LastName);

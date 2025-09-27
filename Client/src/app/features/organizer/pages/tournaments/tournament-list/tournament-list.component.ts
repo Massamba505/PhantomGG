@@ -3,18 +3,19 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
 import { PaginatedResponse } from '@/app/api/models/api.models';
-import { TournamentCardComponent } from '../components/tournament-card/tournament-card.component';
+import { TournamentCard } from '@/app/shared/components/cards';
 import { TournamentSearchComponent } from '../components/tournament-search/tournament-search.component';
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
 import { ToastService } from '@/app/shared/services/toast.service';
-import { OrganizerService } from '@/app/api/services';
+import { TournamentService } from '@/app/api/services';
+import { AuthStateService } from '@/app/store/AuthStateService';
+import { Roles } from '@/app/shared/constants/roles';
 
 @Component({
   selector: 'app-tournament-list',
-  standalone: true,
   imports: [
     CommonModule,
-    TournamentCardComponent,
+    TournamentCard,
     TournamentSearchComponent,
     ConfirmDeleteModal
 ],
@@ -22,24 +23,28 @@ import { OrganizerService } from '@/app/api/services';
   styleUrl: './tournament-list.component.css'
 })
 export class TournamentListComponent implements OnInit {
-  private organizerService = inject(OrganizerService);
+  private tournamentService = inject(TournamentService);
   private router = inject(Router);
   private toastService = inject(ToastService);
+  private authStateStore = inject(AuthStateService);
 
   tournaments = signal<Tournament[]>([]);
   isLoading = signal(false);
-  error = signal<string | null>(null);
   isDeleteModalOpen = signal(false);
   tournamentToDelete = signal<Tournament | null>(null);
   isDeleting = signal(false);
+
+  isOrganizer = computed(()=>{
+    if(!this.authStateStore.isAuthenticated()){
+      return false;
+    }
+    return this.authStateStore.user()!.role == Roles.Organizer;
+  })
   
   searchCriteria = signal<TournamentSearch>({
     searchTerm: undefined,
     status: undefined,
     location: undefined,
-    formatId: undefined,
-    minPrizePool: undefined,
-    maxPrizePool: undefined,
     startDateFrom: undefined,
     startDateTo: undefined,
     isPublic: undefined,
@@ -61,18 +66,15 @@ export class TournamentListComponent implements OnInit {
 
   loadTournaments() {
     this.isLoading.set(true);
-    this.error.set(null);
 
-    this.organizerService.searchTournaments(this.searchCriteria()).subscribe({
+    this.tournamentService.getMyTournaments(this.searchCriteria()).subscribe({
       next: (response) => {
         this.tournaments.set(response.data);
         this.paginationData.set(response);
+      },
+      complete:()=>{
         this.isLoading.set(false);
       },
-      error: (error) => {
-        this.error.set('Failed to load tournaments');
-        this.isLoading.set(false);
-      }
     });
   }
 
@@ -82,6 +84,20 @@ export class TournamentListComponent implements OnInit {
       ...searchCriteria
     }));
 
+    this.loadTournaments();
+  }
+
+  onClearSearh(){
+    this.searchCriteria.set({
+      searchTerm: undefined,
+      status: undefined,
+      location: undefined,
+      startDateFrom: undefined,
+      startDateTo: undefined,
+      isPublic: undefined,
+      pageNumber: 1,
+      pageSize: 6
+    });
     this.loadTournaments();
   }
 
@@ -119,12 +135,15 @@ export class TournamentListComponent implements OnInit {
         this.router.navigate(['/organizer/tournaments', action.tournament.id]);
         break;
       case 'delete':
-        this.deleteTournament(action.tournament);
+        this.deleteTournament(action.tournament.id);
         break;
     }
   }
 
-  deleteTournament(tournament: Tournament) {
+  deleteTournament(tournamentId: string) {
+    const tournament = this.tournaments().find(t => t.id === tournamentId);
+    if (!tournament) return;
+    
     this.tournamentToDelete.set(tournament);
     this.isDeleteModalOpen.set(true);
   }
@@ -134,13 +153,14 @@ export class TournamentListComponent implements OnInit {
     if (!tournament) return;
 
     this.isDeleting.set(true);
-    this.organizerService.deleteTournament(tournament.id).subscribe({
+    this.tournamentService.deleteTournament(tournament.id).subscribe({
       next: () => {
         this.toastService.success('Tournament deleted successfully');
         this.loadTournaments();
         this.closeDeleteModal();
       },
       error: (error) => {
+        debugger;
         this.closeDeleteModal()
         this.isDeleting.set(false);
       }

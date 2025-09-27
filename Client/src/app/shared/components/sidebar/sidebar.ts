@@ -2,31 +2,16 @@ import {
   Component,
   input,
   output,
+  signal,
   OnInit,
   OnDestroy,
-  signal,
-  computed,
   effect,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
-import {
-  LucideAngularModule,
-  Home,
-  Trophy,
-  Users,
-  Calendar,
-  PlusCircle,
-  Bell,
-  MenuIcon,
-  Settings,
-  Briefcase,
-  BarChart,
-  Clock,
-  HelpCircle,
-} from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
 import { Roles } from '../../constants/roles';
+import { LucideIcons } from '../ui/icons/lucide-icons';
 
 interface MenuItem {
   title: string;
@@ -38,48 +23,64 @@ interface MenuItem {
 
 @Component({
   selector: 'app-sidebar',
-  standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './sidebar.html',
 })
 export class Sidebar implements OnInit, OnDestroy {
-  isOpen = input<boolean>(true);
   userRole = input.required<Roles>();
   toggle = output<void>();
-
-  private internalOpen = signal(true);
+  stateChange = output<boolean>();
   
-  actuallyOpen = computed(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth > 768 ? this.isOpen() : this.internalOpen();
-    }
-    return this.isOpen();
+  readonly icons = LucideIcons;
+
+  isOpen = signal(window.innerWidth > 900);
+
+  private stateEffect = effect(() => {
+    this.stateChange.emit(this.isOpen());
   });
 
-  readonly MenuIcon = MenuIcon;
+  readonly MenuIcon = this.icons.MenuIcon;
   menuItems: MenuItem[] = [
     {
       title: 'Dashboard',
       url: '/organizer/dashboard',
-      icon: Home,
+      icon: this.icons.Home,
       roles: [Roles.Organizer],
+    },
+    {
+      title: 'Dashboard',
+      url: '/user/dashboard',
+      icon: this.icons.Home,
+      roles: [Roles.User],
     },
     {
       title: 'My Tournaments',
       url: '/organizer/tournaments',
-      icon: Trophy,
+      icon: this.icons.Trophy,
       roles: [Roles.Organizer],
+    },
+    {
+      title: 'My Teams',
+      url: '/user/teams',
+      icon: this.icons.Users,
+      roles: [Roles.User],
+    },
+    {
+      title: 'Tournaments',
+      url: '/user/tournaments',
+      icon: this.icons.Trophy,
+      roles: [Roles.User],
     },
     {
       title: 'Fixtures',
       url: '/fixtures',
-      icon: Calendar,
+      icon: this.icons.Calendar,
       roles: [Roles.Organizer, Roles.User],
     },
     {
       title: 'Notifications',
       url: '/notifications',
-      icon: Bell,
+      icon: this.icons.Bell,
       roles: [Roles.Organizer, Roles.User],
     },
   ];
@@ -88,8 +89,14 @@ export class Sidebar implements OnInit, OnDestroy {
     {
       title: 'Create Tournament',
       url: '/organizer/tournaments/create',
-      icon: PlusCircle,
+      icon: this.icons.CirclePlus,
       roles: [Roles.Organizer],
+    },
+    {
+      title: 'Create Team',
+      url: '/user/teams/create',
+      icon: this.icons.UserPlus,
+      roles: [Roles.User],
     }
   ];
   
@@ -102,6 +109,11 @@ export class Sidebar implements OnInit, OnDestroy {
   }
 
   handleResize = () => {
-    this.internalOpen.set(window.innerWidth > 768);
+    this.isOpen.set(window.innerWidth > 900);
   };
+
+  onToggle() {
+    this.isOpen.update(prev => !prev);
+    this.toggle.emit();
+  }
 }

@@ -4,7 +4,6 @@ import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-organizer',
-  standalone: true,
   imports: [
     RouterOutlet,
     OrganizerLayout

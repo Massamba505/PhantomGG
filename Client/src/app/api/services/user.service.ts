@@ -10,7 +10,6 @@ import { ChangePassword, ProfilePictureUpload, UpdateUserProfile, User } from '.
 export class UserService {
   private apiClient = inject(ApiClient);
 
-  // User profile operations
   getProfile(): Observable<User> {
     return this.apiClient.get<User>(API_ENDPOINTS.USERS.PROFILE);
   }

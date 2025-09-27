@@ -1,16 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PhantomGG.API.Common;
-using PhantomGG.API.DTOs;
-using PhantomGG.API.DTOs.Team;
-using PhantomGG.API.Security.Interfaces;
-using PhantomGG.API.Services.Interfaces;
+using PhantomGG.Models.DTOs;
+using PhantomGG.Models.DTOs.Team;
+using PhantomGG.Models.DTOs.Player;
+using PhantomGG.Models.Entities;
+using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 
-/// <summary>
-/// Controller for managing teams
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class TeamsController(
@@ -21,17 +18,12 @@ public class TeamsController(
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
     /// <summary>
-    /// Get all teams with pagination (public access)
+    /// Get all teams with search and filtering
     /// </summary>
-    /// <param name="pageNumber">Page number for pagination (default: 1)</param>
-    /// <param name="pageSize">Number of items per page (default: 10)</param>
-    /// <returns>A paginated list of teams</returns>
-    /// <response code="200">Returns the list of teams</response>
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    public async Task<ActionResult<ApiResponse>> GetTeams([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<ApiResponse>> GetTeams([FromQuery] TeamSearchDto searchDto)
     {
-        var teams = await _teamService.GetAllAsync();
+        var teams = await _teamService.SearchAsync(searchDto);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -41,15 +33,9 @@ public class TeamsController(
     }
 
     /// <summary>
-    /// Get a specific team by ID
+    /// Get team details by ID
     /// </summary>
-    /// <param name="id">The team ID</param>
-    /// <returns>The team details</returns>
-    /// <response code="200">Returns the team</response>
-    /// <response code="404">If the team is not found</response>
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(404)]
     public async Task<ActionResult<ApiResponse>> GetTeam(Guid id)
     {
         var team = await _teamService.GetByIdAsync(id);
@@ -62,79 +48,30 @@ public class TeamsController(
     }
 
     /// <summary>
-    /// Search teams with filters
+    /// Get team players
     /// </summary>
-    /// <param name="searchTerm">Term to search in team names</param>
-    /// <param name="tournamentId">Filter teams by tournament ID</param>
-    /// <param name="status">Filter teams by registration status</param>
-    /// <param name="pageNumber">Page number for pagination (default: 1)</param>
-    /// <param name="pageSize">Number of items per page (default: 10)</param>
-    /// <returns>List of teams matching the search criteria</returns>
-    /// <response code="200">Returns the list of matching teams</response>
-    /// <response code="400">If the search parameters are invalid</response>
-    [HttpGet("search")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(400)]
-    public async Task<ActionResult<ApiResponse>> SearchTeams(
-        [FromQuery] string? searchTerm = null,
-        [FromQuery] Guid? tournamentId = null,
-        [FromQuery] string? status = null,
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 10)
+    [HttpGet("{id:guid}/players")]
+    public async Task<ActionResult<ApiResponse>> GetTeamPlayers(Guid id)
     {
-        var searchDto = new TeamSearchDto
-        {
-            SearchTerm = searchTerm,
-            TournamentId = tournamentId,
-            RegistrationStatus = string.IsNullOrEmpty(status) ? null : Enum.Parse<TeamRegistrationStatus>(status, true),
-            PageNumber = pageNumber,
-            PageSize = pageSize
-        };
-
-        var teams = await _teamService.SearchAsync(searchDto);
+        var players = await _teamService.GetTeamPlayersAsync(id);
         return Ok(new ApiResponse
         {
             Success = true,
-            Data = teams,
-            Message = "Search completed successfully"
+            Data = players,
+            Message = "Team players retrieved successfully"
         });
     }
 
     /// <summary>
-    /// Get teams for a specific tournament
+    /// Get current user's teams
     /// </summary>
-    /// <param name="tournamentId">The tournament ID</param>
-    /// <returns>List of teams registered for the tournament</returns>
-    /// <response code="200">Returns the list of tournament teams</response>
-    /// <response code="404">If the tournament is not found</response>
-    [HttpGet("by-tournament/{tournamentId:guid}")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(404)]
-    public async Task<ActionResult<ApiResponse>> GetTeamsByTournament(Guid tournamentId)
-    {
-        var teams = await _teamService.GetByTournamentAsync(tournamentId);
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = teams,
-            Message = "Tournament teams retrieved successfully"
-        });
-    }
-
-    /// <summary>
-    /// Get teams managed by current user
-    /// </summary>
-    /// <returns>List of teams where the current user is the leader</returns>
-    /// <response code="200">Returns the list of user's teams</response>
-    /// <response code="401">If the user is not authenticated</response>
     [HttpGet("my-teams")]
     [Authorize]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(401)]
-    public async Task<ActionResult<ApiResponse>> GetMyTeams()
+    public async Task<ActionResult<ApiResponse>> GetMyTeams([FromQuery] TeamSearchDto searchDto)
     {
-        var user = _currentUserService.GetCurrentUser();
-        var teams = await _teamService.GetByLeaderAsync(user.Id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var teams = await _teamService.GetMyTeamsAsync(searchDto, currentUser.Id);
+
         return Ok(new ApiResponse
         {
             Success = true,
@@ -144,24 +81,14 @@ public class TeamsController(
     }
 
     /// <summary>
-    /// Create a new team
+    /// Create new team
     /// </summary>
-    /// <param name="createDto">Team creation data</param>
-    /// <returns>The created team</returns>
-    /// <response code="201">Returns the newly created team</response>
-    /// <response code="400">If the team data is invalid</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="409">If a team with the same name already exists</response>
     [HttpPost]
     [Authorize]
-    [ProducesResponseType(typeof(ApiResponse), 201)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(409)]
-    public async Task<ActionResult<ApiResponse>> CreateTeam([FromBody] CreateTeamDto createDto)
+    public async Task<ActionResult<ApiResponse>> CreateTeam([FromForm] CreateTeamDto createDto)
     {
-        var user = _currentUserService.GetCurrentUser();
-        var team = await _teamService.CreateAsync(createDto, user.Id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var team = await _teamService.CreateAsync(createDto, currentUser.Id);
         return CreatedAtAction(
             nameof(GetTeam),
             new { id = team.Id },
@@ -174,27 +101,14 @@ public class TeamsController(
     }
 
     /// <summary>
-    /// Update a team
+    /// Update team details
     /// </summary>
-    /// <param name="id">The team ID to update</param>
-    /// <param name="updateDto">Team update data</param>
-    /// <returns>The updated team</returns>
-    /// <response code="200">Returns the updated team</response>
-    /// <response code="400">If the update data is invalid</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="403">If the user is not authorized to update this team</response>
-    /// <response code="404">If the team is not found</response>
     [HttpPut("{id:guid}")]
     [Authorize]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(404)]
-    public async Task<ActionResult<ApiResponse>> UpdateTeam(Guid id, [FromBody] UpdateTeamDto updateDto)
+    public async Task<ActionResult<ApiResponse>> UpdateTeam(Guid id, [FromForm] UpdateTeamDto updateDto)
     {
-        var user = _currentUserService.GetCurrentUser();
-        var team = await _teamService.UpdateAsync(id, updateDto, user.Id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var team = await _teamService.UpdateAsync(id, updateDto, currentUser.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -204,24 +118,14 @@ public class TeamsController(
     }
 
     /// <summary>
-    /// Delete a team
+    /// Delete team
     /// </summary>
-    /// <param name="id">The team ID to delete</param>
-    /// <returns>Confirmation of deletion</returns>
-    /// <response code="200">Team deleted successfully</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="403">If the user is not authorized to delete this team</response>
-    /// <response code="404">If the team is not found</response>
     [HttpDelete("{id:guid}")]
     [Authorize]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(404)]
     public async Task<ActionResult<ApiResponse>> DeleteTeam(Guid id)
     {
-        var user = _currentUserService.GetCurrentUser();
-        await _teamService.DeleteAsync(id, user.Id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        await _teamService.DeleteAsync(id, currentUser.Id);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -232,34 +136,23 @@ public class TeamsController(
     /// <summary>
     /// Upload team logo
     /// </summary>
-    /// <param name="id">The team ID</param>
-    /// <param name="file">The logo image file</param>
-    /// <returns>The URL of the uploaded logo</returns>
-    /// <response code="200">Logo uploaded successfully</response>
-    /// <response code="400">If no file is provided or file is invalid</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="403">If the user is not authorized to update this team</response>
-    /// <response code="404">If the team is not found</response>
     [HttpPost("{id:guid}/logo")]
     [Authorize]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(404)]
     public async Task<ActionResult<ApiResponse>> UploadTeamLogo(Guid id, IFormFile file)
     {
-        if (file == null || file.Length == 0)
-        {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = "No file provided"
-            });
-        }
+        var currentUser = _currentUserService.GetCurrentUser();
+        var team = await _teamService.GetByIdAsync(id);
 
-        var user = _currentUserService.GetCurrentUser();
-        var logoUrl = await _teamService.UploadTeamLogoAsync(id, file, user.Id);
+        var teamEntity = new Team
+        {
+            Id = team.Id,
+            Name = team.Name,
+            UserId = team.UserId,
+            LogoUrl = team.LogoUrl
+        };
+
+        var logoUrl = await _teamService.UploadLogoAsync(teamEntity, file);
+
         return Ok(new ApiResponse
         {
             Success = true,
@@ -269,35 +162,55 @@ public class TeamsController(
     }
 
     /// <summary>
-    /// Get team statistics
+    /// Add player to team
     /// </summary>
-    /// <param name="id">The team ID</param>
-    /// <returns>Team statistics including registration info and player count</returns>
-    /// <response code="200">Returns the team statistics</response>
-    /// <response code="404">If the team is not found</response>
-    [HttpGet("{id:guid}/statistics")]
-    [ProducesResponseType(typeof(ApiResponse), 200)]
-    [ProducesResponseType(404)]
-    public async Task<ActionResult<ApiResponse>> GetTeamStatistics(Guid id)
+    [HttpPost("{id:guid}/players")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse>> AddPlayerToTeam(Guid id, [FromForm] CreatePlayerDto playerDto)
     {
-        var team = await _teamService.GetByIdAsync(id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var player = await _teamService.AddPlayerToTeamAsync(id, playerDto, currentUser.Id);
+        return CreatedAtAction(
+            nameof(GetTeamPlayers),
+            new { id },
+            new ApiResponse
+            {
+                Success = true,
+                Data = player,
+                Message = "Player added to team successfully"
+            });
+    }
 
-        // Basic statistics for MVP
-        var statistics = new
-        {
-            team.Id,
-            team.Name,
-            team.RegistrationStatus,
-            team.NumberOfPlayers,
-            team.RegistrationDate,
-            team.CreatedAt
-        };
-
+    /// <summary>
+    /// Update player in team
+    /// </summary>
+    [HttpPut("{teamId:guid}/players/{playerId:guid}")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse>> UpdateTeamPlayer(Guid teamId, Guid playerId, [FromForm] UpdatePlayerDto updateDto)
+    {
+        var currentUser = _currentUserService.GetCurrentUser();
+        var player = await _teamService.UpdateTeamPlayerAsync(teamId, playerId, updateDto, currentUser.Id);
         return Ok(new ApiResponse
         {
             Success = true,
-            Data = statistics,
-            Message = "Team statistics retrieved successfully"
+            Data = player,
+            Message = "Player updated successfully"
+        });
+    }
+
+    /// <summary>
+    /// Remove player from team
+    /// </summary>
+    [HttpDelete("{teamId:guid}/players/{playerId:guid}")]
+    [Authorize]
+    public async Task<ActionResult<ApiResponse>> RemovePlayerFromTeam(Guid teamId, Guid playerId)
+    {
+        var currentUser = _currentUserService.GetCurrentUser();
+        await _teamService.RemovePlayerFromTeamAsync(teamId, playerId, currentUser.Id);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Message = "Player removed from team successfully"
         });
     }
 }

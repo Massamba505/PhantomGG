@@ -9,8 +9,10 @@ import {
   UpdateTournament,
   TournamentSearch,
   TournamentStatistics,
-  TournamentFormat
+  TournamentFormat,
+  getTournamentFormats
 } from '../models/tournament.models';
+import { TournamentTeam } from '../models/team.models';
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +20,7 @@ import {
 export class TournamentService {
   private apiClient = inject(ApiClient);
 
-  // Public tournament discovery and viewing
-  getPublicTournaments(params?: TournamentSearch): Observable<PaginatedResponse<Tournament>> {
+  getTournaments(params?: TournamentSearch): Observable<PaginatedResponse<Tournament>> {
     return this.apiClient.getPaginated<Tournament>(API_ENDPOINTS.TOURNAMENTS.LIST, params);
   }
 
@@ -27,119 +28,154 @@ export class TournamentService {
     return this.apiClient.get<Tournament>(API_ENDPOINTS.TOURNAMENTS.GET(id));
   }
 
-  searchTournaments(params: TournamentSearch): Observable<PaginatedResponse<Tournament>> {
-    return this.apiClient.getPaginated<Tournament>(API_ENDPOINTS.TOURNAMENTS.SEARCH, params);
+  getTournamentTeams(id: string): Observable<TournamentTeam[]> {
+    return this.apiClient.get<TournamentTeam[]>(API_ENDPOINTS.TOURNAMENTS.TEAMS(id));
   }
 
-  getFeaturedTournaments(): Observable<Tournament[]> {
-    return this.apiClient.get<Tournament[]>(API_ENDPOINTS.TOURNAMENTS.FEATURED);
+  getMyTournaments(params?: TournamentSearch): Observable<PaginatedResponse<Tournament>> {
+    return this.apiClient.getPaginated<Tournament>(API_ENDPOINTS.TOURNAMENTS.MY_TOURNAMENTS, params);
   }
 
-  getUpcomingTournaments(): Observable<Tournament[]> {
-    return this.apiClient.get<Tournament[]>(API_ENDPOINTS.TOURNAMENTS.UPCOMING);
+  registerForTournament(tournamentId: string, registrationData: any): Observable<void> {
+    return this.apiClient.post<void>(API_ENDPOINTS.TOURNAMENTS.REGISTER(tournamentId), registrationData);
   }
 
-  getLiveTournaments(): Observable<Tournament[]> {
-    return this.apiClient.get<Tournament[]>(API_ENDPOINTS.TOURNAMENTS.LIVE);
+  withdrawFromTournament(tournamentId: string, withdrawData: any): Observable<void> {
+    return this.apiClient.post<void>(API_ENDPOINTS.TOURNAMENTS.WITHDRAW(tournamentId), withdrawData);
   }
 
-  getRecentTournaments(): Observable<Tournament[]> {
-    return this.apiClient.get<Tournament[]>(API_ENDPOINTS.TOURNAMENTS.RECENT);
+  createTournament(tournament: CreateTournament): Observable<Tournament> {
+    console.log('Creating tournament with data:', tournament);
+    
+    const formData = new FormData();
+    formData.append('Name', tournament.name);
+    formData.append('Description', tournament.description);
+    if (tournament.location) {
+      formData.append('Location', tournament.location);
+    }
+    if (tournament.registrationStartDate) {
+      formData.append('RegistrationStartDate', new Date(tournament.registrationStartDate).toISOString());
+    }
+    if (tournament.registrationDeadline) {
+      formData.append('RegistrationDeadline', new Date(tournament.registrationDeadline).toISOString());
+    }
+    formData.append('StartDate', new Date(tournament.startDate).toISOString());
+    formData.append('EndDate', new Date(tournament.endDate).toISOString());
+    formData.append('MinTeams', tournament.minTeams.toString());
+    formData.append('MaxTeams', tournament.maxTeams.toString());
+    if (tournament.contactEmail) {
+      formData.append('ContactEmail', tournament.contactEmail);
+    }
+    if (tournament.bannerUrl) {
+      formData.append('BannerUrl', tournament.bannerUrl);
+    }
+    if (tournament.logoUrl) {
+      formData.append('LogoUrl', tournament.logoUrl);
+    }
+    formData.append('IsPublic', tournament.isPublic.toString());
+    
+    // Debug: Log FormData entries
+    console.log('FormData entries:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+    
+    return this.apiClient.postFormData<Tournament>(API_ENDPOINTS.TOURNAMENTS.CREATE, formData);
   }
 
-  getTournamentFormats(): Observable<TournamentFormat[]> {
-    return this.apiClient.get<TournamentFormat[]>(API_ENDPOINTS.TOURNAMENTS.FORMATS);
-  }
-
-  // Public tournament information
-  getTournamentDetails(id: string): Observable<any> {
-    return this.apiClient.get<any>(API_ENDPOINTS.TOURNAMENTS.DETAILS(id));
-  }
-
-  getTournamentRules(id: string): Observable<any> {
-    return this.apiClient.get<any>(API_ENDPOINTS.TOURNAMENTS.RULES(id));
-  }
-
-  getTournamentStatistics(id: string): Observable<TournamentStatistics> {
-    return this.apiClient.get<TournamentStatistics>(API_ENDPOINTS.TOURNAMENTS.STATISTICS(id));
-  }
-
-  getTournamentTeams(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.TEAMS(id));
-  }
-
-  getTournamentStandings(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.STANDINGS(id));
-  }
-
-  getTournamentSchedule(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.SCHEDULE(id));
-  }
-
-  getTournamentMatches(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.MATCHES(id));
-  }
-
-  getTournamentResults(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.RESULTS(id));
-  }
-
-  getLiveMatches(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.LIVE_MATCHES(id));
-  }
-
-  getUpcomingMatches(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.UPCOMING_MATCHES(id));
-  }
-
-  getCompletedMatches(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.COMPLETED_MATCHES(id));
-  }
-
-  // Tournament statistics
-  getTopScorers(id: string, limit: number = 10): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.TOP_SCORERS(id) + `?limit=${limit}`);
-  }
-
-  getTopAssists(id: string, limit: number = 10): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.TOP_ASSISTS(id) + `?limit=${limit}`);
-  }
-
-  getBestPlayers(id: string, limit: number = 10): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.BEST_PLAYERS(id) + `?limit=${limit}`);
-  }
-
-  getTeamStats(id: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.TEAM_STATS(id));
-  }
-
-  // Organizer-specific methods for managing tournaments
-  createTournament(tournament: any): Observable<any> {
-    return this.apiClient.post<any>(API_ENDPOINTS.ORGANIZERS.TOURNAMENTS.CREATE, tournament);
-  }
-
-  updateTournament(id: string, updates: any): Observable<any> {
-    return this.apiClient.put<any>(API_ENDPOINTS.ORGANIZERS.TOURNAMENTS.UPDATE(id), updates);
+  updateTournament(id: string, updates: UpdateTournament): Observable<Tournament> {
+    const formData = new FormData();
+    if (updates.name) {
+      formData.append('Name', updates.name);
+    }
+    if (updates.description) {
+      formData.append('Description', updates.description);
+    }
+    if (updates.location) {
+      formData.append('Location', updates.location);
+    }
+    if (updates.registrationStartDate) {
+      formData.append('RegistrationStartDate', updates.registrationStartDate);
+    }
+    if (updates.registrationDeadline) {
+      formData.append('RegistrationDeadline', updates.registrationDeadline);
+    }
+    if (updates.startDate) {
+      formData.append('StartDate', updates.startDate);
+    }
+    if (updates.endDate) {
+      formData.append('EndDate', updates.endDate);
+    }
+    if (updates.minTeams !== undefined) {
+      formData.append('MinTeams', updates.minTeams.toString());
+    }
+    if (updates.maxTeams !== undefined) {
+      formData.append('MaxTeams', updates.maxTeams.toString());
+    }
+    if (updates.contactEmail) {
+      formData.append('ContactEmail', updates.contactEmail);
+    }
+    if (updates.bannerUrl) {
+      formData.append('BannerUrl', updates.bannerUrl);
+    }
+    if (updates.logoUrl) {
+      formData.append('LogoUrl', updates.logoUrl);
+    }
+    if (updates.isPublic !== undefined) {
+      formData.append('IsPublic', updates.isPublic.toString());
+    }
+    
+    return this.apiClient.putFormData<Tournament>(API_ENDPOINTS.TOURNAMENTS.UPDATE(id), formData);
   }
 
   deleteTournament(id: string): Observable<void> {
-    return this.apiClient.delete<void>(API_ENDPOINTS.ORGANIZERS.TOURNAMENTS.DELETE(id));
+    return this.apiClient.delete<void>(API_ENDPOINTS.TOURNAMENTS.DELETE(id));
   }
 
-  uploadTournamentBanner(tournamentId: string, file: File): Observable<{ bannerUrl: string }> {
-    return this.apiClient.uploadFile<{ bannerUrl: string }>(API_ENDPOINTS.ORGANIZERS.TOURNAMENTS.UPLOAD_BANNER(tournamentId), file);
+  uploadTournamentBanner(tournamentId: string, file: File): Observable<{ imageUrl: string }> {
+    return this.apiClient.uploadFile<{ imageUrl: string }>(API_ENDPOINTS.TOURNAMENTS.UPLOAD_BANNER(tournamentId), file);
   }
 
-  uploadTournamentLogo(tournamentId: string, file: File): Observable<{ logoUrl: string }> {
-    return this.apiClient.uploadFile<{ logoUrl: string }>(API_ENDPOINTS.ORGANIZERS.TOURNAMENTS.UPLOAD_LOGO(tournamentId), file);
+  uploadTournamentLogo(tournamentId: string, file: File): Observable<{ imageUrl: string }> {
+    return this.apiClient.uploadFile<{ imageUrl: string }>(API_ENDPOINTS.TOURNAMENTS.UPLOAD_LOGO(tournamentId), file);
   }
 
-  uploadOrganizerTournamentBanner(tournamentId: string, file: File): Observable<{ bannerUrl: string }> {
-    return this.apiClient.uploadFile<{ bannerUrl: string }>(API_ENDPOINTS.ORGANIZERS.TOURNAMENTS.UPLOAD_BANNER(tournamentId), file);
+  getPendingTeams(tournamentId: string): Observable<TournamentTeam[]> {
+    return this.apiClient.get<TournamentTeam[]>(API_ENDPOINTS.TOURNAMENTS.PENDING_TEAMS(tournamentId));
   }
 
-  // User-specific methods for tournament participation
-  getMyTournaments(): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.USERS.TOURNAMENTS.CURRENT);
+  approveTeam(tournamentId: string, teamId: string): Observable<void> {
+    return this.apiClient.post<void>(API_ENDPOINTS.TOURNAMENTS.APPROVE_TEAM(tournamentId, teamId), {});
   }
+
+  rejectTeam(tournamentId: string, teamId: string): Observable<void> {
+    return this.apiClient.post<void>(API_ENDPOINTS.TOURNAMENTS.REJECT_TEAM(tournamentId, teamId), {});
+  }
+
+  removeTeam(tournamentId: string, teamId: string): Observable<void> {
+    return this.apiClient.delete<void>(API_ENDPOINTS.TOURNAMENTS.REMOVE_TEAM(tournamentId, teamId));
+  }
+
+  getTournamentFormats(): TournamentFormat[] {
+    return getTournamentFormats();
+  }
+
+  // Public methods for browsing tournaments
+  getPublicTournaments(params?: TournamentSearch): Promise<PaginatedResponse<Tournament>> {
+    const searchParams = { ...params, isPublic: true };
+    return this.apiClient.getPaginated<Tournament>(API_ENDPOINTS.TOURNAMENTS.PUBLIC, searchParams).toPromise() as Promise<PaginatedResponse<Tournament>>;
+  }
+
+  getPublicTournament(id: string): Promise<Tournament> {
+    return this.apiClient.get<Tournament>(API_ENDPOINTS.TOURNAMENTS.PUBLIC_DETAILS(id)).toPromise() as Promise<Tournament>;
+  }
+
+  getPublicTournamentTeams(id: string): Promise<TournamentTeam[]> {
+    return this.apiClient.get<TournamentTeam[]>(API_ENDPOINTS.TOURNAMENTS.PUBLIC_TEAMS(id)).toPromise() as Promise<TournamentTeam[]>;
+  }
+
+  getPublicTournamentStatistics(id: string): Promise<TournamentStatistics> {
+    return this.apiClient.get<TournamentStatistics>(API_ENDPOINTS.TOURNAMENTS.PUBLIC_STATISTICS(id)).toPromise() as Promise<TournamentStatistics>;
+  }
+
 }

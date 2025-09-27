@@ -16,10 +16,10 @@ import { getPasswordScore } from '@/app/shared/utils/PasswordScore';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { RegisterRequest } from '@/app/api/models';
+import { Roles } from '@/app/shared/constants/roles';
 
 @Component({
   selector: 'app-signup',
-  standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './signup.html',
 })
@@ -45,6 +45,7 @@ export class Signup {
         '',
         [Validators.required, Validators.email, strictEmailValidator],
       ],
+      role: [Roles.User],
       password: ['', [Validators.required, passwordStrengthValidator]],
       confirmPassword: ['', Validators.required],
     },
@@ -73,14 +74,8 @@ export class Signup {
       return;
     }
 
-    const credentials = this.signupForm.value as RegisterRequest;
-    this.authState.signup(credentials).subscribe({
-      next: () => {
-        this.toast.success('Account created successfully!');
-        if (this.authState.isAuthenticated()) {
-          this.router.navigate(['/dashboard']);
-        }
-      }
+    this.router.navigate(['/auth/role-selection'], {
+      state: { signupData: this.signupForm.value }
     });
   }
 

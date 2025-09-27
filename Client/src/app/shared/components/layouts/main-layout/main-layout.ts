@@ -7,6 +7,5 @@ import { ToastComponent } from '@/app/shared/components/ui/toast/toast';
   selector: 'app-main-layout',
   templateUrl: './main-layout.html',
   imports: [CommonModule, RouterModule, ToastComponent],
-  standalone: true,
 })
 export class MainLayout {}

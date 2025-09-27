@@ -5,8 +5,6 @@ export const organizerRoutes: Routes = [
   {
     path: '',
     loadComponent:()=>import("./organizer").then(m=>m.OrganizerComponent),
-    canActivate: [authGuard],
-    data: { requiredRole: 'Organizer' },
     children: [
       {
         path: '',

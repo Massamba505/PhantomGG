@@ -4,23 +4,22 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Tournament } from '@/app/api/models/tournament.models';
 import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { CurrencyFormatPipe } from '@/app/shared/pipe/currency-format.pipe';
 import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
-import { OrganizerService } from '@/app/api/services';
+import { TournamentService } from '@/app/api/services';
 import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 import { ToastService } from '@/app/shared/services/toast.service';
+import { TournamentTeamManagementComponent } from '../components/tournament-team-management/tournament-team-management.component';
 
 @Component({
   selector: 'app-tournament-details',
-  standalone: true,
-  imports: [CommonModule, LucideAngularModule, CurrencyFormatPipe, LineBreaksPipe, ConfirmDeleteModal],
+  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, ConfirmDeleteModal, TournamentTeamManagementComponent],
   templateUrl: './tournament-details.component.html',
   styleUrl: './tournament-details.component.css'
 })
 export class TournamentDetailsComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private organizerService = inject(OrganizerService);
+  private tournamentService = inject(TournamentService);
   private toastService = inject(ToastService);
 
   tournament = signal<Tournament | null>(null);
@@ -43,15 +42,20 @@ export class TournamentDetailsComponent implements OnInit {
     
     this.loading.set(true);
     
-    this.organizerService.getTournamentDetails(this.tournamentId()).subscribe({
-      next: (tournament) => {
+    this.tournamentService.getTournament(this.tournamentId()).subscribe({
+      next: (tournament: any) => {
         this.tournament.set(tournament);
+        const banner = this.tournament()!.bannerUrl?.split(" ").join("+");
+        const logo = this.tournament()!.logoUrl?.split(" ").join("+");
+        this.tournament.update(current => ({
+          ...current!,
+          bannerUrl: banner,
+          logoUrl: logo
+        }));
+      },
+      complete:()=>{
         this.loading.set(false);
       },
-      error: (error) => {
-        console.error('Failed to load tournament:', error);
-        this.loading.set(false);
-      }
     });
   }
 
@@ -60,7 +64,7 @@ export class TournamentDetailsComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['../..'], { relativeTo: this.route });
+    this.router.navigate(['/organizer/tournaments']);
   }
 
   deleteTournament() {
@@ -77,13 +81,12 @@ export class TournamentDetailsComponent implements OnInit {
     
     this.isDeleting.set(true);
     
-    this.organizerService.deleteTournament(this.tournamentId()).subscribe({
+    this.tournamentService.deleteTournament(this.tournamentId()).subscribe({
       next: () => {
         this.toastService.success('Tournament deleted successfully');
         this.router.navigate(['/organizer/tournaments']);
       },
-      error: (error) => {
-        console.error('Failed to delete tournament:', error);
+      error: (error: any) => {
         this.isDeleting.set(false);
       }
     });

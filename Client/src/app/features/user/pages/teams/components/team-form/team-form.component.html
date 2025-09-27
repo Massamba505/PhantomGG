@@ -1,0 +1,73 @@
+<form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="space-y-4 card">
+  <div>
+    <label class="block text-sm font-medium mb-2"
+      >Team Logo @if (!isEditMode()) {*}</label
+    >
+
+    @if (logoPreview()) {
+    <div class="mb-4">
+      <img
+        [src]="logoPreview()"
+        alt="Team Logo"
+        class="h-32 w-32 object-contain rounded-lg shadow mx-auto"
+      />
+    </div>
+    }
+
+    <input
+      type="file"
+      accept="image/*"
+      (change)="onLogoChange($event)"
+      class="input-field w-full"
+      [class.error]="isFieldInvalid('logo')"
+    />
+
+    @if (submitted() && teamForm.controls['logo'].invalid) {
+    <div class="error-message text-sm mt-1">Logo is required</div>
+    }
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-2">Team Name *</label>
+    <input
+      type="text"
+      formControlName="name"
+      class="input-field w-full"
+      [class.error]="submitted() && teamForm.controls['name'].invalid"
+    />
+    @if (submitted() && teamForm.controls['name'].invalid) {
+    <div class="error-message text-sm mt-1">
+      Team name is required (min 2 chars)
+    </div>
+    }
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium mb-2">Short Name (Optional)</label>
+    <input
+      type="text"
+      formControlName="shortName"
+      placeholder="Auto-generated if not provided"
+      class="input-field w-full"
+      [class.error]="submitted() && teamForm.controls['shortName'].invalid"
+    />
+    @if (submitted() && teamForm.controls['shortName'].invalid) {
+    <div class="error-message text-sm mt-1">
+      Short name must be 10 characters or less
+    </div>
+    }
+  </div>
+
+  <div class="flex space-x-3 pt-4">
+    <button type="button" (click)="onCancel()" class="btn btn-secondary flex-1">
+      Cancel
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary flex-1"
+      [disabled]="submitted() && teamForm.invalid"
+    >
+      {{ isEditMode() ? "Update Team" : "Create Team" }}
+    </button>
+  </div>
+</form>

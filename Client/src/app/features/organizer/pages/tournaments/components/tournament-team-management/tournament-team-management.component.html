@@ -1,0 +1,83 @@
+<div class="space-y-4">
+  <!-- Tab Navigation -->
+  <div class="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+    <button
+      class="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+      [ngClass]="{
+        'dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm':
+          activeTab() === 'approved',
+        'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200':
+          activeTab() !== 'approved'
+      }"
+      (click)="setActiveTab('approved')"
+    >
+      <lucide-angular [img]="icons.CheckCircle" [size]="16"></lucide-angular>
+      Approved Teams
+      <span
+        class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded-full text-xs"
+      >
+        {{ getTeamCount("approved") }}
+      </span>
+    </button>
+
+    <button
+      class="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+      [ngClass]="{
+        'dark:bg-gray-700 text-orange-600 dark:text-orange-400 shadow-sm':
+          activeTab() === 'pending',
+        'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200':
+          activeTab() !== 'pending'
+      }"
+      (click)="setActiveTab('pending')"
+    >
+      <lucide-angular [img]="icons.Clock" [size]="16"></lucide-angular>
+      Pending Teams
+      <span
+        class="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 px-2 py-0.5 rounded-full text-xs"
+      >
+        {{ getTeamCount("pending") }}
+      </span>
+    </button>
+  </div>
+
+  <!-- Team Content -->
+  @if (isLoading()) {
+  <div class="p-8 text-center">
+    <div
+      class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"
+    ></div>
+    <p class="text-gray-600 dark:text-gray-400">Loading teams...</p>
+  </div>
+  } @else if (getCurrentTeams().length === 0) {
+  <div class="p-8 text-center">
+    <div class="text-gray-400 dark:text-gray-600 mb-3">
+      <lucide-angular
+        [img]="icons.Users"
+        [size]="48"
+        class="mx-auto"
+      ></lucide-angular>
+    </div>
+    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+      No {{ activeTab() }} teams
+    </h3>
+    <p class="text-gray-600 dark:text-gray-400">
+      @if (activeTab() === 'approved') { No teams have been approved yet. }
+      @else if (activeTab() === 'pending') { No teams are waiting for approval.
+      } @else { No teams have been rejected. }
+    </p>
+  </div>
+  } @else {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+    @for (team of getCurrentTeams(); track team.id) {
+    <app-team-card
+      [team]="convertToTeam(team)"
+      [config]="getTeamCardConfig(activeTab())"
+      (view)="onTeamView($event)"
+      (delete)="onTeamDelete($event)"
+      (approve)="onTeamApprove($event)"
+      (reject)="onTeamReject($event)"
+    />
+    }
+  </div>
+  }
+</div>
