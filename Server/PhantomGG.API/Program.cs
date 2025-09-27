@@ -12,13 +12,14 @@ public class Program
         // Add services to the container
         builder.Services.AddControllers();
         builder.Services.AddHttpContextAccessor();
-        
+
         // Configure application services
         builder.Services.AddApplicationSettings(builder.Configuration);
         builder.Services.AddSwaggerDocumentation();
         builder.Services.AddCorsPolicy();
         builder.Services.AddDatabase(builder.Configuration);
         builder.Services.AddJwtAuthentication(builder.Configuration);
+        builder.Services.AddApplicationRepositories();
         builder.Services.AddApplicationServices();
 
         var app = builder.Build();

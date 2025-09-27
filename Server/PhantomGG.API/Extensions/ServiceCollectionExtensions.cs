@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
     {
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         services.Configure<CookieSettings>(configuration.GetSection("CookieSettings"));
+        services.AddRouting(options => options.LowercaseUrls = true);
         return services;
     }
 
@@ -24,7 +25,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationRepositories(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -34,6 +35,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<ITournamentStandingRepository, TournamentStandingRepository>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    {
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITournamentService, TournamentService>();
