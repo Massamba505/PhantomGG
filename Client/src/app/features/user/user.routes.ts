@@ -24,13 +24,13 @@ export const userRoutes: Routes = [
       },
       {
         path: 'teams/create',
-        loadComponent: () => import('./pages/teams/create-team/create-team.component').then(m => m.CreateTeamComponent),
+        loadComponent: () => import('./pages/create-team/create-team.component').then(m => m.CreateTeamComponent),
         title: 'Create Team - PhantomGG',
         data:{title:"Create Team"}
       },
       {
         path: 'teams/:id',
-        loadComponent: () => import('./pages/teams/team-details/team-details.component').then(m => m.TeamDetailsComponent),
+        loadComponent: () => import('./pages/team-details/team-details.component').then(m => m.TeamDetailsComponent),
         title: 'Team Details - PhantomGG',
         data:{title:"Team Details"}
       },
@@ -43,6 +43,12 @@ export const userRoutes: Routes = [
       {
         path: 'tournaments',
         loadComponent: () => import('./pages/tournaments/user-tournaments').then(m => m.UserTournaments),
+        title: 'Tournaments - PhantomGG',
+        data:{title:"Tournaments"}
+      },
+      {
+        path: 'tournaments/:id',
+        loadComponent: () => import('../public/tournaments/details/tournament-details').then(m => m.TournamentDetails),
         title: 'Tournaments - PhantomGG',
         data:{title:"Tournaments"}
       }

@@ -73,7 +73,7 @@
       </div>
 
       @if (players().length > 0) {
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @for (player of players(); track player.id) {
         <app-player-card
           [player]="player"
@@ -150,7 +150,6 @@
   </div>
 </div>
 }
-<!-- Player Modal -->
 <app-modal
   [isOpen]="showPlayerModal()"
   [title]="editingPlayer() ? 'Edit Player' : 'Add New Player'"

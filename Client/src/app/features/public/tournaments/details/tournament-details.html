@@ -3,38 +3,18 @@
     <lucide-angular [img]="icons.ArrowLeft" [size]="20"></lucide-angular>
     Back to Tournaments
   </button>
-
-  @if (tournament()) {
-  <div class="flex gap-2">
-    <span class="status-badge">{{ tournamentStatus() }}</span>
-  </div>
-  }
 </div>
 
 @if (loading()) {
 <div class="text-center py-12">
   <p>Loading tournament details...</p>
 </div>
-} @else if (!loading() && error()) {
-<div class="text-center py-12">
-  <lucide-angular
-    [img]="icons.AlertCircle"
-    [size]="48"
-    class="mx-auto mb-4 text-red-500"
-  ></lucide-angular>
-  <p class="text-red-600 mb-4">{{ error() }}</p>
-  <button class="btn btn-primary" (click)="retryLoad()">
-    <lucide-angular [img]="icons.RefreshCw" [size]="16"></lucide-angular>
-    Try Again
-  </button>
-</div>
 } @else if (!loading() && tournament()) {
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-2 space-y-6">
-    <!-- Tournament Banner -->
     <div class="card">
       <div
-        class="tournament-banner mb-4"
+        class="tournament-banner"
         [style.background-image]="
           tournament()!.bannerUrl
             ? 'url(' + tournament()!.bannerUrl + ')'
@@ -42,36 +22,27 @@
         "
         [style.background-size]="'cover'"
         [style.background-position]="'center'"
-      >
-        @if (!tournament()!.bannerUrl) {
-        <div class="h-full flex items-center justify-center">
-          <span class="opacity-50">No banner uploaded</span>
-        </div>
-        }
-      </div>
+      ></div>
     </div>
 
-    <!-- Tournament Description -->
     <div class="card">
       <div class="flex items-center gap-3 mb-4">
         @if (tournament()!.logoUrl) {
         <img
           [src]="tournament()!.logoUrl"
           [alt]="tournament()!.name + ' logo'"
-          class="w-16 h-16 rounded-lg object-cover"
+          class="w-16 h-16 rounded-lg object-contain"
         />
         }
         <div>
           <h1 class="font-semibold text-3xl underline mb-1">
             {{ tournament()!.name }}
           </h1>
-          <span class="status-badge">{{ tournamentStatus() }}</span>
         </div>
       </div>
       <p class="leading-relaxed">{{ tournament()!.description }}</p>
     </div>
 
-    <!-- Participating Teams -->
     <div class="card">
       <div class="flex justify-between items-center mb-4">
         <h2 class="font-semibold text-lg flex items-center gap-2">
@@ -83,43 +54,12 @@
         </span>
       </div>
 
-      @if (teams().length > 0) {
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div
-          *ngFor="let team of teams(); trackBy: trackByTeamId"
-          class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-          (click)="onTeamView(team)"
-        >
-          <div class="flex-shrink-0">
-            @if (team.logoUrl) {
-            <img
-              [src]="team.logoUrl"
-              [alt]="team.name + ' logo'"
-              class="w-10 h-10 rounded-lg object-cover"
-            />
-            } @else {
-            <div
-              class="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center text-sm font-semibold"
-            >
-              {{ getTeamInitials(team.name) }}
-            </div>
-            }
-          </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="font-medium truncate">{{ team.name }}</h3>
-            @if (team.shortName) {
-            <p class="text-sm text-gray-600">{{ team.shortName }}</p>
-            }
-          </div>
-          <span
-            class="status-badge text-xs"
-            [class]="'status-' + team.status.toLowerCase()"
-          >
-            {{ team.status }}
-          </span>
-        </div>
-      </div>
-      } @else {
+      @if (teams().length > 0) { @for (team of teams(); track team.id) {
+      <app-team-card
+        [team]="convertToTeam(team)"
+        [config]="getTeamCardConfig()"
+      />
+      } } @else {
       <div class="text-center py-8 text-gray-500">
         <lucide-angular
           [img]="icons.Users"
@@ -130,108 +70,9 @@
       </div>
       }
     </div>
-
-    <!-- Tournament Statistics -->
-    @if (statistics()) {
-    <div class="card">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="font-semibold text-lg flex items-center gap-2">
-          <lucide-angular [img]="icons.Activity" [size]="20"></lucide-angular>
-          Tournament Statistics
-        </h2>
-      </div>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-        <div class="text-center p-3 bg-gray-50 rounded-lg">
-          <p class="text-2xl font-bold text-blue-600">
-            {{ statistics()!.totalMatches }}
-          </p>
-          <p class="text-sm opacity-75">Total Matches</p>
-        </div>
-        <div class="text-center p-3 bg-gray-50 rounded-lg">
-          <p class="text-2xl font-bold text-green-600">
-            {{ statistics()!.completedMatches }}
-          </p>
-          <p class="text-sm opacity-75">Completed</p>
-        </div>
-        <div class="text-center p-3 bg-gray-50 rounded-lg">
-          <p class="text-2xl font-bold text-orange-600">
-            {{ statistics()!.totalGoals }}
-          </p>
-          <p class="text-sm opacity-75">Total Goals</p>
-        </div>
-        <div class="text-center p-3 bg-gray-50 rounded-lg">
-          <p class="text-2xl font-bold text-purple-600">
-            {{ statistics()!.averageGoalsPerMatch.toFixed(1) }}
-          </p>
-          <p class="text-sm opacity-75">Avg/Match</p>
-        </div>
-      </div>
-
-      <!-- Player Statistics -->
-      @if (statistics()?.topScorer && statistics()!.topScorer!.goals > 0) {
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="font-semibold flex items-center gap-2 text-yellow-800">
-                <lucide-angular
-                  [img]="icons.Target"
-                  [size]="16"
-                ></lucide-angular>
-                Top Scorer
-              </p>
-              <p class="text-lg text-yellow-900">
-                {{ statistics()!.topScorer!.playerName }}
-              </p>
-              <p class="text-sm text-yellow-700">
-                {{ statistics()!.topScorer!.goals }} goals
-              </p>
-            </div>
-            <lucide-angular
-              [img]="icons.Trophy"
-              [size]="24"
-              class="text-yellow-600"
-            ></lucide-angular>
-          </div>
-        </div>
-
-        @if (statistics()?.mostAssists && statistics()!.mostAssists!.assists >
-        0) {
-        <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="font-semibold flex items-center gap-2 text-blue-800">
-                <lucide-angular
-                  [img]="icons.Users"
-                  [size]="16"
-                ></lucide-angular>
-                Most Assists
-              </p>
-              <p class="text-lg text-blue-900">
-                {{ statistics()!.mostAssists!.playerName }}
-              </p>
-              <p class="text-sm text-blue-700">
-                {{ statistics()!.mostAssists!.assists }} assists
-              </p>
-            </div>
-            <lucide-angular
-              [img]="icons.Trophy"
-              [size]="24"
-              class="text-blue-600"
-            ></lucide-angular>
-          </div>
-        </div>
-        }
-      </div>
-      }
-    </div>
-    }
   </div>
 
-  <!-- Sidebar -->
   <div class="space-y-6">
-    <!-- Tournament Info -->
     <div class="card">
       <h3 class="font-semibold mb-4">Tournament Info</h3>
       <div class="space-y-3">
@@ -240,7 +81,7 @@
             <lucide-angular [img]="icons.Activity" [size]="16"></lucide-angular>
             Status:
           </span>
-          <span class="status-badge">{{ tournamentStatus() }}</span>
+          <span>{{ tournamentStatus() }}</span>
         </div>
 
         <div class="flex justify-between">
@@ -282,7 +123,6 @@
       </div>
     </div>
 
-    <!-- Registration Info -->
     <div class="card">
       <h3 class="font-semibold mb-4">Registration</h3>
       <div class="space-y-3">
@@ -332,7 +172,6 @@
       </div>
     </div>
 
-    <!-- Contact Info -->
     <div class="card">
       <h3 class="font-semibold mb-4">Contact</h3>
       <div class="space-y-3">
@@ -370,51 +209,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Quick Stats -->
-    @if (statistics()) {
-    <div class="card">
-      <h3 class="font-semibold mb-4">Quick Stats</h3>
-      <div class="space-y-3">
-        <div class="flex justify-between">
-          <span class="opacity-75">Matches Played:</span>
-          <span class="font-medium"
-            >{{ statistics()!.completedMatches }}/{{
-              statistics()!.totalMatches
-            }}</span
-          >
-        </div>
-
-        <div class="flex justify-between">
-          <span class="opacity-75">Total Goals:</span>
-          <span class="font-medium">{{ statistics()!.totalGoals }}</span>
-        </div>
-
-        <div class="flex justify-between">
-          <span class="opacity-75">Avg Goals/Match:</span>
-          <span class="font-medium">{{
-            statistics()!.averageGoalsPerMatch.toFixed(1)
-          }}</span>
-        </div>
-
-        @if (statistics()?.topScorer && statistics()!.topScorer!.goals > 0) {
-        <div class="pt-3 border-t">
-          <div class="flex justify-between items-center">
-            <span class="opacity-75 text-sm">Leading Scorer:</span>
-            <div class="text-right">
-              <p class="font-medium text-sm">
-                {{ statistics()!.topScorer!.playerName }}
-              </p>
-              <p class="text-xs text-gray-600">
-                {{ statistics()!.topScorer!.goals }} goals
-              </p>
-            </div>
-          </div>
-        </div>
-        }
-      </div>
-    </div>
-    }
   </div>
 </div>
 }

@@ -1,13 +1,13 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-
-// import { TeamCard } from '@/app/shared/components/cards/team-card/team-card';
 import { Tournament, TournamentStatistics } from '@/app/api/models/tournament.models';
 import { TournamentTeam } from '@/app/api/models/team.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { CardTypes, TeamCard, TeamCardConfig } from "../../../../shared/components/cards/team-card/team-card";
+import { AuthStateService } from '@/app/store/AuthStateService';
 
 @Component({
   selector: 'app-tournament-details',
@@ -15,8 +15,9 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   styleUrls: ['./tournament-details.css'],
   imports: [
     CommonModule,
-    LucideAngularModule
-  ],
+    LucideAngularModule,
+    TeamCard
+],
 })
 export class TournamentDetails implements OnInit {
   tournament = signal<Tournament | null>(null);
@@ -25,6 +26,7 @@ export class TournamentDetails implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
 
+  private authStateStore = inject(AuthStateService);
   readonly icons = LucideIcons;
 
   // Computed values
@@ -68,6 +70,28 @@ export class TournamentDetails implements OnInit {
     } else {
       this.router.navigate(['/public/tournaments']);
     }
+  }
+
+  convertToTeam(tournamentTeam: TournamentTeam) {
+    return {
+      id: tournamentTeam.id,
+      name: tournamentTeam.name,
+      shortName: tournamentTeam.shortName,
+      logoUrl: tournamentTeam.logoUrl,
+      userId: tournamentTeam.managerId || '',
+      createdAt: tournamentTeam.registeredAt,
+      updatedAt: undefined
+    };
+  }
+  
+  getTeamCardConfig(): TeamCardConfig {
+    const Manager = this.authStateStore.user();
+    const isPublicView = this.authStateStore.isAuthenticated();
+    return {
+      Manager: Manager,
+      isPublicView: isPublicView,
+      type: 'viewOnly' as CardTypes
+    };
   }
 
   async loadTournamentDetails(tournamentId: string) {

@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TeamFormComponent } from '../components/team-form/team-form.component';
 import { TeamService } from '@/app/api/services/team.service';
 import { CreateTeam, UpdateTeam } from '@/app/api/models/team.models';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LucideAngularModule } from 'lucide-angular';
+import { TeamFormComponent } from '../teams/components/team-form/team-form.component';
 
 @Component({
   selector: 'app-create-team',
