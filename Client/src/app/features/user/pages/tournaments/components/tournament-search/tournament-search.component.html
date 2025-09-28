@@ -2,7 +2,7 @@
   <div class="space-y-4">
     <div class="flex flex-col md:flex-row flex-wrap gap-4">
       <div class="flex-1 min-w-[12em]">
-        <label class="form-label">Search Tournaments</label>
+        <label class="input-label">Search Tournaments</label>
         <input
           type="text"
           class="input-field"
@@ -13,9 +13,9 @@
       </div>
 
       <div class="flex-1 min-w-[12em]">
-        <label class="form-label">Status</label>
+        <label class="input-label">Status</label>
         <select
-          class="form-select"
+          class="input-select"
           [value]="selectedStatus() || ''"
           (change)="onStatusChange($event)"
         >
@@ -58,7 +58,7 @@
 
       <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
-          <label class="form-label">Location</label>
+          <label class="input-label">Location</label>
           <input
             type="text"
             class="input-field"
@@ -69,9 +69,9 @@
         </div>
 
         <div>
-          <label class="form-label">Tournament Format</label>
+          <label class="input-label">Tournament Format</label>
           <select
-            class="form-select"
+            class="input-select"
             [value]="format() || ''"
             (change)="onFormatChange($event)"
           >
@@ -83,9 +83,9 @@
         </div>
 
         <div>
-          <label class="form-label">Visibility</label>
+          <label class="input-label">Visibility</label>
           <select
-            class="form-select"
+            class="input-select"
             [value]="
               isPublic() === undefined ? 'All' : isPublic() ? 'true' : 'false'
             "
@@ -97,7 +97,7 @@
           </select>
         </div>
         <div>
-          <label class="form-label">Start Date From</label>
+          <label class="input-label">Start Date From</label>
           <input
             type="date"
             class="input-field"
@@ -107,7 +107,7 @@
         </div>
 
         <div>
-          <label class="form-label">Start Date To</label>
+          <label class="input-label">Start Date To</label>
           <input
             type="date"
             class="input-field"
