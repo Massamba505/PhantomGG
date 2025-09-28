@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../ui/icons/lucide-icons';
@@ -8,7 +8,7 @@ export interface RoleOption {
   value: Roles;
   title: string;
   description: string;
-  icon: string;
+  icon: any;
   features: string[];
 }
 
@@ -18,7 +18,7 @@ export interface RoleOption {
   imports: [CommonModule, LucideAngularModule],
 })
 export class RoleSelection {
-  selectedRole = input<Roles>(Roles.User);
+  selectedRole = input<Roles | null>(Roles.User);
   roleChange = output<Roles>();
   
   readonly icons = LucideIcons;
@@ -28,7 +28,7 @@ export class RoleSelection {
       value: Roles.User,
       title: 'Player/Team Manager',
       description: 'Join tournaments and manage your team',
-      icon: 'Users',
+      icon: this.icons.Users,
       features: [
         'Create and manage teams',
         'Register for tournaments', 
@@ -40,7 +40,7 @@ export class RoleSelection {
       value: Roles.Organizer,
       title: 'Tournament Organizer',
       description: 'Create and manage tournaments',
-      icon: 'Trophy',
+      icon: this.icons.Trophy,
       features: [
         'Create tournaments',
         'Manage registrations',
@@ -51,9 +51,5 @@ export class RoleSelection {
 
   onRoleSelect(role: Roles) {
     this.roleChange.emit(role);
-  }
-
-  getIconByName(iconName: string) {
-    return (this.icons as any)[iconName] || this.icons.User;
   }
 }

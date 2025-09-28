@@ -8,7 +8,7 @@ import {
   Observable,
 } from 'rxjs';
 import { TokenRefreshService } from '../core/services/tokenRefresh.service';
-import { ApiResponse, Auth, LoginRequest, RegisterRequest, User } from '../api/models';
+import { Auth, LoginRequest, RegisterRequest, User } from '../api/models';
 import { AuthService } from '../api/services';
 
 @Injectable({
@@ -91,9 +91,5 @@ export class AuthStateService {
   private clearAuthState() {
     this.tokenService.clearTokens();
     this.userSignal.set(null);
-  }
-
-  updateUser(user: User) {
-    this.userSignal.set(user);
   }
 }

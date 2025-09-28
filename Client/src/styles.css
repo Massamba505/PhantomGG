@@ -73,6 +73,13 @@
   }
 }
 
+@theme {
+  --color-muted: var(--muted-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-destructive: var(--destructive);
+}
+
 @layer components {
   .btn {
     display: inline-flex;
@@ -224,7 +231,7 @@
     display: block;
     font-size: 0.875rem;
     font-weight: 500;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
     color: var(--foreground);
   }
 
