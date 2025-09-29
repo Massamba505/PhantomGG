@@ -1,18 +1,16 @@
 <div
-  class="fixed left-0 top-0 h-full sidebar-transition z-40 bg-sidebar-bg border-r border-sidebar-border"
+  class="fixed left-0 top-0 h-full z-40 border-r"
   [ngClass]="isOpen() ? 'w-64' : 'w-16'"
 >
   <div class="h-16 flex items-center justify-between px-4">
-    <div class="flex items-center gap-2 overflow-hidden">
+    <div class="flex items-center gap-2">
       @if (isOpen()) {
       <img
         src="PhantomGG_LOGO.png"
         alt="PhantomGG Logo"
         class="w-8 h-8 rounded-lg shadow-sm"
       />
-      <span class="font-bold text-lg truncate transition-opacity duration-200"
-        >PhantomGG</span
-      >
+      <span class="font-bold text-lg truncate text-muted">PhantomGG</span>
       }
     </div>
 
@@ -23,9 +21,7 @@
 
   <div class="p-3 pt-2">
     @if (isOpen()) {
-    <div class="text-xs uppercase font-medium tracking-wider mb-3 px-2">
-      Navigation
-    </div>
+    <div class="text-xs uppercase font-medium mb-3 px-2">Navigation</div>
     }
 
     <nav class="space-y-1">
@@ -33,10 +29,10 @@
       @if(item.roles.includes(userRole())) {
       <a
         [routerLink]="item.url"
-        routerLinkActive="bg-gray-400/40"
-        class="flex w-full items-center gap-3 pl-2.5 pr-2 py-2 rounded-lg group text-sm font-medium hover:bg-gray-400/40"
+        routerLinkActive="btn"
+        class="flex w-full items-center gap-3 pl-2.5 pr-2 py-2 rounded-lg group text-sm font-medium btn-outline"
       >
-        <div class="flex-shrink-0 w-5 h-5">
+        <div class="w-5 h-5">
           <lucide-angular [img]="item.icon" class="h-5 w-5"></lucide-angular>
         </div>
 
@@ -49,9 +45,7 @@
 
     <div class="mt-6 mb-2">
       @if (isOpen()) {
-      <div class="text-xs uppercase font-medium tracking-wider mb-3 px-2">
-        Quick Actions
-      </div>
+      <div class="text-xs uppercase font-medium mb-3 px-2">Quick Actions</div>
       }
 
       <nav class="space-y-1">
@@ -59,10 +53,10 @@
         (action.roles.includes(userRole())) {
         <a
           [routerLink]="action.url"
-          routerLinkActive="bg-gray-400/40"
-          class="flex w-full items-center gap-3 pl-2.5 pr-2 py-2 rounded-lg group text-sm font-medium hover:bg-gray-400/40"
+          routerLinkActive="btn"
+          class="flex w-full items-center gap-3 pl-2.5 pr-2 py-2 rounded-lg group text-sm font-medium btn-outline"
         >
-          <div class="flex-shrink-0 w-5 h-5 text-accent">
+          <div class="w-5 h-5 text-accent">
             <lucide-angular
               [img]="action.icon"
               class="h-5 w-5"

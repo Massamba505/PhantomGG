@@ -1,6 +1,6 @@
-<div class="relative flex-shrink-0">
+<div class="relative">
   <button
-    class="flex cursor-pointer items-center gap-2"
+    class="flex cursor-pointer items-center gap-2 p-1 rounded-full"
     (click)="toggleDropdown()"
   >
     <img
@@ -11,22 +11,33 @@
   </button>
 
   @if (open()) {
-  <div class="absolute top-10 right-0 mt-2 w-36 z-50">
-    <button
-      routerLink="/profile"
-      class="btn btn-secondary w-full flex justify-between items-center mb-0.5"
-    >
-      Profile
-      <lucide-angular [img]="icons.UserCircle2"></lucide-angular>
-    </button>
+  <div class="absolute card p-1 top-12 right-0 w-48 z-50">
+    <div class="px-4 py-2 border-b">
+      <p class="text-sm font-medium truncate">
+        {{ user.firstName }} {{ user.lastName }}
+      </p>
+      <p class="text-xs truncate text-muted">{{ user.email }}</p>
+    </div>
 
-    <button
-      (click)="logout()"
-      class="btn btn-secondary w-full flex justify-between items-center"
-    >
-      Logout
-      <lucide-angular [img]="icons.LogOut"></lucide-angular>
-    </button>
+    <div class="py-1">
+      <button
+        routerLink="/profile"
+        class="w-full px-4 py-2 text-left text-sm flex items-center gap-3 cursor-pointer btn-outline rounded-md"
+      >
+        <lucide-angular
+          [img]="icons.UserCircle2"
+          class="w-4 h-4"
+        ></lucide-angular>
+        Profile
+      </button>
+      <button
+        (click)="logout()"
+        class="w-full px-4 py-2 text-left text-sm flex items-center gap-3 cursor-pointer btn-outline rounded-md"
+      >
+        <lucide-angular [img]="icons.LogOut" class="w-4 h-4"></lucide-angular>
+        Logout
+      </button>
+    </div>
   </div>
   }
 </div>
