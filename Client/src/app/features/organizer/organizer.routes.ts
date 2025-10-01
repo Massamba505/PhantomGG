@@ -33,7 +33,7 @@ export const organizerRoutes: Routes = [
           },
           {
             path: ':id',
-            loadComponent: () => import('./pages/tournaments/tournament-details/tournament-details.component').then(m => m.TournamentDetailsComponent),
+            loadComponent: () => import('./pages/tournaments/tournament-details/tournament-details').then(m => m.TournamentDetailsComponent),
             title: 'Tournament Details - PhantomGG',
             data:{title:"Tournament Details"}
           },

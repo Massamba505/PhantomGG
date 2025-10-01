@@ -25,7 +25,7 @@
   <div class="lg:col-span-2 space-y-6">
     <div class="card">
       <div
-        class="tournament-banner mb-4"
+        class="tournament-banner h-48 rounded-md"
         [style.background-image]="
           tournament()!.bannerUrl
             ? 'url(' + tournament()!.bannerUrl + ')'
@@ -43,9 +43,16 @@
     </div>
 
     <div class="card">
-      <p class="font-semibold text-3xl underline mb-3">
-        {{ tournament()!.name }}
-      </p>
+      <div class="flex items-center gap-3 mb-3">
+        <img
+          [src]="tournament()!.logoUrl"
+          alt="tournament logo"
+          class="h-16 w-16 object-contain rounded-lg"
+        />
+        <p class="font-semibold text-3xl underline mb-3">
+          {{ tournament()!.name }}
+        </p>
+      </div>
       <p
         class="leading-relaxed"
         [innerHTML]="tournament()!.description | appLineBreaks"
