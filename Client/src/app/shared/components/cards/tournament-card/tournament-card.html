@@ -1,5 +1,5 @@
 <div
-  class="card relative group rounded-lg border cursor-pointer"
+  class="card relative group rounded-lg border cursor-pointer overflow-hidden"
   (click)="onView()"
 >
   <div class="relative h-32 w-full">
@@ -35,25 +35,23 @@
     }
   </div>
 
-  <div class="px-1 pt-2 space-y-3">
+  <div class="p-3 space-y-3">
     <div>
-      <h3 class="font-semibold text-md">
-        {{ tournament().name }}
-      </h3>
+      <h3 class="font-semibold text-md">{{ tournament().name }}</h3>
       @if (tournament().description) {
-      <p class="text-xs opacity-75 mt-1 line-clamp-2">
+      <p class="text-xs text-muted mt-1 line-clamp-2">
         {{ tournament().description }}
       </p>
       }
     </div>
 
-    <div class="space-y-2 text-xs opacity-75">
+    <div class="space-y-2 text-xs text-muted">
       <div class="flex items-center space-x-2">
         <lucide-angular [img]="icons.Calendar" size="14" />
-        <span
-          >{{ tournament().startDate | date : "mediumDate" }}
-          {{ tournament().startDate | date : "shortTime" }}</span
-        >
+        <span>
+          {{ tournament().startDate | date : "mediumDate" }}
+          {{ tournament().startDate | date : "shortTime" }}
+        </span>
       </div>
 
       @if (tournament().location) {
@@ -74,18 +72,16 @@
       @if (tournament().registrationDeadline) {
       <div class="flex items-center space-x-2">
         <lucide-angular [img]="icons.Clock" size="14" />
-        <span
-          >{{ tournament().registrationDeadline | date : "mediumDate" }}
-          {{ tournament().registrationDeadline | date : "shortTime" }}</span
-        >
+        <span>
+          {{ tournament().registrationDeadline | date : "mediumDate" }}
+          {{ tournament().registrationDeadline | date : "shortTime" }}
+        </span>
       </div>
       }
     </div>
 
-    <div class="space-y-1 text-xs opacity-75">
-      <div
-        class="w-full btn-outline flex justify-start items-center rounded-full h-1.5"
-      >
+    <div class="space-y-1 text-xs text-muted">
+      <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
         <div
           class="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
           [style.width.%]="getProgressPercentage()"
@@ -100,16 +96,17 @@
     </div>
 
     @if (!isOrganizer()) {
-    <div class="flex justify-start items-center pt-2 gap-2 text-xs">
+    <div class="flex items-center pt-2">
       @if (canJoin()) {
-      <button (click)="onJoin($event)" class="px-4 py-1.5 btn btn-primary">
+      <button (click)="onJoin($event)" class="btn btn-primary">
         Join Tournament
       </button>
       } @else {
-      <button class="px-4 py-1.5 btn btn-outline cursor-not-allowed" disabled>
+      <button class="btn btn-outline rounded-md cursor-not-allowed" disabled>
         {{
-          tournament().status === "RegistrationOpen" &&
-          tournament().teamCount >= tournament().maxTeams
+          isInProgress()
+            ? "In Progress"
+            : isFull()
             ? "Full"
             : tournament().status
         }}

@@ -59,7 +59,7 @@
       <app-tournament-card
         *ngFor="let tournament of tournaments(); trackBy: trackByTournamentId"
         [tournament]="tournament"
-        [isOrganizer]="false"
+        role="Public"
         (view)="onTournamentView($event)"
       >
       </app-tournament-card>

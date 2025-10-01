@@ -64,7 +64,7 @@
       @for (tournament of tournaments(); track tournament.id) {
       <app-tournament-card
         [tournament]="tournament"
-        [isOrganizer]="false"
+        role="User"
         (join)="onTournamentJoin($event)"
         (view)="onTournamentView($event)"
         (leave)="onTournamentLeave($event)"

@@ -45,7 +45,7 @@
     @for (tournament of tournaments(); track tournament.id) {
     <app-tournament-card
       [tournament]="tournament"
-      [isOrganizer]="isOrganizer()"
+      role="Organizer"
       (edit)="editTournament($event)"
       (delete)="deleteTournament($event)"
       (view)="viewTournament($event)"
