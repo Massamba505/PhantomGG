@@ -1,7 +1,7 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TournamentFormComponent } from '../components/tournament-form/tournament-form.component';
+import { TournamentForm } from '../components/tournament-form/tournament-form';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { CreateTournament } from '@/app/api/models/tournament.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
@@ -11,13 +11,13 @@ import { LucideAngularModule } from "lucide-angular";
   selector: 'app-create-tournament',
   imports: [
     CommonModule,
-    TournamentFormComponent,
+    TournamentForm,
     LucideAngularModule
-],
-  templateUrl: './create-tournament.component.html',
-  styleUrl: './create-tournament.component.css'
+  ],
+  templateUrl: './create-tournament.html',
+  styleUrl: './create-tournament.css'
 })
-export class CreateTournamentComponent {
+export class CreateTournamentPage {
   private tournamentService = inject(TournamentService);
   private router = inject(Router);
 
@@ -27,15 +27,12 @@ export class CreateTournamentComponent {
   onSubmit(tournamentData: CreateTournament) {
     this.saving.set(true);
     
-    console.log('Tournament data being sent:', tournamentData);
-    
     this.tournamentService.createTournament(tournamentData).subscribe({
       next: (tournament) => {
         this.router.navigate(['/organizer/tournaments', tournament.id]);
         this.saving.set(false);
       },
       error: (error) => {
-        console.error('Error creating tournament:', error);
         this.saving.set(false);
       }
     });

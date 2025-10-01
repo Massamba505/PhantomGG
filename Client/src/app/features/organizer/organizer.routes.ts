@@ -1,4 +1,3 @@
-import { authGuard } from '@/app/core/guards/auth.guard';
 import { Routes } from '@angular/router';
 
 export const organizerRoutes: Routes = [
@@ -28,7 +27,7 @@ export const organizerRoutes: Routes = [
           },
           {
             path: 'create',
-            loadComponent: () => import('./pages/tournaments/create-tournament/create-tournament.component').then(m => m.CreateTournamentComponent),
+            loadComponent: () => import('./pages/tournaments/create-tournament/create-tournament').then(m => m.CreateTournamentPage),
             title: 'Create Tournament - PhantomGG',
             data:{title:"Create Tournaments"}
           },
@@ -40,7 +39,7 @@ export const organizerRoutes: Routes = [
           },
           {
             path: ':id/edit',
-            loadComponent: () => import('./pages/tournaments/edit-tournament/edit-tournament.component').then(m => m.EditTournamentComponent),
+            loadComponent: () => import('./pages/tournaments/edit-tournament/edit-tournament').then(m => m.EditTournamentPage),
             title: 'Edit Tournament - PhantomGG',
             data:{title:"Edit Tournaments"}
           }

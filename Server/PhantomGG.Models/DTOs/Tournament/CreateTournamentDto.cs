@@ -32,9 +32,6 @@ public class CreateTournamentDto
     [Range(4, 128)]
     public int MaxTeams { get; set; } = 16;
 
-    [EmailAddress]
-    public string? ContactEmail { get; set; }
-
     public IFormFile? BannerUrl { get; set; }
 
     public IFormFile? LogoUrl { get; set; }

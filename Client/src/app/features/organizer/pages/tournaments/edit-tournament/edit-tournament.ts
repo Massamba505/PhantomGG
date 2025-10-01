@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TournamentFormComponent } from '../components/tournament-form/tournament-form.component';
+import { TournamentForm } from '../components/tournament-form/tournament-form';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { Tournament, UpdateTournament } from '@/app/api/models/tournament.models';
 import { LucideAngularModule } from "lucide-angular";
@@ -9,11 +9,11 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-edit-tournament',
-  imports: [CommonModule, TournamentFormComponent, LucideAngularModule],
-  templateUrl: './edit-tournament.component.html',
-  styleUrl: './edit-tournament.component.css'
+  imports: [CommonModule, TournamentForm, LucideAngularModule],
+  templateUrl: './edit-tournament.html',
+  styleUrl: './edit-tournament.css'
 })
-export class EditTournamentComponent implements OnInit {
+export class EditTournamentPage implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private tournamentService = inject(TournamentService);

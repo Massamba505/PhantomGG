@@ -65,7 +65,7 @@ public class TournamentsController(
     /// Get organizer's tournaments
     /// </summary>
     [HttpGet("my-tournaments")]
-    [Authorize]
+    [Authorize(Roles = "Organizer")]
     public async Task<ActionResult<ApiResponse>> GetMyTournaments([FromQuery] TournamentSearchDto searchDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();

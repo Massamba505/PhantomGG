@@ -307,13 +307,13 @@ public class TournamentService(
     private static void ValidateCreateTournament(CreateTournamentDto createDto)
     {
         if (createDto.StartDate <= DateTime.UtcNow)
-            throw new ArgumentException("Tournament start date must be in the future");
+            throw new ValidationException("Tournament start date must be in the future");
 
         if (createDto.EndDate <= createDto.StartDate)
-            throw new ArgumentException("Tournament end date must be after start date");
+            throw new ValidationException("Tournament end date must be after start date");
 
         if (createDto.RegistrationDeadline.HasValue && createDto.RegistrationDeadline >= createDto.StartDate)
-            throw new ArgumentException("Registration deadline must be before tournament start date");
+            throw new ValidationException("Registration deadline must be before tournament start date");
     }
 
     #region Public Methods (no authentication required)

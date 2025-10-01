@@ -16,6 +16,7 @@ export function errorInterceptor(
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+       debugger;
       if (error.status === 401) {
         if (req.url.includes('/refresh')) {
           return throwError(() => error);

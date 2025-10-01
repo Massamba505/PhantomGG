@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-organizer-dashboard',
-  template: ``,
-  imports: []
+  templateUrl: './organizer-dashboard.component.html',
 })
 export class OrganizerDashboardComponent {}
