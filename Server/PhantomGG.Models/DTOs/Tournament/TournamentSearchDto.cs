@@ -12,7 +12,7 @@ public class TournamentSearchDto
     public decimal? MaxPrizePool { get; set; }
     public DateTime? StartDateFrom { get; set; }
     public DateTime? StartDateTo { get; set; }
-    public bool? IsPublic { get; set; } = true;
+    public bool? IsPublic { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, signal, effect, inject, OnInit, computed } from '@angular/core';
+import { Component, signal, inject, OnInit, computed, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TournamentFormat, TournamentSearch } from '@/app/api/models/tournament.models';
@@ -7,12 +7,13 @@ import { TournamentService } from '@/app/api/services';
 @Component({
   selector: 'app-tournament-search',
   imports: [CommonModule, FormsModule],
-  templateUrl: './tournament-search.component.html',
-  styleUrl: './tournament-search.component.css'
+  templateUrl: './tournament-search.html',
+  styleUrl: './tournament-search.css'
 })
 export class TournamentSearchComponent implements OnInit {
-  @Output() searchChange = new EventEmitter<Partial<TournamentSearch>>();
-  @Output() clearFiltersSearch = new EventEmitter<void>();
+  searchChange = output<Partial<TournamentSearch>>();
+  clearFiltersSearch = output<void>();
+
   private tournamentService = inject(TournamentService);
 
   searchTerm = signal('');
@@ -24,7 +25,7 @@ export class TournamentSearchComponent implements OnInit {
   startDateTo = signal<string | undefined>(undefined);
   isPublic = signal<boolean | undefined>(undefined);
 
-    searchCriteria = computed<Partial<TournamentSearch>>(() => {
+  searchCriteria = computed<Partial<TournamentSearch>>(() => {
     return {
         searchTerm: this.searchTerm()?.trim() || undefined,
         status: this.selectedStatus() || undefined,
@@ -32,9 +33,9 @@ export class TournamentSearchComponent implements OnInit {
         format: this.format() || undefined,
         startDateFrom: this.startDateFrom() || undefined,
         startDateTo: this.startDateTo() || undefined,
-        isPublic: this.isPublic() || undefined,
+        isPublic: this.isPublic(),
       };
-    });
+  });
 
   ngOnInit() {
     this.getTournamentFormats();
@@ -86,9 +87,15 @@ export class TournamentSearchComponent implements OnInit {
   onIsPublicChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     let value: boolean | undefined;
-    if (target.value === 'true') value = true;
-    else if (target.value === 'false') value = false;
-    else value = undefined;
+    if (target.value == 'true'){
+      value = true;
+    }
+    else if (target.value == 'false'){
+      value = false;
+    }
+    else{
+      value = undefined;
+    }
     this.isPublic.set(value);
   }
 

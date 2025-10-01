@@ -21,7 +21,7 @@ export const organizerRoutes: Routes = [
         children: [
           {
             path: '',
-            loadComponent: () => import('./pages/tournaments/tournament-list/tournament-list.component').then(m => m.TournamentListComponent),
+            loadComponent: () => import('./pages/tournaments/tournament-list/tournament-list').then(m => m.TournamentListComponent),
             title: 'My Tournaments - PhantomGG',
             data:{title:"Tournaments"}
           },

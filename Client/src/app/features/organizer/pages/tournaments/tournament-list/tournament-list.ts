@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
 import { PaginatedResponse } from '@/app/api/models/api.models';
 import { TournamentCard } from '@/app/shared/components/cards';
-import { TournamentSearchComponent } from '../components/tournament-search/tournament-search.component';
+import { TournamentSearchComponent } from '../components/tournament-search/tournament-search';
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
 import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentService } from '@/app/api/services';
@@ -19,8 +19,8 @@ import { Roles } from '@/app/shared/constants/roles';
     TournamentSearchComponent,
     ConfirmDeleteModal
 ],
-  templateUrl: './tournament-list.component.html',
-  styleUrl: './tournament-list.component.css'
+  templateUrl: './tournament-list.html',
+  styleUrl: './tournament-list.css'
 })
 export class TournamentListComponent implements OnInit {
   private tournamentService = inject(TournamentService);

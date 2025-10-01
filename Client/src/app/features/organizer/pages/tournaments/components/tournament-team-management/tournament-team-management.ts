@@ -13,8 +13,8 @@ type TeamTab = 'approved' | 'pending';
 @Component({
   selector: 'app-tournament-team-management',
   imports: [CommonModule, LucideAngularModule, TeamCard],
-  templateUrl: './tournament-team-management.component.html',
-  styleUrl: './tournament-team-management.component.css'
+  templateUrl: './tournament-team-management.html',
+  styleUrl: './tournament-team-management.css'
 })
 export class TournamentTeamManagementComponent implements OnInit {
   tournamentId = input.required<string>();
