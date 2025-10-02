@@ -55,10 +55,7 @@
       </div>
 
       @if (teams().length > 0) { @for (team of teams(); track team.id) {
-      <app-team-card
-        [team]="convertToTeam(team)"
-        [config]="getTeamCardConfig()"
-      />
+      <app-team-card [team]="convertToTeam(team)" [role]="getTeamRole()" />
       } } @else {
       <div class="text-center py-8 text-gray-500">
         <lucide-angular

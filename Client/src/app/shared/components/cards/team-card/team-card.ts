@@ -1,36 +1,23 @@
-import { Component, input, OnInit, output, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '../../ui/icons/lucide-icons';
-import { Team, User } from '@/app/api/models';
+import { Team } from '@/app/api/models';
 
-export interface TeamCardConfig {
-  isPublicView?: boolean;
-  Manager?: User | null;
-  type: CardTypes;
-}
+export type TeamRole = 'Manager' | 'Organizer' | 'Public';
+export type TeamCardType = 'pending' | 'approved' | 'default';
 
-export type CardTypes = 'approved' | 'pending' | 'viewOnly';
 @Component({
   selector: 'app-team-card',
   templateUrl: './team-card.html',
   styleUrls: ['./team-card.css'],
   imports: [CommonModule, LucideAngularModule],
 })
-export class TeamCard implements OnInit {
+export class TeamCard {
   team = input.required<Team>();
+  role = input<TeamRole>('Public');
+  cardType = input<TeamCardType>('default');
   isLoading = signal(false);
-
-  config = input<TeamCardConfig>({
-    isPublicView: false,
-    Manager: undefined,
-    type: 'viewOnly'
-  });
-  
-  isManager = false;
-  pendingCard = false;
-  approveCard = false;
-  viewOnlyCard = false;
   
   edit = output<Team>();
   delete = output<string>();
@@ -40,12 +27,24 @@ export class TeamCard implements OnInit {
   
   readonly icons = LucideIcons;
 
-  ngOnInit(): void {
-    this.isManager = this.config().Manager?.id == this.team().userId
-    
-    this.pendingCard = this.config().type == 'pending';
-    this.approveCard = this.config().type == 'approved';
-    this.viewOnlyCard = this.config().type == 'viewOnly';
+  isManager(): boolean {
+    return this.role() === 'Manager';
+  }
+
+  isOrganizer(): boolean {
+    return this.role() === 'Organizer';
+  }
+
+  isPublic(): boolean {
+    return this.role() === 'Public';
+  }
+
+  isPendingCard(): boolean {
+    return this.cardType() === 'pending';
+  }
+
+  isApprovedCard(): boolean {
+    return this.cardType() === 'approved';
   }
   onEdit(event: Event) {
     event.stopPropagation();
@@ -67,12 +66,15 @@ export class TeamCard implements OnInit {
     this.reject.emit(this.team().id);
   }
 
-  approveTeam(event: Event) {
+  onApproveTeam(event: Event) {
     event.stopPropagation();
     this.approve.emit(this.team().id);
   }
 
-  onView() {
+  onView(event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
     this.view.emit(this.team());
   }
   

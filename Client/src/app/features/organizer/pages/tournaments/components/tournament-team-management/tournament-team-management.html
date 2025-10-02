@@ -71,7 +71,8 @@
     @for (team of getCurrentTeams(); track team.id) {
     <app-team-card
       [team]="convertToTeam(team)"
-      [config]="getTeamCardConfig(activeTab())"
+      [role]="getTeamRole()"
+      [cardType]="getTeamCardType()"
       (view)="onTeamView($event)"
       (delete)="onTeamDelete($event)"
       (approve)="onTeamApprove($event)"

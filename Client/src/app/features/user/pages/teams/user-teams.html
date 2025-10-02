@@ -60,7 +60,7 @@
       @for (team of teams(); track team.id) {
       <app-team-card
         [team]="team"
-        [config]="getTeamCardConfig()"
+        [role]="getTeamRole()"
         (edit)="onTeamEdit($event)"
         (delete)="onTeamDelete($event)"
         (view)="onTeamView($event)"

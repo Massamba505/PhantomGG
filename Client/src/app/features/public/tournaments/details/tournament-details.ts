@@ -6,7 +6,7 @@ import { Tournament, TournamentStatistics } from '@/app/api/models/tournament.mo
 import { TournamentTeam } from '@/app/api/models/team.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { CardTypes, TeamCard, TeamCardConfig } from "../../../../shared/components/cards/team-card/team-card";
+import { TeamCard, TeamRole } from "../../../../shared/components/cards/team-card/team-card";
 import { AuthStateService } from '@/app/store/AuthStateService';
 
 @Component({
@@ -29,7 +29,6 @@ export class TournamentDetails implements OnInit {
   private authStateStore = inject(AuthStateService);
   readonly icons = LucideIcons;
 
-  // Computed values
   tournamentStatus = computed(() => {
     const t = this.tournament();
     if (!t) return 'Unknown';
@@ -84,14 +83,8 @@ export class TournamentDetails implements OnInit {
     };
   }
   
-  getTeamCardConfig(): TeamCardConfig {
-    const Manager = this.authStateStore.user();
-    const isPublicView = this.authStateStore.isAuthenticated();
-    return {
-      Manager: Manager,
-      isPublicView: isPublicView,
-      type: 'viewOnly' as CardTypes
-    };
+  getTeamRole(): TeamRole {
+    return 'Public';
   }
 
   async loadTournamentDetails(tournamentId: string) {
@@ -99,7 +92,6 @@ export class TournamentDetails implements OnInit {
     this.error.set(null);
     
     try {
-      // Load tournament details, teams, and statistics in parallel
       const [tournament, teams, statistics] = await Promise.all([
         this.tournamentService.getPublicTournament(tournamentId),
         this.tournamentService.getPublicTournamentTeams(tournamentId),
@@ -110,15 +102,13 @@ export class TournamentDetails implements OnInit {
       this.teams.set(teams);
       this.statistics.set(statistics);
     } catch (error) {
-      console.error('Error loading tournament details:', error);
-      this.error.set('Failed to load tournament details. Please try again.');
+      this.loading.set(false);
     } finally {
       this.loading.set(false);
     }
   }
 
   onTeamView(team: TournamentTeam) {
-    // Navigate to team details (if implemented)
     console.log('View team:', team);
   }
 

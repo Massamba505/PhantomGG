@@ -5,7 +5,7 @@ import { TournamentTeam } from '@/app/api/models/team.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { CardTypes, TeamCard, TeamCardConfig } from '@/app/shared/components/cards/team-card/team-card';
+import { TeamCard, TeamRole, TeamCardType } from '@/app/shared/components/cards/team-card/team-card';
 import { AuthStateService } from '@/app/store/AuthStateService';
 
 type TeamTab = 'approved' | 'pending';
@@ -78,11 +78,10 @@ export class TournamentTeamManagementComponent implements OnInit {
     this.tournamentService.approveTeam(this.tournamentId(), team.id).subscribe({
       next: () => {
         this.toastService.success(`${team.name} has been approved`);
-        this.loadTeams(); // Reload to get updated data
+        this.loadTeams();
       },
       error: (error) => {
-        console.error('Failed to approve team:', error);
-        this.toastService.error('Failed to approve team');
+        this.setActionLoading(team.id, false);
       },
       complete: () => {
         this.setActionLoading(team.id, false);
@@ -99,8 +98,7 @@ export class TournamentTeamManagementComponent implements OnInit {
         this.loadTeams(); // Reload to get updated data
       },
       error: (error) => {
-        console.error('Failed to reject team:', error);
-        this.toastService.error('Failed to reject team');
+        this.setActionLoading(team.id, false);
       },
       complete: () => {
         this.setActionLoading(team.id, false);
@@ -117,8 +115,7 @@ export class TournamentTeamManagementComponent implements OnInit {
         this.loadTeams(); // Reload to get updated data
       },
       error: (error) => {
-        console.error('Failed to remove team:', error);
-        this.toastService.error('Failed to remove team');
+        this.setActionLoading(team.id, false);
       },
       complete: () => {
         this.setActionLoading(team.id, false);
@@ -156,14 +153,13 @@ export class TournamentTeamManagementComponent implements OnInit {
     };
   }
 
-  getTeamCardConfig(type: string): TeamCardConfig {
-    const Manager = this.authStateStore.user();
-    const isPublicView = this.authStateStore.isAuthenticated();
-    return {
-      Manager: Manager,
-      isPublicView: isPublicView,
-      type: type as CardTypes
-    };
+  getTeamRole(): TeamRole {
+    return 'Organizer'; // Organizer can approve/reject/remove teams
+  }
+
+  getTeamCardType(): TeamCardType {
+    const tab = this.activeTab();
+    return tab === 'pending' ? 'pending' : 'approved';
   }
 
   onTeamView(team: any) {

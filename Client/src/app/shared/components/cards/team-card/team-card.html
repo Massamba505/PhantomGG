@@ -1,67 +1,112 @@
-<div class="card relative cursor-pointer" (click)="onView()">
-  <div class="flex items-center space-x-3">
-    <div class="w-16 h-16 flex-shrink-0">
-      <img
-        [src]="team().logoUrl"
-        [alt]="team().name + ' logo'"
-        class="w-full h-full object-contain rounded-lg"
-      />
-    </div>
-
-    <div>
-      <h3 class="font-semibold">
+<div (click)="onView()" class="card flex flex-col gap-3 p-3">
+  <div class="flex gap-2">
+    <img
+      [src]="team().logoUrl || 'assets/PhantomGG_LOGO.png'"
+      [alt]="team().name"
+      class="w-12 h-12 object-contain rounded-md"
+    />
+    <div class="flex-1">
+      <span class="font-semibold text-md line-clamp-1">
         {{ team().name }}
-      </h3>
+      </span>
       @if (team().shortName) {
-      <p class="text-sm text-gray-500 dark:text-gray-400 font-mono">
+      <p class="text-xs text-muted font-mono">
         {{ team().shortName }}
       </p>
       }
     </div>
   </div>
-  @if (isManager && viewOnlyCard) {
-  <div class="absolute right-3 top-3 flex space-x-1">
+
+  <div class="grid grid-cols-3 gap-2">
+    <div
+      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+    >
+      <lucide-angular size="14" [img]="icons.Users" />
+      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
+        <span class="line-clamp-1">Members</span>
+        <span class="line-clamp-1">12</span>
+      </div>
+    </div>
+
+    <div
+      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+    >
+      <lucide-angular size="14" [img]="icons.Calendar" />
+      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
+        <span class="line-clamp-1">Events</span>
+        <span class="line-clamp-1">8</span>
+      </div>
+    </div>
+
+    <div
+      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+    >
+      <lucide-angular size="14" [img]="icons.Clock" />
+      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
+        @if (isManager()) {
+        <span class="line-clamp-1">Created</span>
+        } @else {
+        <span class="line-clamp-1">Joined</span>
+        }
+        <span class="line-clamp-1">{{
+          team().createdAt | date : "mediumDate"
+        }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-1 mt-auto">
+    @if (isManager()) {
     <button
       (click)="onEdit($event)"
-      class="p-1.5 btn btn-secondary"
-      title="Edit team"
+      class="btn btn-outline flex justify-center items-center flex-1"
     >
-      <lucide-angular [img]="icons.Edit" size="14" />
+      <lucide-angular size="15" [img]="icons.Edit" />
+      <span>Edit</span>
     </button>
+    <button (click)="onDelete($event)" class="btn btn-destructive">
+      <lucide-angular size="15" [img]="icons.Trash2" />
+    </button>
+    } @if (isOrganizer()) { @if (isPendingCard()) {
+    <!-- Pending team: Show approve and reject buttons -->
     <button
-      (click)="onDelete($event)"
-      class="p-1.5 btn btn-destructive"
-      title="Delete team"
+      (click)="onApproveTeam($event)"
+      class="btn btn-primary flex justify-center items-center py-3 flex-1"
     >
-      <lucide-angular [img]="icons.Trash2" size="14" />
+      <lucide-angular size="15" [img]="icons.Check" />
+      <span>Approve</span>
     </button>
-  </div>
-  } @if (!isManager && approveCard) {
-  <div class="absolute right-3 top-3 flex space-x-1">
+    <button (click)="onRejectTeam($event)" class="btn btn-destructive">
+      <lucide-angular size="15" [img]="icons.X" />
+    </button>
+    } @else if (isApprovedCard()) {
+    <!-- Approved team: Show remove button only -->
     <button
       (click)="onRemoveTeam($event)"
-      class="p-1.5 btn btn-destructive"
-      title="Remove team"
+      class="btn btn-destructive flex justify-center items-center flex-1"
     >
-      <lucide-angular [img]="icons.Trash2" size="14" />
+      <lucide-angular size="15" [img]="icons.Trash2" />
+      <span>Remove</span>
     </button>
-  </div>
-  } @if (!isManager && pendingCard) {
-  <div class="absolute right-3 top-3 flex space-x-1">
+    } @else {
+    <!-- Default organizer view: Show approve and reject -->
     <button
-      (click)="approveTeam($event)"
-      class="p-1.5 btn btn-primary"
-      title="Approve team"
+      (click)="onApproveTeam($event)"
+      class="btn btn-primary flex justify-center items-center py-3 flex-1"
     >
-      <lucide-angular [img]="icons.Check" size="14" />
+      <lucide-angular size="15" [img]="icons.Check" />
+      <span>Approve</span>
     </button>
+    <button (click)="onRejectTeam($event)" class="btn btn-destructive">
+      <lucide-angular size="15" [img]="icons.X" />
+    </button>
+    } } @if (isPublic()) {
     <button
-      (click)="onRejectTeam($event)"
-      class="p-1.5 btn btn-destructive"
-      title="Reject team"
+      (click)="onView($event)"
+      class="btn btn-secondary flex justify-center items-center flex-1"
     >
-      <lucide-angular [img]="icons.X" size="14" />
+      <span>View</span>
     </button>
+    }
   </div>
-  }
 </div>
