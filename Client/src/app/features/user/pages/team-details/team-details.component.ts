@@ -8,7 +8,7 @@ import { AuthStateService } from '@/app/store/AuthStateService';
 import { Team, Player, CreatePlayer, UpdatePlayer } from '@/app/api/models/team.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
-import { PlayerCard, PlayerCardConfig } from '@/app/shared/components/cards/player-card/player-card';
+import { PlayerCard, PlayerRole } from '@/app/shared/components/cards/player-card/player-card';
 import { PlayerForm } from '@/app/shared/components/forms/player-form/player-form';
 
 @Component({
@@ -167,11 +167,8 @@ export class TeamDetailsComponent implements OnInit {
     return !!(user && team && user.id === team.userId);
   }
 
-  getPlayerCardConfig(): PlayerCardConfig {
-    return {
-      isManager: this.isManager(),
-      showActions: this.isManager()
-    };
+  getPlayerRole(): PlayerRole {
+    return this.isManager() ? 'Manager' : 'TeamMember';
   }
 
   retryLoad() {

@@ -1,41 +1,93 @@
-<div class="card relative">
-  <div class="flex items-start gap-3">
+<div (click)="onView()" class="card flex flex-col gap-3 p-3">
+  <div class="flex gap-2">
     <img
-      [src]="player().photoUrl"
+      [src]="player().photoUrl || 'assets/PhantomGG_LOGO.png'"
       [alt]="player().firstName + ' ' + player().lastName"
-      class="w-16 h-16 rounded-full object-contain border-2 border-gray-100"
+      class="w-12 h-12 object-cover rounded-full"
     />
-
-    <div class="flex-1 min-w-0">
-      <h3 class="font-semibold text-lg truncate">
+    <div class="flex-1">
+      <span class="font-semibold text-md line-clamp-1">
         {{ player().firstName }} {{ player().lastName }}
-      </h3>
+      </span>
       @if (player().position) {
-      <p class="text-sm text-gray-600 mb-1">{{ player().position }}</p>
-      } @if (player().email && config().isManager) {
-      <p class="text-sm text-gray-500 truncate">{{ player().email }}</p>
-      }
-      <p class="text-xs text-gray-400 mt-2">
-        Joined {{ player().joinedAt | date : "short" }}
+      <p class="text-xs text-muted">
+        {{ player().position }}
       </p>
+      }
     </div>
   </div>
-  @if (config().isManager && config().showActions) {
-  <div class="flex gap-2 absolute right-3 bottom-3">
-    <button
-      class="btn btn-outline p-2"
-      (click)="onEdit($event)"
-      title="Edit Player"
+
+  <div class="grid grid-cols-3 gap-2">
+    <div
+      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
     >
-      <lucide-angular [img]="icons.Edit" [size]="12"></lucide-angular>
-    </button>
-    <button
-      class="btn btn-destructive p-2"
-      (click)="onDelete($event)"
-      title="Remove Player"
+      <lucide-angular size="14" [img]="icons.Trophy" />
+      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
+        <span class="line-clamp-1">Goals</span>
+        <span class="line-clamp-1">12</span>
+      </div>
+    </div>
+
+    <div
+      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
     >
-      <lucide-angular [img]="icons.Trash2" [size]="12"></lucide-angular>
-    </button>
+      <lucide-angular size="14" [img]="icons.Target" />
+      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
+        <span class="line-clamp-1">Assists</span>
+        <span class="line-clamp-1">8</span>
+      </div>
+    </div>
+
+    <div
+      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+    >
+      <lucide-angular size="14" [img]="icons.Calendar" />
+      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
+        <span class="line-clamp-1">Joined</span>
+        <span class="line-clamp-1">{{
+          player().joinedAt | date : "mediumDate"
+        }}</span>
+      </div>
+    </div>
+  </div>
+
+  @if (player().email && isManager()) {
+  <div
+    class="border p-2 rounded-md text-xs text-muted btn-outline cursor-pointer"
+  >
+    <div class="flex items-center gap-1">
+      <lucide-angular size="12" [img]="icons.Mail" />
+      <span class="font-semibold truncate">{{ player().email }}</span>
+    </div>
   </div>
   }
+
+  <div class="flex gap-1 mt-auto">
+    @if (isManager()) {
+    <button
+      (click)="onEdit($event)"
+      class="btn btn-outline flex justify-center items-center flex-1"
+    >
+      <lucide-angular size="15" [img]="icons.Edit" />
+      <span>Edit</span>
+    </button>
+    <button (click)="onDelete($event)" class="btn btn-destructive">
+      <lucide-angular size="15" [img]="icons.Trash2" />
+    </button>
+    } @if (isTeamMember()) {
+    <button
+      (click)="onView($event)"
+      class="btn btn-secondary flex justify-center items-center flex-1"
+    >
+      <span>View Stats</span>
+    </button>
+    } @if (isPublic()) {
+    <button
+      (click)="onView($event)"
+      class="btn btn-secondary flex justify-center items-center flex-1"
+    >
+      <span>View</span>
+    </button>
+    }
+  </div>
 </div>

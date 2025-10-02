@@ -73,11 +73,11 @@
       </div>
 
       @if (players().length > 0) {
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         @for (player of players(); track player.id) {
         <app-player-card
           [player]="player"
-          [config]="getPlayerCardConfig()"
+          [role]="getPlayerRole()"
           (edit)="onEditPlayer($event)"
           (delete)="onRemovePlayer($event)"
         ></app-player-card>
