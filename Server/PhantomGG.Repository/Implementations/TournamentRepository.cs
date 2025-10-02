@@ -71,7 +71,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId)
+    public async Task<PaginatedResult<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId)
     {
         var query = _context.Tournaments
             .Include(t => t.Organizer)
@@ -122,7 +122,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
             .Take(searchDto.PageSize)
             .ToListAsync();
 
-        return tournaments;
+        return new PaginatedResult<Tournament>(tournaments, totalRecords);
     }
 
     public async Task<Tournament> CreateAsync(Tournament tournament)

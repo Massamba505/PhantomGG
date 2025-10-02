@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { LucideAngularModule } from 'lucide-angular';
 import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
 import { PaginatedResponse } from '@/app/api/models/api.models';
 import { TournamentCard } from '@/app/shared/components/cards';
@@ -10,11 +11,13 @@ import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentService } from '@/app/api/services';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { Roles } from '@/app/shared/constants/roles';
+import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-tournament-list',
   imports: [
     CommonModule,
+    LucideAngularModule,
     TournamentCard,
     TournamentSearchComponent,
     ConfirmDeleteModal
@@ -27,6 +30,8 @@ export class TournamentListComponent implements OnInit {
   private router = inject(Router);
   private toastService = inject(ToastService);
   private authStateStore = inject(AuthStateService);
+
+  readonly icons = LucideIcons;
 
   tournaments = signal<Tournament[]>([]);
   isLoading = signal(false);

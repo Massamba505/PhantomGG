@@ -27,9 +27,9 @@ public class TeamService(
 
     public async Task<PaginatedResponse<TeamDto>> SearchAsync(TeamSearchDto searchDto)
     {
-        var teams = await _teamRepository.SearchAsync(searchDto);
-        var teamDtos = teams.Select(t => t.ToDto());
-        var totalCount = teamDtos.Count();
+        var paginatedResult = await _teamRepository.SearchAsync(searchDto);
+        var teamDtos = paginatedResult.Items.Select(t => t.ToDto());
+        var totalCount = paginatedResult.TotalRecords;
 
         return new PaginatedResponse<TeamDto>
         {

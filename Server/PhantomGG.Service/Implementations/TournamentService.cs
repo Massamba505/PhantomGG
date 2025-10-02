@@ -30,13 +30,13 @@ public class TournamentService(
 
     public async Task<PaginatedResponse<TournamentDto>> SearchAsync(TournamentSearchDto searchDto)
     {
-        var tournaments = await _tournamentRepository.SearchAsync(searchDto);
+        var paginatedResult = await _tournamentRepository.SearchAsync(searchDto);
 
         return new PaginatedResponse<TournamentDto>(
-            tournaments.Select(t => t.ToDto()),
+            paginatedResult.Items.Select(t => t.ToDto()),
             searchDto.PageNumber,
             searchDto.PageSize,
-            totalRecords: tournaments.Count()
+            totalRecords: paginatedResult.TotalRecords
         );
     }
 
@@ -62,13 +62,13 @@ public class TournamentService(
 
     public async Task<PaginatedResponse<TournamentDto>> GetMyTournamentsAsync(TournamentSearchDto searchDto, Guid organizerId)
     {
-        var tournaments = await _tournamentRepository.SearchAsync(searchDto, organizerId: organizerId);
+        var paginatedResult = await _tournamentRepository.SearchAsync(searchDto, organizerId: organizerId);
 
         return new PaginatedResponse<TournamentDto>(
-            tournaments.Select(t => t.ToDto()),
+            paginatedResult.Items.Select(t => t.ToDto()),
             searchDto.PageNumber,
             searchDto.PageSize,
-            totalRecords: tournaments.Count()
+            totalRecords: paginatedResult.TotalRecords
         );
     }
 
