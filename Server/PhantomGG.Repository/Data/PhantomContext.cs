@@ -1,14 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using PhantomGG.Models.Entities;
 
 namespace PhantomGG.Repository.Data;
 
 public partial class PhantomContext : DbContext
 {
-    public PhantomContext()
-    {
-    }
-
     public PhantomContext(DbContextOptions<PhantomContext> options)
         : base(options)
     {
@@ -174,8 +172,6 @@ public partial class PhantomContext : DbContext
                 .HasMaxLength(200)
                 .IsUnicode(false);
             entity.Property(e => e.LogoUrl).IsUnicode(false);
-            entity.Property(e => e.MaxTeams).HasDefaultValue(16);
-            entity.Property(e => e.MinTeams).HasDefaultValue(2);
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
                 .IsUnicode(false);
@@ -197,6 +193,8 @@ public partial class PhantomContext : DbContext
             entity.HasIndex(e => e.TeamId, "IX_TournamentTeams_Team");
 
             entity.HasIndex(e => e.TournamentId, "IX_TournamentTeams_Tournament");
+
+            entity.HasIndex(e => new { e.TournamentId, e.TeamId }, "UQ_TournamentTeams_Unique").IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");

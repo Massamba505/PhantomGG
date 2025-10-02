@@ -11,19 +11,19 @@ public partial class Tournament
 
     public string Description { get; set; } = null!;
 
-    public string? Location { get; set; }
+    public string Location { get; set; } = null!;
 
     public string? BannerUrl { get; set; }
 
     public string? LogoUrl { get; set; }
 
-    public DateTime? RegistrationStartDate { get; set; }
+    public DateTime RegistrationStartDate { get; set; }
 
-    public DateTime? RegistrationDeadline { get; set; }
+    public DateTime RegistrationDeadline { get; set; }
 
     public DateTime StartDate { get; set; }
 
-    public DateTime EndDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
     public int MinTeams { get; set; }
 
