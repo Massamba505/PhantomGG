@@ -15,13 +15,8 @@ export type UserRole = 'Organizer' | 'User' | 'Public';
   styleUrls: ['./tournament-card.css'],
 })
 export class TournamentCard {
-  // Required tournament data
   tournament = input.required<Tournament>();
-
-  // Controls card behavior
   role = input<UserRole>('Public');
-
-  // Event outputs
   edit = output<Tournament>();
   delete = output<string>();
   join = output<Tournament>();
@@ -30,9 +25,6 @@ export class TournamentCard {
 
   readonly icons = LucideIcons;
 
-  /* -------------------------------
-   * Event handlers
-   * -----------------------------*/
   onEdit(e: Event) {
     e.stopPropagation();
     this.edit.emit(this.tournament());
@@ -53,16 +45,11 @@ export class TournamentCard {
     this.leave.emit(this.tournament());
   }
 
-  onView() {
+  onView(e?: Event) {
+    if (e) {
+      e.stopPropagation();
+    }
     this.view.emit(this.tournament());
-  }
-
-  /* -------------------------------
-   * Helpers
-   * -----------------------------*/
-  getProgressPercentage(): number {
-    const t = this.tournament();
-    return Math.min((t.teamCount / t.maxTeams) * 100, 100);
   }
 
   canJoin(): boolean {
@@ -80,19 +67,14 @@ export class TournamentCard {
     );
   }
 
-  isFull(): boolean {
-    const t = this.tournament();
-    return t.teamCount >= t.maxTeams;
-  }
-
-  isInProgress(): boolean {
-    return this.tournament().status === "InProgress";
-  }
-
   isOrganizer(): boolean {
-    // debugger;/
-    console.log(Roles.Organizer.toString())
-    console.log(this.role())
     return this.role() === Roles.Organizer.toString();
+  }
+
+  isUser(): boolean {
+    return this.role() === Roles.User.toString();
+  }
+  isPublic(): boolean {
+    return this.role() === 'Public';
   }
 }

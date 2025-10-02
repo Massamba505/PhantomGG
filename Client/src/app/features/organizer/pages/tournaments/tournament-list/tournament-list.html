@@ -1,4 +1,4 @@
-<div class="relative h-full flex flex-col">
+<div class="relative flex flex-col">
   @if (isOrganizer()) {
   <div class="flex justify-end items-center mb-2">
     <button class="btn btn-primary" (click)="createTournament()">
@@ -41,7 +41,9 @@
     }
   </div>
 
-  <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6"
+  >
     @for (tournament of tournaments(); track tournament.id) {
     <app-tournament-card
       [tournament]="tournament"

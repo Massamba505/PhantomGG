@@ -160,7 +160,7 @@ export class TournamentListComponent implements OnInit {
         this.closeDeleteModal();
       },
       error: (error) => {
-        debugger;
+        
         this.closeDeleteModal()
         this.isDeleting.set(false);
       }

@@ -1,118 +1,113 @@
-<div
-  class="card relative group rounded-lg border cursor-pointer overflow-hidden"
-  (click)="onView()"
->
-  <div class="relative h-32 w-full">
+<div (click)="onView()" class="card flex flex-col gap-3 p-3">
+  <div class="flex gap-2">
     <img
-      [src]="tournament().bannerUrl"
-      [alt]="tournament().name + ' banner'"
-      class="w-full h-full object-cover object-center rounded-md"
+      [src]="tournament().logoUrl"
+      [alt]="tournament().name"
+      class="w-12 h-12 object-contain rounded-md"
     />
-
-    <div class="absolute top-3 left-3">
-      <span class="btn bg-gray-500 px-2 py-1 text-xs font-medium rounded-full">
+    <div class="flex-1">
+      <span class="font-semibold text-md line-clamp-1">
+        {{ tournament().name }}
+      </span>
+    </div>
+    <div class="flex flex-col">
+      <span class="font-semibold text-xs py-1 btn btn-outline px-2">
         {{ tournament().status }}
       </span>
     </div>
-
-    @if (isOrganizer()) {
-    <div class="absolute top-3 right-3 flex space-x-1">
-      <button
-        (click)="onEdit($event)"
-        class="p-1.5 btn btn-secondary"
-        title="Edit tournament"
-      >
-        <lucide-angular [img]="icons.Edit" size="14" />
-      </button>
-      <button
-        (click)="onDelete($event)"
-        class="p-1.5 btn btn-destructive cursor-pointer"
-        title="Delete tournament"
-      >
-        <lucide-angular [img]="icons.Trash2" size="14" />
-      </button>
-    </div>
-    }
   </div>
 
-  <div class="p-3 space-y-3">
-    <div>
-      <h3 class="font-semibold text-md">{{ tournament().name }}</h3>
-      @if (tournament().description) {
-      <p class="text-xs text-muted mt-1 line-clamp-2">
-        {{ tournament().description }}
-      </p>
-      }
+  <div
+    class="border p-2 rounded-md text-xs text-muted h-[48px] btn-outline cursor-pointer"
+  >
+    <span class="line-clamp-2">{{ tournament().description }}</span>
+  </div>
+
+  <div class="grid grid-cols-3 gap-2">
+    <div
+      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+    >
+      <lucide-angular size="14" [img]="icons.Users" />
+      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
+        <span class="line-clamp-1">Location</span>
+        <span class="line-clamp-1">{{ tournament().location }}</span>
+      </div>
     </div>
 
-    <div class="space-y-2 text-xs text-muted">
-      <div class="flex items-center space-x-2">
-        <lucide-angular [img]="icons.Calendar" size="14" />
-        <span>
-          {{ tournament().startDate | date : "mediumDate" }}
-          {{ tournament().startDate | date : "shortTime" }}
+    <div
+      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+    >
+      <lucide-angular size="14" [img]="icons.Users" />
+      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
+        <span class="line-clamp-1">Teams</span>
+        <span class="line-clamp-1">
+          {{ tournament().teamCount }} / {{ tournament().maxTeams }}
         </span>
       </div>
-
-      @if (tournament().location) {
-      <div class="flex items-center space-x-2">
-        <lucide-angular [img]="icons.MapPin" size="14" />
-        <span>{{ tournament().location }}</span>
-      </div>
-      }
-
-      <div class="flex items-center space-x-2">
-        <lucide-angular [img]="icons.Users" size="14" />
-        <span
-          >{{ tournament().teamCount }} /
-          {{ tournament().maxTeams }} teams</span
-        >
-      </div>
-
-      @if (tournament().registrationDeadline) {
-      <div class="flex items-center space-x-2">
-        <lucide-angular [img]="icons.Clock" size="14" />
-        <span>
-          {{ tournament().registrationDeadline | date : "mediumDate" }}
-          {{ tournament().registrationDeadline | date : "shortTime" }}
-        </span>
-      </div>
-      }
     </div>
 
-    <div class="space-y-1 text-xs text-muted">
-      <div class="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-        <div
-          class="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-          [style.width.%]="getProgressPercentage()"
-        ></div>
-      </div>
-      <div class="flex justify-between">
-        <span>{{ tournament().teamCount }} registered</span>
-        <span
-          >{{ tournament().maxTeams - tournament().teamCount }} spots left</span
-        >
+    <div
+      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+    >
+      <lucide-angular size="14" [img]="icons.Trophy" />
+      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
+        <span class="line-clamp-1">Format</span>
+        <span class="line-clamp-1">RB</span>
       </div>
     </div>
+  </div>
 
-    @if (!isOrganizer()) {
-    <div class="flex items-center pt-2">
-      @if (canJoin()) {
-      <button (click)="onJoin($event)" class="btn btn-primary">
-        Join Tournament
-      </button>
-      } @else {
-      <button class="btn btn-outline rounded-md cursor-not-allowed" disabled>
-        {{
-          isInProgress()
-            ? "In Progress"
-            : isFull()
-            ? "Full"
-            : tournament().status
-        }}
-      </button>
-      }
+  <div
+    class="border p-2 rounded-md text-xs line-clamp-2 text-muted btn-outline cursor-pointer"
+  >
+    <div class="flex items-center gap-1">
+      <lucide-angular size="12" [img]="icons.Calendar" />
+      <span>Start:</span>
+      <span class="font-semibold">
+        {{ tournament().registrationStartDate | date : "mediumDate" }}
+      </span>
     </div>
+    <div class="flex items-center gap-1">
+      <lucide-angular size="12" [img]="icons.Calendar" />
+      <span>Deadline:</span>
+      <span class="font-semibold">
+        {{ tournament().registrationDeadline | date : "mediumDate" }}
+      </span>
+    </div>
+  </div>
+
+  <div class="flex gap-1 mt-auto">
+    @if (isOrganizer()) {
+    <button
+      (click)="onEdit($event)"
+      class="btn btn-outline flex justify-center items-center flex-1"
+    >
+      <lucide-angular size="15" [img]="icons.Edit" />
+      <span>Edit</span>
+    </button>
+    <button (click)="onDelete($event)" class="btn btn-destructive">
+      <lucide-angular size="15" [img]="icons.Trash2" />
+    </button>
+    } @if (isUser()) {
+    <button
+      (click)="onView($event)"
+      class="btn btn-secondary flex justify-center items-center flex-1"
+    >
+      <span>View</span>
+    </button>
+    <button
+      (click)="onJoin($event)"
+      class="btn btn-primary flex justify-center items-center"
+    >
+      <span>Join</span>
+    </button>
+    } @if(isPublic()){
+    <button
+      (click)="onView($event)"
+      class="btn btn-secondary flex justify-center items-center flex-1"
+    >
+      <span>View</span>
+    </button>
     }
   </div>
 </div>
