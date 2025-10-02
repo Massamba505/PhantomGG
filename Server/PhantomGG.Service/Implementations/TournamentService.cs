@@ -209,7 +209,7 @@ public class TournamentService(
 
         var team = await _teamService.GetByIdAsync(withdrawDto.TeamId);
 
-        if (team.UserId != userId)
+        if (tournament.OrganizerId != userId)
         {
             throw new UnauthorizedException("You don't have permission to register this team");
         }
