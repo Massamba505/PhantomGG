@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TournamentForm } from '../components/tournament-form/tournament-form';
+import { TournamentForm } from '../../../../../shared/components/forms/tournament-form/tournament-form';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { CreateTournament } from '@/app/api/models/tournament.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';

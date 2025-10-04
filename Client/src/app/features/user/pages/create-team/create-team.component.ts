@@ -6,7 +6,7 @@ import { CreateTeam, UpdateTeam } from '@/app/api/models/team.models';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LucideAngularModule } from 'lucide-angular';
-import { TeamFormComponent } from '../teams/components/team-form/team-form.component';
+import { TeamFormComponent } from '../../../../shared/components/forms/team-form/team-form.component';
 
 @Component({
   selector: 'app-create-team',

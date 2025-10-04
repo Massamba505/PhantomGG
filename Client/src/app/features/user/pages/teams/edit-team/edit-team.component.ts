@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TeamFormComponent } from '../components/team-form/team-form.component';
+import { TeamFormComponent } from '../../../../../shared/components/forms/team-form/team-form.component';
 import { TeamService } from '@/app/api/services/team.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { CreateTeam, UpdateTeam, Team } from '@/app/api/models/team.models';
