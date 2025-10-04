@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TournamentForm } from '../../../../../shared/components/forms/tournament-form/tournament-form';
+import { TournamentForm } from '../../../../shared/components/forms/tournament-form/tournament-form';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { Tournament, UpdateTournament } from '@/app/api/models/tournament.models';
 import { LucideAngularModule } from "lucide-angular";

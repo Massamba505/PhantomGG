@@ -8,7 +8,7 @@ import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
 import { TournamentService } from '@/app/api/services';
 import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { TournamentTeamManagementComponent } from '../components/tournament-team-management/tournament-team-management';
+import { TournamentTeamManagementComponent } from './components/tournament-team-management/tournament-team-management';
 
 @Component({
   selector: 'app-tournament-details',

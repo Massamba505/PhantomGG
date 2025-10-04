@@ -5,7 +5,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
 import { PaginatedResponse } from '@/app/api/models/api.models';
 import { TournamentCard } from '@/app/shared/components/cards';
-import { TournamentSearchComponent } from '../components/tournament-search/tournament-search';
+import { TournamentSearchComponent } from './components/tournament-search/tournament-search';
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
 import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentService } from '@/app/api/services';
