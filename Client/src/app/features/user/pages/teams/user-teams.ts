@@ -9,7 +9,7 @@ import { Team, TeamSearch } from '@/app/api/models/team.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamCard, TeamRole } from '@/app/shared/components/cards/team-card/team-card';
 import { AuthStateService } from '@/app/store/AuthStateService';
-import { TeamSearchComponent } from './components/team-search/team-search.component';
+import { TeamSearchComponent } from './components/team-search/team-search';
 
 @Component({
   selector: 'app-user-teams',

@@ -36,7 +36,7 @@ export const userRoutes: Routes = [
       },
       {
         path: 'teams/:id/edit',
-        loadComponent: () => import('./pages/teams/edit-team/edit-team.component').then(m => m.EditTeamComponent),
+        loadComponent: () => import('./pages/edit-team/edit-team').then(m => m.EditTeamComponent),
         title: 'Edit Team - PhantomGG',
         data:{title:"Edit Team"}
       },

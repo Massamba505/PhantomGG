@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TeamFormComponent } from '../../../../../shared/components/forms/team-form/team-form.component';
+import { TeamFormComponent } from '../../../../shared/components/forms/team-form/team-form.component';
 import { TeamService } from '@/app/api/services/team.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { CreateTeam, UpdateTeam, Team } from '@/app/api/models/team.models';
@@ -12,7 +12,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   selector: 'app-edit-team',
   standalone: true,
   imports: [CommonModule, TeamFormComponent, LucideAngularModule],
-  templateUrl: "./edit-team.component.html"
+  templateUrl: "./edit-team.html"
 })
 export class EditTeamComponent implements OnInit {
   private router = inject(Router);

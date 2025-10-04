@@ -12,8 +12,8 @@ import { TeamSearch } from '@/app/api/models/team.models';
     FormsModule,
     LucideAngularModule
   ],
-  templateUrl: './team-search.component.html',
-  styleUrl: './team-search.component.css'
+  templateUrl: './team-search.html',
+  styleUrl: './team-search.css'
 })
 export class TeamSearchComponent {
   readonly icons = LucideIcons;
