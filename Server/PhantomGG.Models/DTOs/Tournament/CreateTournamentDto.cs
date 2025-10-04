@@ -16,9 +16,11 @@ public class CreateTournamentDto
     [StringLength(200)]
     public string? Location { get; set; }
 
-    public DateTime? RegistrationStartDate { get; set; }
+    [Required]
+    public DateTime RegistrationStartDate { get; set; }
 
-    public DateTime? RegistrationDeadline { get; set; }
+    [Required]
+    public DateTime RegistrationDeadline { get; set; }
 
     [Required]
     public DateTime StartDate { get; set; }

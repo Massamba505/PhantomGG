@@ -62,16 +62,16 @@
   >
     <div class="flex items-center gap-1">
       <lucide-angular size="12" [img]="icons.Calendar" />
-      <span>Start:</span>
+      <span>Registration Deadline:</span>
       <span class="font-semibold">
-        {{ tournament().registrationStartDate | date : "mediumDate" }}
+        {{ tournament().registrationDeadline | date : "mediumDate" }}
       </span>
     </div>
     <div class="flex items-center gap-1">
       <lucide-angular size="12" [img]="icons.Calendar" />
-      <span>Deadline:</span>
+      <span>Start:</span>
       <span class="font-semibold">
-        {{ tournament().registrationDeadline | date : "mediumDate" }}
+        {{ tournament().startDate | date : "mediumDate" }}
       </span>
     </div>
   </div>

@@ -312,7 +312,7 @@ public class TournamentService(
         if (createDto.EndDate <= createDto.StartDate)
             throw new ValidationException("Tournament end date must be after start date");
 
-        if (createDto.RegistrationDeadline.HasValue && createDto.RegistrationDeadline >= createDto.StartDate)
+        if (createDto.RegistrationDeadline >= createDto.StartDate)
             throw new ValidationException("Registration deadline must be before tournament start date");
     }
 

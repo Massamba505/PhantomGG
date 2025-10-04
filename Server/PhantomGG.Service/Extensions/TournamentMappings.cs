@@ -17,7 +17,7 @@ public static class TournamentMappings
             RegistrationStartDate = tournament.RegistrationStartDate,
             RegistrationDeadline = tournament.RegistrationDeadline,
             StartDate = tournament.StartDate,
-            EndDate = tournament.EndDate,
+            EndDate = tournament.EndDate ?? DateTime.UtcNow,
             MinTeams = tournament.MinTeams,
             MaxTeams = tournament.MaxTeams,
             BannerUrl = tournament.BannerUrl,
