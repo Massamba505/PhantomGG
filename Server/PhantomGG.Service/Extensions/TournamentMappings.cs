@@ -66,7 +66,7 @@ public static class TournamentMappings
         if (updateDto.Location != null)
             tournament.Location = updateDto.Location;
         if (updateDto.RegistrationDeadline.HasValue)
-            tournament.RegistrationDeadline = updateDto.RegistrationDeadline;
+            tournament.RegistrationDeadline = updateDto.RegistrationDeadline.Value;
         if (updateDto.StartDate.HasValue)
             tournament.StartDate = updateDto.StartDate.Value;
         if (updateDto.MaxTeams.HasValue)
