@@ -4,28 +4,35 @@ import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Player } from '@/app/api/models/team.models';
 
-export interface PlayerCardConfig {
-  isManager?: boolean;
-  showActions?: boolean;
-}
+export type PlayerRole = 'Manager' | 'TeamMember' | 'Public';
 
 @Component({
   selector: 'app-player-card',
   templateUrl: './player-card.html',
+  styleUrls: ['./player-card.css'],
   imports: [CommonModule, LucideAngularModule],
 })
 export class PlayerCard {
   player = input.required<Player>();
-  config = input<PlayerCardConfig>({
-    isManager: false,
-    showActions: true
-  });
+  role = input<PlayerRole>('Public');
   
   edit = output<Player>();
   delete = output<string>();
   view = output<Player>();
   
   readonly icons = LucideIcons;
+
+  isManager(): boolean {
+    return this.role() === 'Manager';
+  }
+
+  isTeamMember(): boolean {
+    return this.role() === 'TeamMember';
+  }
+
+  isPublic(): boolean {
+    return this.role() === 'Public';
+  }
 
   onEdit(event: Event) {
     event.stopPropagation();
@@ -37,8 +44,10 @@ export class PlayerCard {
     this.delete.emit(this.player().id);
   }
 
-  onView() {
+  onView(event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
     this.view.emit(this.player());
   }
-
 }

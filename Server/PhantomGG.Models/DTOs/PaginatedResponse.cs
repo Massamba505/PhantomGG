@@ -25,3 +25,15 @@ public class PaginatedResponse<T>
         HasPreviousPage = pageNumber > 1;
     }
 }
+
+public class PaginatedResult<T>
+{
+    public IEnumerable<T> Items { get; set; } = new List<T>();
+    public int TotalRecords { get; set; }
+
+    public PaginatedResult(IEnumerable<T> items, int totalRecords)
+    {
+        Items = items;
+        TotalRecords = totalRecords;
+    }
+}

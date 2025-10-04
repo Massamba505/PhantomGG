@@ -7,9 +7,9 @@ import { TeamService } from '@/app/api/services/team.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { Team, TeamSearch } from '@/app/api/models/team.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { TeamCard, TeamCardConfig } from '@/app/shared/components/cards/team-card/team-card';
+import { TeamCard, TeamRole } from '@/app/shared/components/cards/team-card/team-card';
 import { AuthStateService } from '@/app/store/AuthStateService';
-import { TeamSearchComponent } from './components/team-search/team-search.component';
+import { TeamSearchComponent } from './components/team-search/team-search';
 
 @Component({
   selector: 'app-user-teams',
@@ -41,13 +41,8 @@ export class UserTeams implements OnInit {
   isLoading = signal(false);
   searchCriteria = signal<Partial<TeamSearch>>({});
 
-  getTeamCardConfig(): TeamCardConfig {
-    const Manager = this.authStateStore.user();
-    return {
-      isPublicView: false,
-      Manager: Manager,
-      type: 'viewOnly'
-    };
+  getTeamRole(): TeamRole {
+    return 'Manager';
   }
 
   ngOnInit() {
@@ -70,8 +65,7 @@ export class UserTeams implements OnInit {
         this.totalPages.set(response.totalPages);
       },
       error: (error) => {
-        console.error('Failed to load teams:', error);
-        this.toastService.error('Failed to load teams');
+        this.isLoading.set(false);
       },
       complete: () => {
         this.isLoading.set(false);
@@ -91,7 +85,6 @@ export class UserTeams implements OnInit {
     this.loadMyTeams();
   }
 
-  // Pagination methods
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
@@ -107,7 +100,7 @@ export class UserTeams implements OnInit {
     const target = event.target as HTMLSelectElement;
     const newPageSize = parseInt(target.value);
     this.pageSize.set(newPageSize);
-    this.currentPage.set(1); // Reset to first page when changing page size
+    this.currentPage.set(1);
     this.loadMyTeams();
   }
 
@@ -137,12 +130,10 @@ export class UserTeams implements OnInit {
     const pages: number[] = [];
     
     if (total <= 7) {
-      // Show all pages if 7 or fewer
       for (let i = 1; i <= total; i++) {
         pages.push(i);
       }
     } else {
-      // Show smart pagination
       const start = Math.max(1, current - 2);
       const end = Math.min(total, current + 2);
       

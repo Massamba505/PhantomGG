@@ -206,8 +206,8 @@ public class MatchService : IMatchService
                 {
                     Id = Guid.NewGuid(),
                     TournamentId = generateDto.TournamentId,
-                    HomeTeamId = teamsList[i].Id,
-                    AwayTeamId = teamsList[j].Id,
+                    HomeTeamId = teamsList[i].TeamId,
+                    AwayTeamId = teamsList[j].TeamId,
                     MatchDate = matchDate,
                     Status = "Scheduled",
                     // Venue = generateDto.DefaultVenue
@@ -229,8 +229,8 @@ public class MatchService : IMatchService
                     {
                         Id = Guid.NewGuid(),
                         TournamentId = generateDto.TournamentId,
-                        HomeTeamId = teamsList[j].Id, // Swapped home and away
-                        AwayTeamId = teamsList[i].Id,
+                        HomeTeamId = teamsList[j].TeamId, // Swapped home and away
+                        AwayTeamId = teamsList[i].TeamId,
                         MatchDate = matchDate,
                         Status = "Scheduled",
                         // Venue = generateDto.DefaultVenue
@@ -277,7 +277,7 @@ public class MatchService : IMatchService
         var shuffledTeams = teamsList.OrderBy(x => Guid.NewGuid()).ToList();
 
         // Add bye placeholders if needed
-        var bracketTeams = new List<Team?>(shuffledTeams.Cast<Team?>());
+        var bracketTeams = new List<TournamentTeam?>(shuffledTeams.Cast<TournamentTeam?>());
         for (int i = 0; i < byesNeeded; i++)
         {
             bracketTeams.Add(null); // null represents a bye
@@ -304,8 +304,8 @@ public class MatchService : IMatchService
             {
                 Id = Guid.NewGuid(),
                 TournamentId = generateDto.TournamentId,
-                HomeTeamId = homeTeam.Id,
-                AwayTeamId = awayTeam.Id,
+                HomeTeamId = homeTeam.TeamId,
+                AwayTeamId = awayTeam.TeamId,
                 MatchDate = matchDate,
                 Status = "Scheduled",
                 // Venue = generateDto.DefaultVenue

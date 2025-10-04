@@ -17,7 +17,7 @@ public static class TournamentMappings
             RegistrationStartDate = tournament.RegistrationStartDate,
             RegistrationDeadline = tournament.RegistrationDeadline,
             StartDate = tournament.StartDate,
-            EndDate = tournament.EndDate,
+            EndDate = tournament.EndDate ?? DateTime.UtcNow,
             MinTeams = tournament.MinTeams,
             MaxTeams = tournament.MaxTeams,
             BannerUrl = tournament.BannerUrl,
@@ -66,7 +66,7 @@ public static class TournamentMappings
         if (updateDto.Location != null)
             tournament.Location = updateDto.Location;
         if (updateDto.RegistrationDeadline.HasValue)
-            tournament.RegistrationDeadline = updateDto.RegistrationDeadline;
+            tournament.RegistrationDeadline = updateDto.RegistrationDeadline.Value;
         if (updateDto.StartDate.HasValue)
             tournament.StartDate = updateDto.StartDate.Value;
         if (updateDto.MaxTeams.HasValue)

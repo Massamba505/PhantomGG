@@ -1,13 +1,13 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-
-// import { TeamCard } from '@/app/shared/components/cards/team-card/team-card';
 import { Tournament, TournamentStatistics } from '@/app/api/models/tournament.models';
 import { TournamentTeam } from '@/app/api/models/team.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { TeamCard, TeamRole } from "../../../../shared/components/cards/team-card/team-card";
+import { AuthStateService } from '@/app/store/AuthStateService';
 
 @Component({
   selector: 'app-tournament-details',
@@ -15,8 +15,9 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   styleUrls: ['./tournament-details.css'],
   imports: [
     CommonModule,
-    LucideAngularModule
-  ],
+    LucideAngularModule,
+    TeamCard
+],
 })
 export class TournamentDetails implements OnInit {
   tournament = signal<Tournament | null>(null);
@@ -25,9 +26,9 @@ export class TournamentDetails implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
 
+  private authStateStore = inject(AuthStateService);
   readonly icons = LucideIcons;
 
-  // Computed values
   tournamentStatus = computed(() => {
     const t = this.tournament();
     if (!t) return 'Unknown';
@@ -70,12 +71,27 @@ export class TournamentDetails implements OnInit {
     }
   }
 
+  convertToTeam(tournamentTeam: TournamentTeam) {
+    return {
+      id: tournamentTeam.id,
+      name: tournamentTeam.name,
+      shortName: tournamentTeam.shortName,
+      logoUrl: tournamentTeam.logoUrl,
+      userId: tournamentTeam.managerId || '',
+      createdAt: tournamentTeam.registeredAt,
+      updatedAt: undefined
+    };
+  }
+  
+  getTeamRole(): TeamRole {
+    return 'Public';
+  }
+
   async loadTournamentDetails(tournamentId: string) {
     this.loading.set(true);
     this.error.set(null);
     
     try {
-      // Load tournament details, teams, and statistics in parallel
       const [tournament, teams, statistics] = await Promise.all([
         this.tournamentService.getPublicTournament(tournamentId),
         this.tournamentService.getPublicTournamentTeams(tournamentId),
@@ -86,15 +102,13 @@ export class TournamentDetails implements OnInit {
       this.teams.set(teams);
       this.statistics.set(statistics);
     } catch (error) {
-      console.error('Error loading tournament details:', error);
-      this.error.set('Failed to load tournament details. Please try again.');
+      this.loading.set(false);
     } finally {
       this.loading.set(false);
     }
   }
 
   onTeamView(team: TournamentTeam) {
-    // Navigate to team details (if implemented)
     console.log('View team:', team);
   }
 

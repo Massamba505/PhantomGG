@@ -12,6 +12,6 @@ public interface ITeamRepository
     Task<Team> CreateAsync(Team team);
     Task<Team> UpdateAsync(Team team);
     Task DeleteAsync(Guid id);
-    Task<IEnumerable<Team>> SearchAsync(TeamSearchDto searchDto, Guid? userId = null);
+    Task<PaginatedResult<Team>> SearchAsync(TeamSearchDto searchDto, Guid? userId = null);
     Task<bool> IsTeamNameUniqueInTournamentAsync(string teamName, Guid tournamentId, Guid? excludeTeamId = null);
 }

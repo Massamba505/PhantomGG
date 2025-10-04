@@ -26,12 +26,10 @@ export class RoleSelectionPage {
   loading = this.authState.loading;
 
   constructor() {
-    // Get signup data from navigation state
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state?.['signupData']) {
       this.signupData = navigation.extras.state['signupData'];
     } else {
-      // If no signup data, redirect back to signup
       this.router.navigate(['/auth/signup']);
     }
   }
@@ -46,7 +44,6 @@ export class RoleSelectionPage {
       return;
     }
 
-    // Add the selected role to signup data and register
     const credentials: RegisterRequest = {
       ...this.signupData,
       role: this.selectedRole()!
@@ -60,7 +57,9 @@ export class RoleSelectionPage {
         }
       },
       error: (error) => {
-        this.toast.error('Failed to create account. Please try again.');
+        this.router.navigate(['/auth/signup'],{
+          state : { signupData: this.signupData }
+        });
       }
     });
   }

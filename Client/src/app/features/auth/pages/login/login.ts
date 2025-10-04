@@ -51,6 +51,12 @@ export class Login {
     });
   }
 
+  checkFieldError(name: string) {
+    const control = this.userForm.get(name);
+    return (this.submitted() || control?.touched) && control?.errors;
+  }
+
+
   togglePassword() {
     this.showPassword.update((v) => !v);
   }

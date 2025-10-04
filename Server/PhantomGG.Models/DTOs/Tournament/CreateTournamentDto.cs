@@ -16,9 +16,11 @@ public class CreateTournamentDto
     [StringLength(200)]
     public string? Location { get; set; }
 
-    public DateTime? RegistrationStartDate { get; set; }
+    [Required]
+    public DateTime RegistrationStartDate { get; set; }
 
-    public DateTime? RegistrationDeadline { get; set; }
+    [Required]
+    public DateTime RegistrationDeadline { get; set; }
 
     [Required]
     public DateTime StartDate { get; set; }
@@ -31,9 +33,6 @@ public class CreateTournamentDto
 
     [Range(4, 128)]
     public int MaxTeams { get; set; } = 16;
-
-    [EmailAddress]
-    public string? ContactEmail { get; set; }
 
     public IFormFile? BannerUrl { get; set; }
 

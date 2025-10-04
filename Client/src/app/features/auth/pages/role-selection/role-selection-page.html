@@ -1,18 +1,18 @@
-<div class="card">
-  <app-role-selection
-    [selectedRole]="selectedRole() ?? Roles.User"
-    (roleChange)="onRoleSelected($event)"
-  >
-  </app-role-selection>
+<div class="max-w-lg mx-auto">
+  <div class="card">
+    <app-role-selection
+      [selectedRole]="selectedRole()"
+      (roleChange)="onRoleSelected($event)"
+    >
+    </app-role-selection>
 
-  <div class="mt-8 pt-6 border-t">
     <button
       (click)="onContinue()"
       [disabled]="!selectedRole() || loading()"
-      class="w-full btn btn-primary py-3 text-lg font-medium"
+      class="btn btn-primary mt-6 py-2.5 w-full"
     >
       @if (loading()) {
-      <span class="animate-pulse">Creating account...</span>
+      <span>Creating account...</span>
       } @else {
       <span>Create Account</span>
       }

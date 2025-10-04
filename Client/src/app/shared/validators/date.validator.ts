@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors } from "@angular/forms";
+import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 
 export function dateNotInPastValidator(control: AbstractControl): ValidationErrors | null {
   if (!control.value) return null;
@@ -48,4 +48,38 @@ export function tournamentStartDateValidator(control: AbstractControl): Validati
   }
 
   return null;
+}
+
+export function tournamentDatesValidator(): ValidatorFn {
+  return (group: AbstractControl): ValidationErrors | null => {
+    if (!group) return null;
+
+    const regStart = new Date(group.get('registrationStartDate')?.value);
+    const regDeadline = new Date(group.get('registrationDeadline')?.value);
+    const startDate = new Date(group.get('startDate')?.value);
+    const endDate = new Date(group.get('endDate')?.value);
+
+    if (!(regStart && regDeadline && startDate && endDate)) return null;
+
+    const errors: Record<string, boolean> = {};
+    const now = new Date();
+
+  if (regStart < now) {
+      errors['registrationStartInPast'] = true;
+    }
+
+    if (regDeadline < regStart) {
+      errors['registrationDeadlineBeforeStart'] = true;
+    }
+
+    if (startDate < regDeadline) {
+      errors['startBeforeRegistrationDeadline'] = true;
+    }
+
+    if (endDate < startDate) {
+      errors['endBeforeStart'] = true;
+    }
+
+    return Object.keys(errors).length ? errors : null;
+  };
 }

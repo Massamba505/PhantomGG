@@ -56,11 +56,13 @@
   </div>
 
   <div class="flex-1">
-    <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+    >
       @for (team of teams(); track team.id) {
       <app-team-card
         [team]="team"
-        [config]="getTeamCardConfig()"
+        [role]="getTeamRole()"
         (edit)="onTeamEdit($event)"
         (delete)="onTeamDelete($event)"
         (view)="onTeamView($event)"
@@ -86,24 +88,27 @@
       </select>
     </div>
 
+    @if (totalPages() > 0) {
     <div class="text-sm opacity-75 mx-auto">
       Page {{ currentPage() }} of {{ totalPages() }} ({{ totalCount() }} total)
     </div>
-
-    <div class="flex items-center gap-2 mx-auto">
+    } @if (totalPages() > 1) {
+    <div class="flex items-center gap-1 mx-auto">
       <button
         class="btn btn-secondary btn-sm"
         [disabled]="!hasPreviousPage()"
         (click)="onPageChange(1)"
+        title="First page"
       >
-        First
+        <lucide-angular [img]="icons.ChevronsLeft" size="16" />
       </button>
       <button
         class="btn btn-secondary btn-sm"
         [disabled]="!hasPreviousPage()"
         (click)="onPageChange(currentPage() - 1)"
+        title="Previous page"
       >
-        Previous
+        <lucide-angular [img]="icons.ChevronLeft" size="16" />
       </button>
 
       @for (pageNum of getPageNumbers(); track pageNum) {
@@ -121,17 +126,20 @@
         class="btn btn-secondary btn-sm"
         [disabled]="!hasNextPage()"
         (click)="onPageChange(currentPage() + 1)"
+        title="Next page"
       >
-        Next
+        <lucide-angular [img]="icons.ChevronRight" size="16" />
       </button>
       <button
         class="btn btn-secondary btn-sm"
         [disabled]="!hasNextPage()"
         (click)="onPageChange(totalPages())"
+        title="Last page"
       >
-        Last
+        <lucide-angular [img]="icons.ChevronsRight" size="16" />
       </button>
     </div>
+    }
   </div>
   }
 </div>

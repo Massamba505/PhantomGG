@@ -1,0 +1,252 @@
+<form
+  [formGroup]="tournamentForm"
+  (ngSubmit)="onSubmit()"
+  class="space-y-4 card"
+>
+  <div>
+    <label class="input-label"
+      >Tournament Name <span class="required">*</span></label
+    >
+    <input
+      type="text"
+      formControlName="name"
+      placeholder="Enter tournament name"
+      class="input-field w-full"
+      [class.error]="submitted() && tournamentForm.controls['name'].invalid"
+    />
+    @if (submitted() && tournamentForm.controls['name'].invalid) {
+    <div class="error-message text-sm mt-1">
+      Tournament name is required (min 3 chars)
+    </div>
+    }
+  </div>
+
+  <div>
+    <label class="input-label"
+      >Description <span class="required">*</span></label
+    >
+    <textarea
+      formControlName="description"
+      placeholder="Describe your tournament..."
+      rows="4"
+      class="textarea w-full"
+      [class.error]="
+        submitted() && tournamentForm.controls['description'].invalid
+      "
+    ></textarea>
+    @if (submitted() && tournamentForm.controls['description'].invalid) {
+    <div class="error-message text-sm mt-1">
+      Description is required (min 10 chars)
+    </div>
+    }
+  </div>
+
+  <div>
+    <label class="input-label">Tournament Banner</label>
+
+    @if (bannerPreview()) {
+    <div class="mb-4">
+      <img
+        [src]="bannerPreview()"
+        alt="Tournament Banner"
+        class="h-48 w-full object-cover rounded-lg shadow"
+      />
+    </div>
+    }
+
+    <input
+      type="file"
+      accept="image/*"
+      (change)="onBannerChange($event)"
+      class="input-field w-full"
+    />
+  </div>
+
+  <div>
+    <label class="input-label">Tournament Logo</label>
+
+    @if (logoPreview()) {
+    <div class="mb-4">
+      <img
+        [src]="logoPreview()"
+        alt="Tournament Logo"
+        class="h-32 w-32 object-contain rounded-lg shadow mx-auto"
+      />
+    </div>
+    }
+
+    <input
+      type="file"
+      accept="image/*"
+      (change)="onLogoChange($event)"
+      class="input-field w-full"
+    />
+  </div>
+
+  <div>
+    <label class="input-label">Location <span class="required">*</span></label>
+    <input
+      type="text"
+      formControlName="location"
+      placeholder="Tournament location"
+      class="input-field w-full"
+    />@if (isFieldInvalid('location')) {
+    <div class="error-message text-xs mt-1">Location is required</div>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div>
+      <label class="input-label"
+        >Registration Start <span class="required">*</span></label
+      >
+      <input
+        type="datetime-local"
+        formControlName="registrationStartDate"
+        [min]="todayDateTime"
+        class="input-field w-full"
+        [class.error]="isFieldInvalid('registrationStartDate')"
+      />
+      @if (isFieldInvalid('registrationStartDate')) {
+      <div class="error-message text-xs mt-1">
+        Registration start is required
+      </div>
+      } @if (submitted() && tournamentForm.errors?.['registrationStartInPast'])
+      {
+      <div class="error-message text-xs mt-1">
+        Registration start cannot be in the past.
+      </div>
+      }
+    </div>
+
+    <div>
+      <label class="input-label"
+        >Registration Deadline <span class="required">*</span></label
+      >
+      <input
+        type="datetime-local"
+        formControlName="registrationDeadline"
+        [min]="
+          tournamentForm.get('registrationStartDate')?.value || todayDateTime
+        "
+        class="input-field w-full"
+        [class.error]="isFieldInvalid('registrationDeadline')"
+      />
+      @if (isFieldInvalid('registrationDeadline')) {
+      <div class="error-message text-xs mt-1">
+        Registration deadline is required
+      </div>
+      } @if (submitted() &&
+      tournamentForm.errors?.['registrationDeadlineBeforeStart']) {
+      <div class="error-message text-xs mt-1">
+        Registration deadline cannot be before registration start.
+      </div>
+      }
+    </div>
+
+    <div>
+      <label class="input-label"
+        >Start Date <span class="required">*</span></label
+      >
+      <input
+        type="datetime-local"
+        formControlName="startDate"
+        [min]="
+          tournamentForm.get('registrationDeadline')?.value || todayDateTime
+        "
+        class="input-field w-full"
+        [class.error]="isFieldInvalid('startDate')"
+      />
+      @if (isFieldInvalid('startDate')) {
+      <div class="error-message text-xs mt-1">Start date is required</div>
+      } @if (submitted() &&
+      tournamentForm.errors?.['startBeforeRegistrationDeadline']) {
+      <div class="error-message text-xs mt-1">
+        Start date must be after registration deadline.
+      </div>
+      }
+    </div>
+
+    <div>
+      <label class="input-label"
+        >End Date <span class="required">*</span></label
+      >
+      <input
+        type="datetime-local"
+        formControlName="endDate"
+        [min]="tournamentForm.get('startDate')?.value || todayDateTime"
+        class="input-field w-full"
+        [class.error]="isFieldInvalid('endDate')"
+      />
+      @if (isFieldInvalid('endDate')) {
+      <div class="error-message text-xs mt-1">End date is required</div>
+      } @if (submitted() && tournamentForm.errors?.['endBeforeStart']) {
+      <div class="error-message text-xs mt-1">
+        End date must be after start date.
+      </div>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="input-label"
+        >Min Teams <span class="required">*</span></label
+      >
+      <input
+        type="number"
+        formControlName="minTeams"
+        min="2"
+        max="64"
+        class="input-field w-full"
+        [class.error]="
+          submitted() && tournamentForm.controls['minTeams'].invalid
+        "
+      />
+      @if (submitted() && tournamentForm.controls['minTeams'].invalid) {
+      <div class="error-message text-xs mt-1">Min teams is required</div>
+      }
+    </div>
+
+    <div>
+      <label class="input-label"
+        >Max Teams <span class="required">*</span></label
+      >
+      <input
+        type="number"
+        formControlName="maxTeams"
+        min="4"
+        max="128"
+        class="input-field w-full"
+        [class.error]="
+          submitted() && tournamentForm.controls['maxTeams'].invalid
+        "
+      />
+      @if (submitted() && tournamentForm.controls['maxTeams'].invalid) {
+      <div class="error-message text-xs mt-1">Max teams is required</div>
+      }
+    </div>
+  </div>
+
+  <div>
+    <div class="flex items-center gap-2">
+      <input type="checkbox" formControlName="isPublic" class="checkbox" />
+      <label for="checkbox" class="input-label mb-0"
+        >Make tournament public</label
+      >
+    </div>
+  </div>
+
+  <div class="flex space-x-3 pt-4">
+    <button type="button" (click)="onCancel()" class="btn btn-secondary flex-1">
+      Cancel
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary flex-1"
+      [disabled]="submitted() && tournamentForm.invalid"
+    >
+      {{ isEditMode() ? "Update Tournament" : "Create Tournament" }}
+    </button>
+  </div>
+</form>

@@ -59,7 +59,7 @@ public class TeamRepository(PhantomContext context) : ITeamRepository
         }
     }
 
-    public async Task<IEnumerable<Team>> SearchAsync(TeamSearchDto searchDto, Guid? userId)
+    public async Task<PaginatedResult<Team>> SearchAsync(TeamSearchDto searchDto, Guid? userId)
     {
         var query = _context.Teams
             .Include(t => t.Players)
@@ -82,13 +82,15 @@ public class TeamRepository(PhantomContext context) : ITeamRepository
             query = query.Where(t => t.TournamentTeams.Any(tt => tt.TournamentId == searchDto.TournamentId.Value));
         }
 
+        var totalRecords = await query.CountAsync();
+
         var teams = await query
             .OrderBy(t => t.Name)
             .Skip((searchDto.Page - 1) * searchDto.PageSize)
             .Take(searchDto.PageSize)
             .ToListAsync();
 
-        return teams;
+        return new PaginatedResult<Team>(teams, totalRecords); ;
     }
 
     public async Task<bool> IsTeamNameUniqueInTournamentAsync(string teamName, Guid tournamentId, Guid? excludeTeamId = null)

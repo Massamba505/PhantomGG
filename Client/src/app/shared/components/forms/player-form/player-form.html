@@ -7,13 +7,13 @@
   <img
     [src]="previewData()!.photoUrl"
     [alt]="getFullName()"
-    class="w-32 h-32 rounded-full object-contain border-2 border-gray-100 mx-auto"
+    class="w-32 h-32 object-cover rounded-full border-2 border-gray-100 mx-auto"
   />
   }
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
     <div>
-      <label class="form-label" for="firstName">First Name *</label>
+      <label class="input-label" for="firstName">First Name *</label>
       <input
         id="firstName"
         type="text"
@@ -28,7 +28,7 @@
     </div>
 
     <div>
-      <label class="form-label" for="lastName">Last Name *</label>
+      <label class="input-label" for="lastName">Last Name *</label>
       <input
         id="lastName"
         type="text"
@@ -44,7 +44,7 @@
   </div>
 
   <div>
-    <label class="form-label" for="position">Position</label>
+    <label class="input-label" for="position">Position</label>
     <input
       id="position"
       type="text"
@@ -59,7 +59,7 @@
   </div>
 
   <div>
-    <label class="form-label" for="email">Email</label>
+    <label class="input-label" for="email">Email</label>
     <input
       id="email"
       type="email"
@@ -74,7 +74,7 @@
   </div>
 
   <div>
-    <label class="form-label" for="photo">Player Photo</label>
+    <label class="input-label" for="photo">Player Photo</label>
     <div class="">
       <input
         id="photo"

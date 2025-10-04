@@ -30,13 +30,13 @@ public class TournamentService(
 
     public async Task<PaginatedResponse<TournamentDto>> SearchAsync(TournamentSearchDto searchDto)
     {
-        var tournaments = await _tournamentRepository.SearchAsync(searchDto);
+        var paginatedResult = await _tournamentRepository.SearchAsync(searchDto);
 
         return new PaginatedResponse<TournamentDto>(
-            tournaments.Select(t => t.ToDto()),
+            paginatedResult.Items.Select(t => t.ToDto()),
             searchDto.PageNumber,
             searchDto.PageSize,
-            totalRecords: tournaments.Count()
+            totalRecords: paginatedResult.TotalRecords
         );
     }
 
@@ -62,13 +62,13 @@ public class TournamentService(
 
     public async Task<PaginatedResponse<TournamentDto>> GetMyTournamentsAsync(TournamentSearchDto searchDto, Guid organizerId)
     {
-        var tournaments = await _tournamentRepository.SearchAsync(searchDto, organizerId: organizerId);
+        var paginatedResult = await _tournamentRepository.SearchAsync(searchDto, organizerId: organizerId);
 
         return new PaginatedResponse<TournamentDto>(
-            tournaments.Select(t => t.ToDto()),
+            paginatedResult.Items.Select(t => t.ToDto()),
             searchDto.PageNumber,
             searchDto.PageSize,
-            totalRecords: tournaments.Count()
+            totalRecords: paginatedResult.TotalRecords
         );
     }
 
@@ -209,7 +209,7 @@ public class TournamentService(
 
         var team = await _teamService.GetByIdAsync(withdrawDto.TeamId);
 
-        if (team.UserId != userId)
+        if (tournament.OrganizerId != userId)
         {
             throw new UnauthorizedException("You don't have permission to register this team");
         }
@@ -307,13 +307,13 @@ public class TournamentService(
     private static void ValidateCreateTournament(CreateTournamentDto createDto)
     {
         if (createDto.StartDate <= DateTime.UtcNow)
-            throw new ArgumentException("Tournament start date must be in the future");
+            throw new ValidationException("Tournament start date must be in the future");
 
         if (createDto.EndDate <= createDto.StartDate)
-            throw new ArgumentException("Tournament end date must be after start date");
+            throw new ValidationException("Tournament end date must be after start date");
 
-        if (createDto.RegistrationDeadline.HasValue && createDto.RegistrationDeadline >= createDto.StartDate)
-            throw new ArgumentException("Registration deadline must be before tournament start date");
+        if (createDto.RegistrationDeadline >= createDto.StartDate)
+            throw new ValidationException("Registration deadline must be before tournament start date");
     }
 
     #region Public Methods (no authentication required)

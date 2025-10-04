@@ -63,9 +63,6 @@ export class TournamentService {
     formData.append('EndDate', new Date(tournament.endDate).toISOString());
     formData.append('MinTeams', tournament.minTeams.toString());
     formData.append('MaxTeams', tournament.maxTeams.toString());
-    if (tournament.contactEmail) {
-      formData.append('ContactEmail', tournament.contactEmail);
-    }
     if (tournament.bannerUrl) {
       formData.append('BannerUrl', tournament.bannerUrl);
     }
@@ -111,9 +108,6 @@ export class TournamentService {
     }
     if (updates.maxTeams !== undefined) {
       formData.append('MaxTeams', updates.maxTeams.toString());
-    }
-    if (updates.contactEmail) {
-      formData.append('ContactEmail', updates.contactEmail);
     }
     if (updates.bannerUrl) {
       formData.append('BannerUrl', updates.bannerUrl);

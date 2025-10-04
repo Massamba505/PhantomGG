@@ -1,3 +1,4 @@
+using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Models.Entities;
 
@@ -9,7 +10,7 @@ public interface ITournamentRepository
     Task<Tournament?> GetByIdAsync(Guid id);
     Task<IEnumerable<Tournament>> GetByOrganizerAsync(Guid organizerId);
     Task<IEnumerable<Tournament>> GetMyTournamentsAsync(Guid userId);
-    Task<IEnumerable<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId = null);
+    Task<PaginatedResult<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId = null);
     Task<IEnumerable<Tournament>> GetTournamentsByTeamAsync(Guid teamId);
     Task<Tournament> CreateAsync(Tournament tournament);
     Task<Tournament> UpdateAsync(Tournament tournament);

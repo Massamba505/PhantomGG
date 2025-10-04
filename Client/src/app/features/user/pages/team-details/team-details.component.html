@@ -1,0 +1,164 @@
+<div class="flex items-center justify-between gap-4 mb-6">
+  <button class="btn btn-outline" (click)="onBackToTeams()">
+    <lucide-angular [img]="icons.ArrowLeft" [size]="20"></lucide-angular>
+    Back to Teams
+  </button>
+
+  @if (team() && isManager()) {
+  <div class="flex gap-2">
+    <button class="btn btn-outline" (click)="onEditTeam()">
+      <lucide-angular [img]="icons.Edit" [size]="16"></lucide-angular>
+      Edit Team
+    </button>
+  </div>
+  }
+</div>
+
+@if (loading()) {
+<div class="text-center py-12">
+  <p>Loading team details...</p>
+</div>
+} @else if (error()) {
+<div class="text-center py-12">
+  <lucide-angular
+    [img]="icons.AlertCircle"
+    [size]="48"
+    class="mx-auto mb-4 text-red-500"
+  ></lucide-angular>
+  <p class="text-red-600 mb-4">{{ error() }}</p>
+  <button class="btn btn-primary" (click)="retryLoad()">
+    <lucide-angular [img]="icons.RefreshCw" [size]="16"></lucide-angular>
+    Try Again
+  </button>
+</div>
+} @else if (!loading() && team()) {
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 space-y-6">
+    <div class="card">
+      <div class="flex items-center gap-4 mb-4">
+        @if (team()!.logoUrl) {
+        <img
+          [src]="team()!.logoUrl"
+          [alt]="team()!.name + ' logo'"
+          class="w-32 h-32 rounded-lg object-contain"
+        />
+        } @else {
+        <div
+          class="w-20 h-20 rounded-lg flex items-center justify-center text-xl font-semibold"
+        >
+          {{ team()!.name.charAt(0).toUpperCase() }}
+        </div>
+        }
+        <div>
+          <h1 class="font-bold text-3xl">{{ team()!.name }}</h1>
+          @if (team()!.shortName) {
+          <p class="opacity-75 text-lg">{{ team()!.shortName }}</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="font-bold text-xl flex items-center gap-2">
+          <lucide-angular [img]="icons.Users" [size]="24"></lucide-angular>
+          Team Players
+        </h2>
+        @if (isManager()) {
+        <button class="btn btn-primary" (click)="onShowAddPlayer()">
+          <lucide-angular [img]="icons.Plus" [size]="16"></lucide-angular>
+          Add Player
+        </button>
+        }
+      </div>
+
+      @if (players().length > 0) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        @for (player of players(); track player.id) {
+        <app-player-card
+          [player]="player"
+          [role]="getPlayerRole()"
+          (edit)="onEditPlayer($event)"
+          (delete)="onRemovePlayer($event)"
+        ></app-player-card>
+        }
+      </div>
+      } @else {
+      <div class="text-center py-12 rounded-lg">
+        <lucide-angular
+          [img]="icons.Users"
+          [size]="48"
+          class="mx-auto mb-4 text-gray-400"
+        ></lucide-angular>
+        <h3 class="text-lg font-semibold text-gray-600 mb-2">No Players Yet</h3>
+        <p class="text-gray-500 mb-4">
+          @if (isManager()) { Start building your team by adding your first
+          player } @else { No players have been added to this team yet }
+        </p>
+        @if (isManager()) {
+        <button class="btn btn-primary" (click)="onShowAddPlayer()">
+          <lucide-angular [img]="icons.Plus" [size]="16"></lucide-angular>
+          Add First Player
+        </button>
+        }
+      </div>
+      }
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="card">
+      <h3 class="font-semibold text-lg mb-4 flex items-center gap-2">
+        <lucide-angular [img]="icons.BarChart3" [size]="20"></lucide-angular>
+        Team Statistics
+      </h3>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="opacity-75">Total Players</span>
+          <span class="font-semibold text-lg">{{ players().length }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="opacity-75">Team Created</span>
+          <span class="font-semibold">{{
+            team()!.createdAt | date : "short"
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    @if (isManager()) {
+    <div class="card">
+      <h3 class="font-semibold text-lg mb-4">Quick Actions</h3>
+      <div class="space-y-3">
+        <button
+          class="btn btn-outline w-full justify-start"
+          (click)="onEditTeam()"
+        >
+          <lucide-angular [img]="icons.Edit" [size]="16"></lucide-angular>
+          Edit Team Details
+        </button>
+        <button
+          class="btn btn-outline w-full justify-start"
+          (click)="onShowAddPlayer()"
+        >
+          <lucide-angular [img]="icons.UserPlus" [size]="16"></lucide-angular>
+          Add New Player
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+}
+<app-modal
+  [isOpen]="showPlayerModal()"
+  [title]="editingPlayer() ? 'Edit Player' : 'Add New Player'"
+  (close)="onClosePlayerModal()"
+>
+  <app-player-form
+    [player]="editingPlayer()"
+    [teamId]="team()!.id"
+    (save)="onPlayerSave($event)"
+    (cancel)="onClosePlayerModal()"
+  ></app-player-form>
+</app-modal>
