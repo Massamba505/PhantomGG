@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
     GET: (tournamentId: string) => `tournaments/${tournamentId}`,
     TEAMS: (tournamentId: string) => `tournaments/${tournamentId}/teams`,
     MATCHES: (tournamentId: string) => `tournaments/${tournamentId}/matches`,
+    STATISTICS: (tournamentId: string) => `tournaments/${tournamentId}/statistics`,
     STANDINGS: (tournamentId: string) => `tournaments/${tournamentId}/standings`,
     CREATE: 'tournaments',
     UPDATE: (tournamentId: string) => `tournaments/${tournamentId}`,

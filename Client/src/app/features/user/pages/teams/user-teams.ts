@@ -52,19 +52,20 @@ export class UserTeams implements OnInit {
   loadMyTeams() {
     this.isLoading.set(true);
     
-    const searchParams: TeamSearch = {
+    const searchParams = {
       pageNumber: this.currentPage(),
       pageSize: this.pageSize(),
+      scope: 'my' as const,
       ...this.searchCriteria()
     };
     
-    this.teamService.getMyTeams(searchParams).subscribe({
-      next: (response) => {
+    this.teamService.getTeams(searchParams).subscribe({
+      next: (response: any) => {
         this.teams.set(response.data);
         this.totalCount.set(response.totalRecords);
         this.totalPages.set(response.totalPages);
       },
-      error: (error) => {
+      error: (error: any) => {
         this.isLoading.set(false);
       },
       complete: () => {

@@ -28,7 +28,7 @@ export class TournamentService {
     return this.apiClient.get<Tournament>(API_ENDPOINTS.TOURNAMENTS.GET(id));
   }
 
-  getTournamentTeams(id: string, status?: string): Observable<TournamentTeam[]> {
+  getTournamentTeams(id: string, status?: "Approved" | "pending"): Observable<TournamentTeam[]> {
     const url = status ? `${API_ENDPOINTS.TOURNAMENTS.TEAMS(id)}?status=${status}` : API_ENDPOINTS.TOURNAMENTS.TEAMS(id);
     return this.apiClient.get<TournamentTeam[]>(url);
   }
@@ -37,30 +37,34 @@ export class TournamentService {
     return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.MATCHES(id));
   }
 
+  getTournamentStatistics(id: string): Observable<TournamentStatistics> {
+    return this.apiClient.get<TournamentStatistics>(API_ENDPOINTS.TOURNAMENTS.STATISTICS(id));
+  }
+
   getTournamentStandings(id: string): Observable<any[]> {
     return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.STANDINGS(id));
   }
 
-  manageTeam(tournamentId: string, teamId: string | null, action: 'register' | 'withdraw' | 'approve' | 'reject'): Observable<void> {
+  manageTeam(tournamentId: string, teamId: string | null, action: 0 | 1 | 2 | 3): Observable<void> {
     const actionData = { action, teamId };
     const endpoint = teamId ? API_ENDPOINTS.TOURNAMENTS.MANAGE_TEAM(tournamentId, teamId) : API_ENDPOINTS.TOURNAMENTS.MANAGE_TEAM(tournamentId);
     return this.apiClient.put<void>(endpoint, actionData);
   }
 
   registerForTournament(tournamentId: string, teamId: string): Observable<void> {
-    return this.manageTeam(tournamentId, teamId, 'register');
+    return this.manageTeam(tournamentId, teamId, 0);
   }
 
   withdrawFromTournament(tournamentId: string, teamId: string): Observable<void> {
-    return this.manageTeam(tournamentId, teamId, 'withdraw');
+    return this.manageTeam(tournamentId, teamId, 1);
   }
 
   approveTeam(tournamentId: string, teamId: string): Observable<void> {
-    return this.manageTeam(tournamentId, teamId, 'approve');
+    return this.manageTeam(tournamentId, teamId, 2);
   }
 
   rejectTeam(tournamentId: string, teamId: string): Observable<void> {
-    return this.manageTeam(tournamentId, teamId, 'reject');
+    return this.manageTeam(tournamentId, teamId, 3);
   }
 
   createTournament(tournament: CreateTournament): Observable<Tournament> {

@@ -59,12 +59,13 @@ export class TournamentBrowse implements OnInit {
       const filters = {
         ...this.searchFilters(),
         pageNumber: this.currentPage(),
-        pageSize: this.pageSize()
+        pageSize: this.pageSize(),
+        scope: 'public' as const
       };
       
-      const result = await this.tournamentService.getPublicTournaments(filters);
-      this.tournaments.set(result.data || []);
-      this.totalCount.set(result.totalRecords || 0);
+      const result = await this.tournamentService.getTournaments(filters).toPromise();
+      this.tournaments.set(result?.data || []);
+      this.totalCount.set(result?.totalRecords || 0);
     } catch (error) {
       console.error('Error loading tournaments:', error);
       this.error.set('Failed to load tournaments. Please try again.');
