@@ -23,6 +23,22 @@ public partial class User
 
     public bool IsActive { get; set; }
 
+    public bool EmailVerified { get; set; }
+
+    public string? EmailVerificationToken { get; set; }
+
+    public DateTime? EmailVerificationTokenExpiry { get; set; }
+
+    public string? PasswordResetToken { get; set; }
+
+    public DateTime? PasswordResetTokenExpiry { get; set; }
+
+    public int FailedLoginAttempts { get; set; }
+
+    public DateTime? AccountLockedUntil { get; set; }
+
+    public DateTime? LastLoginAt { get; set; }
+
     public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
     public virtual ICollection<Team> Teams { get; set; } = new List<Team>();
