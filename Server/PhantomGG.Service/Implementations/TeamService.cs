@@ -8,7 +8,6 @@ using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Interfaces;
 using PhantomGG.Service.Mappings;
-using System.Numerics;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -25,50 +24,37 @@ public class TeamService(
     private readonly IPlayerService _playerService = playerService;
     private readonly IPlayerRepository _playerRepository = playerRepository;
 
-    public async Task<PaginatedResponse<TeamDto>> SearchAsync(TeamSearchDto searchDto)
+    public async Task<PaginatedResponse<TeamDto>> SearchAsync(TeamSearchDto searchDto, Guid? userId = null)
     {
-        var paginatedResult = await _teamRepository.SearchAsync(searchDto);
-        var teamDtos = paginatedResult.Items.Select(t => t.ToDto());
-        var totalCount = paginatedResult.TotalRecords;
-
-        return new PaginatedResponse<TeamDto>
+        switch (searchDto.Scope)
         {
-            Data = teamDtos,
-            TotalRecords = totalCount,
-            PageNumber = searchDto.Page,
-            PageSize = searchDto.PageSize
-        };
+            case TeamScope.My when userId.HasValue:
+                var paginatedResult = await _teamRepository.SearchAsync(searchDto, userId: userId.Value);
+                return new PaginatedResponse<TeamDto>(
+                    paginatedResult.Items.Select(t => t.ToDto()),
+                    searchDto.Page,
+                    searchDto.PageSize,
+                    totalRecords: paginatedResult.TotalRecords
+                );
+            case TeamScope.My when !userId.HasValue:
+                throw new UnauthorizedException("Authentication required for accessing user teams");
+            case TeamScope.Public:
+            case TeamScope.All:
+            default:
+                var result = await _teamRepository.SearchAsync(searchDto);
+                return new PaginatedResponse<TeamDto>(
+                    result.Items.Select(t => t.ToDto()),
+                    searchDto.Page,
+                    searchDto.PageSize,
+                    totalRecords: result.TotalRecords
+                );
+        }
     }
 
     public async Task<TeamDto> GetByIdAsync(Guid teamId)
     {
         var team = await ValidateTeamExistsAsync(teamId);
-
         return team.ToDto();
-    }
-
-    public async Task<IEnumerable<PlayerDto>> GetTeamPlayersAsync(Guid teamId)
-    {
-        var team = await ValidateTeamExistsAsync(teamId);
-
-        var players = await _playerRepository.GetByTeamAsync(teamId);
-
-        return players.Select(p => p.ToDto());
-    }
-
-    public async Task<PaginatedResponse<TeamDto>> GetMyTeamsAsync(TeamSearchDto searchDto, Guid userId)
-    {
-        var paginatedResult = await _teamRepository.SearchAsync(searchDto, userId : userId);
-        var teamDtos = paginatedResult.Items.Select(t => t.ToDto());
-        var totalCount = paginatedResult.TotalRecords;
-
-        return new PaginatedResponse<TeamDto>
-        {
-            Data = teamDtos,
-            TotalRecords = totalCount,
-            PageNumber = searchDto.Page,
-            PageSize = searchDto.PageSize
-        };
     }
 
     public async Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid managerId)
@@ -76,25 +62,25 @@ public class TeamService(
         await ValidateUserTeamNameUniqueness(createDto.Name, managerId);
         var team = createDto.ToEntity(managerId);
 
+        await _teamRepository.CreateAsync(team);
+
         if (createDto.LogoUrl != null)
         {
-            var logoUrl = await UploadLogoAsync(team, createDto.LogoUrl);
-            team.LogoUrl = logoUrl;
+            team.LogoUrl = await UploadLogoAsync(team, createDto.LogoUrl);
         }
         else
         {
             team.LogoUrl = $"https://placehold.co/200x200?text={team.Name}";
         }
 
-        var createdTeam = await _teamRepository.CreateAsync(team);
+        await _teamRepository.UpdateAsync(team);
 
-        return createdTeam.ToDto();
+        return team.ToDto();
     }
 
     public async Task<TeamDto> UpdateAsync(Guid teamId, UpdateTeamDto updateDto, Guid userId)
     {
         var existingTeam = await ValidateTeamExistsAsync(teamId);
-
         ValidateTeamOwnership(existingTeam, userId);
 
         if (!string.IsNullOrEmpty(updateDto.Name) && updateDto.Name != existingTeam.Name)
@@ -126,29 +112,22 @@ public class TeamService(
     public async Task DeleteAsync(Guid teamId, Guid userId)
     {
         var team = await ValidateTeamExistsAsync(teamId);
-
         ValidateTeamOwnership(team, userId);
         await ValidateTeamCanBeDeleted(team);
 
         await _teamRepository.DeleteAsync(teamId);
     }
 
-    public async Task<string> UploadLogoAsync(Team team, IFormFile file)
+    public async Task<IEnumerable<PlayerDto>> GetTeamPlayersAsync(Guid teamId)
     {
-        if (!string.IsNullOrEmpty(team.LogoUrl))
-        {
-            await _imageService.DeleteImageAsync(team.LogoUrl);
-        }
-
-        var logoUrl = await _imageService.SaveImageAsync(file, ImageType.TeamLogo, team.Id);
-
-        return logoUrl;
+        var team = await ValidateTeamExistsAsync(teamId);
+        var players = await _playerRepository.GetByTeamAsync(teamId);
+        return players.Select(p => p.ToDto());
     }
 
     public async Task<PlayerDto> AddPlayerToTeamAsync(Guid teamId, CreatePlayerDto playerDto, Guid userId)
     {
         var team = await ValidateTeamExistsAsync(teamId);
-
         ValidateTeamOwnership(team, userId);
 
         var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(teamId);
@@ -163,28 +142,35 @@ public class TeamService(
         }
 
         var player = await _playerService.CreateAsync(playerDto);
-
         return player;
     }
 
     public async Task<PlayerDto> UpdateTeamPlayerAsync(Guid teamId, Guid playerId, UpdatePlayerDto updateDto, Guid userId)
     {
         var team = await ValidateTeamExistsAsync(teamId);
-
         ValidateTeamOwnership(team, userId);
 
         var updatedPlayer = await _playerService.UpdateAsync(updateDto, playerId);
-
         return updatedPlayer;
     }
 
     public async Task RemovePlayerFromTeamAsync(Guid teamId, Guid playerId, Guid userId)
     {
         var team = await ValidateTeamExistsAsync(teamId);
-
         ValidateTeamOwnership(team, userId);
 
         await _playerService.DeleteAsync(teamId, playerId);
+    }
+
+    public async Task<string> UploadLogoAsync(Team team, IFormFile file)
+    {
+        if (!string.IsNullOrEmpty(team.LogoUrl))
+        {
+            await _imageService.DeleteImageAsync(team.LogoUrl);
+        }
+
+        var logoUrl = await _imageService.SaveImageAsync(file, ImageType.TeamLogo, team.Id);
+        return logoUrl;
     }
 
     private async Task ValidateUserTeamNameUniqueness(string teamName, Guid managerId)

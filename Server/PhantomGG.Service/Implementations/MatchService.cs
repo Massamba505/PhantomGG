@@ -37,7 +37,7 @@ public class MatchService : IMatchService
     {
         var match = await _matchRepository.GetByIdAsync(id);
         if (match == null)
-            throw new ArgumentException("Match not found");
+            throw new NotFoundException("Match not found");
 
         return match.ToDto();
     }
@@ -52,18 +52,18 @@ public class MatchService : IMatchService
     {
         var match = await _matchRepository.GetByIdAsync(matchId);
         if (match == null)
-            throw new ArgumentException("Match not found");
+            throw new NotFoundException("Match not found");
 
         // Validate that the organizer has permission to update this match
         var tournament = await _tournamentRepository.GetByIdAsync(match.TournamentId);
         if (tournament == null)
-            throw new ArgumentException("Tournament not found");
+            throw new NotFoundException("Tournament not found");
 
         if (tournament.OrganizerId != organizerId)
             throw new UnauthorizedException("You don't have permission to update this match");
 
         if (resultDto is not MatchResultDto matchResult)
-            throw new ArgumentException("Invalid result data");
+            throw new ValidationException("Invalid result data");
 
         // Update match scores and status
         match.HomeScore = matchResult.HomeScore;
@@ -78,7 +78,7 @@ public class MatchService : IMatchService
     {
         var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
         if (tournament == null)
-            throw new ArgumentException("Tournament not found");
+            throw new NotFoundException("Tournament not found");
 
         // Validate that the organizer has permission
         if (tournament.OrganizerId != organizerId)
@@ -119,7 +119,7 @@ public class MatchService : IMatchService
         // Check if user has permission to create matches
         var tournament = await _tournamentRepository.GetByIdAsync(createDto.TournamentId);
         if (tournament == null)
-            throw new ArgumentException("Tournament not found");
+            throw new NotFoundException("Tournament not found");
 
 
         // Validate teams exist and are part of the tournament
@@ -127,7 +127,7 @@ public class MatchService : IMatchService
         var awayTeam = await _teamRepository.GetByIdAsync(createDto.AwayTeamId);
 
         if (homeTeam == null || awayTeam == null)
-            throw new ArgumentException("One or both teams not found");
+            throw new NotFoundException("One or both teams not found");
 
         // if (homeTeam.TournamentId != createDto.TournamentId || awayTeam.TournamentId != createDto.TournamentId)
         //     throw new ArgumentException("Teams must be part of the tournament");
@@ -145,7 +145,7 @@ public class MatchService : IMatchService
     {
         var match = await _matchRepository.GetByIdAsync(id);
         if (match == null)
-            throw new ArgumentException("Match not found");
+            throw new NotFoundException("Match not found");
 
 
         updateDto.UpdateEntity(match);
@@ -157,7 +157,7 @@ public class MatchService : IMatchService
     {
         var match = await _matchRepository.GetByIdAsync(id);
         if (match == null)
-            throw new ArgumentException("Match not found");
+            throw new NotFoundException("Match not found");
 
 
         // Update match result
@@ -173,7 +173,7 @@ public class MatchService : IMatchService
     {
         var match = await _matchRepository.GetByIdAsync(id);
         if (match == null)
-            throw new ArgumentException("Match not found");
+            throw new NotFoundException("Match not found");
 
 
         await _matchRepository.DeleteAsync(id);
@@ -185,7 +185,7 @@ public class MatchService : IMatchService
     {
         var tournament = await _tournamentRepository.GetByIdAsync(generateDto.TournamentId);
         if (tournament == null)
-            throw new ArgumentException("Tournament not found");
+            throw new NotFoundException("Tournament not found");
 
 
         var teams = await _tournamentRepository.GetTournamentTeamsAsync(generateDto.TournamentId);
@@ -257,7 +257,7 @@ public class MatchService : IMatchService
     {
         var tournament = await _tournamentRepository.GetByIdAsync(generateDto.TournamentId);
         if (tournament == null)
-            throw new ArgumentException("Tournament not found");
+            throw new NotFoundException("Tournament not found");
 
 
         var teams = await _tournamentRepository.GetTournamentTeamsAsync(generateDto.TournamentId);
@@ -355,7 +355,7 @@ public class MatchService : IMatchService
     {
         var match = await _matchRepository.GetByIdAsync(matchId);
         if (match == null)
-            throw new ArgumentException("Match not found");
+            throw new NotFoundException("Match not found");
 
 
         match.Status = "In Progress";
@@ -368,7 +368,7 @@ public class MatchService : IMatchService
     {
         var match = await _matchRepository.GetByIdAsync(matchId);
         if (match == null)
-            throw new ArgumentException("Match not found");
+            throw new NotFoundException("Match not found");
 
 
         match.Status = "Completed";
@@ -381,7 +381,7 @@ public class MatchService : IMatchService
     {
         var match = await _matchRepository.GetByIdAsync(matchId);
         if (match == null)
-            throw new ArgumentException("Match not found");
+            throw new NotFoundException("Match not found");
 
 
         match.Status = "Cancelled";
@@ -394,7 +394,7 @@ public class MatchService : IMatchService
     {
         var match = await _matchRepository.GetByIdAsync(matchId);
         if (match == null)
-            throw new ArgumentException("Match not found");
+            throw new NotFoundException("Match not found");
 
 
         match.MatchDate = newDate;
@@ -421,7 +421,7 @@ public class MatchService : IMatchService
     {
         var tournament = await _tournamentRepository.GetByIdAsync(generateDto.TournamentId);
         if (tournament == null)
-            throw new ArgumentException("Tournament not found");
+            throw new NotFoundException("Tournament not found");
 
 
         // Create a GenerateFixturesDto from the AutoGenerateFixturesDto
@@ -439,7 +439,7 @@ public class MatchService : IMatchService
         {
             "roundrobin" => await GenerateRoundRobinFixturesAsync(fixtureDto, userId),
             "singleelimination" => await GenerateKnockoutFixturesAsync(fixtureDto, userId),
-            _ => throw new ArgumentException($"Unsupported tournament format: {generateDto.TournamentFormat}")
+            _ => throw new ValidationException($"Unsupported tournament format: {generateDto.TournamentFormat}")
         };
     }
 
@@ -447,7 +447,7 @@ public class MatchService : IMatchService
     {
         var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
         if (tournament == null)
-            throw new ArgumentException("Tournament not found");
+            throw new NotFoundException("Tournament not found");
 
 
         return new FixtureGenerationStatusDto

@@ -18,35 +18,23 @@ export const API_ENDPOINTS = {
     LIST: 'tournaments',
     GET: (tournamentId: string) => `tournaments/${tournamentId}`,
     TEAMS: (tournamentId: string) => `tournaments/${tournamentId}/teams`,
-    MY_TOURNAMENTS: 'tournaments/my-tournaments',
-    REGISTER: (tournamentId: string) => `tournaments/${tournamentId}/register`,
-    WITHDRAW: (tournamentId: string) => `tournaments/${tournamentId}/withdraw`,
+    MATCHES: (tournamentId: string) => `tournaments/${tournamentId}/matches`,
+    STANDINGS: (tournamentId: string) => `tournaments/${tournamentId}/standings`,
     CREATE: 'tournaments',
     UPDATE: (tournamentId: string) => `tournaments/${tournamentId}`,
     DELETE: (tournamentId: string) => `tournaments/${tournamentId}`,
-    UPLOAD_BANNER: (tournamentId: string) => `tournaments/${tournamentId}/image/banner`,
-    UPLOAD_LOGO: (tournamentId: string) => `tournaments/${tournamentId}/image/logo`,
-    PENDING_TEAMS: (tournamentId: string) => `tournaments/${tournamentId}/teams/pending`,
-    APPROVE_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/approve`,
-    REJECT_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}/reject`,
-    REMOVE_TEAM: (tournamentId: string, teamId: string) => `tournaments/${tournamentId}/teams/${teamId}`,
-    // Public endpoints
-    PUBLIC: 'tournaments/public',
-    PUBLIC_DETAILS: (tournamentId: string) => `tournaments/public/${tournamentId}`,
-    PUBLIC_TEAMS: (tournamentId: string) => `tournaments/public/${tournamentId}/teams`,
-    PUBLIC_STATISTICS: (tournamentId: string) => `tournaments/public/${tournamentId}/statistics`,
-    PUBLIC_MATCHES: (tournamentId: string) => `tournaments/public/${tournamentId}/matches`
+    MANAGE_TEAM: (tournamentId: string, teamId?: string) => 
+      teamId ? `tournaments/${tournamentId}/teams/${teamId}` : `tournaments/${tournamentId}/teams`,
+    CREATE_BRACKET: (tournamentId: string) => `tournaments/${tournamentId}/bracket`
   },
 
   TEAMS: {
     LIST: 'teams',
     GET: (teamId: string) => `teams/${teamId}`,
     PLAYERS: (teamId: string) => `teams/${teamId}/players`,
-    MY_TEAMS: 'teams/my-teams',
     CREATE: 'teams',
     UPDATE: (teamId: string) => `teams/${teamId}`,
     DELETE: (teamId: string) => `teams/${teamId}`,
-    UPLOAD_LOGO: (teamId: string) => `teams/${teamId}/logo`,
     ADD_PLAYER: (teamId: string) => `teams/${teamId}/players`,
     UPDATE_PLAYER: (teamId: string, playerId: string) => `teams/${teamId}/players/${playerId}`,
     REMOVE_PLAYER: (teamId: string, playerId: string) => `teams/${teamId}/players/${playerId}`
