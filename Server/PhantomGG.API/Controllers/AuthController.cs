@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using PhantomGG.Common.Config;
 using PhantomGG.Models.DTOs;
@@ -28,6 +29,7 @@ public class AuthController(
     /// </summary>
     /// <param name="request">User registration data</param>
     [HttpPost("register")]
+    [EnableRateLimiting("RegisterPolicy")]
     [AllowAnonymous]
     public async Task<ActionResult<ApiResponse>> Register([FromBody] RegisterRequestDto request)
     {
@@ -52,6 +54,7 @@ public class AuthController(
     /// </summary>
     /// <param name="request">Login credentials including email and password</param>
     [HttpPost("login")]
+    [EnableRateLimiting("LoginPolicy")]
     [AllowAnonymous]
     public async Task<ActionResult<ApiResponse>> Login([FromBody] LoginRequestDto request)
     {

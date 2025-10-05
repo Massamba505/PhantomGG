@@ -1,5 +1,6 @@
 using PhantomGG.API.Extensions;
 using PhantomGG.API.Middleware;
+using System.Threading.RateLimiting;
 
 namespace PhantomGG.API;
 
@@ -21,12 +22,14 @@ public class Program
         builder.Services.AddJwtAuthentication(builder.Configuration);
         builder.Services.AddApplicationRepositories();
         builder.Services.AddApplicationServices();
+        builder.Services.AddRateLimiting();
 
         var app = builder.Build();
 
         // Configure the HTTP request pipeline
         app.UseSwaggerDocumentation(app.Environment);
         app.UseHttpsRedirection();
+        app.UseRateLimiter();
         app.UseStaticFiles();
         app.UseCors("CorsPolicy");
         app.UseMiddleware<GlobalExceptionMiddleware>();
