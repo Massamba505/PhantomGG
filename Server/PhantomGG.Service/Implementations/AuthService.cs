@@ -17,6 +17,7 @@ public class AuthService(
     IPasswordHasher passwordHasher,
     ITokenService tokenService,
     ICookieService cookieService,
+    IEmailService emailService,
     IHttpContextAccessor httpContextAccessor) : IAuthService
 {
     private readonly IUserRepository _userRepository = userRepository;
@@ -24,6 +25,7 @@ public class AuthService(
     private readonly ITokenService _tokenService = tokenService;
     private readonly IRefreshTokenService _refreshTokeService = refreshTokeService;
     private readonly ICookieService _cookieService = cookieService;
+    private readonly IEmailService _emailService = emailService;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public async Task<AuthDto> RegisterAsync(RegisterRequestDto request)
@@ -46,10 +48,16 @@ public class AuthService(
             ProfilePictureUrl = request.ProfilePictureUrl ?? $"https://eu.ui-avatars.com/api/?name={request.FirstName}+{request.LastName}&size=250",
             Role = request.Role.ToString(),
             CreatedAt = DateTime.UtcNow,
-            IsActive = true
+            IsActive = true,
+            EmailVerified = false,
+            EmailVerificationToken = GenerateSecureToken(),
+            EmailVerificationTokenExpiry = DateTime.UtcNow.AddDays(1),
+            FailedLoginAttempts = 0
         };
 
         await _userRepository.CreateAsync(user);
+
+        await _emailService.SendEmailVerificationAsync(user.Email, user.FirstName, user.EmailVerificationToken!);
 
         return await GenerateTokensAsync(user);
     }
@@ -59,15 +67,28 @@ public class AuthService(
         var user = await _userRepository.GetByEmailAsync(request.Email.ToLower());
         if (user == null || !user.IsActive)
         {
+            await HandleFailedLoginAsync(request.Email.ToLower());
             throw new UnauthorizedException("Invalid email or password");
+        }
+
+        if (user.AccountLockedUntil.HasValue && user.AccountLockedUntil > DateTime.UtcNow)
+        {
+            throw new UnauthorizedException($"Account is locked until {user.AccountLockedUntil:yyyy-MM-dd HH:mm} UTC");
+        }
+
+        if (!user.EmailVerified)
+        {
+            throw new UnauthorizedException("Please verify your email address");
         }
 
         var validPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash);
         if (!validPassword)
         {
+            await HandleFailedLoginAsync(user);
             throw new UnauthorizedException("Invalid email or password");
         }
 
+        await HandleSuccessfulLoginAsync(user);
         return await GenerateTokensAsync(user, rememberMe: request.RememberMe);
     }
 
@@ -103,13 +124,9 @@ public class AuthService(
             errors.Add("Email is required and must be valid and no more than 100 characters");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)
+        if (!IsValidPassword(request.Password))
         {
-            errors.Add("Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character");
-        }
-        else if (!IsValidPassword(request.Password))
-        {
-            errors.Add("Password must contain at least one letter and one digit");
+            errors.Add("Password must be at least 8 characters with uppercase, lowercase, number, and special character");
         }
 
         if (!EnumHelper.ToEnum<UserRoles>(request.Role).HasValue)
@@ -141,5 +158,40 @@ public class AuthService(
         _cookieService.SetRefreshToken(_httpContextAccessor.HttpContext!.Response, refreshToken.Token, rememberMe);
 
         return result;
+    }
+
+    private static string GenerateSecureToken()
+    {
+        return Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+    }
+
+    private async Task HandleFailedLoginAsync(string email)
+    {
+        var user = await _userRepository.GetByEmailAsync(email);
+        if (user != null)
+        {
+            await HandleFailedLoginAsync(user);
+        }
+    }
+
+    private async Task HandleFailedLoginAsync(User user)
+    {
+        user.FailedLoginAttempts++;
+
+        if (user.FailedLoginAttempts >= 5)
+        {
+            user.AccountLockedUntil = DateTime.UtcNow.AddMinutes(30);
+            await _emailService.SendAccountLockedAsync(user.Email, user.FirstName, user.AccountLockedUntil.Value);
+        }
+
+        await _userRepository.UpdateAsync(user);
+    }
+
+    private async Task HandleSuccessfulLoginAsync(User user)
+    {
+        user.FailedLoginAttempts = 0;
+        user.AccountLockedUntil = null;
+        user.LastLoginAt = DateTime.UtcNow;
+        await _userRepository.UpdateAsync(user);
     }
 }

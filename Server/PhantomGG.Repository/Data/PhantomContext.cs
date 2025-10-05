@@ -215,12 +215,21 @@ public partial class PhantomContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
+            entity.HasIndex(e => e.AccountLockedUntil, "IX_Users_AccountLockedUntil");
+
             entity.HasIndex(e => e.Email, "IX_Users_Email").IsUnique();
+
+            entity.HasIndex(e => e.EmailVerificationToken, "IX_Users_EmailVerificationToken");
+
+            entity.HasIndex(e => e.PasswordResetToken, "IX_Users_PasswordResetToken");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.EmailVerificationToken)
+                .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.FirstName)
                 .HasMaxLength(50)
@@ -230,6 +239,9 @@ public partial class PhantomContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.PasswordHash)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.PasswordResetToken)
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.ProfilePictureUrl)

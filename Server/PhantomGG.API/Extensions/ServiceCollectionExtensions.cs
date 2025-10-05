@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
     {
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
         services.Configure<CookieSettings>(configuration.GetSection("CookieSettings"));
+        services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
         services.AddRouting(options => options.LowercaseUrls = true);
         return services;
     }
@@ -41,6 +42,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthVerificationService, AuthVerificationService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITournamentService, TournamentService>();
         services.AddScoped<ITeamService, TeamService>();
@@ -53,6 +55,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IImageService, LocalFileImageService>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 
         return services;
     }

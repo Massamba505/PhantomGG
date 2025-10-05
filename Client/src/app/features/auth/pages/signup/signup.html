@@ -92,6 +92,11 @@
         <p class="text-xs mt-1" [class]="passwordStrength.color">
           {{ passwordStrength.label }}
         </p>
+        } @if (checkFieldError('password')) {
+        <p class="text-sm error-message mt-1">
+          Password must be at least 8 characters with uppercase, lowercase,
+          number, and special character
+        </p>
         }
       </div>
 

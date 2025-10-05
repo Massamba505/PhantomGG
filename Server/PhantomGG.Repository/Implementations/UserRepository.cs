@@ -21,6 +21,20 @@ public class UserRepository(PhantomContext context) : IUserRepository
             .FirstOrDefaultAsync(u => u.Id == id);
     }
 
+    public async Task<User?> GetByEmailVerificationTokenAsync(string token)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.EmailVerificationToken == token &&
+                                    u.EmailVerificationTokenExpiry > DateTime.UtcNow);
+    }
+
+    public async Task<User?> GetByPasswordResetTokenAsync(string token)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.PasswordResetToken == token &&
+                                    u.PasswordResetTokenExpiry > DateTime.UtcNow);
+    }
+
     public async Task<bool> EmailExistsAsync(string email)
     {
         return await _context.Users
