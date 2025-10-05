@@ -1,6 +1,6 @@
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Tournament;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 
 namespace PhantomGG.Service.Mappings;
 

@@ -1,5 +1,5 @@
 using PhantomGG.Models.DTOs.Match;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 
 namespace PhantomGG.Service.Mappings;
 

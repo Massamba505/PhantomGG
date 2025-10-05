@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Tournament;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Data;
 using PhantomGG.Repository.Interfaces;
 

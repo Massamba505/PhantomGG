@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Player;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Interfaces;
@@ -26,7 +26,7 @@ namespace PhantomGG.Service.Implementations
         public async Task<PlayerDto> CreateAsync(CreatePlayerDto createDto)
         {
             var player = createDto.ToEntity();
-            if(createDto.PhotoUrl != null)
+            if (createDto.PhotoUrl != null)
             {
                 player.PhotoUrl = await UploadPlayerPhotoAsync(player, createDto.PhotoUrl);
             }

@@ -5,7 +5,7 @@ using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Models.DTOs.TournamentStanding;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Interfaces;

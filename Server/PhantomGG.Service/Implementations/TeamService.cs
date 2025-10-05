@@ -3,7 +3,7 @@ using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Player;
 using PhantomGG.Models.DTOs.Team;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Interfaces;

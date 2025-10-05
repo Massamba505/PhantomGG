@@ -3,7 +3,7 @@ using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Models.DTOs.MatchEvent;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Exceptions;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Service.Mappings;
 
 namespace PhantomGG.Service.Implementations;

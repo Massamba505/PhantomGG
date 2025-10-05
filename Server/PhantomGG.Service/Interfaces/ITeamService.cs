@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Models.DTOs.Player;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 
 namespace PhantomGG.Service.Interfaces;
 

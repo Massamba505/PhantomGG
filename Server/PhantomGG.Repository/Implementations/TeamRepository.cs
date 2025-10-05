@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PhantomGG.Repository.Data;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Repository.Interfaces;

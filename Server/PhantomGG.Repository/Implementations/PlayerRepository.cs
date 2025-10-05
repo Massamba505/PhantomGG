@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PhantomGG.Repository.Data;
 using PhantomGG.Repository.Interfaces;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 
 namespace PhantomGG.Repository.Implementations
 {
