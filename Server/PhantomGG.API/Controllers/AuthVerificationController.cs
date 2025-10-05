@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Service.Interfaces;
@@ -9,6 +10,7 @@ namespace PhantomGG.API.Controllers;
 [Route("api/auth")]
 [ApiController]
 [AllowAnonymous]
+[EnableRateLimiting("AuthVerificationPolicy")]
 public class AuthVerificationController(IAuthVerificationService authVerificationService) : ControllerBase
 {
     private readonly IAuthVerificationService _authVerificationService = authVerificationService;
