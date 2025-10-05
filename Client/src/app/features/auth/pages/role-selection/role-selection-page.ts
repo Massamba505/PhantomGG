@@ -51,10 +51,10 @@ export class RoleSelectionPage {
 
     this.authState.register(credentials).subscribe({
       next: () => {
-        this.toast.success('Account created successfully!');
-        if (this.authState.isAuthenticated()) {
-          this.router.navigate(['/dashboard']);
-        }
+        debugger;
+        this.router.navigate(['/auth/verify-email-sent'], {
+          state: { email: credentials.email }
+        });
       },
       error: (error) => {
         this.router.navigate(['/auth/signup'],{

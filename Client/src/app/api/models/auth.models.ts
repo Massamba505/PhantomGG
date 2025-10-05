@@ -45,3 +45,20 @@ export interface ChangePassword {
 export interface ProfilePictureUpload {
   imageUrl: string;
 }
+
+export interface VerifyEmailRequest {
+  token: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}

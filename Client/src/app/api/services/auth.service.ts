@@ -6,7 +6,11 @@ import {
   Auth,
   LoginRequest,
   RegisterRequest,
-  User
+  User,
+  VerifyEmailRequest,
+  ResendVerificationRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest
 } from '../models/auth.models';
 
 @Injectable({
@@ -33,5 +37,21 @@ export class AuthService {
 
   logout(): Observable<void> {
     return this.apiClient.post<void>(API_ENDPOINTS.AUTH.LOGOUT, {});
+  }
+
+  verifyEmail(request: VerifyEmailRequest): Observable<void> {
+    return this.apiClient.post<void>(API_ENDPOINTS.AUTH.VERIFY_EMAIL, request);
+  }
+
+  resendVerification(request: ResendVerificationRequest): Observable<void> {
+    return this.apiClient.post<void>(API_ENDPOINTS.AUTH.RESEND_VERIFICATION, request);
+  }
+
+  forgotPassword(request: ForgotPasswordRequest): Observable<void> {
+    return this.apiClient.post<void>(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, request);
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<void> {
+    return this.apiClient.post<void>(API_ENDPOINTS.AUTH.RESET_PASSWORD, request);
   }
 }

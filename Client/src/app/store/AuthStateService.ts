@@ -55,7 +55,7 @@ export class AuthStateService {
   register(credentials: RegisterRequest) {
     return this.withLoading(
       this.authService.register(credentials).pipe(
-        tap((res) => this.handleAuthSuccess(res)),
+        // tap((res) => this.handleAuthSuccess(res)),
         catchError((error) => throwError(() => error))
       )
     );

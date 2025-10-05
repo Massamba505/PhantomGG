@@ -91,6 +91,30 @@
       </button>
     </form>
 
+    @if (showResendVerification()) {
+    <div class="card mt-4">
+      <div class="flex items-center gap-3">
+        <lucide-angular
+          [img]="icons.AlertTriangle"
+          [size]="20"
+          class="text-orange-600"
+        ></lucide-angular>
+        <div class="flex-1">
+          <p class="text-sm font-medium">Email verification required</p>
+          <p class="text-xs text-orange-600 mt-1">
+            Please verify your email before logging in
+          </p>
+        </div>
+      </div>
+      <button
+        (click)="resendVerification()"
+        class="btn btn-outline btn-sm mt-3 w-full"
+      >
+        Resend Verification Email
+      </button>
+    </div>
+    }
+
     <div class="flex items-center my-6">
       <div class="border-t border-border flex-1"></div>
       <span class="px-4 text-sm">OR</span>

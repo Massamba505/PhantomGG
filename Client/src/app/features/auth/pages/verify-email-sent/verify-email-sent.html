@@ -1,0 +1,56 @@
+<div class="max-w-md mx-auto">
+  <div class="card text-center">
+    <div class="flex flex-col items-center space-y-4">
+      <div
+        class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center"
+      >
+        <lucide-angular
+          [img]="icons.Mail"
+          [size]="32"
+          class="text-blue-600"
+        ></lucide-angular>
+      </div>
+
+      <h1 class="text-2xl font-bold">Check Your Email</h1>
+
+      <div class="space-y-2">
+        <p class="text-muted">We've sent a verification email to:</p>
+        <p class="font-semibold text-primary">{{ email() }}</p>
+      </div>
+
+      <div class="space-y-3 text-sm text-muted">
+        <p>
+          Please check your inbox and click the verification link to activate
+          your account.
+        </p>
+        <p>You must verify your email before you can log in.</p>
+      </div>
+
+      <div class="flex flex-col gap-3 w-full">
+        <button
+          (click)="resendVerification()"
+          [disabled]="resending()"
+          class="btn btn-primary"
+        >
+          @if (resending()) {
+          <div class="flex items-center justify-center gap-2">
+            <div
+              class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
+            ></div>
+            <span>Sending...</span>
+          </div>
+          } @else { Resend Verification Email }
+        </button>
+
+        <button (click)="goToLogin()" class="btn btn-outline">
+          Back to Login
+        </button>
+      </div>
+
+      <div class="text-xs text-muted space-y-1">
+        <p>Didn't receive the email?</p>
+        <p>Check your spam folder or try resending the verification email.</p>
+      </div>
+    </div>
+  </div>
+</div>
