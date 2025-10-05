@@ -61,6 +61,7 @@ export interface TournamentSearch {
   startDateFrom?: string;
   startDateTo?: string;
   isPublic?: boolean;
+  scope?: 'public' | 'my' | 'all';
   pageNumber?: number;
   pageSize?: number;
 }

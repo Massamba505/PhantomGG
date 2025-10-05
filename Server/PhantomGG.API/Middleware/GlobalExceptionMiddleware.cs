@@ -27,21 +27,16 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
     {
         var response = context.Response;
         response.ContentType = "application/json";
-        var statusCode = exception switch
-        {
-            ValidationException => HttpStatusCode.BadRequest,
-            UnauthorizedException => HttpStatusCode.Unauthorized,
-            ForbiddenException => HttpStatusCode.Forbidden,
-            NotFoundException => HttpStatusCode.NotFound,
-            ConflictException => HttpStatusCode.Conflict,
-            _ => HttpStatusCode.InternalServerError
-        };
 
-        var message = exception.Message;
-        if (statusCode == HttpStatusCode.InternalServerError)
+        var (statusCode, message) = exception switch
         {
-            message = "An internal server error occurred";
-        }
+            ValidationException => (HttpStatusCode.BadRequest, exception.Message),
+            UnauthorizedException => (HttpStatusCode.Unauthorized, exception.Message),
+            ForbiddenException => (HttpStatusCode.Forbidden, exception.Message),
+            NotFoundException => (HttpStatusCode.NotFound, exception.Message),
+            ConflictException => (HttpStatusCode.Conflict, exception.Message),
+            _ => (HttpStatusCode.InternalServerError, "An internal server error occurred")
+        };
 
         var apiResponse = new ApiResponse
         {
@@ -58,5 +53,4 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
 
         await response.WriteAsync(jsonResponse);
     }
-
 }

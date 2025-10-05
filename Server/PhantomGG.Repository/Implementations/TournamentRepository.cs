@@ -20,16 +20,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
-    public async Task<IEnumerable<Tournament>> GetAllAsync()
-    {
-        return await _context.Tournaments
-            .Include(t => t.Organizer)
-            .Include(t => t.TournamentTeams)
-            .Where(t => t.IsPublic)
-            .OrderByDescending(t => t.CreatedAt)
-            .ToListAsync();
-    }
-
     public async Task<Tournament> CreateAsync(Tournament tournament)
     {
         _context.Tournaments.Add(tournament);
@@ -53,26 +43,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Tournament>> GetByOrganizerAsync(Guid organizerId)
-    {
-        return await _context.Tournaments
-            .Include(t => t.Organizer)
-            .Include(t => t.TournamentTeams)
-            .Where(t => t.OrganizerId == organizerId)
-            .OrderByDescending(t => t.CreatedAt)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Tournament>> GetTournamentsByTeamAsync(Guid teamId)
-    {
-        return await _context.Tournaments
-            .Include(t => t.TournamentTeams)
-            .Where(t => t.TournamentTeams.Any(tt => tt.TeamId == teamId))
-            .OrderBy(t => t.StartDate)
-            .ToListAsync();
-    }
-
-    public async Task<PaginatedResult<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId)
+    public async Task<PaginatedResult<Tournament>> SearchAsync(TournamentSearchDto searchDto, Guid? organizerId = null)
     {
         var query = _context.Tournaments
             .Include(t => t.Organizer)
@@ -126,6 +97,15 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         return new PaginatedResult<Tournament>(tournaments, totalRecords);
     }
 
+    public async Task<IEnumerable<Tournament>> GetTournamentsByTeamAsync(Guid teamId)
+    {
+        return await _context.Tournaments
+            .Include(t => t.TournamentTeams)
+            .Where(t => t.TournamentTeams.Any(tt => tt.TeamId == teamId))
+            .OrderBy(t => t.StartDate)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<TournamentTeam>> GetTournamentTeamsAsync(Guid tournamentId)
     {
         return await _context.TournamentTeams
@@ -162,12 +142,6 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
                                        tt.TeamId == teamId);
     }
 
-    public async Task<int> GetTournamentTeamCountAsync(Guid tournamentId)
-    {
-        return await _context.TournamentTeams
-            .CountAsync(tt => tt.TournamentId == tournamentId);
-    }
-
     public async Task RegisterTeamForTournamentAsync(TournamentTeam tournamentTeam)
     {
         _context.TournamentTeams.Add(tournamentTeam);
@@ -178,7 +152,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         registration.Status = status.ToString();
 
-        if(status == TeamRegistrationStatus.Approved)
+        if (status == TeamRegistrationStatus.Approved)
         {
             registration.AcceptedAt = DateTime.UtcNow;
         }
