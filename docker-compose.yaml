@@ -69,6 +69,14 @@ services:
       - CookieSettings__Path=${COOKIE_PATH}
       - CookieSettings__Secure=${COOKIE_SECURE}
       - CookieSettings__HttpOnly=${COOKIE_HTTP_ONLY}
+      - EmailSettings__SmtpHost=${EMAIL_SMTP_HOST}
+      - EmailSettings__SmtpPort=${EMAIL_SMTP_PORT}
+      - EmailSettings__UseSsl=${EMAIL_USE_SSL}
+      - EmailSettings__Username=${EMAIL_USERNAME}
+      - EmailSettings__Password=${EMAIL_PASSWORD}
+      - EmailSettings__FromEmail=${EMAIL_FROM_EMAIL}
+      - EmailSettings__FromName=${EMAIL_FROM_NAME}
+      - EmailSettings__FrontendBaseUrl=${FRONTEND_BASE_URL}
     depends_on:
       flyway:
         condition: service_completed_successfully
