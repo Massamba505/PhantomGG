@@ -180,7 +180,7 @@ public class TournamentService(
             throw new ForbiddenException("Team is already registered for this tournament");
         }
 
-        var approvedCount = await _tournamentRepository.GetApprovedTeamCountAsync(tournamentId);
+        var approvedCount = await _tournamentRepository.GetTeamCountAsync(tournamentId, TeamRegistrationStatus.Approved);
         if (approvedCount >= tournament.MaxTeams)
         {
             throw new ForbiddenException("Tournament has reached maximum team capacity");
@@ -219,13 +219,19 @@ public class TournamentService(
             throw new ForbiddenException("Team is not registered for this tournament");
         }
 
-        await _tournamentRepository.RemoveTeamFromTournamentAsync(tournamentId, team.Id);
+        var registration = await _tournamentRepository.GetTeamRegistrationAsync(tournament.Id, team.Id);
+        if (registration == null)
+        {
+            throw new NotFoundException("Team registration not found");
+        }
+
+        await _tournamentRepository.RemoveTeamFromTournamentAsync(registration);
     }
 
     public async Task<IEnumerable<TournamentTeamDto>> GetPendingTeamsAsync(Guid tournamentId, Guid organizerId)
     {
         await ValidateOrganizerAccessAsync(tournamentId, organizerId);
-        var tournamentTeams = await _tournamentRepository.GetPendingTeamsAsync(tournamentId);
+        var tournamentTeams = await _tournamentRepository.GetTournamentTeamByStatus(tournamentId, TeamRegistrationStatus.Pending);
         return tournamentTeams.Select(tt => tt.ToDto());
     }
 
@@ -238,18 +244,19 @@ public class TournamentService(
         {
             throw new NotFoundException("Team registration not found");
         }
+
         if (registration.Status != TeamRegistrationStatus.Pending.ToString())
         {
             throw new ForbiddenException("Only pending registrations can be approved");
         }
 
-        var approvedCount = await _tournamentRepository.GetApprovedTeamCountAsync(tournamentId);
+        var approvedCount = await _tournamentRepository.GetTeamCountAsync(tournamentId, TeamRegistrationStatus.Approved);
         if (approvedCount >= tournament.MaxTeams)
         {
             throw new ForbiddenException("Tournament has reached maximum team capacity");
         }
 
-        await _tournamentRepository.ApproveTeamAsync(tournamentId, teamId);
+        await _tournamentRepository.ChangeTeamRegistrationStatusAsync(registration, TeamRegistrationStatus.Approved);
     }
 
     public async Task RejectTeamAsync(Guid tournamentId, Guid teamId, Guid organizerId)
@@ -266,7 +273,7 @@ public class TournamentService(
             throw new ForbiddenException("Only pending registrations can be rejected");
         }
 
-        await _tournamentRepository.RejectTeamAsync(tournamentId, teamId);
+        await _tournamentRepository.ChangeTeamRegistrationStatusAsync(registration, TeamRegistrationStatus.Rejected);
     }
 
     public async Task CreateTournamentBracketAsync(Guid tournamentId, Guid organizerId)

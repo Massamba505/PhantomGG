@@ -22,7 +22,6 @@
     <ProjectReference Include="..\PhantomGG.Models\PhantomGG.Models.csproj" />
     <ProjectReference Include="..\PhantomGG.Repository\PhantomGG.Repository.csproj" />
     <ProjectReference Include="..\PhantomGG.Service\PhantomGG.Service.csproj" />
-    <ProjectReference Include="..\PhantomGG.Validation\PhantomGG.Validation.csproj" />
   </ItemGroup>
 
   <ItemGroup>
