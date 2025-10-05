@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Models.DTOs.Player;
-using PhantomGG.Models.Entities;
 using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.API.Controllers;
@@ -18,12 +17,15 @@ public class TeamsController(
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
     /// <summary>
-    /// Get all teams with search and filtering
+    /// team search 
     /// </summary>
     [HttpGet]
     public async Task<ActionResult<ApiResponse>> GetTeams([FromQuery] TeamSearchDto searchDto)
     {
-        var teams = await _teamService.SearchAsync(searchDto);
+        var currentUser = _currentUserService.GetCurrentUser();
+        Guid? userId = currentUser?.Id;
+
+        var teams = await _teamService.SearchAsync(searchDto, userId);
         return Ok(new ApiResponse
         {
             Success = true,
@@ -59,24 +61,6 @@ public class TeamsController(
             Success = true,
             Data = players,
             Message = "Team players retrieved successfully"
-        });
-    }
-
-    /// <summary>
-    /// Get current user's teams
-    /// </summary>
-    [HttpGet("my-teams")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse>> GetMyTeams([FromQuery] TeamSearchDto searchDto)
-    {
-        var currentUser = _currentUserService.GetCurrentUser();
-        var teams = await _teamService.GetMyTeamsAsync(searchDto, currentUser.Id);
-
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = teams,
-            Message = "Your teams retrieved successfully"
         });
     }
 
@@ -130,34 +114,6 @@ public class TeamsController(
         {
             Success = true,
             Message = "Team deleted successfully"
-        });
-    }
-
-    /// <summary>
-    /// Upload team logo
-    /// </summary>
-    [HttpPost("{id:guid}/logo")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse>> UploadTeamLogo(Guid id, IFormFile file)
-    {
-        var currentUser = _currentUserService.GetCurrentUser();
-        var team = await _teamService.GetByIdAsync(id);
-
-        var teamEntity = new Team
-        {
-            Id = team.Id,
-            Name = team.Name,
-            UserId = team.UserId,
-            LogoUrl = team.LogoUrl
-        };
-
-        var logoUrl = await _teamService.UploadLogoAsync(teamEntity, file);
-
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = new { logoUrl },
-            Message = "Team logo uploaded successfully"
         });
     }
 

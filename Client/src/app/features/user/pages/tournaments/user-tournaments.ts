@@ -88,11 +88,11 @@ export class UserTournaments implements OnInit {
   }
 
   loadMyTeams() {
-    this.teamService.getMyTeams().subscribe({
-      next: (response) => {
+    this.teamService.getTeams({ scope: 'my' }).subscribe({
+      next: (response: any) => {
         this.myTeams.set(response.data);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Failed to load teams:', error);
       }
     });
@@ -176,9 +176,7 @@ export class UserTournaments implements OnInit {
     
     this.isJoiningTournament.set(true);
     
-    this.tournamentService.registerForTournament(tournament.id, {
-      teamId: team.id
-    }).subscribe({
+    this.tournamentService.registerForTournament(tournament.id, team.id).subscribe({
       next: () => {
         this.toastService.success(`Successfully registered ${team.name} for ${tournament.name}`);
         this.loadTournaments();

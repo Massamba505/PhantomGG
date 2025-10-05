@@ -16,11 +16,19 @@ export function errorInterceptor(
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-       debugger;
+      const isAuthEndpoint = req.url.includes('/auth/login') || 
+                            req.url.includes('/auth/register') || 
+                            req.url.includes('/auth/refresh');
+      
       if (error.status === 401) {
-        if (req.url.includes('/refresh')) {
-          return throwError(() => error);
+        if (isAuthEndpoint) {
+          if (req.url.includes('/refresh')) {
+            toast.error('Your session has expired. Please log in again.');
+          } else {
+            toast.error(error.error?.message);
+          }
         }
+        return throwError(() => error);
       }
       
       if (error.status === 0) {

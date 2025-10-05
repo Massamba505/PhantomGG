@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PhantomGG.Models.Entities;
+namespace PhantomGG.Repository.Entities;
 
 public partial class User
 {

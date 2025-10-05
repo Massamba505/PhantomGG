@@ -1,5 +1,5 @@
 using PhantomGG.Models.DTOs.AuthToken;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 
 namespace PhantomGG.Service.Interfaces;
 

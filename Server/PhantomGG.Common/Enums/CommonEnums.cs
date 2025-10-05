@@ -64,3 +64,25 @@ public enum PlayerPosition
     Midfielder,
     Forward
 }
+
+public enum TournamentScope
+{
+    Public,
+    My,
+    All
+}
+
+public enum TeamScope
+{
+    Public,
+    My,
+    All
+}
+
+public enum TeamAction
+{
+    Register = 0,
+    Withdraw = 1,
+    Approve = 3,
+    Reject = 4
+}

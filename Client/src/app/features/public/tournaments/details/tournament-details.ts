@@ -93,14 +93,14 @@ export class TournamentDetails implements OnInit {
     
     try {
       const [tournament, teams, statistics] = await Promise.all([
-        this.tournamentService.getPublicTournament(tournamentId),
-        this.tournamentService.getPublicTournamentTeams(tournamentId),
-        this.tournamentService.getPublicTournamentStatistics(tournamentId).catch(() => null) // Optional
+        this.tournamentService.getTournament(tournamentId).toPromise(),
+        this.tournamentService.getTournamentTeams(tournamentId).toPromise(),
+        this.tournamentService.getTournamentStatistics(tournamentId).toPromise().catch(() => null) // Optional
       ]);
       
-      this.tournament.set(tournament);
-      this.teams.set(teams);
-      this.statistics.set(statistics);
+      this.tournament.set(tournament || null);
+      this.teams.set(teams || []);
+      this.statistics.set(statistics || null);
     } catch (error) {
       this.loading.set(false);
     } finally {

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Match;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Data;
 
 namespace PhantomGG.Repository.Implementations;
@@ -163,7 +163,7 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
     public async Task<int> GetCompletedMatchCountAsync(Guid tournamentId)
     {
         return await _context.Matches
-            .CountAsync(m => m.TournamentId == tournamentId && 
+            .CountAsync(m => m.TournamentId == tournamentId &&
                 m.Status == MatchStatus.Completed.ToString());
     }
 

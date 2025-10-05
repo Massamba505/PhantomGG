@@ -40,16 +40,16 @@ export class TournamentTeamManagementComponent implements OnInit {
   loadTeams() {
     this.isLoading.set(true);
     
-    this.tournamentService.getTournamentTeams(this.tournamentId()).subscribe({
+    this.tournamentService.getTournamentTeams(this.tournamentId(), "Approved").subscribe({
       next: (teams) => {
-        this.approvedTeams.set(teams.filter(team => team.status === 'Approved'));
+        this.approvedTeams.set(teams);
       },
       complete: () => {
         this.isLoading.set(false);
       }
     });
 
-    this.tournamentService.getPendingTeams(this.tournamentId()).subscribe({
+    this.tournamentService.getTournamentTeams(this.tournamentId(), "pending").subscribe({
       next: (teams) => {
         this.pendingTeams.set(teams);
       }
@@ -109,12 +109,12 @@ export class TournamentTeamManagementComponent implements OnInit {
   removeTeam(team: TournamentTeam) {
     this.setActionLoading(team.id, true);
     
-    this.tournamentService.removeTeam(this.tournamentId(), team.id).subscribe({
+    this.tournamentService.rejectTeam(this.tournamentId(), team.id).subscribe({
       next: () => {
         this.toastService.success(`${team.name} has been removed from the tournament`);
-        this.loadTeams(); // Reload to get updated data
+        this.loadTeams();
       },
-      error: (error) => {
+      error: () => {
         this.setActionLoading(team.id, false);
       },
       complete: () => {

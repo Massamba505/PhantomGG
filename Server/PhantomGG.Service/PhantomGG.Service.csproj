@@ -10,7 +10,6 @@
     <ProjectReference Include="..\PhantomGG.Common\PhantomGG.Common.csproj" />
     <ProjectReference Include="..\PhantomGG.Models\PhantomGG.Models.csproj" />
     <ProjectReference Include="..\PhantomGG.Repository\PhantomGG.Repository.csproj" />
-    <ProjectReference Include="..\PhantomGG.Validation\PhantomGG.Validation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

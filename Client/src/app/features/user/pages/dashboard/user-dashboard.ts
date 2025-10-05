@@ -32,11 +32,11 @@ export class UserDashboard implements OnInit {
   }
 
   loadMyTeams() {
-    this.teamService.getMyTeams().subscribe({
-      next: (response) => {
+    this.teamService.getTeams({ scope: 'my' }).subscribe({
+      next: (response: any) => {
         this.myTeams.set(response.data);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Failed to load teams:', error);
       }
     });

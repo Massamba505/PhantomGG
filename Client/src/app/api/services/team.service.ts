@@ -31,10 +31,6 @@ export class TeamService {
     return this.apiClient.get<Player[]>(API_ENDPOINTS.TEAMS.PLAYERS(id));
   }
 
-  getMyTeams(params?: TeamSearch): Observable<PaginatedResponse<Team>> {
-    return this.apiClient.getPaginated<Team>(API_ENDPOINTS.TEAMS.MY_TEAMS, params);
-  }
-
   createTeam(team: CreateTeam): Observable<Team> {
     const formData = new FormData();
     formData.append('Name', team.name);
@@ -69,10 +65,6 @@ export class TeamService {
 
   deleteTeam(id: string): Observable<void> {
     return this.apiClient.delete<void>(API_ENDPOINTS.TEAMS.DELETE(id));
-  }
-
-  uploadTeamLogo(teamId: string, file: File): Observable<{ logoUrl: string }> {
-    return this.apiClient.uploadFile<{ logoUrl: string }>(API_ENDPOINTS.TEAMS.UPLOAD_LOGO(teamId), file);
   }
 
   addPlayerToTeam(teamId: string, playerData: CreatePlayer): Observable<Player> {

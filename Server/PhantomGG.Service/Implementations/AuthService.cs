@@ -5,7 +5,7 @@ using PhantomGG.Repository.Interfaces;
 using PhantomGG.Common.Enums;
 using PhantomGG.Common.Helpers;
 using PhantomGG.Models.DTOs.Auth;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 using System.Text.RegularExpressions;
 using PhantomGG.Service.Mappings;
 

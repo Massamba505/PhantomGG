@@ -1,5 +1,5 @@
 using PhantomGG.Models.DTOs.User;
-using PhantomGG.Models.Entities;
+using PhantomGG.Repository.Entities;
 
 namespace PhantomGG.Service.Mappings;
 

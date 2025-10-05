@@ -72,8 +72,8 @@ export class TournamentListComponent implements OnInit {
   loadTournaments() {
     this.isLoading.set(true);
 
-    this.tournamentService.getMyTournaments(this.searchCriteria()).subscribe({
-      next: (response) => {
+    this.tournamentService.getTournaments({ ...this.searchCriteria(), scope: 'my' }).subscribe({
+      next: (response: any) => {
         this.tournaments.set(response.data);
         this.paginationData.set(response);
       },

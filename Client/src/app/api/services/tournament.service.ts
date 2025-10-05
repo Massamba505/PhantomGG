@@ -28,25 +28,46 @@ export class TournamentService {
     return this.apiClient.get<Tournament>(API_ENDPOINTS.TOURNAMENTS.GET(id));
   }
 
-  getTournamentTeams(id: string): Observable<TournamentTeam[]> {
-    return this.apiClient.get<TournamentTeam[]>(API_ENDPOINTS.TOURNAMENTS.TEAMS(id));
+  getTournamentTeams(id: string, status?: "Approved" | "pending"): Observable<TournamentTeam[]> {
+    const url = status ? `${API_ENDPOINTS.TOURNAMENTS.TEAMS(id)}?status=${status}` : API_ENDPOINTS.TOURNAMENTS.TEAMS(id);
+    return this.apiClient.get<TournamentTeam[]>(url);
   }
 
-  getMyTournaments(params?: TournamentSearch): Observable<PaginatedResponse<Tournament>> {
-    return this.apiClient.getPaginated<Tournament>(API_ENDPOINTS.TOURNAMENTS.MY_TOURNAMENTS, params);
+  getTournamentMatches(id: string): Observable<any[]> {
+    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.MATCHES(id));
   }
 
-  registerForTournament(tournamentId: string, registrationData: any): Observable<void> {
-    return this.apiClient.post<void>(API_ENDPOINTS.TOURNAMENTS.REGISTER(tournamentId), registrationData);
+  getTournamentStatistics(id: string): Observable<TournamentStatistics> {
+    return this.apiClient.get<TournamentStatistics>(API_ENDPOINTS.TOURNAMENTS.STATISTICS(id));
   }
 
-  withdrawFromTournament(tournamentId: string, withdrawData: any): Observable<void> {
-    return this.apiClient.post<void>(API_ENDPOINTS.TOURNAMENTS.WITHDRAW(tournamentId), withdrawData);
+  getTournamentStandings(id: string): Observable<any[]> {
+    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.STANDINGS(id));
+  }
+
+  manageTeam(tournamentId: string, teamId: string | null, action: 0 | 1 | 2 | 3): Observable<void> {
+    const actionData = { action, teamId };
+    const endpoint = teamId ? API_ENDPOINTS.TOURNAMENTS.MANAGE_TEAM(tournamentId, teamId) : API_ENDPOINTS.TOURNAMENTS.MANAGE_TEAM(tournamentId);
+    return this.apiClient.put<void>(endpoint, actionData);
+  }
+
+  registerForTournament(tournamentId: string, teamId: string): Observable<void> {
+    return this.manageTeam(tournamentId, teamId, 0);
+  }
+
+  withdrawFromTournament(tournamentId: string, teamId: string): Observable<void> {
+    return this.manageTeam(tournamentId, teamId, 1);
+  }
+
+  approveTeam(tournamentId: string, teamId: string): Observable<void> {
+    return this.manageTeam(tournamentId, teamId, 2);
+  }
+
+  rejectTeam(tournamentId: string, teamId: string): Observable<void> {
+    return this.manageTeam(tournamentId, teamId, 3);
   }
 
   createTournament(tournament: CreateTournament): Observable<Tournament> {
-    console.log('Creating tournament with data:', tournament);
-    
     const formData = new FormData();
     formData.append('Name', tournament.name);
     formData.append('Description', tournament.description);
@@ -71,11 +92,9 @@ export class TournamentService {
     }
     formData.append('IsPublic', tournament.isPublic.toString());
     
-    // Debug: Log FormData entries
-    console.log('FormData entries:');
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(`${key}:`, value);
+    // }
     
     return this.apiClient.postFormData<Tournament>(API_ENDPOINTS.TOURNAMENTS.CREATE, formData);
   }
@@ -126,50 +145,11 @@ export class TournamentService {
     return this.apiClient.delete<void>(API_ENDPOINTS.TOURNAMENTS.DELETE(id));
   }
 
-  uploadTournamentBanner(tournamentId: string, file: File): Observable<{ imageUrl: string }> {
-    return this.apiClient.uploadFile<{ imageUrl: string }>(API_ENDPOINTS.TOURNAMENTS.UPLOAD_BANNER(tournamentId), file);
-  }
-
-  uploadTournamentLogo(tournamentId: string, file: File): Observable<{ imageUrl: string }> {
-    return this.apiClient.uploadFile<{ imageUrl: string }>(API_ENDPOINTS.TOURNAMENTS.UPLOAD_LOGO(tournamentId), file);
-  }
-
-  getPendingTeams(tournamentId: string): Observable<TournamentTeam[]> {
-    return this.apiClient.get<TournamentTeam[]>(API_ENDPOINTS.TOURNAMENTS.PENDING_TEAMS(tournamentId));
-  }
-
-  approveTeam(tournamentId: string, teamId: string): Observable<void> {
-    return this.apiClient.post<void>(API_ENDPOINTS.TOURNAMENTS.APPROVE_TEAM(tournamentId, teamId), {});
-  }
-
-  rejectTeam(tournamentId: string, teamId: string): Observable<void> {
-    return this.apiClient.post<void>(API_ENDPOINTS.TOURNAMENTS.REJECT_TEAM(tournamentId, teamId), {});
-  }
-
-  removeTeam(tournamentId: string, teamId: string): Observable<void> {
-    return this.apiClient.delete<void>(API_ENDPOINTS.TOURNAMENTS.REMOVE_TEAM(tournamentId, teamId));
+  createTournamentBracket(tournamentId: string): Observable<void> {
+    return this.apiClient.post<void>(API_ENDPOINTS.TOURNAMENTS.CREATE_BRACKET(tournamentId), {});
   }
 
   getTournamentFormats(): TournamentFormat[] {
     return getTournamentFormats();
   }
-
-  // Public methods for browsing tournaments
-  getPublicTournaments(params?: TournamentSearch): Promise<PaginatedResponse<Tournament>> {
-    const searchParams = { ...params, isPublic: true };
-    return this.apiClient.getPaginated<Tournament>(API_ENDPOINTS.TOURNAMENTS.PUBLIC, searchParams).toPromise() as Promise<PaginatedResponse<Tournament>>;
-  }
-
-  getPublicTournament(id: string): Promise<Tournament> {
-    return this.apiClient.get<Tournament>(API_ENDPOINTS.TOURNAMENTS.PUBLIC_DETAILS(id)).toPromise() as Promise<Tournament>;
-  }
-
-  getPublicTournamentTeams(id: string): Promise<TournamentTeam[]> {
-    return this.apiClient.get<TournamentTeam[]>(API_ENDPOINTS.TOURNAMENTS.PUBLIC_TEAMS(id)).toPromise() as Promise<TournamentTeam[]>;
-  }
-
-  getPublicTournamentStatistics(id: string): Promise<TournamentStatistics> {
-    return this.apiClient.get<TournamentStatistics>(API_ENDPOINTS.TOURNAMENTS.PUBLIC_STATISTICS(id)).toPromise() as Promise<TournamentStatistics>;
-  }
-
 }

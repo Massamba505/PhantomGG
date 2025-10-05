@@ -35,6 +35,7 @@ export interface UpdateTeam {
 
 export interface TeamSearch {
   searchTerm?: string;
+  scope?: 'public' | 'my' | 'all';
   pageNumber?: number;
   pageSize?: number;
 }
