@@ -8,7 +8,6 @@ import {
   CreateTournament,
   UpdateTournament,
   TournamentSearch,
-  TournamentStatistics,
   TournamentFormat,
   getTournamentFormats
 } from '../models/tournament.models';
@@ -35,10 +34,6 @@ export class TournamentService {
 
   getTournamentMatches(id: string): Observable<any[]> {
     return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.MATCHES(id));
-  }
-
-  getTournamentStatistics(id: string): Observable<TournamentStatistics> {
-    return this.apiClient.get<TournamentStatistics>(API_ENDPOINTS.TOURNAMENTS.STATISTICS(id));
   }
 
   getTournamentStandings(id: string): Observable<any[]> {

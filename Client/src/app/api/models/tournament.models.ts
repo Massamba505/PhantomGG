@@ -77,25 +77,6 @@ export interface TournamentFormat {
   description: string;
 }
 
-export interface TournamentStatistics {
-  tournamentId: string;
-  totalTeams: number;
-  totalMatches: number;
-  completedMatches: number;
-  totalGoals: number;
-  averageGoalsPerMatch: number;
-  topScorer?: {
-    playerId: string;
-    playerName: string;
-    goals: number;
-  };
-  mostAssists?: {
-    playerId: string;
-    playerName: string;
-    assists: number;
-  };
-}
-
 export function getTournamentFormats(): TournamentFormat[] {
   return [
     {

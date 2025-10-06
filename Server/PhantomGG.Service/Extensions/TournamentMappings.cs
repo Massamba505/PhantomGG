@@ -1,6 +1,9 @@
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Repository.Entities;
+using System.Text;
+using System.Text.Json;
 
 namespace PhantomGG.Service.Mappings;
 
@@ -79,5 +82,12 @@ public static class TournamentMappings
             tournament.IsPublic = updateDto.IsPublic.Value;
 
         tournament.UpdatedAt = DateTime.UtcNow;
+    }
+
+    public static string GetDeterministicKey(this TournamentSearchDto dto)
+    {
+        return Convert.ToBase64String(
+            Encoding.UTF8.GetBytes(JsonSerializer.Serialize(dto))
+        );
     }
 }

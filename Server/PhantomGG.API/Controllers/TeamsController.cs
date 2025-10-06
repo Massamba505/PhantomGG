@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
-using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Models.DTOs.Player;
+using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.API.Controllers;
@@ -23,7 +24,7 @@ public class TeamsController(
     public async Task<ActionResult<ApiResponse>> GetTeams([FromQuery] TeamSearchDto searchDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        Guid? userId = currentUser?.Id;
+        Guid? userId = currentUser.Role == UserRoles.Organizer.ToString() ? currentUser?.Id : null;
 
         var teams = await _teamService.SearchAsync(searchDto, userId);
         return Ok(new ApiResponse

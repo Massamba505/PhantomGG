@@ -23,7 +23,7 @@ public class TournamentsController(
     public async Task<ActionResult<ApiResponse>> GetTournaments([FromQuery] TournamentSearchDto searchDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        Guid? userId = currentUser?.Id;
+        Guid? userId = currentUser.Role == UserRoles.Organizer.ToString()? currentUser?.Id : null;
 
         var tournaments = await _tournamentService.SearchAsync(searchDto, userId);
         return Ok(new ApiResponse
@@ -56,7 +56,7 @@ public class TournamentsController(
     public async Task<ActionResult<ApiResponse>> GetTournamentTeams(Guid id, [FromQuery] TeamRegistrationStatus status = TeamRegistrationStatus.Approved)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        Guid? userId = currentUser?.Id;
+        Guid? userId = currentUser.Role == UserRoles.Organizer.ToString() ? currentUser?.Id : null;
 
         var tournamentTeams = await _tournamentService.GetTournamentTeamsAsync(id, userId, status);
 

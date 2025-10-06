@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Hybrid;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Match;
@@ -16,48 +17,65 @@ namespace PhantomGG.Service.Implementations;
 public class TournamentService(
     ITournamentRepository tournamentRepository,
     ITeamService teamService,
-    IImageService imageService) : ITournamentService
+    IImageService imageService,
+    HybridCache cache) : ITournamentService
 {
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
     private readonly ITeamService _teamService = teamService;
     private readonly IImageService _imageService = imageService;
+    private readonly HybridCache _cache = cache;
 
     public async Task<PaginatedResponse<TournamentDto>> SearchAsync(TournamentSearchDto searchDto, Guid? userId = null)
     {
-        switch (searchDto.Scope)
+        if (userId.HasValue)
         {
-            case TournamentScope.Public:
-                searchDto.IsPublic = true;
-                break;
-            case TournamentScope.My when userId.HasValue:
-                var paginatedResult = await _tournamentRepository.SearchAsync(searchDto, organizerId: userId.Value);
-                return new PaginatedResponse<TournamentDto>(
-                    paginatedResult.Items.Select(t => t.ToDto()),
-                    searchDto.PageNumber,
-                    searchDto.PageSize,
-                    totalRecords: paginatedResult.TotalRecords
-                );
-            case TournamentScope.My when !userId.HasValue:
-                throw new UnauthorizedException("Authentication required for accessing user tournaments");
-            case TournamentScope.All:
-            default:
-                searchDto.IsPublic = true;
-                break;
+            var myTournaments = await _tournamentRepository.SearchAsync(searchDto, organizerId: userId.Value);
+            return new PaginatedResponse<TournamentDto>(
+                myTournaments.Items.Select(t => t.ToDto()),
+                searchDto.PageNumber,
+                searchDto.PageSize,
+                totalRecords: myTournaments.TotalRecords
+            );
         }
 
-        var result = await _tournamentRepository.SearchAsync(searchDto);
-        return new PaginatedResponse<TournamentDto>(
-            result.Items.Select(t => t.ToDto()),
-            searchDto.PageNumber,
-            searchDto.PageSize,
-            totalRecords: result.TotalRecords
+        searchDto.IsPublic = true;
+        string cacheKey = $"tournaments_search_{searchDto.GetDeterministicKey()}_{searchDto.PageNumber}_{searchDto.PageSize}";
+        return await _cache.GetOrCreateAsync(
+            cacheKey,
+            async cancel =>
+            {
+                var publicResult = await _tournamentRepository.SearchAsync(searchDto);
+                return new PaginatedResponse<TournamentDto>(
+                    publicResult.Items.Select(t => t.ToDto()),
+                    searchDto.PageNumber,
+                    searchDto.PageSize,
+                    totalRecords: publicResult.TotalRecords
+                );
+            },
+            options: new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(5)
+            },
+            cancellationToken: CancellationToken.None
         );
     }
 
+
     public async Task<TournamentDto> GetByIdAsync(Guid id)
     {
-        var tournament = await ValidateTournamentExistsAsync(id);
-        return tournament.ToDto();
+        return await _cache.GetOrCreateAsync(
+            $"tournament_{id}",
+            async cancel =>
+            {
+                var tournament = await ValidateTournamentExistsAsync(id);
+                return tournament.ToDto();
+            },
+            options: new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(10)
+            },
+            cancellationToken: CancellationToken.None
+        );
     }
 
     public async Task<TournamentDto> CreateAsync(CreateTournamentDto createDto, Guid organizerId)
@@ -119,6 +137,24 @@ public class TournamentService(
 
     public async Task<IEnumerable<TournamentTeamDto>> GetTournamentTeamsAsync(Guid tournamentId, Guid? userId = null, TeamRegistrationStatus status = TeamRegistrationStatus.Approved)
     {
+        if (status == TeamRegistrationStatus.Approved && !userId.HasValue)
+        {
+            return await _cache.GetOrCreateAsync(
+                $"tournament_teams_{tournamentId}_{status}",
+                async cancel =>
+                {
+                    var tournament = await ValidateTournamentExistsAsync(tournamentId);
+                    IEnumerable<TournamentTeam> tournamentTeams = await _tournamentRepository.GetTournamentTeamByStatus(tournamentId, status);
+                    return tournamentTeams.Select(tt => tt.ToDto());
+                },
+                options: new HybridCacheEntryOptions
+                {
+                    Expiration = TimeSpan.FromMinutes(15)
+                },
+                cancellationToken: CancellationToken.None
+            );
+        }
+
         var tournament = await ValidateTournamentExistsAsync(tournamentId);
 
         if (userId.HasValue && tournament.OrganizerId != userId.Value && status != TeamRegistrationStatus.Approved)
@@ -127,7 +163,6 @@ public class TournamentService(
         }
 
         IEnumerable<TournamentTeam> tournamentTeams = await _tournamentRepository.GetTournamentTeamByStatus(tournamentId, status);
-
         return tournamentTeams.Select(tt => tt.ToDto());
     }
 
@@ -140,9 +175,20 @@ public class TournamentService(
 
     public async Task<IEnumerable<MatchDto>> GetTournamentMatchesAsync(Guid tournamentId, Guid? userId = null)
     {
-        var tournament = await ValidateTournamentExistsAsync(tournamentId);
-        var matches = await _tournamentRepository.GetTournamentMatchesAsync(tournamentId);
-        return matches.Select(m => m.ToDto());
+        return await _cache.GetOrCreateAsync(
+            $"tournament_matches_{tournamentId}",
+            async cancel =>
+            {
+                var tournament = await ValidateTournamentExistsAsync(tournamentId);
+                var matches = await _tournamentRepository.GetTournamentMatchesAsync(tournamentId);
+                return matches.Select(m => m.ToDto());
+            },
+            options: new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(10)
+            },
+            cancellationToken: CancellationToken.None
+        );
     }
 
     public async Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid tournamentId)

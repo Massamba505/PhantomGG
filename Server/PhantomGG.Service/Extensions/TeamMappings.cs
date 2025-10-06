@@ -1,5 +1,8 @@
 using PhantomGG.Models.DTOs.Team;
+using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Repository.Entities;
+using System.Text;
+using System.Text.Json;
 
 namespace PhantomGG.Service.Mappings;
 
@@ -58,5 +61,11 @@ public static class TeamMappings
             ManagerName = $"{tournamentTeam.Team.User.FirstName} {tournamentTeam.Team.User.LastName}".Trim(),
             ManagerId = tournamentTeam.Team.UserId
         };
+    }
+    public static string GetDeterministicKey(this TeamSearchDto dto)
+    {
+        return Convert.ToBase64String(
+            Encoding.UTF8.GetBytes(JsonSerializer.Serialize(dto))
+        );
     }
 }

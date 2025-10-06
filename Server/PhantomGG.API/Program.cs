@@ -1,6 +1,7 @@
 using PhantomGG.API.Extensions;
 using PhantomGG.API.Middleware;
 using System.Threading.RateLimiting;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace PhantomGG.API;
 
@@ -23,6 +24,7 @@ public class Program
         builder.Services.AddApplicationRepositories();
         builder.Services.AddApplicationServices();
         builder.Services.AddRateLimiting();
+        builder.Services.AddHybridCache();
 
         var app = builder.Build();
 
