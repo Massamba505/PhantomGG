@@ -5,27 +5,39 @@ using PhantomGG.Repository.Interfaces;
 using PhantomGG.Models.DTOs.User;
 using PhantomGG.Common.Enums;
 using PhantomGG.Service.Mappings;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace PhantomGG.Service.Implementations;
 
 public class UserService(
     IUserRepository userRepository,
     IPasswordHasher passwordHasher,
-    IImageService imageService) : IUserService
+    IImageService imageService,
+    HybridCache cache) : IUserService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IImageService _imageService = imageService;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
+    private readonly HybridCache _cache = cache;
 
     public async Task<UserDto> GetByIdAsync(Guid id)
     {
-        var user = await _userRepository.GetByIdAsync(id);
-        if (user == null)
+        var cacheKey = $"user_{id}";
+        var options = new HybridCacheEntryOptions
         {
-            throw new NotFoundException("User not found");
-        }
+            Expiration = TimeSpan.FromMinutes(30)
+        };
 
-        return user.ToDto();
+        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null)
+            {
+                throw new NotFoundException("User not found");
+            }
+
+            return user.ToDto();
+        }, options);
     }
 
     public async Task<UserDto> UpdateProfileAsync(Guid userId, UpdateUserProfileRequest request)

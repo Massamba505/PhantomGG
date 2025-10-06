@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Hybrid;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Player;
@@ -16,45 +17,67 @@ public class TeamService(
     ITournamentRepository tournamentRepository,
     IImageService imageService,
     IPlayerService playerService,
-    IPlayerRepository playerRepository) : ITeamService
+    IPlayerRepository playerRepository,
+    HybridCache cache) : ITeamService
 {
     private readonly ITeamRepository _teamRepository = teamRepository;
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
     private readonly IImageService _imageService = imageService;
     private readonly IPlayerService _playerService = playerService;
     private readonly IPlayerRepository _playerRepository = playerRepository;
+    private readonly HybridCache _cache = cache;
 
     public async Task<PaginatedResponse<TeamDto>> SearchAsync(TeamSearchDto searchDto, Guid? userId = null)
     {
-        switch (searchDto.Scope)
+        if (userId.HasValue)
         {
-            case TeamScope.My when userId.HasValue:
-                var paginatedResult = await _teamRepository.SearchAsync(searchDto, userId: userId.Value);
-                return new PaginatedResponse<TeamDto>(
-                    paginatedResult.Items.Select(t => t.ToDto()),
-                    searchDto.Page,
-                    searchDto.PageSize,
-                    totalRecords: paginatedResult.TotalRecords
-                );
-            case TeamScope.My when !userId.HasValue:
-                throw new UnauthorizedException("Authentication required for accessing user teams");
-            case TeamScope.Public:
-            case TeamScope.All:
-            default:
-                var result = await _teamRepository.SearchAsync(searchDto);
-                return new PaginatedResponse<TeamDto>(
-                    result.Items.Select(t => t.ToDto()),
-                    searchDto.Page,
-                    searchDto.PageSize,
-                    totalRecords: result.TotalRecords
-                );
+            var myTeams = await _teamRepository.SearchAsync(searchDto, userId: userId.Value);
+            return new PaginatedResponse<TeamDto>(
+                myTeams.Items.Select(t => t.ToDto()),
+                searchDto.Page,
+                searchDto.PageSize,
+                totalRecords: myTeams.TotalRecords
+            );
         }
+
+        searchDto.IsPublic = true;
+        string cacheKey = $"teams_search_{searchDto.GetDeterministicKey()}_{searchDto.Page}_{searchDto.PageSize}";
+        return await _cache.GetOrCreateAsync(
+            cacheKey,
+            async cancel =>
+            {
+                var publicTeams = await _teamRepository.SearchAsync(searchDto);
+                return new PaginatedResponse<TeamDto>(
+                    publicTeams.Items.Select(t => t.ToDto()),
+                    searchDto.Page,
+                    searchDto.PageSize,
+                    totalRecords: publicTeams.TotalRecords
+                );
+            },
+            options: new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(5)
+            },
+            cancellationToken: CancellationToken.None
+        );
     }
+
 
     public async Task<TeamDto> GetByIdAsync(Guid teamId)
     {
-        var team = await ValidateTeamExistsAsync(teamId);
-        return team.ToDto();
+        return await _cache.GetOrCreateAsync(
+            $"team_{teamId}",
+            async cancel =>
+            {
+                var team = await ValidateTeamExistsAsync(teamId);
+                return team.ToDto();
+            },
+            options: new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(20)
+            },
+            cancellationToken: CancellationToken.None
+        );
     }
 
     public async Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid managerId)
@@ -120,9 +143,20 @@ public class TeamService(
 
     public async Task<IEnumerable<PlayerDto>> GetTeamPlayersAsync(Guid teamId)
     {
-        var team = await ValidateTeamExistsAsync(teamId);
-        var players = await _playerRepository.GetByTeamAsync(teamId);
-        return players.Select(p => p.ToDto());
+        return await _cache.GetOrCreateAsync(
+            $"team_players_{teamId}",
+            async cancel =>
+            {
+                var team = await ValidateTeamExistsAsync(teamId);
+                var players = await _playerRepository.GetByTeamAsync(teamId);
+                return players.Select(p => p.ToDto());
+            },
+            options: new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(25)
+            },
+            cancellationToken: CancellationToken.None
+        );
     }
 
     public async Task<PlayerDto> AddPlayerToTeamAsync(Guid teamId, CreatePlayerDto playerDto, Guid userId)

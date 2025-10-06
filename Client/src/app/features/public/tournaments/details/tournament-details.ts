@@ -2,12 +2,11 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { Tournament, TournamentStatistics } from '@/app/api/models/tournament.models';
+import { Tournament } from '@/app/api/models/tournament.models';
 import { TournamentTeam } from '@/app/api/models/team.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { TeamCard, TeamRole } from "../../../../shared/components/cards/team-card/team-card";
-import { AuthStateService } from '@/app/store/AuthStateService';
+import { TeamCard, TeamRole } from "@/app/shared/components/cards/team-card/team-card";
 
 @Component({
   selector: 'app-tournament-details',
@@ -22,11 +21,9 @@ import { AuthStateService } from '@/app/store/AuthStateService';
 export class TournamentDetails implements OnInit {
   tournament = signal<Tournament | null>(null);
   teams = signal<TournamentTeam[]>([]);
-  statistics = signal<TournamentStatistics | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
 
-  private authStateStore = inject(AuthStateService);
   readonly icons = LucideIcons;
 
   tournamentStatus = computed(() => {
@@ -92,15 +89,13 @@ export class TournamentDetails implements OnInit {
     this.error.set(null);
     
     try {
-      const [tournament, teams, statistics] = await Promise.all([
+      const [tournament, teams] = await Promise.all([
         this.tournamentService.getTournament(tournamentId).toPromise(),
-        this.tournamentService.getTournamentTeams(tournamentId).toPromise(),
-        this.tournamentService.getTournamentStatistics(tournamentId).toPromise().catch(() => null) // Optional
+        this.tournamentService.getTournamentTeams(tournamentId).toPromise()
       ]);
       
       this.tournament.set(tournament || null);
       this.teams.set(teams || []);
-      this.statistics.set(statistics || null);
     } catch (error) {
       this.loading.set(false);
     } finally {

@@ -65,13 +65,6 @@ public enum PlayerPosition
     Forward
 }
 
-public enum TournamentScope
-{
-    Public,
-    My,
-    All
-}
-
 public enum TeamScope
 {
     Public,

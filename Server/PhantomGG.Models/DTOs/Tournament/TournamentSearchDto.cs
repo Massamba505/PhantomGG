@@ -10,7 +10,6 @@ public class TournamentSearchDto
     public DateTime? StartDateFrom { get; set; }
     public DateTime? StartDateTo { get; set; }
     public bool? IsPublic { get; set; }
-    public TournamentScope? Scope { get; set; } = TournamentScope.All;
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
 }

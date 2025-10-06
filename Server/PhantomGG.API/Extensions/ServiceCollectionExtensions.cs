@@ -57,6 +57,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IImageService, LocalFileImageService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+        services.AddScoped<ICacheInvalidationService, CacheInvalidationService>();
 
         return services;
     }
