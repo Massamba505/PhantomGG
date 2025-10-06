@@ -53,7 +53,13 @@ public static class RateLimitingExtensions
                         QueueLimit = 0
                     }));
 
-            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.OnRejected = async (context, token) =>
+            {
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                context.HttpContext.Response.ContentType = "application/json";
+                var responseBody = "{\"message\": \"Too many requests. Please try again later.\"}";
+                await context.HttpContext.Response.WriteAsync(responseBody, cancellationToken: token);
+            };
         });
 
         return services;

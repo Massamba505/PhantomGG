@@ -29,12 +29,12 @@ public class Program
         // Configure the HTTP request pipeline
         app.UseSwaggerDocumentation(app.Environment);
         app.UseHttpsRedirection();
-        app.UseRateLimiter();
         app.UseStaticFiles();
         app.UseCors("CorsPolicy");
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseRateLimiter();
         app.MapControllers();
 
         app.Run();
