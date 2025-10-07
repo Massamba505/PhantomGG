@@ -7,7 +7,6 @@
   </div>
 
   <div class="filter-form">
-    <!-- Search Input -->
     <div class="form-group">
       <label class="input-label">Search tournaments</label>
       <div class="input-with-icon">
@@ -23,7 +22,6 @@
     </div>
 
     <div class="filter-grid">
-      <!-- Status Filter -->
       <div class="form-group">
         <label class="input-label">Status</label>
         <select class="input-select" [(ngModel)]="status" (change)="onSearch()">
@@ -33,7 +31,6 @@
         </select>
       </div>
 
-      <!-- Location Filter -->
       <div class="form-group">
         <label class="input-label">Location</label>
         <div class="input-with-icon">
@@ -48,7 +45,6 @@
         </div>
       </div>
 
-      <!-- Date Range -->
       <div class="form-group">
         <label class="input-label">Start Date From</label>
         <input
@@ -70,7 +66,6 @@
       </div>
     </div>
 
-    <!-- Action Buttons -->
     <div class="filter-actions">
       <button type="button" class="clear-button" (click)="onClear()">
         <lucide-icon [img]="icons.X" class="button-icon"></lucide-icon>
