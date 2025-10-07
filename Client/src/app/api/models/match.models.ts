@@ -49,7 +49,7 @@ export interface MatchResult {
 
 export interface AutoGenerateFixtures {
   tournamentId: string;
-  tournamentFormat: string; // "RoundRobin" or "SingleElimination"
+  tournamentFormat: string;
   startDate: string;
   daysBetweenRounds?: number;
   defaultVenue?: string;
@@ -77,4 +77,72 @@ export interface FixtureGenerationStatus {
   status: string;
   canGenerateFixtures: boolean;
   message?: string;
+}
+
+export enum MatchEventType {
+  Goal = 'Goal',
+  Assist = 'Assist',
+  YellowCard = 'YellowCard',
+  RedCard = 'RedCard',
+  Foul = 'Foul',
+  Substitution = 'Substitution'
+}
+
+export interface MatchEvent {
+  id: string;
+  matchId: string;
+  eventType: MatchEventType;
+  minute: number;
+  teamId: string;
+  teamName?: string;
+  playerId: string;
+  playerName?: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface CreateMatchEvent {
+  matchId: string;
+  eventType: MatchEventType;
+  minute: number;
+  teamId: string;
+  playerId: string;
+  description?: string;
+}
+
+export interface UpdateMatchEvent {
+  eventType?: MatchEventType;
+  minute?: number;
+  playerId?: string;
+  description?: string;
+}
+
+export interface PlayerEventsSummary {
+  playerId: string;
+  playerName: string;
+  teamId: string;
+  teamName: string;
+  goals: number;
+  assists: number;
+  yellowCards: number;
+  redCards: number;
+  fouls: number;
+  totalEvents: number;
+}
+
+export interface TeamEventsSummary {
+  teamId: string;
+  teamName: string;
+  totalGoals: number;
+  totalAssists: number;
+  totalYellowCards: number;
+  totalRedCards: number;
+  totalFouls: number;
+  totalSubstitutions: number;
+  totalEvents: number;
+  topScorer?: {
+    playerId: string;
+    playerName: string;
+    goals: number;
+  };
 }

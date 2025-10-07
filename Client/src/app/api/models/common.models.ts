@@ -39,17 +39,6 @@ export type MatchStatus =
   | 'Postponed'
   | 'Cancelled';
 
-export type MatchEventType = 
-  | 'Goal'
-  | 'YellowCard'
-  | 'RedCard'
-  | 'Substitution'
-  | 'CornerKick'
-  | 'Offside'
-  | 'Foul'
-  | 'PenaltyMiss'
-  | 'OwnGoal';
-
 export type PlayerPosition = 
   | 'Goalkeeper'
   | 'Defender'
