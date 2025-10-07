@@ -107,7 +107,6 @@ export interface CreateMatchEvent {
   minute: number;
   teamId: string;
   playerId: string;
-  description?: string;
 }
 
 export interface UpdateMatchEvent {

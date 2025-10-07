@@ -6,6 +6,7 @@ export interface Team {
   userId: string;
   createdAt: string;
   updatedAt?: string;
+  players?:Player[]
 }
 
 export interface TournamentTeam {
@@ -17,6 +18,7 @@ export interface TournamentTeam {
   registeredAt: string;
   managerName?: string;
   managerId?: string;
+  players?:Player[]
 }
 
 export interface CreateTeam {

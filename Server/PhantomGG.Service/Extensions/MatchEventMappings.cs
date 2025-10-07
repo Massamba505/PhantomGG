@@ -12,7 +12,7 @@ public static class MatchEventMappings
         {
             Id = matchEvent.Id,
             MatchId = matchEvent.MatchId,
-            EventType = Enum.Parse<MatchEventType>(matchEvent.EventType),
+            EventType = matchEvent.EventType,
             Minute = matchEvent.Minute,
             TeamId = matchEvent.TeamId,
             TeamName = matchEvent.Team?.Name ?? "Unknown",

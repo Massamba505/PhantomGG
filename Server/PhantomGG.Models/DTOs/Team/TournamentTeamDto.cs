@@ -1,3 +1,5 @@
+using PhantomGG.Models.DTOs.Player;
+
 namespace PhantomGG.Models.DTOs.Team;
 
 public class TournamentTeamDto
@@ -11,4 +13,6 @@ public class TournamentTeamDto
     public DateTime? AcceptedAt { get; set; }
     public string? ManagerName { get; set; }
     public Guid? ManagerId { get; set; }
+    public IEnumerable<PlayerDto> Players { get; set; } = new List<PlayerDto>();
+
 }

@@ -10,6 +10,8 @@ public static class TeamMappings
 {
     public static TeamDto ToDto(this Team team)
     {
+        var players = team.Players.Select(p=>p.ToDto());
+
         return new TeamDto
         {
             Id = team.Id,
@@ -18,7 +20,8 @@ public static class TeamMappings
             LogoUrl = team.LogoUrl,
             UserId = team.UserId,
             CreatedAt = team.CreatedAt,
-            UpdatedAt = team.UpdatedAt
+            UpdatedAt = team.UpdatedAt,
+            players = players
         };
     }
 
@@ -49,6 +52,7 @@ public static class TeamMappings
 
     public static TournamentTeamDto ToDto(this TournamentTeam tournamentTeam)
     {
+        var players = tournamentTeam.Team.Players.Select(p => p.ToDto());
         return new TournamentTeamDto
         {
             Id = tournamentTeam.TeamId,
@@ -59,7 +63,9 @@ public static class TeamMappings
             RegisteredAt = tournamentTeam.RequestedAt,
             AcceptedAt = tournamentTeam.AcceptedAt,
             ManagerName = $"{tournamentTeam.Team.User.FirstName} {tournamentTeam.Team.User.LastName}".Trim(),
-            ManagerId = tournamentTeam.Team.UserId
+            ManagerId = tournamentTeam.Team.UserId,
+            Players = players
+
         };
     }
     public static string GetDeterministicKey(this TeamSearchDto dto)

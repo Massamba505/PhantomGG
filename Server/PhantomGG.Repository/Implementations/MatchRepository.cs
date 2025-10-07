@@ -26,6 +26,7 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
             .Include(m => m.HomeTeam)
             .Include(m => m.AwayTeam)
             .Where(m => m.TournamentId == tournamentId)
+            .Include(m => m.Tournament)
             .OrderBy(m => m.MatchDate)
             .ToListAsync();
     }
@@ -49,6 +50,7 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
             .Where(m => m.TournamentId == tournamentId &&
                        m.MatchDate > DateTime.UtcNow &&
                        m.Status == MatchStatus.Scheduled.ToString())
+            .Include(m => m.Tournament)
             .OrderBy(m => m.MatchDate)
             .ToListAsync();
     }
@@ -59,6 +61,7 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
             .Include(m => m.HomeTeam)
             .Include(m => m.AwayTeam)
             .Where(m => m.TournamentId == tournamentId && m.Status == MatchStatus.Completed.ToString())
+            .Include(m => m.Tournament)
             .OrderByDescending(m => m.MatchDate)
             .ToListAsync();
     }

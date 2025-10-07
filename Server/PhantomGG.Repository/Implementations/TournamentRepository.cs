@@ -109,18 +109,22 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     public async Task<IEnumerable<TournamentTeam>> GetTournamentTeamsAsync(Guid tournamentId)
     {
         return await _context.TournamentTeams
-                              .Include(tt => tt.Team)
-                              .ThenInclude(t => t.User)
-                              .Where(tt => tt.TournamentId == tournamentId)
-                              .OrderBy(tt => tt.Team.Name)
-                              .ToListAsync();
+                            .Include(tt => tt.Team)
+                                .ThenInclude(t => t.User)
+                            .Include(tt => tt.Team)
+                                .ThenInclude(t => t.Players)
+                            .Where(tt => tt.TournamentId == tournamentId)
+                            .OrderBy(tt => tt.Team.Name)
+                            .ToListAsync();
     }
 
     public async Task<IEnumerable<TournamentTeam>> GetTournamentTeamByStatus(Guid tournamentId, TeamRegistrationStatus status)
     {
         return await _context.TournamentTeams
             .Include(tt => tt.Team)
-            .ThenInclude(t => t.User)
+                .ThenInclude(t => t.User)
+            .Include(tt => tt.Team)
+                .ThenInclude(t => t.Players)
             .Where(tt => tt.TournamentId == tournamentId &&
                         tt.Status == status.ToString())
             .OrderBy(tt => tt.RequestedAt)
@@ -176,7 +180,9 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         return await _context.Matches
             .Include(m => m.HomeTeam)
+                .ThenInclude(t => t.Players)
             .Include(m => m.AwayTeam)
+                .ThenInclude(t => t.Players)
             .Include(m => m.MatchEvents)
                 .ThenInclude(me => me.Player)
             .Where(m => m.TournamentId == tournamentId)
@@ -189,6 +195,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
         return await _context.MatchEvents
             .Include(me => me.Player)
             .Include(me => me.Team)
+                .ThenInclude(t => t.Players)
             .Include(me => me.Match)
             .Where(me => me.Match.TournamentId == tournamentId)
             .OrderBy(me => me.Match.MatchDate)
