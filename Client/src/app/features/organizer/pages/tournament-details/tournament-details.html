@@ -60,15 +60,13 @@
     </div>
 
     <div class="card">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="font-semibold text-lg">Team Management</h2>
-        <span class="status-badge">
-          {{ tournament()!.teamCount }}/{{ tournament()!.maxTeams }} Teams
-        </span>
-      </div>
-
       <app-tournament-team-management [tournamentId]="tournament()!.id">
       </app-tournament-team-management>
+    </div>
+
+    <div class="card">
+      <app-tournament-match-management [tournamentId]="tournament()!.id">
+      </app-tournament-match-management>
     </div>
   </div>
 

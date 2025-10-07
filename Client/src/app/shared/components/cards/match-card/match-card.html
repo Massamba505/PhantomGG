@@ -1,0 +1,106 @@
+<div (click)="onView()" class="card flex flex-col gap-3 p-3">
+  <div class="flex items-center justify-between text-muted">
+    <div class="flex items-center gap-2">
+      <lucide-angular size="16" [img]="icons.Calendar" />
+      <span class="text-sm font-medium">
+        {{ match().matchDate | date : "mediumDate" }}</span
+      >
+      <span class="text-xs text-muted">
+        {{ match().matchDate | date : "shortTime" }}</span
+      >
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-semibold">
+        {{ match().status }}
+      </span>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between p-2">
+    <div class="flex items-center gap-3 flex-1">
+      <img
+        [src]="match().homeTeamLogo"
+        [alt]="match().homeTeamName"
+        class="w-10 h-10 object-contain rounded-md"
+      />
+      <div class="flex flex-col">
+        <span class="font-semibold text-sm line-clamp-1">{{
+          match().homeTeamName
+        }}</span>
+        <span class="text-xs text-muted">Home</span>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-center px-4">
+      <span class="text-lg font-bold text-center min-w-[60px]">
+        {{ getScoreDisplay() }}
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3 flex-1 justify-end">
+      <div class="flex flex-col text-right">
+        <span class="font-semibold text-sm line-clamp-1">{{
+          match().awayTeamName
+        }}</span>
+        <span class="text-xs text-muted">Away</span>
+      </div>
+      <img
+        [src]="match().awayTeamLogo"
+        [alt]="match().awayTeamName"
+        class="w-10 h-10 object-contain rounded-md"
+      />
+    </div>
+  </div>
+
+  <div
+    class="border flex flex-col gap-3 px-3 py-2 btn-outline rounded-md text-muted"
+  >
+    <div class="flex flex-row gap-1 text-xs font-semibold items-center">
+      <lucide-angular size="14" [img]="icons.Trophy" />
+      <span class="line-clamp-1">{{ match().tournamentName }}</span>
+    </div>
+
+    <div
+      class="flex flex-row gap-1 text-center text-xs font-semibold items-center"
+    >
+      <lucide-angular size="14" [img]="icons.MapPin" />
+      <span class="line-clamp-1">{{ match().venue || "TBD" }}</span>
+    </div>
+  </div>
+
+  <div class="flex gap-2 mt-auto">
+    @if (isOrganizer()) { @if (canEdit()) {
+    <button
+      (click)="onEdit($event)"
+      class="btn btn-outline flex justify-center items-center flex-1"
+    >
+      <lucide-angular size="15" [img]="icons.Edit" />
+      <span>Edit Match</span>
+    </button>
+    } @if (canUpdateResult()) {
+    <button
+      (click)="onUpdateResult($event)"
+      class="btn btn-primary flex justify-center items-center flex-1"
+    >
+      <lucide-angular size="15" [img]="icons.Target" />
+      <span>Update Match</span>
+    </button>
+    } @if (!canEdit() && !canUpdateResult()) {
+    <button
+      (click)="onView($event)"
+      class="btn btn-secondary flex justify-center items-center flex-1"
+    >
+      <lucide-angular size="15" [img]="icons.Eye" />
+      <span>View Details</span>
+    </button>
+    } } @else {
+    <button
+      (click)="onView($event)"
+      class="btn btn-secondary flex justify-center items-center flex-1"
+    >
+      <lucide-angular size="15" [img]="icons.Eye" />
+      <span>View Match</span>
+    </button>
+    }
+  </div>
+</div>

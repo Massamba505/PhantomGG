@@ -7,6 +7,7 @@ import { TournamentTeam } from '@/app/api/models/team.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamCard, TeamRole } from "@/app/shared/components/cards/team-card/team-card";
+import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
 
 @Component({
   selector: 'app-tournament-details',
@@ -15,7 +16,8 @@ import { TeamCard, TeamRole } from "@/app/shared/components/cards/team-card/team
   imports: [
     CommonModule,
     LucideAngularModule,
-    TeamCard
+    TeamCard,
+    LineBreaksPipe
 ],
 })
 export class TournamentDetails implements OnInit {

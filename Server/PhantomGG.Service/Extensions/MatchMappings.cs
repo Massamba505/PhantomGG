@@ -19,7 +19,7 @@ public static class MatchMappings
             AwayTeamName = match.AwayTeam?.Name ?? "Unknown",
             AwayTeamLogo = match.AwayTeam?.LogoUrl,
             MatchDate = match.MatchDate,
-            Venue = "",
+            Venue = match.Tournament?.Location ?? "TBD",
             Status = match.Status,
             HomeScore = match.HomeScore,
             AwayScore = match.AwayScore

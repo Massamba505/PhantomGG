@@ -5,7 +5,6 @@ namespace PhantomGG.Repository.Interfaces;
 
 public interface IMatchRepository
 {
-    Task<IEnumerable<Match>> GetAllAsync();
     Task<Match?> GetByIdAsync(Guid id);
     Task<IEnumerable<Match>> GetByTournamentAsync(Guid tournamentId);
     Task<IEnumerable<Match>> GetByTeamAsync(Guid teamId);

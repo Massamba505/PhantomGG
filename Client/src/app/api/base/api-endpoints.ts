@@ -42,5 +42,30 @@ export const API_ENDPOINTS = {
     ADD_PLAYER: (teamId: string) => `teams/${teamId}/players`,
     UPDATE_PLAYER: (teamId: string, playerId: string) => `teams/${teamId}/players/${playerId}`,
     REMOVE_PLAYER: (teamId: string, playerId: string) => `teams/${teamId}/players/${playerId}`
+  },
+
+  MATCHES: {
+    LIST: 'matches',
+    GET: (matchId: string) => `matches/${matchId}`,
+    TOURNAMENT_MATCHES: (tournamentId: string) => `matches/tournament/${tournamentId}`,
+    TEAM_MATCHES: (teamId: string) => `matches/team/${teamId}`,
+    SEARCH: 'matches/search',
+    CREATE: 'matches',
+    UPDATE: (matchId: string) => `matches/${matchId}`,
+    DELETE: (matchId: string) => `matches/${matchId}`,
+    UPDATE_RESULT: (matchId: string) => `matches/${matchId}/result`,
+    
+    GENERATE_FIXTURES: 'matches/generate-fixtures',
+    FIXTURE_STATUS: (tournamentId: string) => `matches/fixture-status/${tournamentId}`,
+    
+    EVENTS: {
+      LIST_BY_MATCH: (matchId: string) => `matches/${matchId}/events`,
+      GET: (eventId: string) => `matches/events/${eventId}`,
+      PLAYER_EVENTS: (playerId: string) => `matches/player/${playerId}/events`,
+      TEAM_EVENTS: (teamId: string) => `matches/team/${teamId}/events`,
+      CREATE: 'matches/events',
+      UPDATE: (eventId: string) => `matches/events/${eventId}`,
+      DELETE: (eventId: string) => `matches/events/${eventId}`
+    }
   }
 } as const;

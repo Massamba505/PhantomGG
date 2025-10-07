@@ -11,16 +11,6 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
 {
     private readonly PhantomContext _context = context;
 
-    public async Task<IEnumerable<Match>> GetAllAsync()
-    {
-        return await _context.Matches
-            .Include(m => m.Tournament)
-            .Include(m => m.HomeTeam)
-            .Include(m => m.AwayTeam)
-            .OrderByDescending(m => m.MatchDate)
-            .ToListAsync();
-    }
-
     public async Task<Match?> GetByIdAsync(Guid id)
     {
         return await _context.Matches
@@ -36,6 +26,7 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
             .Include(m => m.HomeTeam)
             .Include(m => m.AwayTeam)
             .Where(m => m.TournamentId == tournamentId)
+            .Include(m => m.Tournament)
             .OrderBy(m => m.MatchDate)
             .ToListAsync();
     }
@@ -59,6 +50,7 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
             .Where(m => m.TournamentId == tournamentId &&
                        m.MatchDate > DateTime.UtcNow &&
                        m.Status == MatchStatus.Scheduled.ToString())
+            .Include(m => m.Tournament)
             .OrderBy(m => m.MatchDate)
             .ToListAsync();
     }
@@ -69,6 +61,7 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
             .Include(m => m.HomeTeam)
             .Include(m => m.AwayTeam)
             .Where(m => m.TournamentId == tournamentId && m.Status == MatchStatus.Completed.ToString())
+            .Include(m => m.Tournament)
             .OrderByDescending(m => m.MatchDate)
             .ToListAsync();
     }
@@ -109,10 +102,14 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
             query = query.Where(m => m.MatchDate <= searchDto.DateTo);
         }
 
+        if (searchDto.Cursor.HasValue)
+        {
+            query = query.Where(m => m.Id.CompareTo(searchDto.Cursor.Value) > 0);
+        }
+
         return await query
-            .OrderBy(m => m.MatchDate)
-            .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
-            .Take(searchDto.PageSize)
+            .OrderBy(m => m.Id)
+            .Take(searchDto.Limit)
             .ToListAsync();
     }
 

@@ -47,14 +47,11 @@ public enum MatchStatus
 public enum MatchEventType
 {
     Goal,
+    Assist,
     YellowCard,
     RedCard,
-    Substitution,
-    CornerKick,
-    Offside,
     Foul,
-    PenaltyMiss,
-    OwnGoal
+    Substitution
 }
 
 public enum PlayerPosition
@@ -76,6 +73,6 @@ public enum TeamAction
 {
     Register = 0,
     Withdraw = 1,
-    Approve = 3,
-    Reject = 4
+    Approve = 2,
+    Reject = 3
 }

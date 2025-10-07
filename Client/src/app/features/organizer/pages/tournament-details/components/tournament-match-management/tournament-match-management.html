@@ -1,0 +1,64 @@
+<app-match-header
+  [teamCount]="tournamentTeams().length"
+  (generateFixtures)="openGenerateFixturesModal()"
+  (createMatch)="openCreateMatchModal()"
+/>
+
+<app-match-tabs
+  [matches]="matches()"
+  [activeTab]="activeTab()"
+  (tabChange)="onTabChange($event)"
+/>
+
+<app-match-list
+  [matches]="filteredMatches()"
+  [activeTab]="activeTab()"
+  [isLoading]="isLoading()"
+  (view)="onMatchView($event)"
+  (edit)="onMatchEdit($event)"
+  (updateResult)="onMatchUpdateResult($event)"
+/>
+
+<app-create-match-modal
+  [isOpen]="showCreateMatchModal()"
+  [teams]="tournamentTeams()"
+  [tournament]="tournament()"
+  [tournamentId]="tournamentId()"
+  (close)="closeModals()"
+  (create)="onCreateMatch($event)"
+/>
+
+<app-edit-match-modal
+  [isOpen]="showEditMatchModal()"
+  [teams]="tournamentTeams()"
+  [tournament]="tournament()"
+  [selectedMatch]="selectedMatch()"
+  (close)="closeModals()"
+  (update)="onEditMatch($event)"
+/>
+
+<app-update-result-modal
+  [isOpen]="showUpdateResultModal()"
+  [selectedMatch]="selectedMatch()"
+  [matchEvents]="selectedMatchEvents()"
+  (close)="closeModals()"
+  (updateResult)="onUpdateResult($event)"
+  (addEvent)="openAddEventModal()"
+/>
+
+<app-add-event-modal
+  [isOpen]="showAddEventModal()"
+  [selectedMatch]="selectedMatch()"
+  [teams]="tournamentTeams()"
+  (close)="closeModals()"
+  (addEvent)="onAddEvent($event)"
+/>
+
+<app-generate-fixtures-modal
+  [isOpen]="showGenerateFixturesModal()"
+  [teams]="tournamentTeams()"
+  [tournament]="tournament()"
+  [tournamentId]="tournamentId()"
+  (close)="closeModals()"
+  (generateFixtures)="onGenerateFixtures($event)"
+/>

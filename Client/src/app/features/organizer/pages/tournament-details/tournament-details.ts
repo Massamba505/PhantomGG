@@ -9,10 +9,11 @@ import { TournamentService } from '@/app/api/services';
 import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentTeamManagementComponent } from './components/tournament-team-management/tournament-team-management';
+import { TournamentMatchManagementComponent } from './components/tournament-match-management/tournament-match-management';
 
 @Component({
   selector: 'app-tournament-details',
-  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, ConfirmDeleteModal, TournamentTeamManagementComponent],
+  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, ConfirmDeleteModal, TournamentTeamManagementComponent, TournamentMatchManagementComponent],
   templateUrl: './tournament-details.html',
   styleUrl: './tournament-details.css'
 })

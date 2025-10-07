@@ -24,7 +24,7 @@ public class TeamsController(
     public async Task<ActionResult<ApiResponse>> GetTeams([FromQuery] TeamSearchDto searchDto)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        Guid? userId = currentUser.Role == UserRoles.Organizer.ToString() ? currentUser?.Id : null;
+        Guid? userId = currentUser.Role == UserRoles.User.ToString() ? currentUser?.Id : null;
 
         var teams = await _teamService.SearchAsync(searchDto, userId);
         return Ok(new ApiResponse
