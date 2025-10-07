@@ -22,12 +22,22 @@ public class CacheInvalidationService : ICacheInvalidationService
         await _cache.RemoveAsync($"tournament_{tournamentId}");
         await _cache.RemoveAsync($"tournament_teams_{tournamentId}");
         await _cache.RemoveAsync($"tournament_matches_{tournamentId}");
+        await _cache.RemoveAsync($"upcoming_matches_{tournamentId}");
+        await _cache.RemoveAsync($"completed_matches_{tournamentId}");
+        await _cache.RemoveAsync($"fixture_status_{tournamentId}");
+
     }
 
     public async Task InvalidateTeamCacheAsync(Guid teamId)
     {
         await _cache.RemoveAsync($"team_{teamId}");
         await _cache.RemoveAsync($"team_players_{teamId}");
+    }
+
+    public async Task InvalidateMatchCacheAsync(Guid matchId)
+    {
+        await _cache.RemoveAsync($"match_{matchId}");
+        await _cache.RemoveAsync($"match_events_{matchId}");
     }
 
     public async Task InvalidateTournamentRelatedCacheAsync(Guid tournamentId)

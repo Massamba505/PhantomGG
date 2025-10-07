@@ -5,6 +5,7 @@ using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Repository.Entities;
 using PhantomGG.Service.Mappings;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -13,24 +14,30 @@ public class MatchService : IMatchService
     private readonly IMatchRepository _matchRepository;
     private readonly ITournamentRepository _tournamentRepository;
     private readonly ITeamRepository _teamRepository;
+    private readonly IMatchEventRepository _matchEventRepository;
+    private readonly IPlayerRepository _playerRepository;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ICacheInvalidationService _cacheInvalidationService;
+    private readonly HybridCache _cache;
 
     public MatchService(
         IMatchRepository matchRepository,
         ITournamentRepository tournamentRepository,
         ITeamRepository teamRepository,
-        ICurrentUserService currentUserService)
+        IMatchEventRepository matchEventRepository,
+        IPlayerRepository playerRepository,
+        ICurrentUserService currentUserService,
+        ICacheInvalidationService cacheInvalidationService,
+        HybridCache cache)
     {
         _matchRepository = matchRepository;
         _tournamentRepository = tournamentRepository;
         _teamRepository = teamRepository;
+        _matchEventRepository = matchEventRepository;
+        _playerRepository = playerRepository;
         _currentUserService = currentUserService;
-    }
-
-    public async Task<IEnumerable<MatchDto>> GetAllAsync()
-    {
-        var matches = await _matchRepository.GetAllAsync();
-        return matches.Select(m => m.ToDto());
+        _cacheInvalidationService = cacheInvalidationService;
+        _cache = cache;
     }
 
     public async Task<MatchDto> GetByIdAsync(Guid id)
@@ -54,7 +61,6 @@ public class MatchService : IMatchService
         if (match == null)
             throw new NotFoundException("Match not found");
 
-        // Validate that the organizer has permission to update this match
         var tournament = await _tournamentRepository.GetByIdAsync(match.TournamentId);
         if (tournament == null)
             throw new NotFoundException("Tournament not found");
@@ -65,12 +71,15 @@ public class MatchService : IMatchService
         if (resultDto is not MatchResultDto matchResult)
             throw new ValidationException("Invalid result data");
 
-        // Update match scores and status
         match.HomeScore = matchResult.HomeScore;
         match.AwayScore = matchResult.AwayScore;
         match.Status = Common.Enums.MatchStatus.Completed.ToString();
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);
+
+        await _cacheInvalidationService.InvalidateMatchCacheAsync(matchId);
+        await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(match.TournamentId);
+
         return updatedMatch.ToDto();
     }
 
@@ -80,12 +89,9 @@ public class MatchService : IMatchService
         if (tournament == null)
             throw new NotFoundException("Tournament not found");
 
-        // Validate that the organizer has permission
         if (tournament.OrganizerId != organizerId)
             throw new UnauthorizedException("You don't have permission to generate brackets for this tournament");
 
-        // For now, return existing matches for this tournament
-        // TODO: Implement proper bracket generation logic in a future phase
         var existingMatches = await _matchRepository.GetByTournamentAsync(tournamentId);
         return existingMatches.Select(m => m.ToDto());
     }
@@ -116,23 +122,18 @@ public class MatchService : IMatchService
 
     public async Task<MatchDto> CreateAsync(CreateMatchDto createDto, Guid userId)
     {
-        // Check if user has permission to create matches
         var tournament = await _tournamentRepository.GetByIdAsync(createDto.TournamentId);
         if (tournament == null)
             throw new NotFoundException("Tournament not found");
 
 
-        // Validate teams exist and are part of the tournament
         var homeTeam = await _teamRepository.GetByIdAsync(createDto.HomeTeamId);
         var awayTeam = await _teamRepository.GetByIdAsync(createDto.AwayTeamId);
 
         if (homeTeam == null || awayTeam == null)
             throw new NotFoundException("One or both teams not found");
 
-        // if (homeTeam.TournamentId != createDto.TournamentId || awayTeam.TournamentId != createDto.TournamentId)
-        //     throw new ArgumentException("Teams must be part of the tournament");
 
-        // Check for scheduling conflicts
         if (await _matchRepository.TeamsHaveMatchOnDateAsync(createDto.HomeTeamId, createDto.AwayTeamId, createDto.MatchDate))
             throw new ForbiddenException("Teams already have a match scheduled on this date");
 
@@ -160,7 +161,6 @@ public class MatchService : IMatchService
             throw new NotFoundException("Match not found");
 
 
-        // Update match result
         match.HomeScore = resultDto.HomeScore;
         match.AwayScore = resultDto.AwayScore;
         match.Status = "Completed";
@@ -180,7 +180,6 @@ public class MatchService : IMatchService
     }
 
 
-    // Fixture generation - simplified for MVP
     public async Task<IEnumerable<MatchDto>> GenerateRoundRobinFixturesAsync(GenerateFixturesDto generateDto, Guid userId)
     {
         var tournament = await _tournamentRepository.GetByIdAsync(generateDto.TournamentId);
@@ -197,7 +196,6 @@ public class MatchService : IMatchService
         var matches = new List<Match>();
         var matchDate = generateDto.StartDate;
 
-        // Simple round-robin generation
         for (int i = 0; i < teamsList.Count; i++)
         {
             for (int j = i + 1; j < teamsList.Count; j++)
@@ -210,7 +208,6 @@ public class MatchService : IMatchService
                     AwayTeamId = teamsList[j].TeamId,
                     MatchDate = matchDate,
                     Status = "Scheduled",
-                    // Venue = generateDto.DefaultVenue
                 };
 
                 matches.Add(match);
@@ -218,7 +215,6 @@ public class MatchService : IMatchService
             }
         }
 
-        // If return matches are requested, generate them
         if (generateDto.IncludeReturnMatches)
         {
             for (int i = 0; i < teamsList.Count; i++)
@@ -233,7 +229,6 @@ public class MatchService : IMatchService
                         AwayTeamId = teamsList[i].TeamId,
                         MatchDate = matchDate,
                         Status = "Scheduled",
-                        // Venue = generateDto.DefaultVenue
                     };
 
                     matches.Add(returnMatch);
@@ -242,7 +237,6 @@ public class MatchService : IMatchService
             }
         }
 
-        // Save all matches
         var createdMatches = new List<Match>();
         foreach (var match in matches)
         {
@@ -253,104 +247,6 @@ public class MatchService : IMatchService
         return createdMatches.Select(m => m.ToDto());
     }
 
-    public async Task<IEnumerable<MatchDto>> GenerateKnockoutFixturesAsync(GenerateFixturesDto generateDto, Guid userId)
-    {
-        var tournament = await _tournamentRepository.GetByIdAsync(generateDto.TournamentId);
-        if (tournament == null)
-            throw new NotFoundException("Tournament not found");
-
-
-        var teams = await _tournamentRepository.GetTournamentTeamsAsync(generateDto.TournamentId);
-        var teamsList = teams.ToList();
-
-        if (teamsList.Count < tournament.MinTeams)
-            throw new ForbiddenException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
-
-        // For single elimination, we need a power of 2 number of teams
-        var powerOfTwo = GetNextPowerOfTwo(teamsList.Count);
-        var byesNeeded = powerOfTwo - teamsList.Count;
-
-        var matches = new List<Match>();
-        var matchDate = generateDto.StartDate;
-
-        // Shuffle teams for fair bracket seeding
-        var shuffledTeams = teamsList.OrderBy(x => Guid.NewGuid()).ToList();
-
-        // Add bye placeholders if needed
-        var bracketTeams = new List<TournamentTeam?>(shuffledTeams.Cast<TournamentTeam?>());
-        for (int i = 0; i < byesNeeded; i++)
-        {
-            bracketTeams.Add(null); // null represents a bye
-        }
-
-        var currentRoundTeams = bracketTeams;
-        var roundName = GetRoundName(powerOfTwo / 2);
-
-        // Generate first round matches (with byes)
-        for (int i = 0; i < currentRoundTeams.Count; i += 2)
-        {
-            var homeTeam = currentRoundTeams[i];
-            var awayTeam = currentRoundTeams[i + 1];
-
-            // Skip matches where both teams are byes
-            if (homeTeam == null && awayTeam == null)
-                continue;
-
-            // If one team has a bye, they automatically advance
-            if (homeTeam == null || awayTeam == null)
-                continue;
-
-            var match = new Match
-            {
-                Id = Guid.NewGuid(),
-                TournamentId = generateDto.TournamentId,
-                HomeTeamId = homeTeam.TeamId,
-                AwayTeamId = awayTeam.TeamId,
-                MatchDate = matchDate,
-                Status = "Scheduled",
-                // Venue = generateDto.DefaultVenue
-            };
-
-            matches.Add(match);
-        }
-
-        // Generate subsequent rounds (placeholders for future matches)
-        var remainingTeams = powerOfTwo / 2;
-        while (remainingTeams > 1)
-        {
-            matchDate = matchDate.AddDays(generateDto.DaysBetweenMatches);
-            remainingTeams /= 2;
-            roundName = GetRoundName(remainingTeams);
-
-            for (int i = 0; i < remainingTeams; i++)
-            {
-                var match = new Match
-                {
-                    Id = Guid.NewGuid(),
-                    TournamentId = generateDto.TournamentId,
-                    HomeTeamId = Guid.Empty, // TBD based on previous round results
-                    AwayTeamId = Guid.Empty, // TBD based on previous round results
-                    MatchDate = matchDate,
-                    Status = "Pending", // Will be scheduled once teams are determined
-                    // Venue = generateDto.DefaultVenue
-                };
-
-                matches.Add(match);
-            }
-        }
-
-        // Save all matches
-        var createdMatches = new List<Match>();
-        foreach (var match in matches)
-        {
-            var createdMatch = await _matchRepository.CreateAsync(match);
-            createdMatches.Add(createdMatch);
-        }
-
-        return createdMatches.Select(m => m.ToDto());
-    }
-
-    // Match status management
     public async Task<MatchDto> StartMatchAsync(Guid matchId, Guid userId)
     {
         var match = await _matchRepository.GetByIdAsync(matchId);
@@ -404,51 +300,168 @@ public class MatchService : IMatchService
         return updatedMatch.ToDto();
     }
 
-    // Match events - simplified for MVP
-    public Task AddMatchEventAsync(Guid matchId, CreateMatchEventDto eventDto, Guid userId)
-    {
-        // For MVP, just throw not implemented
-        throw new NotImplementedException("Match events will be implemented in a future phase");
-    }
 
-    public Task<IEnumerable<MatchEventDto>> GetMatchEventsAsync(Guid matchId)
+    private async Task ValidateTournamentOrganizerAsync(Guid tournamentId, Guid userId)
     {
-        // For MVP, just return empty list
-        return Task.FromResult<IEnumerable<MatchEventDto>>(new List<MatchEventDto>());
-    }
-
-    public async Task<IEnumerable<MatchDto>> AutoGenerateFixturesAsync(AutoGenerateFixturesDto generateDto, Guid userId)
-    {
-        var tournament = await _tournamentRepository.GetByIdAsync(generateDto.TournamentId);
+        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
         if (tournament == null)
             throw new NotFoundException("Tournament not found");
 
-
-        // Create a GenerateFixturesDto from the AutoGenerateFixturesDto
-        var fixtureDto = new GenerateFixturesDto
-        {
-            TournamentId = generateDto.TournamentId,
-            StartDate = generateDto.StartDate,
-            DaysBetweenMatches = generateDto.DaysBetweenRounds,
-            DefaultVenue = generateDto.DefaultVenue,
-            IncludeReturnMatches = generateDto.IncludeReturnMatches
-        };
-
-        // Generate fixtures based on tournament format
-        return generateDto.TournamentFormat.ToLower() switch
-        {
-            "roundrobin" => await GenerateRoundRobinFixturesAsync(fixtureDto, userId),
-            "singleelimination" => await GenerateKnockoutFixturesAsync(fixtureDto, userId),
-            _ => throw new ValidationException($"Unsupported tournament format: {generateDto.TournamentFormat}")
-        };
+        if (tournament.OrganizerId != userId)
+            throw new UnauthorizedException("Only tournament organizers can perform this action");
     }
+
+    private async Task ValidateMatchEventPermissionsAsync(Guid matchId, Guid userId)
+    {
+        var match = await _matchRepository.GetByIdAsync(matchId);
+        if (match == null)
+            throw new NotFoundException("Match not found");
+
+        await ValidateTournamentOrganizerAsync(match.TournamentId, userId);
+    }
+
+    private async Task ValidatePlayerTeamRelationshipAsync(Guid playerId, Guid teamId, Guid matchId)
+    {
+        var player = await _playerRepository.GetByIdAsync(playerId);
+        if (player == null)
+            throw new NotFoundException($"Player {playerId} not found");
+
+        if (player.TeamId != teamId)
+            throw new ValidationException($"Player {playerId} does not belong to team {teamId}");
+
+        var match = await _matchRepository.GetByIdAsync(matchId);
+        if (match == null)
+            throw new NotFoundException("Match not found");
+
+        if (teamId != match.HomeTeamId && teamId != match.AwayTeamId)
+            throw new ValidationException($"Team {teamId} is not playing in this match");
+    }
+
+
+
+    public async Task<IEnumerable<MatchEventDto>> GetMatchEventsAsync(Guid matchId)
+    {
+        var cacheKey = $"match_events_{matchId}";
+        var options = new HybridCacheEntryOptions
+        {
+            Expiration = TimeSpan.FromMinutes(5)
+        };
+
+        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
+        {
+            var events = await _matchEventRepository.GetByMatchIdAsync(matchId);
+            return events.Select(e => e.ToDto());
+        }, options);
+    }
+
+    public async Task<IEnumerable<MatchEventDto>> GetPlayerEventsAsync(Guid playerId)
+    {
+        var cacheKey = $"player_events_{playerId}";
+        var options = new HybridCacheEntryOptions
+        {
+            Expiration = TimeSpan.FromMinutes(5)
+        };
+
+        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
+        {
+            var events = await _matchEventRepository.GetByPlayerIdAsync(playerId);
+            return events.Select(e => e.ToDto());
+        }, options);
+    }
+
+    public async Task<IEnumerable<MatchEventDto>> GetTeamEventsAsync(Guid teamId)
+    {
+        var cacheKey = $"team_events_{teamId}";
+        var options = new HybridCacheEntryOptions
+        {
+            Expiration = TimeSpan.FromMinutes(5)
+        };
+
+        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
+        {
+            var events = await _matchEventRepository.GetByTeamIdAsync(teamId);
+            return events.Select(e => e.ToDto());
+        }, options);
+    }
+
+    public async Task<MatchEventDto> GetMatchEventByIdAsync(Guid id)
+    {
+        var cacheKey = $"match_event_{id}";
+        var options = new HybridCacheEntryOptions
+        {
+            Expiration = TimeSpan.FromMinutes(5)
+        };
+
+        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
+        {
+            var matchEvent = await _matchEventRepository.GetByIdAsync(id);
+            if (matchEvent == null)
+                throw new NotFoundException("Match event not found");
+
+            return matchEvent.ToDto();
+        }, options);
+    }
+
+    public async Task<MatchEventDto> CreateMatchEventAsync(CreateMatchEventDto createDto, Guid userId)
+    {
+        await ValidateMatchEventPermissionsAsync(createDto.MatchId, userId);
+
+        await ValidatePlayerTeamRelationshipAsync(createDto.PlayerId, createDto.TeamId, createDto.MatchId);
+
+        var matchEvent = createDto.ToEntity();
+        var createdEvent = await _matchEventRepository.CreateAsync(matchEvent);
+
+        await _cacheInvalidationService.InvalidateMatchCacheAsync(createDto.MatchId);
+
+        return createdEvent.ToDto();
+    }
+
+    public async Task<MatchEventDto> UpdateMatchEventAsync(Guid id, UpdateMatchEventDto updateDto, Guid userId)
+    {
+        var existingEvent = await _matchEventRepository.GetByIdAsync(id);
+        if (existingEvent == null)
+            throw new NotFoundException("Match event not found");
+
+        await ValidateMatchEventPermissionsAsync(existingEvent.MatchId, userId);
+
+        if (updateDto.EventType.HasValue)
+            existingEvent.EventType = updateDto.EventType.Value.ToString();
+
+        if (updateDto.Minute.HasValue)
+            existingEvent.Minute = updateDto.Minute.Value;
+
+        if (updateDto.PlayerId.HasValue)
+        {
+            await ValidatePlayerTeamRelationshipAsync(updateDto.PlayerId.Value, existingEvent.TeamId, existingEvent.MatchId);
+            existingEvent.PlayerId = updateDto.PlayerId.Value;
+        }
+
+        var updatedEvent = await _matchEventRepository.UpdateAsync(existingEvent);
+
+        await _cacheInvalidationService.InvalidateMatchCacheAsync(existingEvent.MatchId);
+
+        return updatedEvent.ToDto();
+    }
+
+    public async Task DeleteMatchEventAsync(Guid id, Guid userId)
+    {
+        var existingEvent = await _matchEventRepository.GetByIdAsync(id);
+        if (existingEvent == null)
+            throw new NotFoundException("Match event not found");
+
+        await ValidateMatchEventPermissionsAsync(existingEvent.MatchId, userId);
+
+        await _matchEventRepository.DeleteAsync(id);
+
+        await _cacheInvalidationService.InvalidateMatchCacheAsync(existingEvent.MatchId);
+    }
+
 
     public async Task<FixtureGenerationStatusDto> GetFixtureGenerationStatusAsync(Guid tournamentId)
     {
         var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
         if (tournament == null)
             throw new NotFoundException("Tournament not found");
-
 
         return new FixtureGenerationStatusDto
         {
@@ -457,33 +470,6 @@ public class MatchService : IMatchService
             RequiredTeams = tournament.MinTeams,
             MaxTeams = tournament.MaxTeams,
             Status = tournament.Status,
-        };
-    }
-
-    // Helper methods for knockout tournament generation
-    private static int GetNextPowerOfTwo(int number)
-    {
-        if (number <= 1) return 2;
-
-        int power = 1;
-        while (power < number)
-        {
-            power *= 2;
-        }
-        return power;
-    }
-
-    private static string GetRoundName(int teamsRemaining)
-    {
-        return teamsRemaining switch
-        {
-            1 => "Final",
-            2 => "Semi-Final",
-            4 => "Quarter-Final",
-            8 => "Round of 16",
-            16 => "Round of 32",
-            32 => "Round of 64",
-            _ => $"Round of {teamsRemaining * 2}"
         };
     }
 }
