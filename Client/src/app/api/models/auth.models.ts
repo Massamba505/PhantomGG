@@ -1,9 +1,11 @@
+import { UserRoles } from "./common.models";
+
 export interface UserDto {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
-  role: string;
+  role: UserRoles;
   profilePictureUrl: string;
 }
 

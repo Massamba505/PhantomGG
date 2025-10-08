@@ -19,6 +19,7 @@ public class TeamService(
     IPlayerService playerService,
     ITeamValidationService teamValidationService,
     IPlayerRepository playerRepository,
+    ICacheInvalidationService cacheInvalidationService,
     HybridCache cache) : ITeamService
 {
     private readonly ITeamRepository _teamRepository = teamRepository;
@@ -28,6 +29,7 @@ public class TeamService(
     private readonly IPlayerRepository _playerRepository = playerRepository;
     private readonly ITeamValidationService _teamValidationService = teamValidationService;
     private readonly HybridCache _cache = cache;
+    private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
 
     public async Task<PagedResult<TeamDto>> SearchAsync(TeamQuery query, Guid? userId = null)
     {
@@ -41,25 +43,12 @@ public class TeamService(
             PageSize = query.PageSize
         };
 
-        string cacheKey = spec.GetDeterministicKey();
-
-        return await _cache.GetOrCreateAsync(
-            cacheKey,
-            async cancel =>
-            {
-                var teams = await _teamRepository.SearchAsync(spec);
-                return new PagedResult<TeamDto>(
-                    teams.Data.Select(t => t.ToDto()),
-                    query.Page,
-                    query.PageSize,
-                    teams.Meta.TotalRecords
-                );
-            },
-            options: new HybridCacheEntryOptions
-            {
-                Expiration = TimeSpan.FromMinutes(2)
-            },
-            cancellationToken: CancellationToken.None
+        var teams = await _teamRepository.SearchAsync(spec);
+        return new PagedResult<TeamDto>(
+            teams.Data.Select(t => t.ToDto()),
+            query.Page,
+            query.PageSize,
+            teams.Meta.TotalRecords
         );
     }
 
@@ -101,6 +90,7 @@ public class TeamService(
         }
 
         await _teamRepository.UpdateAsync(team);
+        await _cacheInvalidationService.InvalidateTeamRelatedCacheAsync(team.Id);
 
         return team.ToDto();
     }
@@ -139,6 +129,7 @@ public class TeamService(
         }
 
         var updatedTeam = await _teamRepository.UpdateAsync(existingTeam);
+        await _cacheInvalidationService.InvalidateTeamRelatedCacheAsync(updatedTeam.Id);
         return updatedTeam.ToDto();
     }
 
@@ -146,6 +137,7 @@ public class TeamService(
     {
         var team = await _teamValidationService.ValidateTeamCanBeDeleted(teamId, userId);
         await _teamRepository.DeleteAsync(team.Id);
+        await _cacheInvalidationService.InvalidateTeamRelatedCacheAsync(team.Id);
     }
 
     public async Task<IEnumerable<PlayerDto>> GetTeamPlayersAsync(Guid teamId)
@@ -182,6 +174,7 @@ public class TeamService(
         }
 
         var player = await _playerService.CreateAsync(playerDto);
+        await _cacheInvalidationService.InvalidateTeamCacheAsync(teamId);
         return player;
     }
 
@@ -190,6 +183,7 @@ public class TeamService(
         var team = await _teamValidationService.ValidateCanManageTeamAsync(userId, teamId);
 
         var updatedPlayer = await _playerService.UpdateAsync(updateDto, playerId);
+        await _cacheInvalidationService.InvalidateTeamCacheAsync(team.Id);
         return updatedPlayer;
     }
 
@@ -197,5 +191,6 @@ public class TeamService(
     {
         var team = await _teamValidationService.ValidateCanManageTeamAsync(userId, teamId);
         await _playerService.DeleteAsync(team.Id, playerId);
+        await _cacheInvalidationService.InvalidateTeamCacheAsync(team.Id);
     }
 }

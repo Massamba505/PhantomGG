@@ -25,18 +25,17 @@ export function errorInterceptor(
           if (req.url.includes('/refresh')) {
             toast.error('Your session has expired. Please log in again.');
           } else {
-            toast.error(error.error?.message);
+            toast.error(error.error?.error);
           }
         }
         return throwError(() => error);
       }
-      
       if (error.status === 0) {
         toast.warn('Network error. Please check your internet.');
       } else if (error.status >= 500) {
         toast.error('Server error. Please try again later.');
       } else if (error.status >= 400) {
-        toast.error(error.error?.message || 'Something went wrong.');
+        toast.error(error.error?.error || 'Something went wrong.');
       }
 
       return throwError(() => error);

@@ -68,13 +68,6 @@ public enum PlayerPosition
     Forward = 4
 }
 
-public enum TeamScope
-{
-    Public = 1,
-    My = 2,
-    All = 3
-}
-
 public enum TeamAction
 {
     Register = 1,

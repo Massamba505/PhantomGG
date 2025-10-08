@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Match } from '@/app/api/models/match.models';
-import { Roles } from '@/app/shared/constants/roles';
-import { MatchStatus } from '@/app/api/models';
+import { MatchStatus, UserRoles } from '@/app/api/models';
 
 export type MatchUserRole = 'Organizer' | 'User' | 'Public';
 
@@ -43,11 +42,11 @@ export class MatchCard {
   }
 
   isOrganizer(): boolean {
-    return this.role() === Roles.Organizer.toString();
+    return this.role() === UserRoles.Organizer.toString();
   }
 
   isUser(): boolean {
-    return this.role() === Roles.User.toString();
+    return this.role() === UserRoles.User.toString();
   }
 
   isPublic(): boolean {

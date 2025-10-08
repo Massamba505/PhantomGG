@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
@@ -8,9 +8,8 @@ import { TournamentCard } from '@/app/shared/components/cards';
 import { TournamentSearchComponent } from './components/tournament-search/tournament-search';
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
 import { ToastService } from '@/app/shared/services/toast.service';
-import { TournamentService } from '@/app/api/services';
+import { TournamentService, UserRoles } from '@/app/api/services';
 import { AuthStateService } from '@/app/store/AuthStateService';
-import { Roles } from '@/app/shared/constants/roles';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
@@ -43,7 +42,7 @@ export class TournamentListComponent implements OnInit {
     if(!this.authStateStore.isAuthenticated()){
       return false;
     }
-    return this.authStateStore.user()!.role == Roles.Organizer;
+    return this.authStateStore.user()!.role == UserRoles.Organizer;
   })
   
   searchCriteria = signal<TournamentSearch>({

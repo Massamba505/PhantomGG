@@ -32,7 +32,6 @@ namespace PhantomGG.Service.Implementations
             }
 
             var createdPlayer = await _playerRepository.CreateAsync(player);
-
             return createdPlayer.ToDto();
         }
 

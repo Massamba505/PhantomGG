@@ -27,7 +27,9 @@ export enum UserRoles {
   Admin = 1,
   Organizer = 2,
   User = 3
-}export enum ImageType {
+}
+
+export enum ImageType {
   ProfilePicture = 1,
   TournamentBanner = 2,
   TournamentLogo = 3,
@@ -79,12 +81,6 @@ export enum PlayerPosition {
   Defender = 2,
   Midfielder = 3,
   Forward = 4
-}
-
-export enum TeamScope {
-  Public = 1,
-  My = 2,
-  All = 3
 }
 
 export enum TeamAction {

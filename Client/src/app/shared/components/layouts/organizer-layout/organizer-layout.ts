@@ -9,12 +9,12 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { Roles } from '@/app/shared/constants/roles';
 import { Sidebar } from '../../sidebar/sidebar';
 import { ThemeToggle } from '../../ui/theme-toggle/theme-toggle';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { ProfileDropdown } from '../../profile-dropdown/profile-dropdown';
 import { map } from 'rxjs';
+import { UserRoles } from '@/app/api/models';
 
 @Component({
   selector: 'app-organizer-layout',
@@ -29,9 +29,9 @@ export class OrganizerLayout implements OnInit {
 
   sidebarOpen = signal(false);
   pageTitle = signal('Dashboard');
-  userRole = computed<Roles>(() => {
-    const role = this.authState.user()?.role as Roles;
-    return role ?? Roles.Organizer;
+  userRole = computed<UserRoles>(() => {
+    const role = this.authState.user()?.role as UserRoles;
+    return role ?? UserRoles.Organizer;
   });
 
   ngOnInit() {

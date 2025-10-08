@@ -3,6 +3,7 @@ using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Image;
 using PhantomGG.Models.DTOs.Tournament;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Repository.Specifications;
 using PhantomGG.Service.Exceptions;
@@ -15,12 +16,14 @@ public class TournamentService(
     ITournamentRepository tournamentRepository,
     IImageService imageService,
     ITournamentValidationService validationService,
+    ICacheInvalidationService cacheInvalidationService,
     HybridCache cache) : ITournamentService
 {
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
     private readonly ITournamentValidationService _validationService = validationService;
     private readonly IImageService _imageService = imageService;
     private readonly HybridCache _cache = cache;
+    private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
 
     public async Task<PagedResult<TournamentDto>> SearchAsync(TournamentQuery query, Guid? userId = null)
     {
@@ -37,21 +40,12 @@ public class TournamentService(
             PageSize = query.PageSize
         };
 
-        string cacheKey = spec.GetDeterministicKey();
-
-        return await _cache.GetOrCreateAsync(
-            cacheKey,
-            async cancel =>
-            {
-                var result = await _tournamentRepository.SearchAsync(spec);
-                return new PagedResult<TournamentDto>(
-                    result.Data.Select(t => t.ToDto()),
-                    result.Meta.Page,
-                    result.Meta.PageSize,
-                    result.Meta.TotalRecords
-                );
-            },
-            new HybridCacheEntryOptions { Expiration = TimeSpan.FromMinutes(2) }
+        var result = await _tournamentRepository.SearchAsync(spec);
+        return new PagedResult<TournamentDto>(
+            result.Data.Select(t => t.ToDto()),
+            result.Meta.Page,
+            result.Meta.PageSize,
+            result.Meta.TotalRecords
         );
     }
 
@@ -102,6 +96,7 @@ public class TournamentService(
         }
 
         var createdTournament = await _tournamentRepository.CreateAsync(tournament);
+        await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournament.Id);
 
         return createdTournament.ToDto();
     }
@@ -139,14 +134,16 @@ public class TournamentService(
         }
 
         var updatedTournament = await _tournamentRepository.UpdateAsync(tournament);
+        await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournament.Id);
 
         return updatedTournament.ToDto();
     }
 
     public async Task DeleteAsync(Guid id, Guid organizerId)
     {
-        await _validationService.ValidateCanDeleteAsync(id, organizerId);
+        var tournament = await _validationService.ValidateCanDeleteAsync(id, organizerId);
         await _tournamentRepository.DeleteAsync(id);
+        await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournament.Id);
     }
 
     public async Task<IEnumerable<TournamentDto>> GetByOrganizerAsync(Guid organizerId)

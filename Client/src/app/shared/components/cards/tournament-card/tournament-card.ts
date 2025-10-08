@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Tournament } from '@/app/api/models/tournament.models';
-import { Roles } from '@/app/shared/constants/roles';
+import { UserRoles } from '@/app/api/models';
 
-export type UserRole = 'Organizer' | 'User' | 'Public';
+export type CardRoles = 'Organizer' | 'User' | 'Public';
 
 @Component({
   selector: 'app-tournament-card',
@@ -16,7 +16,7 @@ export type UserRole = 'Organizer' | 'User' | 'Public';
 })
 export class TournamentCard {
   tournament = input.required<Tournament>();
-  role = input<UserRole>('Public');
+  role = input<CardRoles>('Public');
   edit = output<Tournament>();
   delete = output<string>();
   join = output<Tournament>();
@@ -60,7 +60,7 @@ export class TournamentCard {
       : new Date(t.startDate);
 
     return (
-      this.role() === Roles.User.toString() &&
+      this.role() === UserRoles.User.toString() &&
       t.status === 'RegistrationOpen' &&
       now < regDeadline &&
       t.teamCount < t.maxTeams
@@ -68,11 +68,11 @@ export class TournamentCard {
   }
 
   isOrganizer(): boolean {
-    return this.role() === Roles.Organizer.toString();
+    return this.role() === UserRoles.Organizer.toString();
   }
 
   isUser(): boolean {
-    return this.role() === Roles.User.toString();
+    return this.role() === UserRoles.User.toString();
   }
   isPublic(): boolean {
     return this.role() === 'Public';
