@@ -1,13 +1,13 @@
 namespace PhantomGG.Models.DTOs.Match;
 
-public class MatchSearchDto
+public class MatchQuery
 {
-    public string? SearchTerm { get; set; }
+    public string? Q { get; set; }
     public Guid? TournamentId { get; set; }
+    public Guid? TeamId { get; set; }
     public string? Status { get; set; }
-    public DateTime? DateFrom { get; set; }
-    public DateTime? DateTo { get; set; }
-    public string? Venue { get; set; }
-    public Guid? Cursor { get; set; }
-    public int Limit { get; set; } = 20;
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 20;
 }

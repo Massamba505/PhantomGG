@@ -1,5 +1,8 @@
 using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Repository.Entities;
+using PhantomGG.Repository.Specifications;
+using System.Text;
+using System.Text.Json;
 
 namespace PhantomGG.Service.Mappings;
 
@@ -46,5 +49,12 @@ public static class MatchMappings
         match.MatchDate = updateDto.MatchDate;
         if (!string.IsNullOrEmpty(updateDto.Status))
             match.Status = updateDto.Status;
+    }
+
+    public static string GetDeterministicKey(this MatchSpecification dto)
+    {
+        return Convert.ToBase64String(
+            Encoding.UTF8.GetBytes(JsonSerializer.Serialize(dto))
+        );
     }
 }

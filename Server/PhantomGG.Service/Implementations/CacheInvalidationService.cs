@@ -3,14 +3,9 @@ using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.Service.Implementations;
 
-public class CacheInvalidationService : ICacheInvalidationService
+public class CacheInvalidationService(HybridCache cache) : ICacheInvalidationService
 {
-    private readonly HybridCache _cache;
-
-    public CacheInvalidationService(HybridCache cache)
-    {
-        _cache = cache;
-    }
+    private readonly HybridCache _cache = cache;
 
     public async Task InvalidateUserCacheAsync(Guid userId)
     {

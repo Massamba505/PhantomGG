@@ -22,7 +22,6 @@ public static class RepositoryExtensions
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ITournamentRepository, TournamentRepository>();
         services.AddScoped<ITournamentTeamRepository, TournamentTeamRepository>();
-        services.AddScoped<ITournamentMatchRepository, TournamentMatchRepository>();
         services.AddScoped<ITeamRepository, TeamRepository>();
         services.AddScoped<IPlayerRepository, PlayerRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();

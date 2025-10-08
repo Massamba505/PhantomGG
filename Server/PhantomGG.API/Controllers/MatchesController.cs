@@ -4,526 +4,161 @@ using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Models.DTOs.MatchEvent;
 using PhantomGG.Service.Interfaces;
-using PhantomGG.Service.Exceptions;
 
 namespace PhantomGG.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class MatchesController(
-            IMatchService matchService,
-            ICurrentUserService currentUserService) : ControllerBase
+    IMatchService matchService,
+    IMatchEventService matchEventService,
+    ICurrentUserService currentUserService) : ControllerBase
 {
     private readonly IMatchService _matchService = matchService;
+    private readonly IMatchEventService _matchEventService = matchEventService;
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
-
     /// <summary>
-    /// Get a specific match by ID
+    /// Search or list matches
     /// </summary>
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse>> GetMatch(Guid id)
+    [HttpGet]
+    public async Task<ActionResult<PagedResult<MatchDto>>> GetMatches([FromQuery] MatchQuery query)
     {
-        try
-        {
-            var match = await _matchService.GetByIdAsync(id);
-            return Ok(new ApiResponse
-            {
-                Success = true,
-                Data = match,
-                Message = "Match retrieved successfully"
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
+        var result = await _matchService.SearchAsync(query);
+        return Ok(result);
     }
 
     /// <summary>
-    /// Get all matches for a specific tournament
+    /// Get match details
     /// </summary>
-    [HttpGet("tournament/{tournamentId}")]
-    public async Task<ActionResult<ApiResponse>> GetMatchesByTournament(Guid tournamentId)
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<MatchDto>> GetMatch(Guid id)
     {
-        var matches = await _matchService.GetByTournamentAsync(tournamentId);
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = matches,
-            Message = "Tournament matches retrieved successfully"
-        });
+        var match = await _matchService.GetByIdAsync(id);
+        return Ok(match);
     }
 
     /// <summary>
-    /// Get all matches for a specific team
-    /// </summary>
-    [HttpGet("team/{teamId}")]
-    public async Task<ActionResult<ApiResponse>> GetMatchesByTeam(Guid teamId)
-    {
-        var matches = await _matchService.GetByTeamAsync(teamId);
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = matches,
-            Message = "Team matches retrieved successfully"
-        });
-    }
-
-    /// <summary>
-    /// Search matches with various filters
-    /// </summary>
-    [HttpGet("search")]
-    public async Task<ActionResult<ApiResponse>> SearchMatches([FromQuery] MatchSearchDto searchDto)
-    {
-        var matches = await _matchService.SearchAsync(searchDto);
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = matches,
-            Message = "Match search completed"
-        });
-    }
-
-    /// <summary>
-    /// Create a new match
+    /// Create a match
     /// </summary>
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> CreateMatch([FromBody] CreateMatchDto createDto)
+    public async Task<ActionResult<MatchDto>> CreateMatch([FromBody] CreateMatchDto createDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var match = await _matchService.CreateAsync(createDto, currentUser.Id);
 
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var match = await _matchService.CreateAsync(createDto, userId);
-
-            return CreatedAtAction(nameof(GetMatch), new { id = match.Id }, new ApiResponse
-            {
-                Success = true,
-                Data = match,
-                Message = "Match created successfully"
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (UnauthorizedException ex)
-        {
-            return StatusCode(403, new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
+        return CreatedAtAction(nameof(GetMatch), new { id = match.Id }, match);
     }
 
     /// <summary>
-    /// Update an existing match
+    /// Update match info
     /// </summary>
-    [HttpPut("{id}")]
+    [HttpPatch("{id:guid}")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> UpdateMatch(Guid id, [FromBody] UpdateMatchDto updateDto)
+    public async Task<ActionResult<MatchDto>> UpdateMatch(Guid id, [FromBody] UpdateMatchDto updateDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var match = await _matchService.UpdateAsync(id, updateDto, userId);
-
-            return Ok(new ApiResponse
-            {
-                Success = true,
-                Data = match,
-                Message = "Match updated successfully"
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (UnauthorizedException ex)
-        {
-            return StatusCode(403, new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
+        var currentUser = _currentUserService.GetCurrentUser();
+        var match = await _matchService.UpdateAsync(id, updateDto, currentUser.Id);
+        return Ok(match);
     }
 
     /// <summary>
-    /// Update match result and score
+    /// Delete match
     /// </summary>
-    [HttpPut("{id}/result")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse>> UpdateMatchResult(Guid id, [FromBody] MatchResultDto resultDto)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var match = await _matchService.UpdateResultAsync(id, resultDto, userId);
-
-            return Ok(new ApiResponse
-            {
-                Success = true,
-                Data = match,
-                Message = "Match result updated successfully"
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (UnauthorizedException ex)
-        {
-            return StatusCode(403, new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-    }
-
-    /// <summary>
-    /// Delete a match
-    /// </summary>
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [Authorize]
     public async Task<ActionResult> DeleteMatch(Guid id)
     {
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            await _matchService.DeleteAsync(id, userId);
-            return NoContent();
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (UnauthorizedException ex)
-        {
-            return StatusCode(403, new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
+        var currentUser = _currentUserService.GetCurrentUser();
+        await _matchService.DeleteAsync(id, currentUser.Id);
+        return NoContent();
     }
 
-
     /// <summary>
-    /// Generate round-robin fixtures for a tournament
+    /// Submit or update match result
     /// </summary>
-    [HttpPost("generate-fixtures")]
+    [HttpPatch("{id:guid}/result")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> GenerateFixtures([FromBody] GenerateFixturesDto generateDto)
+    public async Task<ActionResult<MatchDto>> UpdateMatchResult(Guid id, [FromBody] MatchResultDto resultDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var matches = await _matchService.GenerateRoundRobinFixturesAsync(generateDto, userId);
-
-            return Ok(new ApiResponse
-            {
-                Success = true,
-                Data = matches,
-                Message = "Fixtures generated successfully"
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (UnauthorizedException ex)
-        {
-            return StatusCode(403, new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (ForbiddenException ex)
-        {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
+        var currentUser = _currentUserService.GetCurrentUser();
+        var match = await _matchService.UpdateResultAsync(id, resultDto, currentUser.Id);
+        return Ok(match);
     }
 
     /// <summary>
-    /// Get fixture generation status for a tournament
+    /// List events for a match
     /// </summary>
-    [HttpGet("fixture-status/{tournamentId}")]
-    public async Task<ActionResult<ApiResponse>> GetFixtureGenerationStatus(Guid tournamentId)
+    [HttpGet("{id:guid}/events")]
+    public async Task<ActionResult<IEnumerable<MatchEventDto>>> GetMatchEvents(
+        Guid id,
+        [FromQuery] string? type)
     {
-        try
+        var events = await _matchEventService.GetMatchEventsAsync(id);
+
+        if (!string.IsNullOrEmpty(type))
         {
-            var status = await _matchService.GetFixtureGenerationStatusAsync(tournamentId);
-            return Ok(new ApiResponse
-            {
-                Success = true,
-                Data = status,
-                Message = "Fixture status retrieved successfully"
-            });
+            events = events.Where(e => e.EventType.Equals(type, StringComparison.OrdinalIgnoreCase));
         }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-    }
 
-
-
-    /// <summary>
-    /// Get all events for a specific match
-    /// </summary>
-    [HttpGet("{matchId}/events")]
-    public async Task<ActionResult<ApiResponse>> GetMatchEvents(Guid matchId)
-    {
-        var events = await _matchService.GetMatchEventsAsync(matchId);
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = events,
-            Message = "Match events retrieved successfully"
-        });
+        return Ok(events);
     }
 
     /// <summary>
-    /// Get a specific match event by ID
+    /// Add an event to a match
     /// </summary>
-    [HttpGet("events/{eventId}")]
-    public async Task<ActionResult<ApiResponse>> GetMatchEvent(Guid eventId)
-    {
-        try
-        {
-            var matchEvent = await _matchService.GetMatchEventByIdAsync(eventId);
-            return Ok(new ApiResponse
-            {
-                Success = true,
-                Data = matchEvent,
-                Message = "Match event retrieved successfully"
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-    }
-
-    /// <summary>
-    /// Get all events for a specific player
-    /// </summary>
-    [HttpGet("player/{playerId}/events")]
-    public async Task<ActionResult<ApiResponse>> GetPlayerEvents(Guid playerId)
-    {
-        var events = await _matchService.GetPlayerEventsAsync(playerId);
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = events,
-            Message = "Player events retrieved successfully"
-        });
-    }
-
-    /// <summary>
-    /// Get all events for a specific team
-    /// </summary>
-    [HttpGet("team/{teamId}/events")]
-    public async Task<ActionResult<ApiResponse>> GetTeamEvents(Guid teamId)
-    {
-        var events = await _matchService.GetTeamEventsAsync(teamId);
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Data = events,
-            Message = "Team events retrieved successfully"
-        });
-    }
-
-    /// <summary>
-    /// Create a new match event
-    /// </summary>
-    [HttpPost("events")]
+    [HttpPost("{id:guid}/events")]
     [Authorize]
-    public async Task<ActionResult<ApiResponse>> CreateMatchEvent([FromBody] CreateMatchEventDto createDto)
+    public async Task<ActionResult<MatchEventDto>> CreateMatchEvent(Guid id, [FromBody] CreateMatchEventDto createDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var currentUser = _currentUserService.GetCurrentUser();
 
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var createdEvent = await _matchService.CreateMatchEventAsync(createDto, userId);
+        // Ensure match ID consistency
+        createDto.MatchId = id;
 
-            return CreatedAtAction(
-                nameof(GetMatchEvent),
-                new { eventId = createdEvent.Id },
-                new ApiResponse
-                {
-                    Success = true,
-                    Data = createdEvent,
-                    Message = "Match event created successfully"
-                });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (UnauthorizedException ex)
-        {
-            return StatusCode(403, new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (ValidationException ex)
-        {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
+        var createdEvent = await _matchEventService.CreateMatchEventAsync(createDto, currentUser.Id);
+
+        return CreatedAtAction(
+            nameof(GetMatchEvent),
+            new { matchId = id, eventId = createdEvent.Id },
+            createdEvent);
     }
 
     /// <summary>
-    /// Update an existing match event
+    /// Get an event
     /// </summary>
-    [HttpPut("events/{eventId}")]
-    [Authorize]
-    public async Task<ActionResult<ApiResponse>> UpdateMatchEvent(Guid eventId, [FromBody] UpdateMatchEventDto updateDto)
+    [HttpGet("{matchId:guid}/events/{eventId:guid}")]
+    public async Task<ActionResult<MatchEventDto>> GetMatchEvent(Guid matchId, Guid eventId)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var updatedEvent = await _matchService.UpdateMatchEventAsync(eventId, updateDto, userId);
-
-            return Ok(new ApiResponse
-            {
-                Success = true,
-                Data = updatedEvent,
-                Message = "Match event updated successfully"
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (UnauthorizedException ex)
-        {
-            return StatusCode(403, new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
+        var matchEvent = await _matchEventService.GetMatchEventByIdAsync(eventId);
+        return Ok(matchEvent);
     }
 
     /// <summary>
-    /// Delete a match event
+    /// Update an event
     /// </summary>
-    [HttpDelete("events/{eventId}")]
+    [HttpPatch("{matchId:guid}/events/{eventId:guid}")]
     [Authorize]
-    public async Task<ActionResult> DeleteMatchEvent(Guid eventId)
+    public async Task<ActionResult<MatchEventDto>> UpdateMatchEvent(
+        Guid matchId,
+        Guid eventId,
+        [FromBody] UpdateMatchEventDto updateDto)
     {
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            await _matchService.DeleteMatchEventAsync(eventId, userId);
-            return NoContent();
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
-        catch (UnauthorizedException ex)
-        {
-            return StatusCode(403, new ApiResponse
-            {
-                Success = false,
-                Message = ex.Message
-            });
-        }
+        var currentUser = _currentUserService.GetCurrentUser();
+        var updatedEvent = await _matchEventService.UpdateMatchEventAsync(eventId, updateDto, currentUser.Id);
+        return Ok(updatedEvent);
     }
 
+    /// <summary>
+    /// Delete an event
+    /// </summary>
+    [HttpDelete("{matchId:guid}/events/{eventId:guid}")]
+    [Authorize]
+    public async Task<ActionResult> DeleteMatchEvent(Guid matchId, Guid eventId)
+    {
+        var currentUser = _currentUserService.GetCurrentUser();
+        await _matchEventService.DeleteMatchEventAsync(eventId, currentUser.Id);
+        return NoContent();
+    }
 }

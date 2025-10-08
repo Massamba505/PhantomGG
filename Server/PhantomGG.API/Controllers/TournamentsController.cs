@@ -15,13 +15,13 @@ namespace PhantomGG.API.Controllers;
 public class TournamentsController(
     ITournamentService tournamentService,
     ITournamentTeamService tournamentTeamService,
-    ITournamentMatchService tournamentMatchService,
+    IMatchService matchService,
     ITournamentStandingService tournamentStandingService,
     ICurrentUserService currentUserService) : ControllerBase
 {
     private readonly ITournamentService _tournamentService = tournamentService;
     private readonly ITournamentTeamService _tournamentTeamService = tournamentTeamService;
-    private readonly ITournamentMatchService _tournamentMatchService = tournamentMatchService;
+    private readonly IMatchService _matchService = matchService;
     private readonly ITournamentStandingService _tournamentStandingService = tournamentStandingService;
     private readonly ICurrentUserService _currentUserService = currentUserService;
 
@@ -137,7 +137,7 @@ public class TournamentsController(
         Guid id,
         [FromQuery] MatchStatus? status)
     {
-        var matches = await _tournamentMatchService.GetMatchesAsync(id, status);
+        var matches = await _matchService.GetByTournamentAndStatusAsync(id, status);
         return Ok(matches);
     }
 
@@ -179,7 +179,7 @@ public class TournamentsController(
     public async Task<ActionResult> GenerateFixtures(Guid id, [FromBody] GenerateFixturesRequest request)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        await _tournamentMatchService.CreateBracketAsync(id, currentUser.Id);
+        await _matchService.CreateTournamentBracketAsync(id, currentUser.Id);
 
         return Accepted();
     }

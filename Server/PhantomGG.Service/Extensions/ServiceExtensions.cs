@@ -13,13 +13,14 @@ public static class ServiceExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITournamentService, TournamentService>();
         services.AddScoped<ITournamentTeamService, TournamentTeamService>();
-        services.AddScoped<ITournamentMatchService, TournamentMatchService>();
         services.AddScoped<ITournamentStandingService, TournamentStandingService>();
         services.AddScoped<ITournamentValidationService, TournamentValidationService>();
         services.AddScoped<ITeamValidationService, TeamValidationService>();
+        services.AddScoped<IMatchValidationService, MatchValidationService>();
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<IPlayerService, PlayerService>();
         services.AddScoped<IMatchService, MatchService>();
+        services.AddScoped<IMatchEventService, MatchEventService>();
 
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
