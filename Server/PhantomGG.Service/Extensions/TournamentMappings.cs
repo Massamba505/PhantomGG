@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Repository.Entities;
+using PhantomGG.Repository.Specifications;
 using System.Text;
 using System.Text.Json;
 
@@ -44,7 +44,7 @@ public static class TournamentMappings
             Id = Guid.NewGuid(),
             Name = createDto.Name,
             Description = createDto.Description,
-            Location = createDto.Location,
+            Location = createDto.Location ?? "TBA",
             RegistrationStartDate = createDto.RegistrationStartDate,
             RegistrationDeadline = createDto.RegistrationDeadline,
             StartDate = createDto.StartDate,
@@ -74,20 +74,16 @@ public static class TournamentMappings
             tournament.StartDate = updateDto.StartDate.Value;
         if (updateDto.MaxTeams.HasValue)
             tournament.MaxTeams = updateDto.MaxTeams.Value;
-        //if (updateDto.BannerUrl != null)
-        //    tournament.BannerUrl = updateDto.BannerUrl;
-        //if (updateDto.LogoUrl != null)
-        //    tournament.LogoUrl = updateDto.LogoUrl;
         if (updateDto.IsPublic.HasValue)
             tournament.IsPublic = updateDto.IsPublic.Value;
 
         tournament.UpdatedAt = DateTime.UtcNow;
     }
 
-    public static string GetDeterministicKey(this TournamentSearchDto dto)
+    public static string GetDeterministicKey(this TournamentSpecification spec)
     {
         return Convert.ToBase64String(
-            Encoding.UTF8.GetBytes(JsonSerializer.Serialize(dto))
+            Encoding.UTF8.GetBytes(JsonSerializer.Serialize(spec))
         );
     }
 }
