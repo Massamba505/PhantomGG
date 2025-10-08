@@ -15,6 +15,5 @@ public class TournamentQuery
 
     [Range(1, int.MaxValue, ErrorMessage = "Page size must be at least 1")]
     public int PageSize { get; set; } = 10;
-    public string? Sort { get; set; }
     public bool? IsPublic { get; set; }
 }

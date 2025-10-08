@@ -82,7 +82,7 @@ public class TournamentService(
                 OldFileUrl = tournament.BannerUrl,
                 File = createDto.BannerUrl,
                 ImageType = ImageType.TournamentBanner,
-                TournamentId = tournament.Id
+                Id = tournament.Id
             };
 
             tournament.BannerUrl = await _imageService.UploadImageAsync(uploadImage);
@@ -95,7 +95,7 @@ public class TournamentService(
                 OldFileUrl = tournament.BannerUrl,
                 File = createDto.LogoUrl,
                 ImageType = ImageType.TournamentBanner,
-                TournamentId = tournament.Id
+                Id = tournament.Id
             };
 
             tournament.LogoUrl = await _imageService.UploadImageAsync(uploadImage);
@@ -119,7 +119,7 @@ public class TournamentService(
                 OldFileUrl = tournament.BannerUrl,
                 File = updateDto.BannerUrl,
                 ImageType = ImageType.TournamentBanner,
-                TournamentId = tournament.Id
+                Id = tournament.Id
             };
 
             tournament.BannerUrl = await _imageService.UploadImageAsync(uploadImage);
@@ -132,7 +132,7 @@ public class TournamentService(
                 OldFileUrl = tournament.BannerUrl,
                 File = updateDto.LogoUrl,
                 ImageType = ImageType.TournamentBanner,
-                TournamentId = tournament.Id
+                Id = tournament.Id
             };
 
             tournament.LogoUrl = await _imageService.UploadImageAsync(uploadImage);

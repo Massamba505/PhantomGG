@@ -2,22 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using PhantomGG.Repository.Data;
 using PhantomGG.Repository.Entities;
 using PhantomGG.Models.DTOs;
-using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Repository.Interfaces;
+using PhantomGG.Repository.Specifications;
 
 namespace PhantomGG.Repository.Implementations;
 
 public class TeamRepository(PhantomContext context) : ITeamRepository
 {
     private readonly PhantomContext _context = context;
-
-    public async Task<IEnumerable<Team>> GetAllAsync()
-    {
-        return await _context.Teams
-            .Include(t => t.Players)
-            .OrderByDescending(t => t.CreatedAt)
-            .ToListAsync();
-    }
 
     public async Task<Team?> GetByIdAsync(Guid teamId)
     {
@@ -59,38 +51,23 @@ public class TeamRepository(PhantomContext context) : ITeamRepository
         }
     }
 
-    public async Task<PaginatedResult<Team>> SearchAsync(TeamSearchDto searchDto, Guid? userId)
+    public async Task<PagedResult<Team>> SearchAsync(TeamSpecification specification)
     {
         var query = _context.Teams
             .Include(t => t.Players)
+            .Include(t => t.TournamentTeams)
+            .Where(specification.ToExpression())
             .OrderByDescending(t => t.CreatedAt)
             .AsQueryable();
 
-        if (userId.HasValue)
-        {
-            query = query.Where(t => t.UserId == userId.Value);
-        }
-
-        if (!string.IsNullOrEmpty(searchDto.SearchTerm))
-        {
-            query = query.Where(t => t.Name.Contains(searchDto.SearchTerm) ||
-                                    t.ShortName.Contains(searchDto.SearchTerm));
-        }
-
-        if (searchDto.TournamentId.HasValue)
-        {
-            query = query.Where(t => t.TournamentTeams.Any(tt => tt.TournamentId == searchDto.TournamentId.Value));
-        }
-
-        var totalRecords = await query.CountAsync();
+        var totalCount = await query.CountAsync();
 
         var teams = await query
-            .OrderBy(t => t.Name)
-            .Skip((searchDto.Page - 1) * searchDto.PageSize)
-            .Take(searchDto.PageSize)
+            .Skip((specification.Page - 1) * specification.PageSize)
+            .Take(specification.PageSize)
             .ToListAsync();
 
-        return new PaginatedResult<Team>(teams, totalRecords); ;
+        return new PagedResult<Team>(teams, specification.Page, specification.PageSize, totalCount);
     }
 
     public async Task<bool> IsTeamNameUniqueInTournamentAsync(string teamName, Guid tournamentId, Guid? excludeTeamId = null)

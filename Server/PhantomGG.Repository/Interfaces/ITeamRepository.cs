@@ -1,17 +1,16 @@
 using PhantomGG.Repository.Entities;
 using PhantomGG.Models.DTOs;
-using PhantomGG.Models.DTOs.Team;
+using PhantomGG.Repository.Specifications;
 
 namespace PhantomGG.Repository.Interfaces;
 
 public interface ITeamRepository
 {
-    Task<IEnumerable<Team>> GetAllAsync();
     Task<Team?> GetByIdAsync(Guid id);
     Task<IEnumerable<Team>> GetByUserAsync(Guid userId);
     Task<Team> CreateAsync(Team team);
     Task<Team> UpdateAsync(Team team);
     Task DeleteAsync(Guid id);
-    Task<PaginatedResult<Team>> SearchAsync(TeamSearchDto searchDto, Guid? userId = null);
+    Task<PagedResult<Team>> SearchAsync(TeamSpecification specification);
     Task<bool> IsTeamNameUniqueInTournamentAsync(string teamName, Guid tournamentId, Guid? excludeTeamId = null);
 }

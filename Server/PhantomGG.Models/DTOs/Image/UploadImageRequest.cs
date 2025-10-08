@@ -12,7 +12,7 @@ public class UploadImageRequest
     public required IFormFile File { get; set; }
 
     [Required]
-    public Guid TournamentId { get; set; }
+    public Guid Id { get; set; }
 
     [Required]
     public ImageType ImageType { get; set; }

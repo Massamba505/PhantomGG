@@ -1,6 +1,6 @@
 using PhantomGG.Models.DTOs.Team;
-using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Repository.Entities;
+using PhantomGG.Repository.Specifications;
 using System.Text;
 using System.Text.Json;
 
@@ -10,7 +10,7 @@ public static class TeamMappings
 {
     public static TeamDto ToDto(this Team team)
     {
-        var players = team.Players.Select(p=>p.ToDto());
+        var players = team.Players.Select(p => p.ToDto());
 
         return new TeamDto
         {
@@ -32,8 +32,8 @@ public static class TeamMappings
             Id = Guid.NewGuid(),
             Name = createDto.Name,
             ShortName = createDto.ShortName ?? string.Empty,
-            //LogoUrl = createDto.LogoUrl,
             UserId = userId,
+            LogoUrl = $"https://placehold.co/200x200?text={createDto.Name}",
             CreatedAt = DateTime.UtcNow
         };
     }
@@ -44,8 +44,6 @@ public static class TeamMappings
             team.Name = updateDto.Name;
         if (!string.IsNullOrEmpty(updateDto.ShortName))
             team.ShortName = updateDto.ShortName;
-        //if (updateDto.LogoUrl != null)
-        //    team.LogoUrl = updateDto.LogoUrl;
 
         team.UpdatedAt = DateTime.UtcNow;
     }
@@ -68,7 +66,8 @@ public static class TeamMappings
 
         };
     }
-    public static string GetDeterministicKey(this TeamSearchDto dto)
+
+    public static string GetDeterministicKey(this TeamSpecification dto)
     {
         return Convert.ToBase64String(
             Encoding.UTF8.GetBytes(JsonSerializer.Serialize(dto))
