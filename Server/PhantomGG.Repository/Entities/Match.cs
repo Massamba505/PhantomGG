@@ -15,7 +15,7 @@ public partial class Match
 
     public DateTime MatchDate { get; set; }
 
-    public string Status { get; set; } = null!;
+    public int Status { get; set; }
 
     public int? HomeScore { get; set; }
 

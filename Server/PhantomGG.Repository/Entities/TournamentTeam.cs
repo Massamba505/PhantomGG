@@ -11,7 +11,7 @@ public partial class TournamentTeam
 
     public Guid TeamId { get; set; }
 
-    public string Status { get; set; } = null!;
+    public int Status { get; set; }
 
     public DateTime RequestedAt { get; set; }
 

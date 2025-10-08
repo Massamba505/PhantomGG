@@ -9,7 +9,7 @@ public partial class MatchEvent
 
     public Guid MatchId { get; set; }
 
-    public string EventType { get; set; } = null!;
+    public int EventType { get; set; }
 
     public int Minute { get; set; }
 
