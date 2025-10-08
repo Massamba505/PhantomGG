@@ -13,10 +13,9 @@ public static class PlayerMappings
             FirstName = player.FirstName,
             LastName = player.LastName,
             Position = player.Position,
-            Email = player.Email,
             PhotoUrl = player.PhotoUrl,
             TeamId = player.TeamId,
-            TeamName = player.Team?.Name ?? "Unknown",
+            TeamName = player.Team.Name,
             JoinedAt = player.CreatedAt
         };
     }

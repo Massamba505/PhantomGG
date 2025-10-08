@@ -80,7 +80,7 @@ public class LocalFileImageService(
             await DeleteImageAsync(uploadImage.OldFileUrl);
         }
 
-        var imageUrl = await SaveImageAsync(uploadImage.File, uploadImage.ImageType, uploadImage.TournamentId);
+        var imageUrl = await SaveImageAsync(uploadImage.File, uploadImage.ImageType, uploadImage.Id);
 
         return imageUrl;
     }
