@@ -46,7 +46,7 @@ public class MatchesController(
     [Authorize]
     public async Task<ActionResult<MatchDto>> CreateMatch([FromBody] CreateMatchDto createDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var match = await _matchService.CreateAsync(createDto, currentUser.Id);
 
         return CreatedAtAction(nameof(GetMatch), new { id = match.Id }, match);
@@ -59,7 +59,7 @@ public class MatchesController(
     [Authorize]
     public async Task<ActionResult<MatchDto>> UpdateMatch(Guid id, [FromBody] UpdateMatchDto updateDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var match = await _matchService.UpdateAsync(id, updateDto, currentUser.Id);
         return Ok(match);
     }
@@ -71,7 +71,7 @@ public class MatchesController(
     [Authorize]
     public async Task<ActionResult> DeleteMatch(Guid id)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         await _matchService.DeleteAsync(id, currentUser.Id);
         return NoContent();
     }
@@ -83,7 +83,7 @@ public class MatchesController(
     [Authorize]
     public async Task<ActionResult<MatchDto>> UpdateMatchResult(Guid id, [FromBody] MatchResultDto resultDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var match = await _matchService.UpdateResultAsync(id, resultDto, currentUser.Id);
         return Ok(match);
     }
@@ -113,7 +113,7 @@ public class MatchesController(
     [Authorize]
     public async Task<ActionResult<MatchEventDto>> CreateMatchEvent(Guid id, [FromBody] CreateMatchEventDto createDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
 
         // Ensure match ID consistency
         createDto.MatchId = id;
@@ -146,7 +146,7 @@ public class MatchesController(
         Guid eventId,
         [FromBody] UpdateMatchEventDto updateDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var updatedEvent = await _matchEventService.UpdateMatchEventAsync(eventId, updateDto, currentUser.Id);
         return Ok(updatedEvent);
     }
@@ -158,7 +158,7 @@ public class MatchesController(
     [Authorize]
     public async Task<ActionResult> DeleteMatchEvent(Guid matchId, Guid eventId)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         await _matchEventService.DeleteMatchEventAsync(eventId, currentUser.Id);
         return NoContent();
     }

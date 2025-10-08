@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Service.Interfaces;
 
@@ -25,10 +24,10 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
 
         if (!success)
         {
-            return BadRequest("Invalid or expired verification token");
+            return BadRequest(new { message = "Invalid or expired verification token" });
         }
 
-        return Ok("Email verified successfully");
+        return Ok(new { message = "Email verified successfully" });
     }
 
     /// <summary>
@@ -39,7 +38,7 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
     {
         await _authVerificationService.ResendEmailVerificationAsync(request.Email);
 
-        return Ok("Verification email sent");
+        return Ok(new { message = "Verification email sent" });
     }
 
     /// <summary>
@@ -50,7 +49,7 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
     {
         await _authVerificationService.InitiatePasswordResetAsync(request.Email);
 
-        return Ok("If an account exists with that email, a password reset link has been sent");
+        return Ok(new { message = "If an account exists with that email, a password reset link has been sent" });
     }
 
     /// <summary>
@@ -63,9 +62,9 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
 
         if (!success)
         {
-            return BadRequest("Invalid or expired reset token");
+            return BadRequest(new { message = "Invalid or expired reset token" });
         }
 
-        return Ok("Password reset successfully");
+        return Ok(new { message = "Password reset successfully" });
     }
 }

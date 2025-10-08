@@ -30,10 +30,12 @@ public class AuthController(
     [HttpPost("register")]
     [EnableRateLimiting("RegisterPolicy")]
     [AllowAnonymous]
-    public async Task<ActionResult<AuthDto>> Register([FromBody] RegisterRequestDto request)
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
     {
-        var result = await _authService.RegisterAsync(request);
-        return Created("/api/auth/me", result);
+        await _authService.RegisterAsync(request);
+
+        return Accepted(new { message = "Verification email sent. Please check your inbox." });
+
     }
 
     /// <summary>
@@ -68,7 +70,7 @@ public class AuthController(
     [Authorize]
     public async Task<ActionResult<UserDto>> Me()
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var result = await _userService.GetByIdAsync(currentUser.Id);
         return Ok(result);
     }
