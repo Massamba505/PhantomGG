@@ -16,11 +16,17 @@ public class CacheInvalidationService(HybridCache cache) : ICacheInvalidationSer
     {
         await _cache.RemoveAsync($"tournament_{tournamentId}");
         await _cache.RemoveAsync($"tournament_teams_{tournamentId}");
+        await _cache.RemoveAsync($"tournament_teams_{tournamentId}_all");
+        await _cache.RemoveAsync($"tournament_teams_{tournamentId}_Pending");
+        await _cache.RemoveAsync($"tournament_teams_{tournamentId}_Approved");
+        await _cache.RemoveAsync($"tournament_teams_{tournamentId}_Rejected");
         await _cache.RemoveAsync($"tournament_matches_{tournamentId}");
         await _cache.RemoveAsync($"upcoming_matches_{tournamentId}");
         await _cache.RemoveAsync($"completed_matches_{tournamentId}");
         await _cache.RemoveAsync($"fixture_status_{tournamentId}");
-
+        await _cache.RemoveAsync($"tournament_standings_{tournamentId}");
+        await _cache.RemoveAsync($"player_goal_standings_{tournamentId}");
+        await _cache.RemoveAsync($"player_assist_standings_{tournamentId}");
     }
 
     public async Task InvalidateTeamCacheAsync(Guid teamId)
@@ -32,18 +38,29 @@ public class CacheInvalidationService(HybridCache cache) : ICacheInvalidationSer
     public async Task InvalidateMatchCacheAsync(Guid matchId)
     {
         await _cache.RemoveAsync($"match_{matchId}");
-        await _cache.RemoveAsync($"match_events_{matchId}");
     }
 
     public async Task InvalidateTournamentRelatedCacheAsync(Guid tournamentId)
     {
         await InvalidateTournamentCacheAsync(tournamentId);
         await _cache.RemoveAsync("all_tournaments");
+        await _cache.RemoveAsync($"tournament_standings_{tournamentId}");
+        await _cache.RemoveAsync($"player_goal_standings_{tournamentId}");
+        await _cache.RemoveAsync($"player_assist_standings_{tournamentId}");
     }
 
     public async Task InvalidateTeamRelatedCacheAsync(Guid teamId)
     {
         await InvalidateTeamCacheAsync(teamId);
         await _cache.RemoveAsync("all_teams");
+    }
+
+    public async Task InvalidatePlayerStatsAsync(Guid playerId, Guid teamId, Guid tournamentId)
+    {
+        await _cache.RemoveAsync($"player_events_{playerId}");
+        await _cache.RemoveAsync($"team_events_{teamId}");
+        await _cache.RemoveAsync($"tournament_standings_{tournamentId}");
+        await _cache.RemoveAsync($"player_goal_standings_{tournamentId}");
+        await _cache.RemoveAsync($"player_assist_standings_{tournamentId}");
     }
 }

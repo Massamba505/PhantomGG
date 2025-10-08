@@ -51,7 +51,7 @@ public class TournamentService(
                     result.Meta.TotalRecords
                 );
             },
-            new HybridCacheEntryOptions { Expiration = TimeSpan.FromMinutes(5) }
+            new HybridCacheEntryOptions { Expiration = TimeSpan.FromMinutes(2) }
         );
     }
 

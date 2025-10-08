@@ -94,7 +94,7 @@ public class MatchService(
             },
             new HybridCacheEntryOptions
             {
-                Expiration = TimeSpan.FromMinutes(5)
+                Expiration = TimeSpan.FromMinutes(2)
             }
         );
     }

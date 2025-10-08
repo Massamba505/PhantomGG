@@ -8,4 +8,5 @@ public interface ICacheInvalidationService
     Task InvalidateMatchCacheAsync(Guid matchId);
     Task InvalidateTournamentRelatedCacheAsync(Guid tournamentId);
     Task InvalidateTeamRelatedCacheAsync(Guid teamId);
+    Task InvalidatePlayerStatsAsync(Guid playerId, Guid teamId, Guid tournamentId);
 }

@@ -57,7 +57,7 @@ public class TeamService(
             },
             options: new HybridCacheEntryOptions
             {
-                Expiration = TimeSpan.FromMinutes(5)
+                Expiration = TimeSpan.FromMinutes(2)
             },
             cancellationToken: CancellationToken.None
         );

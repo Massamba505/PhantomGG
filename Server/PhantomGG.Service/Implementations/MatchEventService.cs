@@ -9,30 +9,21 @@ namespace PhantomGG.Service.Implementations;
 
 public class MatchEventService(
     IMatchEventRepository matchEventRepository,
-    IPlayerRepository playerRepository,
+    IMatchRepository matchRepository,
     IMatchValidationService matchValidationService,
     ICacheInvalidationService cacheInvalidationService,
     HybridCache cache) : IMatchEventService
 {
     private readonly IMatchEventRepository _matchEventRepository = matchEventRepository;
-    private readonly IPlayerRepository _playerRepository = playerRepository;
+    private readonly IMatchRepository _matchRepository = matchRepository;
     private readonly IMatchValidationService _matchValidationService = matchValidationService;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
     private readonly HybridCache _cache = cache;
 
     public async Task<IEnumerable<MatchEventDto>> GetMatchEventsAsync(Guid matchId)
     {
-        var cacheKey = $"match_events_{matchId}";
-        var options = new HybridCacheEntryOptions
-        {
-            Expiration = TimeSpan.FromMinutes(5)
-        };
-
-        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
-        {
-            var events = await _matchEventRepository.GetByMatchIdAsync(matchId);
-            return events.Select(e => e.ToDto());
-        }, options);
+        var events = await _matchEventRepository.GetByMatchIdAsync(matchId);
+        return events.Select(e => e.ToDto());
     }
 
     public async Task<IEnumerable<MatchEventDto>> GetPlayerEventsAsync(Guid playerId)
@@ -40,7 +31,7 @@ public class MatchEventService(
         var cacheKey = $"player_events_{playerId}";
         var options = new HybridCacheEntryOptions
         {
-            Expiration = TimeSpan.FromMinutes(5)
+            Expiration = TimeSpan.FromMinutes(10)
         };
 
         return await _cache.GetOrCreateAsync(cacheKey, async _ =>
@@ -55,7 +46,7 @@ public class MatchEventService(
         var cacheKey = $"team_events_{teamId}";
         var options = new HybridCacheEntryOptions
         {
-            Expiration = TimeSpan.FromMinutes(5)
+            Expiration = TimeSpan.FromMinutes(10)
         };
 
         return await _cache.GetOrCreateAsync(cacheKey, async _ =>
@@ -87,11 +78,16 @@ public class MatchEventService(
     {
         await _matchValidationService.ValidateCanUpdateMatchAsync(createDto.MatchId, userId);
 
-        // Validate player belongs to one of the teams in the match
         await _matchValidationService.ValidatePlayerTeamRelationshipAsync(createDto.PlayerId, createDto.TeamId, createDto.MatchId);
 
         var matchEvent = createDto.ToEntity();
         var createdEvent = await _matchEventRepository.CreateAsync(matchEvent);
+
+        var matchEntity = await _matchRepository.GetByIdAsync(createDto.MatchId);
+        if (matchEntity != null)
+        {
+            await _cacheInvalidationService.InvalidatePlayerStatsAsync(createDto.PlayerId, createDto.TeamId, matchEntity.TournamentId);
+        }
 
         await _cacheInvalidationService.InvalidateMatchCacheAsync(createDto.MatchId);
 
@@ -120,6 +116,12 @@ public class MatchEventService(
 
         var updatedEvent = await _matchEventRepository.UpdateAsync(existingEvent);
 
+        var matchEntity = await _matchRepository.GetByIdAsync(existingEvent.MatchId);
+        if (matchEntity != null)
+        {
+            await _cacheInvalidationService.InvalidatePlayerStatsAsync(existingEvent.PlayerId, existingEvent.TeamId, matchEntity.TournamentId);
+        }
+
         await _cacheInvalidationService.InvalidateMatchCacheAsync(existingEvent.MatchId);
 
         return updatedEvent.ToDto();
@@ -134,6 +136,12 @@ public class MatchEventService(
         await _matchValidationService.ValidateCanUpdateMatchAsync(existingEvent.MatchId, userId);
 
         await _matchEventRepository.DeleteAsync(id);
+
+        var matchEntity = await _matchRepository.GetByIdAsync(existingEvent.MatchId);
+        if (matchEntity != null)
+        {
+            await _cacheInvalidationService.InvalidatePlayerStatsAsync(existingEvent.PlayerId, existingEvent.TeamId, matchEntity.TournamentId);
+        }
 
         await _cacheInvalidationService.InvalidateMatchCacheAsync(existingEvent.MatchId);
     }

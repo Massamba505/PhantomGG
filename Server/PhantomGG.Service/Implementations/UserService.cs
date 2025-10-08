@@ -25,7 +25,7 @@ public class UserService(
         var cacheKey = $"user_{id}";
         var options = new HybridCacheEntryOptions
         {
-            Expiration = TimeSpan.FromMinutes(30)
+            Expiration = TimeSpan.FromMinutes(10)
         };
 
         return await _cache.GetOrCreateAsync(cacheKey, async _ =>
