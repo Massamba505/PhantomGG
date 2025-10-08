@@ -161,4 +161,24 @@ public class MatchesController(
         await _matchEventService.DeleteMatchEventAsync(eventId, currentUser.Id);
         return NoContent();
     }
+
+    /// <summary>
+    /// Get all events for a specific player
+    /// </summary>
+    [HttpGet("player/{playerId:guid}/events")]
+    public async Task<ActionResult<IEnumerable<MatchEventDto>>> GetPlayerEvents(Guid playerId)
+    {
+        var events = await _matchEventService.GetPlayerEventsAsync(playerId);
+        return Ok(events);
+    }
+
+    /// <summary>
+    /// Get all events for a specific team
+    /// </summary>
+    [HttpGet("team/{teamId:guid}/events")]
+    public async Task<ActionResult<IEnumerable<MatchEventDto>>> GetTeamEvents(Guid teamId)
+    {
+        var events = await _matchEventService.GetTeamEventsAsync(teamId);
+        return Ok(events);
+    }
 }
