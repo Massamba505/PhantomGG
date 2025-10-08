@@ -96,7 +96,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
 
         var goalGroups = await _context.MatchEvents
             .Where(me => me.Match.TournamentId == tournamentId &&
-                         me.EventType == "Goal")
+                         me.EventType == MatchEventType.Goal.ToString())
             .GroupBy(me => new { me.TeamId })
             .Select(g => new
             {
@@ -146,10 +146,9 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
 
     public async Task<IEnumerable<PlayerAssistStandingDto>> GetPlayerAssistStandingsAsync(Guid tournamentId)
     {
-        // Get assist providers from match events
         var assistStandings = await _context.MatchEvents
             .Where(me => me.Match.TournamentId == tournamentId &&
-                        me.EventType == "Assist")
+                        me.EventType == MatchEventType.Assist.ToString())
             .GroupBy(me => new { me.TeamId })
             .Select(g => new
             {
@@ -161,7 +160,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
                 team => team.Id,
                 (assists, team) => new PlayerAssistStandingDto
                 {
-                    PlayerId = Guid.Empty, // We don't have player IDs in events, using player name
+                    PlayerId = Guid.Empty,
                     PlayerName = string.Empty,
                     TeamId = assists.TeamId,
                     TeamName = team.Name,
@@ -178,7 +177,6 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
             .ThenByDescending(p => p.AssistsPerMatch)
             .ToListAsync();
 
-        // Assign positions
         for (int i = 0; i < assistStandings.Count; i++)
         {
             assistStandings[i].Position = i + 1;
