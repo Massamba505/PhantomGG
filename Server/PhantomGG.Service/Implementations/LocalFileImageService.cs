@@ -1,8 +1,9 @@
-using PhantomGG.Service.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using PhantomGG.Common.Enums;
+using PhantomGG.Models.DTOs.Image;
 using PhantomGG.Service.Exceptions;
+using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -70,6 +71,18 @@ public class LocalFileImageService(
         {
             return false;
         });
+    }
+
+    public async Task<string> UploadImageAsync(UploadImageRequest uploadImage)
+    {
+        if (!string.IsNullOrEmpty(uploadImage.OldFileUrl))
+        {
+            await DeleteImageAsync(uploadImage.OldFileUrl);
+        }
+
+        var imageUrl = await SaveImageAsync(uploadImage.File, uploadImage.ImageType, uploadImage.TournamentId);
+
+        return imageUrl;
     }
 
     private void ValidateFile(IFormFile file)
