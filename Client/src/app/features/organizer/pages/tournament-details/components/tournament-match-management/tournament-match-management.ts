@@ -12,6 +12,7 @@ import {
   GenerateFixtures 
 } from '@/app/api/models/match.models';
 import { Team, Player } from '@/app/api/models/team.models';
+import { MatchStatus, TeamRegistrationStatus } from '@/app/api/models/common.models';
 import { MatchService } from '@/app/api/services/match.service';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { Tournament } from '@/app/api/models';
@@ -78,14 +79,13 @@ export class TournamentMatchManagementComponent implements OnInit {
     if (tab === 'all') return allMatches;
     
     return allMatches.filter(match => {
-      const status = match.status?.toLowerCase();
       switch (tab) {
         case 'scheduled':
-          return status === 'scheduled' || status === 'pending';
+          return match.status === MatchStatus.Scheduled;
         case 'inprogress':
-          return status === 'inprogress';
+          return match.status === MatchStatus.InProgress;
         case 'completed':
-          return status === 'completed' || status === 'finished';
+          return match.status === MatchStatus.Completed;
         default:
           return true;
       }
@@ -131,16 +131,16 @@ export class TournamentMatchManagementComponent implements OnInit {
   }
 
   loadTournamentTeams() {
-    this.tournamentService.getTournamentTeams(this.tournamentId(), 'Approved').subscribe({
+    this.tournamentService.getTournamentTeams(this.tournamentId(), TeamRegistrationStatus.Approved).subscribe({
       next: (teams) => {
         const convertedTeams: Team[] = teams.map(tt => ({
           id: tt.id,
           name: tt.name,
-          shortName: tt.shortName,
+          shortName: tt.shortName || '',
           logoUrl: tt.logoUrl,
           userId: tt.managerId || '',
           createdAt: tt.registeredAt,
-          players:tt.players,
+          players: tt.players,
           updatedAt: undefined
         }));
         this.tournamentTeams.set(convertedTeams);
@@ -199,7 +199,6 @@ export class TournamentMatchManagementComponent implements OnInit {
   onMatchView(match: Match) {
     this.selectedMatch.set(match);
     this.loadMatchEvents(match.id);
-    console.log('View match:', match);
   }
 
   onMatchEdit(match: Match) {
@@ -279,7 +278,13 @@ export class TournamentMatchManagementComponent implements OnInit {
   }
 
   onAddEvent(eventData: CreateMatchEvent) {
-    this.matchService.createMatchEvent(eventData).subscribe({
+    const matchId = this.selectedMatch()?.id;
+    if (!matchId) {
+      this.toastService.error('No match selected');
+      return;
+    }
+    
+    this.matchService.createMatchEvent(matchId, eventData).subscribe({
       next: (event) => {
         this.toastService.success('Match event added successfully');
         this.loadMatchEvents(this.selectedMatch()!.id);

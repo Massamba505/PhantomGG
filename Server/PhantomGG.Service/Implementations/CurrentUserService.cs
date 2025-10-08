@@ -12,11 +12,11 @@ public class CurrentUserService(
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    public CurrentUserDto GetCurrentUser()
+    public CurrentUserDto? GetCurrentUser()
     {
         if (!IsAuthenticated())
         {
-            throw new UnauthorizedException("User is not authenticated");
+            return null;
         }
 
         var user = _httpContextAccessor.HttpContext?.User!;

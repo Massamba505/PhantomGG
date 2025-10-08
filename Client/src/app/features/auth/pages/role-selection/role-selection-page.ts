@@ -51,7 +51,6 @@ export class RoleSelectionPage {
 
     this.authState.register(credentials).subscribe({
       next: () => {
-        debugger;
         this.router.navigate(['/auth/verify-email-sent'], {
           state: { email: credentials.email }
         });

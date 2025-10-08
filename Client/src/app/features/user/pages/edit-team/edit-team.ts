@@ -56,7 +56,6 @@ export class EditTeamComponent implements OnInit {
 
     this.isSaving.set(true);
     
-    // For edit team component, we expect UpdateTeam data
     const updateData = teamData as UpdateTeam;
     
     this.teamService.updateTeam(this.teamId, updateData).subscribe({

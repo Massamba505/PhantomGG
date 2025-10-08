@@ -35,10 +35,10 @@ export class TournamentFilter {
       searchTerm: this.searchTerm() || undefined,
       status: this.status() || undefined,
       location: this.location() || undefined,
-      startDateFrom: this.startDateFrom() || undefined,
-      startDateTo: this.startDateTo() || undefined,
+      startFrom: this.startDateFrom() || undefined,
+      startTo: this.startDateTo() || undefined,
       isPublic: true,
-      pageNumber: 1,
+      page: 1,
       pageSize: 12
     };
     

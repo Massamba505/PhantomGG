@@ -1,9 +1,9 @@
-import { Component, input, output, OnInit, inject, effect } from '@angular/core';
+import { Component, input, output, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { Team } from '@/app/api/models/team.models';
-import { Tournament, Match } from '@/app/api/models';
+import { Match, MatchStatus } from '@/app/api/models';
 import { UpdateMatch } from '@/app/api/models/match.models';
 
 @Component({
@@ -23,7 +23,7 @@ import { UpdateMatch } from '@/app/api/models/match.models';
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium mb-2">Home Team</label>
-            <select formControlName="homeTeamId" class="input-select">
+            <select [value]="" formControlName="homeTeamId" class="input-select">
                 @for(team of teams(); track team.id){
                 <option [value]="team.id">
                     {{ team.name }}
@@ -48,12 +48,21 @@ import { UpdateMatch } from '@/app/api/models/match.models';
           <label class="block text-sm font-medium mb-2">Match Date & Time</label>
           <input
             type="datetime-local"
-            [min]="tournament()?.startDate"
+            [min]="startDate()"
             formControlName="matchDate"
             class="input-field"
           />
         </div>
-
+        <div>
+          <label class="block text-sm font-medium mb-2">Match Status</label>
+          <select formControlName="status" class="input-select">
+              @for(matchStatus of matchStatuses; track matchStatus){
+              <option [value]="matchStatus">
+                  {{ matchStatus }}
+              </option>
+              }
+          </select>
+        </div>
         <div>
           <label class="block text-sm font-medium mb-2">Venue</label>
           <input
@@ -84,18 +93,25 @@ import { UpdateMatch } from '@/app/api/models/match.models';
     </app-modal>
   `
 })
-export class EditMatchModalComponent implements OnInit {
+export class EditMatchModalComponent {
   isOpen = input.required<boolean>();
   teams = input.required<Team[]>();
-  tournament = input.required<Tournament | null>();
+  startDate = input.required<string | null>();
   selectedMatch = input.required<Match | null>();
-  
+  matchStatuses = Object.values(MatchStatus);
+
   close = output<void>();
   update = output<{ matchId: string; updateData: UpdateMatch }>();
   
   private fb = inject(FormBuilder);
   
-  editMatchForm!: FormGroup;
+  editMatchForm: FormGroup = this.fb.group({
+    homeTeamId: ['', Validators.required],
+    awayTeamId: ['', Validators.required],
+    matchDate: ['', Validators.required],
+    venue: [''],
+    status:['']
+  });
 
   constructor() {
     effect(() => {
@@ -105,18 +121,10 @@ export class EditMatchModalComponent implements OnInit {
           homeTeamId: match.homeTeamId,
           awayTeamId: match.awayTeamId,
           matchDate: new Date(match.matchDate).toISOString().slice(0, 16),
-          venue: match.venue || ''
+          venue: match.venue || '',
+          status: match.status
         });
       }
-    });
-  }
-
-  ngOnInit() {
-    this.editMatchForm = this.fb.group({
-      homeTeamId: ['', Validators.required],
-      awayTeamId: ['', Validators.required],
-      matchDate: ['', Validators.required],
-      venue: ['']
     });
   }
 
@@ -128,7 +136,8 @@ export class EditMatchModalComponent implements OnInit {
       homeTeamId: formValue.homeTeamId,
       awayTeamId: formValue.awayTeamId,
       matchDate: formValue.matchDate,
-      venue: formValue.venue
+      venue: formValue.venue,
+      status: formValue.status
     };
 
     this.update.emit({

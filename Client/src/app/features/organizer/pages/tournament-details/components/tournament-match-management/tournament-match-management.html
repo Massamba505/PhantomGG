@@ -22,7 +22,7 @@
 <app-create-match-modal
   [isOpen]="showCreateMatchModal()"
   [teams]="tournamentTeams()"
-  [tournament]="tournament()"
+  [startDate]="tournament()?.startDate ?? ''"
   [tournamentId]="tournamentId()"
   (close)="closeModals()"
   (create)="onCreateMatch($event)"
@@ -31,7 +31,7 @@
 <app-edit-match-modal
   [isOpen]="showEditMatchModal()"
   [teams]="tournamentTeams()"
-  [tournament]="tournament()"
+  [startDate]="tournament()?.startDate ?? ''"
   [selectedMatch]="selectedMatch()"
   (close)="closeModals()"
   (update)="onEditMatch($event)"

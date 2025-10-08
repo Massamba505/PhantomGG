@@ -74,11 +74,12 @@ export class TournamentDetails implements OnInit {
     return {
       id: tournamentTeam.id,
       name: tournamentTeam.name,
-      shortName: tournamentTeam.shortName,
+      shortName: tournamentTeam.shortName || '',
       logoUrl: tournamentTeam.logoUrl,
       userId: tournamentTeam.managerId || '',
       createdAt: tournamentTeam.registeredAt,
-      updatedAt: undefined
+      updatedAt: undefined,
+      players: tournamentTeam.players
     };
   }
   

@@ -103,7 +103,6 @@ export class PlayerForm implements OnInit {
       this.selectedFile.set(file);
       this.form.patchValue({ photoUrl: file });
       
-      // Create preview URL
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl.set(e.target?.result as string);

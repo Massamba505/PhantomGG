@@ -73,7 +73,6 @@ export class Signup {
 
   onSubmit() {
     this.submitted.set(true);
-    debugger;
     if (this.signupForm.invalid) {
       return;
     }

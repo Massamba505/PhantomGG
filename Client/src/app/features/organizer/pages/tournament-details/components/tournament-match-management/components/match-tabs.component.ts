@@ -2,6 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { Match } from '@/app/api/models/match.models';
+import { MatchStatus } from '@/app/api/models';
 
 export type MatchTab = 'all' | 'scheduled' | 'inprogress' | 'completed';
 
@@ -74,14 +75,14 @@ export class MatchTabsComponent {
     if (tab === 'all') return this.matches().length;
     
     return this.matches().filter(match => {
-      const status = match.status?.toLowerCase();
+      const status = match.status;
       switch (tab) {
         case 'scheduled':
-          return status === 'scheduled' || status === 'pending';
+          return status === MatchStatus.Scheduled;
         case 'inprogress':
-          return status === 'inprogress' || status === 'in progress';
+          return status === MatchStatus.InProgress;
         case 'completed':
-          return status === 'completed' || status === 'finished';
+          return status === MatchStatus.Completed;
         default:
           return true;
       }

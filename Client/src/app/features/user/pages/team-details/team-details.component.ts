@@ -90,7 +90,6 @@ export class TeamDetailsComponent implements OnInit {
     }
   }
 
-  // Player management methods
   onShowAddPlayer() {
     this.editingPlayer.set(null);
     this.showPlayerModal.set(true);
@@ -160,7 +159,6 @@ export class TeamDetailsComponent implements OnInit {
     }
   }
 
-  // Utility methods
   isManager(): boolean {
     const user = this.authStateService.user();
     const team = this.team();

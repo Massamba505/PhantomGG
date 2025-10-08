@@ -4,6 +4,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Match } from '@/app/api/models/match.models';
 import { Roles } from '@/app/shared/constants/roles';
+import { MatchStatus } from '@/app/api/models';
 
 export type MatchUserRole = 'Organizer' | 'User' | 'Public';
 
@@ -54,23 +55,23 @@ export class MatchCard {
   }
 
   canUpdateResult(): boolean {
-    const matchStatus = this.match().status?.toLowerCase();
-    return this.isOrganizer() && (matchStatus === 'inprogress');
+    const matchStatus = this.match().status;
+    return this.isOrganizer() && (matchStatus === MatchStatus.InProgress);
   }
 
   canEdit(): boolean {
-    const matchStatus = this.match().status?.toLowerCase();
-    return this.isOrganizer() && (matchStatus === 'scheduled');
+    const matchStatus = this.match().status;
+    return this.isOrganizer() && (matchStatus === MatchStatus.Scheduled);
   }
 
   isInProgress(): boolean {
-    const matchStatus = this.match().status?.toLowerCase();
-    return matchStatus === 'inprogress';
+    const matchStatus = this.match().status;
+    return matchStatus === MatchStatus.InProgress;
   }
 
   isCompleted(): boolean {
-    const matchStatus = this.match().status?.toLowerCase();
-    return matchStatus === 'completed';
+    const matchStatus = this.match().status;
+    return matchStatus === MatchStatus.Completed;
   }
 
   getScoreDisplay(): string {

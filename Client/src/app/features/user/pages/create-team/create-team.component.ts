@@ -29,7 +29,6 @@ export class CreateTeamComponent {
   onSubmit(teamData: CreateTeam | UpdateTeam) {
     this.saving.set(true);
     
-    // For create team component, we expect CreateTeam data
     const createTeamData = teamData as CreateTeam;
     
     this.teamService.createTeam(createTeamData).subscribe({

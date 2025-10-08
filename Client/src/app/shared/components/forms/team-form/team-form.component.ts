@@ -24,21 +24,17 @@ export class TeamFormComponent implements OnInit, OnChanges {
   isEditMode = computed(() => this.team !== null);
 
   ngOnInit() {
-    console.log('TeamForm ngOnInit - team:', this.team);
     this.initializeForm();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('TeamForm ngOnChanges - changes:', changes);
     if (changes['team'] && this.teamForm) {
-      console.log('Team changed, reinitializing form with:', changes['team'].currentValue);
       this.initializeForm();
     }
   }
 
   private initializeForm() {
     const team = this.team;
-    console.log('Initializing form with team:', team);
     
     this.teamForm = this.fb.group({
       name: [
@@ -49,20 +45,19 @@ export class TeamFormComponent implements OnInit, OnChanges {
         team?.shortName || '',
         [Validators.maxLength(10)],
       ],
-      logo: [null], // Optional for both create and edit
+      logo: [null],
     });
 
-    // Set logo preview if team has logoUrl
+  
     if (team?.logoUrl) {
       this.logoPreview.set(team.logoUrl);
     } else {
       this.logoPreview.set(null);
     }
 
-    console.log('Form initialized with values:', this.teamForm.value);
   }
 
-  // Handle file select
+
   onLogoChange(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
@@ -70,7 +65,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
       this.teamForm.patchValue({ logo: file });
       this.teamForm.get('logo')?.updateValueAndValidity();
 
-      // Show preview
+    
       const reader = new FileReader();
       reader.onload = () => this.logoPreview.set(reader.result as string);
       reader.readAsDataURL(file);
@@ -86,7 +81,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
     const formValue = this.teamForm.value;
 
     if (this.isEditMode()) {
-      // For edit mode
+    
       const updateData: UpdateTeam = {
         name: formValue.name,
         shortName: formValue.shortName || undefined,
@@ -96,7 +91,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
 
       this.formSubmit.emit(updateData);
     } else {
-      // For create mode
+    
       const createData: CreateTeam = {
         name: formValue.name,
         shortName: formValue.shortName || undefined,

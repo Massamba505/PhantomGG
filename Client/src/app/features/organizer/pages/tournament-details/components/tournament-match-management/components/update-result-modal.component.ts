@@ -5,6 +5,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models/match.models';
+import { MatchStatus } from '@/app/api/models';
 
 @Component({
   selector: 'app-update-result-modal',
@@ -62,6 +63,16 @@ import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models
                 />
               </div>
             </div>
+            <!-- <div>
+              <label class="block text-sm font-medium mb-2">Match Status</label>
+              <select formControlName="status" class="input-select">
+                  @for(matchStatus of matchStatuses; track matchStatus.id){
+                  <option [value]="matchStatus.id">
+                      {{ matchStatus.value }}
+                  </option>
+                  }
+              </select>
+            </div> -->
 
             <div class="flex gap-2 pt-4">
               <button
@@ -127,6 +138,7 @@ export class UpdateResultModalComponent implements OnInit {
   isOpen = input.required<boolean>();
   selectedMatch = input.required<Match | null>();
   matchEvents = input.required<MatchEvent[]>();
+  matchStatuses = []//(MatchStatus);
   
   close = output<void>();
   updateResult = output<{ matchId: string; result: MatchResult }>();
@@ -143,7 +155,8 @@ export class UpdateResultModalComponent implements OnInit {
       if (match && this.updateResultForm) {
         this.updateResultForm.patchValue({
           homeScore: match.homeScore || 0,
-          awayScore: match.awayScore || 0
+          awayScore: match.awayScore || 0,
+          status: match.status
         });
       }
     });
@@ -152,7 +165,8 @@ export class UpdateResultModalComponent implements OnInit {
   ngOnInit() {
     this.updateResultForm = this.fb.group({
       homeScore: [0, [Validators.required, Validators.min(0)]],
-      awayScore: [0, [Validators.required, Validators.min(0)]]
+      awayScore: [0, [Validators.required, Validators.min(0)]],
+      status: [MatchStatus.Scheduled, [Validators.required]]
     });
   }
 
@@ -161,8 +175,9 @@ export class UpdateResultModalComponent implements OnInit {
     
     const formValue = this.updateResultForm.value;
     const resultData: MatchResult = {
-      homeScore: formValue.homeScore,
-      awayScore: formValue.awayScore
+      homeScore: parseInt(formValue.homeScore),
+      awayScore: parseInt(formValue.awayScore),
+      status: parseInt(formValue.status) 
     };
 
     this.updateResult.emit({
@@ -171,12 +186,13 @@ export class UpdateResultModalComponent implements OnInit {
     });
   }
 
-  formatEventType(eventType: MatchEventType): string {
+  formatEventType(eventType: string): string {
     return eventType.replace(/([A-Z])/g, ' $1').trim();
   }
 
-  getEventIcon(eventType: MatchEventType): any {
-    switch (eventType) {
+  getEventIcon(eventType: string): any {
+    const enumValue = this.stringToMatchEventType(eventType);
+    switch (enumValue) {
       case MatchEventType.Goal:
         return this.icons.Target;
       case MatchEventType.YellowCard:
@@ -192,8 +208,9 @@ export class UpdateResultModalComponent implements OnInit {
     }
   }
 
-  getEventIconClass(eventType: MatchEventType): string {
-    switch (eventType) {
+  getEventIconClass(eventType: string): string {
+    const enumValue = this.stringToMatchEventType(eventType);
+    switch (enumValue) {
       case MatchEventType.Goal:
         return 'text-green-600';
       case MatchEventType.YellowCard:
@@ -207,5 +224,17 @@ export class UpdateResultModalComponent implements OnInit {
       default:
         return 'text-blue-600';
     }
+  }
+
+  private stringToMatchEventType(eventType: string): MatchEventType | undefined {
+    const eventMap: Record<string, MatchEventType> = {
+      'Goal': MatchEventType.Goal,
+      'Assist': MatchEventType.Assist,
+      'YellowCard': MatchEventType.YellowCard,
+      'RedCard': MatchEventType.RedCard,
+      'Foul': MatchEventType.Foul,
+      'Substitution': MatchEventType.Substitution
+    };
+    return eventMap[eventType];
   }
 }

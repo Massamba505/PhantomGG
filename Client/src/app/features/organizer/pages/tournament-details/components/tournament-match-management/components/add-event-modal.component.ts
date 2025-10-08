@@ -109,7 +109,6 @@ export class AddEventModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   addEventForm!: FormGroup;
 
-  // Reactive state
   selectedTeamId = signal<string | null>(null);
   selectedPlayerId = signal<string | null>(null);
 
@@ -135,12 +134,14 @@ export class AddEventModalComponent implements OnInit {
     return this.playersForSelectedTeam().find(p => p.id === playerId) ?? null;
   });
 
-    eventTypes = computed(() =>
-        Object.values(MatchEventType).map((value, index) => ({
-            id: index + 1,
-            value
-        }))
-    );
+  eventTypes = computed(() => {
+    return Object.keys(MatchEventType)
+      .filter(key => isNaN(Number(key)))
+      .map(key => ({
+        id: MatchEventType[key as keyof typeof MatchEventType] as number,
+        value: key
+      }));
+  });
 
   ngOnInit() {
     this.addEventForm = this.fb.group({
@@ -164,7 +165,6 @@ export class AddEventModalComponent implements OnInit {
     if (this.addEventForm.invalid || !this.selectedMatch()) return;
 
     const formValue = this.addEventForm.value;
-    debugger;
 
     const eventData: CreateMatchEvent = {
       matchId: this.selectedMatch()!.id,
@@ -183,7 +183,7 @@ export class AddEventModalComponent implements OnInit {
     this.selectedPlayerId.set(null);
   }
 
-  formatEventType(eventType: MatchEventType): string {
+  formatEventType(eventType: string): string {
     return eventType.replace(/([A-Z])/g, ' $1').trim();
   }
 }

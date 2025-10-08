@@ -12,7 +12,7 @@ export interface MatchDto {
   awayTeamLogo?: string;
   matchDate: string;
   venue?: string;
-  status: string;
+  status: MatchStatus;
   homeScore?: number;
   awayScore?: number;
 }
