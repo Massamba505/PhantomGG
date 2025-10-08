@@ -2,15 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../base/api-client.service';
 import { API_ENDPOINTS } from '../base/api-endpoints';
-import { PaginatedResponse } from '../models/api.models';
+import { PagedResult } from '../models/api.models';
 import {
-  Team,
-  CreateTeam,
-  UpdateTeam,
-  TeamSearch,
-  Player,
-  CreatePlayer,
-  UpdatePlayer
+  TeamDto,
+  CreateTeamDto,
+  UpdateTeamDto,
+  TeamQuery,
+  PlayerDto,
+  CreatePlayerDto,
+  UpdatePlayerDto
 } from '../models/team.models';
 
 @Injectable({
@@ -19,87 +19,92 @@ import {
 export class TeamService {
   private apiClient = inject(ApiClient);
 
-  getTeams(params?: TeamSearch): Observable<PaginatedResponse<Team>> {
-    return this.apiClient.getPaginated<Team>(API_ENDPOINTS.TEAMS.LIST, params);
+  getTeams(params?: Partial<TeamQuery>): Observable<PagedResult<TeamDto>> {
+    const query: TeamQuery = {
+      page: 1,
+      pageSize: 10,
+      ...params
+    };
+    return this.apiClient.getPaged<TeamDto>(API_ENDPOINTS.TEAMS.LIST, query);
   }
 
-  getTeam(id: string): Observable<Team> {
-    return this.apiClient.get<Team>(API_ENDPOINTS.TEAMS.GET(id));
+  getTeam(id: string): Observable<TeamDto> {
+    return this.apiClient.get<TeamDto>(API_ENDPOINTS.TEAMS.GET(id));
   }
 
-  getTeamPlayers(id: string): Observable<Player[]> {
-    return this.apiClient.get<Player[]>(API_ENDPOINTS.TEAMS.PLAYERS(id));
+  getTeamPlayers(id: string): Observable<PlayerDto[]> {
+    return this.apiClient.get<PlayerDto[]>(API_ENDPOINTS.TEAMS.PLAYERS(id));
   }
 
-  createTeam(team: CreateTeam): Observable<Team> {
+  createTeam(team: CreateTeamDto): Observable<TeamDto> {
     const formData = new FormData();
-    formData.append('Name', team.name);
+    formData.append('name', team.name);
     if (team.shortName) {
-      formData.append('ShortName', team.shortName);
+      formData.append('shortName', team.shortName);
     }
     if (team.logoUrl) {
-      formData.append('LogoUrl', team.logoUrl);
+      formData.append('logoUrl', team.logoUrl);
     }
     if (team.teamPhotoUrl) {
-      formData.append('TeamPhotoUrl', team.teamPhotoUrl);
+      formData.append('teamPhotoUrl', team.teamPhotoUrl);
     }
     
-    return this.apiClient.postFormData<Team>(API_ENDPOINTS.TEAMS.CREATE, formData);
+    return this.apiClient.postFormData<TeamDto>(API_ENDPOINTS.TEAMS.CREATE, formData);
   }
 
-  updateTeam(id: string, updates: UpdateTeam): Observable<Team> {
+  updateTeam(id: string, updates: UpdateTeamDto): Observable<TeamDto> {
     const formData = new FormData();
-    formData.append('Name', updates.name);
+    formData.append('name', updates.name);
     if (updates.shortName) {
-      formData.append('ShortName', updates.shortName);
+      formData.append('shortName', updates.shortName);
     }
     if (updates.logoUrl) {
-      formData.append('LogoUrl', updates.logoUrl);
+      formData.append('logoUrl', updates.logoUrl);
     }
     if (updates.teamPhotoUrl) {
-      formData.append('TeamPhotoUrl', updates.teamPhotoUrl);
+      formData.append('teamPhotoUrl', updates.teamPhotoUrl);
     }
     
-    return this.apiClient.putFormData<Team>(API_ENDPOINTS.TEAMS.UPDATE(id), formData);
+    return this.apiClient.patchFormData<TeamDto>(API_ENDPOINTS.TEAMS.UPDATE(id), formData);
   }
 
   deleteTeam(id: string): Observable<void> {
     return this.apiClient.delete<void>(API_ENDPOINTS.TEAMS.DELETE(id));
   }
 
-  addPlayerToTeam(teamId: string, playerData: CreatePlayer): Observable<Player> {
+  addPlayerToTeam(teamId: string, playerData: CreatePlayerDto): Observable<PlayerDto> {
     const formData = new FormData();
-    formData.append('FirstName', playerData.firstName);
-    formData.append('LastName', playerData.lastName);
+    formData.append('firstName', playerData.firstName);
+    formData.append('lastName', playerData.lastName);
     if (playerData.position) {
-      formData.append('Position', playerData.position);
+      formData.append('position', playerData.position);
     }
     if (playerData.email) {
-      formData.append('Email', playerData.email);
+      formData.append('email', playerData.email);
     }
     if (playerData.photoUrl) {
-      formData.append('PhotoUrl', playerData.photoUrl);
+      formData.append('photoUrl', playerData.photoUrl);
     }
-    formData.append('TeamId', playerData.teamId);
+    formData.append('teamId', playerData.teamId);
     
-    return this.apiClient.postFormData<Player>(API_ENDPOINTS.TEAMS.ADD_PLAYER(teamId), formData);
+    return this.apiClient.postFormData<PlayerDto>(API_ENDPOINTS.TEAMS.ADD_PLAYER(teamId), formData);
   }
 
-  updateTeamPlayer(teamId: string, playerId: string, updates: UpdatePlayer): Observable<Player> {
+  updateTeamPlayer(teamId: string, playerId: string, updates: UpdatePlayerDto): Observable<PlayerDto> {
     const formData = new FormData();
-    formData.append('FirstName', updates.firstName);
-    formData.append('LastName', updates.lastName);
+    formData.append('firstName', updates.firstName);
+    formData.append('lastName', updates.lastName);
     if (updates.position) {
-      formData.append('Position', updates.position);
+      formData.append('position', updates.position);
     }
     if (updates.email) {
-      formData.append('Email', updates.email);
+      formData.append('email', updates.email);
     }
     if (updates.photoUrl) {
-      formData.append('PhotoUrl', updates.photoUrl);
+      formData.append('photoUrl', updates.photoUrl);
     }
     
-    return this.apiClient.putFormData<Player>(API_ENDPOINTS.TEAMS.UPDATE_PLAYER(teamId, playerId), formData);
+    return this.apiClient.patchFormData<PlayerDto>(API_ENDPOINTS.TEAMS.UPDATE_PLAYER(teamId, playerId), formData);
   }
 
   removePlayerFromTeam(teamId: string, playerId: string): Observable<void> {

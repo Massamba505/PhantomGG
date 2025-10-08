@@ -1,46 +1,95 @@
+export interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalRecords: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface PagedResult<T> {
+  data: T[];
+  meta: PaginationMeta;
+  totalRecords?: number;
+}
+
 export interface PaginationParams {
-  pageNumber?: number;
+  page?: number;
   pageSize?: number;
 }
 
 export interface SearchParams extends PaginationParams {
-  searchTerm?: string;
+  q?: string;
   filters?: Record<string, any>;
 }
 
-export type UserRole = 'Admin' | 'Organizer' | 'User';
+export enum UserRoles {
+  Admin = 1,
+  Organizer = 2,
+  User = 3
+}export enum ImageType {
+  ProfilePicture = 1,
+  TournamentBanner = 2,
+  TournamentLogo = 3,
+  TeamLogo = 4,
+  TeamPhoto = 5,
+  PlayerPhoto = 6
+}
 
-export type ImageType = 
-  | 'ProfilePicture'
-  | 'TournamentBanner'
-  | 'TournamentLogo'
-  | 'TeamLogo'
-  | 'TeamPhoto'
-  | 'PlayerPhoto';
+export enum TournamentStatus {
+  Draft = 1,
+  RegistrationOpen = 2,
+  RegistrationClosed = 3,
+  InProgress = 4,
+  Completed = 5,
+  Cancelled = 6
+}
 
-export type TournamentStatus = 
-  | 'Draft'
-  | 'RegistrationOpen'
-  | 'RegistrationClosed'
-  | 'InProgress'
-  | 'Completed'
-  | 'Cancelled';
+export enum TournamentFormats {
+  SingleElimination = 1,
+  RoundRobin = 2
+}
 
-export type TeamRegistrationStatus = 
-  | 'Pending'
-  | 'Approved'
-  | 'Rejected'
-  | 'Withdrawn';
+export enum TeamRegistrationStatus {
+  Pending = 1,
+  Approved = 2,
+  Rejected = 3,
+  Withdrawn = 4
+}
 
-export type MatchStatus = 
-  | 'Scheduled'
-  | 'InProgress'
-  | 'Completed'
-  | 'Postponed'
-  | 'Cancelled';
+export enum MatchStatus {
+  Scheduled = 1,
+  InProgress = 2,
+  Completed = 3,
+  Postponed = 4,
+  Cancelled = 5
+}
 
-export type PlayerPosition = 
-  | 'Goalkeeper'
-  | 'Defender'
-  | 'Midfielder'
-  | 'Forward';
+export enum MatchEventType {
+  Goal = 1,
+  Assist = 2,
+  YellowCard = 3,
+  RedCard = 4,
+  Foul = 5,
+  Substitution = 6
+}
+
+export enum PlayerPosition {
+  Goalkeeper = 1,
+  Defender = 2,
+  Midfielder = 3,
+  Forward = 4
+}
+
+export enum TeamScope {
+  Public = 1,
+  My = 2,
+  All = 3
+}
+
+export enum TeamAction {
+  Register = 1,
+  Withdraw = 2,
+  Approve = 3,
+  Reject = 4
+}

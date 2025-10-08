@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiResponse, PaginatedResponse } from '../models/api.models';
+import { PagedResult } from '../models/api.models';
 import { environment } from '@/environments/environment.development';
 
 @Injectable({
@@ -14,23 +14,19 @@ export class ApiClient {
   private readonly baseUrl = this.env.apiUrl;
 
   get<T>(endpoint: string): Observable<T> {
-    return this.http.get<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`)
-      .pipe(map(response => response.data!));
+    return this.http.get<T>(`${this.baseUrl}/${endpoint}`);
   }
 
   post<T>(endpoint: string, data?: any): Observable<T> {
-    return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, data)
-      .pipe(map(response => response.data!));
+    return this.http.post<T>(`${this.baseUrl}/${endpoint}`, data);
   }
 
   put<T>(endpoint: string, data?: any): Observable<T> {
-    return this.http.put<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, data)
-      .pipe(map(response => response.data!));
+    return this.http.put<T>(`${this.baseUrl}/${endpoint}`, data);
   }
 
   patch<T>(endpoint: string, data?: any): Observable<T> {
-    return this.http.patch<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, data)
-      .pipe(map(response => response.data!));
+    return this.http.patch<T>(`${this.baseUrl}/${endpoint}`, data);
   }
 
   delete<T>(endpoint: string): Observable<T> {
@@ -47,38 +43,65 @@ export class ApiClient {
     );
   }
 
-  getPaginated<T>(endpoint: string, params?: any): Observable<PaginatedResponse<T>> {
-    let httpParams = new HttpParams();
+  private convertSearchParams(params: any): any {
+    if (!params) return params;
     
-    if (params) {
-      Object.keys(params).forEach(key => {
-        if (params[key] !== null && params[key] !== undefined) {
-          httpParams = httpParams.set(key, params[key].toString());
+    const converted = { ...params };
+    
+    if (converted.searchTerm) {
+      converted.q = converted.searchTerm;
+      delete converted.searchTerm;
+    }
+    
+    if (converted.pageNumber) {
+      converted.page = converted.pageNumber;
+      delete converted.pageNumber;
+    }
+    
+    delete converted.scope;
+    
+    return converted;
+  }
+  
+  getPaged<T>(endpoint: string, params?: any): Observable<PagedResult<T>> {
+    let httpParams = new HttpParams();
+    const convertedParams = this.convertSearchParams(params);
+    
+    if (convertedParams) {
+      Object.keys(convertedParams).forEach(key => {
+        if (convertedParams[key] !== null && convertedParams[key] !== undefined) {
+          httpParams = httpParams.set(key, convertedParams[key].toString());
         }
       });
     }
 
-    return this.http.get<ApiResponse<PaginatedResponse<T>>>(
+    return this.http.get<PagedResult<T>>(
       `${this.baseUrl}/${endpoint}`, 
       { params: httpParams }
-    ).pipe(map(response => response.data!));
+    ).pipe(
+      map(result => ({
+        ...result,
+        totalRecords: result.meta.totalRecords
+      }))
+    );
   }
 
   uploadFile<T>(endpoint: string, file: File): Observable<T> {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData)
-      .pipe(map(response => response.data!));
+    return this.http.post<T>(`${this.baseUrl}/${endpoint}`, formData);
   }
 
   postFormData<T>(endpoint: string, formData: FormData): Observable<T> {
-    return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData)
-      .pipe(map(response => response.data!));
+    return this.http.post<T>(`${this.baseUrl}/${endpoint}`, formData);
   }
 
   putFormData<T>(endpoint: string, formData: FormData): Observable<T> {
-    return this.http.put<ApiResponse<T>>(`${this.baseUrl}/${endpoint}`, formData)
-      .pipe(map(response => response.data!));
+    return this.http.put<T>(`${this.baseUrl}/${endpoint}`, formData);
+  }
+
+  patchFormData<T>(endpoint: string, formData: FormData): Observable<T> {
+    return this.http.patch<T>(`${this.baseUrl}/${endpoint}`, formData);
   }
 }

@@ -1,26 +1,28 @@
-import { UserRole } from "./common.models";
-
-export interface User {
+export interface UserDto {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
-  role: UserRole;
+  role: string;
   profilePictureUrl: string;
 }
 
-export interface Auth {
+export interface AuthDto {
   accessToken: string;
-  user: User;
+  user: UserDto;
 }
 
-export interface LoginRequest {
+export interface RefreshTokenResponse {
+  accessToken: string;
+}
+
+export interface LoginRequestDto {
   email: string;
   password: string;
-  rememberMe?: boolean;
+  rememberMe: boolean;
 }
 
-export interface RegisterRequest {
+export interface RegisterRequestDto {
   firstName: string;
   lastName: string;
   email: string;
@@ -29,21 +31,19 @@ export interface RegisterRequest {
   role: string;
 }
 
-export interface UpdateUserProfile {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  profilePictureUrl?: string;
+export interface UpdateUserProfileRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
-export interface ChangePassword {
+export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
-  confirmPassword: string;
 }
 
-export interface ProfilePictureUpload {
-  imageUrl: string;
+export interface ProfilePictureUploadDto {
+  profilePictureUrl: string;
 }
 
 export interface VerifyEmailRequest {
@@ -62,3 +62,11 @@ export interface ResetPasswordRequest {
   token: string;
   newPassword: string;
 }
+
+export type User = UserDto;
+export type Auth = AuthDto;
+export type LoginRequest = LoginRequestDto;
+export type RegisterRequest = RegisterRequestDto;
+export type UpdateUserProfile = UpdateUserProfileRequest;
+export type ChangePassword = ChangePasswordRequest;
+export type ProfilePictureUpload = ProfilePictureUploadDto;

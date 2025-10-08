@@ -14,7 +14,7 @@ public class LocalFileImageService(
     private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    private readonly long _maxFileSize = 5 * 1024 * 1024; // 5MB
+    private readonly long _maxFileSize = 5 * 1024 * 1024;
     private readonly string[] _supportedTypes = { "image/jpeg", "image/png", "image/gif", "image/webp" };
 
     public async Task<string> SaveImageAsync(IFormFile file, ImageType imageType, Guid? entityId = null)

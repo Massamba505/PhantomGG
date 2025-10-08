@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthStateService } from '@/app/store/AuthStateService';
-import { UserRole } from '@/app/api/models';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthStateService);
@@ -14,8 +13,8 @@ export const authGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  const requiredRoles = route.data['roles'] as Array<UserRole>;
-  const userRole = authService.user()?.role! as UserRole;
+  const requiredRoles = route.data['roles'] as Array<string>;
+  const userRole = authService.user()?.role!;
   
   if (!requiredRoles || requiredRoles.length === 0) {
     return true;

@@ -186,11 +186,9 @@ public class MatchValidationService(
     {
         var match = await ValidateMatchExistsAsync(matchId);
 
-        // Only tournament organizer can update matches
         if (match.Tournament.OrganizerId != userId)
             throw new ForbiddenException("You don't have permission to update this match");
 
-        // Cannot update completed matches
         if (match.Status == (int)MatchStatus.Completed)
             throw new ForbiddenException("Cannot update completed matches");
 
@@ -201,11 +199,9 @@ public class MatchValidationService(
     {
         var match = await ValidateMatchExistsAsync(matchId);
 
-        // Only tournament organizer can delete matches
         if (match.Tournament.OrganizerId != userId)
             throw new ForbiddenException("You don't have permission to delete this match");
 
-        // Cannot delete matches that have started or completed
         if (match.Status == (int)MatchStatus.InProgress || match.Status == (int)MatchStatus.Completed)
             throw new ForbiddenException("Cannot delete matches that have started or completed");
 
@@ -216,11 +212,9 @@ public class MatchValidationService(
     {
         var match = await ValidateMatchExistsAsync(matchId);
 
-        // Only tournament organizer can update results
         if (match.Tournament.OrganizerId != userId)
             throw new ForbiddenException("You don't have permission to update match results");
 
-        // Match must be in progress or completed to update results
         if (match.Status == (int)MatchStatus.Scheduled)
             throw new ForbiddenException("Cannot update results for scheduled matches");
 
@@ -229,7 +223,6 @@ public class MatchValidationService(
 
     public async Task ValidateTeamsCanPlayAsync(Guid homeTeamId, Guid awayTeamId, Guid tournamentId)
     {
-        // Teams cannot play against themselves
         if (homeTeamId == awayTeamId)
             throw new ValidationException("A team cannot play against itself");
 
@@ -266,11 +259,9 @@ public class MatchValidationService(
         if (tournament == null)
             throw new NotFoundException("Tournament not found");
 
-        // Only tournament organizer can create/manage matches
         if (tournament.OrganizerId != userId)
             throw new ForbiddenException("You don't have permission to manage matches for this tournament");
 
-        // Tournament must be in the right state for match management
         if (tournament.Status == (int)TournamentStatus.Completed)
             throw new ForbiddenException("Cannot manage matches for completed tournaments");
 
