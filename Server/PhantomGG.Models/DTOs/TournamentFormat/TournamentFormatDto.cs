@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.Models.DTOs.TournamentFormat;
 

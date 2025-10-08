@@ -27,7 +27,7 @@ public class UsersController(
     }
 
     /// <summary>
-    /// Update current user profile (partial update)
+    /// Update current user profile
     /// </summary>
     [HttpPatch("profile")]
     public async Task<ActionResult<UserDto>> UpdateProfile([FromBody] UpdateUserProfileRequest request)

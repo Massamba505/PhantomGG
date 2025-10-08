@@ -1,3 +1,4 @@
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.User;
 
 namespace PhantomGG.Models.DTOs.Tournament;
@@ -26,3 +27,8 @@ public class TournamentDto
     public int PendingTeamCount { get; set; }
     public int MatchCount { get; set; }
 }
+
+public record TeamRegistrationRequest(Guid TeamId);
+public record GenerateFixturesRequest(TournamentFormats Format);
+public record FixtureStatusResponse(string Status);
+public record TeamManagementRequest(TeamAction Action);
