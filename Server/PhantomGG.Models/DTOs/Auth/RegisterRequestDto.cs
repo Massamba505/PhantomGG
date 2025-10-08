@@ -6,7 +6,7 @@ namespace PhantomGG.Models.DTOs.Auth;
 public class RegisterRequestDto
 {
     [Required]
-    //[StringLength(50, MinimumLength = 1)]
+    [StringLength(50, MinimumLength = 1)]
     public string FirstName { get; set; } = string.Empty;
 
     [Required]
@@ -25,5 +25,6 @@ public class RegisterRequestDto
     [StringLength(255, MinimumLength = 1)]
     public string? ProfilePictureUrl { get; set; }
 
-    public string Role { get; set; } = string.Empty;
+    [Required]
+    public UserRoles Role { get; set; }
 }

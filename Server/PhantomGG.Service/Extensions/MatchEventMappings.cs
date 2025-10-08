@@ -12,7 +12,7 @@ public static class MatchEventMappings
         {
             Id = matchEvent.Id,
             MatchId = matchEvent.MatchId,
-            EventType = matchEvent.EventType,
+            EventType = (MatchEventType)matchEvent.EventType,
             Minute = matchEvent.Minute,
             TeamId = matchEvent.TeamId,
             TeamName = matchEvent.Team?.Name ?? "Unknown",
@@ -26,7 +26,7 @@ public static class MatchEventMappings
         return new MatchEvent
         {
             MatchId = createDto.MatchId,
-            EventType = createDto.EventType.ToString(),
+            EventType = (int)createDto.EventType,
             Minute = createDto.Minute,
             TeamId = createDto.TeamId,
             PlayerId = createDto.PlayerId
@@ -36,7 +36,7 @@ public static class MatchEventMappings
     public static void UpdateEntity(this UpdateMatchEventDto updateDto, MatchEvent matchEvent)
     {
         if (updateDto.EventType.HasValue)
-            matchEvent.EventType = updateDto.EventType.Value.ToString();
+            matchEvent.EventType = (int)updateDto.EventType.Value;
 
         if (updateDto.Minute.HasValue)
             matchEvent.Minute = updateDto.Minute.Value;

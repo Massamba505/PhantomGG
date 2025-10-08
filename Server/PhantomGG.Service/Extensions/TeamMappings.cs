@@ -1,3 +1,4 @@
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Specifications;
@@ -57,7 +58,7 @@ public static class TeamMappings
             Name = tournamentTeam.Team.Name,
             ShortName = tournamentTeam.Team.ShortName,
             LogoUrl = tournamentTeam.Team.LogoUrl,
-            Status = tournamentTeam.Status,
+            Status = (TeamRegistrationStatus)tournamentTeam.Status,
             RegisteredAt = tournamentTeam.RequestedAt,
             AcceptedAt = tournamentTeam.AcceptedAt,
             ManagerName = $"{tournamentTeam.Team.User.FirstName} {tournamentTeam.Team.User.LastName}".Trim(),

@@ -27,7 +27,7 @@ public class TournamentValidationService(
         if (tournament.OrganizerId != userId)
             throw new ForbiddenException("You don't have permission to update this tournament");
 
-        if (tournament.Status == TournamentStatus.InProgress.ToString() || tournament.Status == TournamentStatus.Completed.ToString())
+        if (tournament.Status == (int)TournamentStatus.InProgress || tournament.Status == (int)TournamentStatus.Completed)
             throw new ForbiddenException("Cannot update tournament that is in progress or completed");
 
         return tournament;
@@ -40,7 +40,7 @@ public class TournamentValidationService(
         if (tournament.OrganizerId != userId)
             throw new ForbiddenException("You don't have permission to delete this tournament");
 
-        if (tournament.Status == TournamentStatus.InProgress.ToString())
+        if (tournament.Status == (int)TournamentStatus.InProgress)
             throw new ForbiddenException("Cannot delete tournament that is in progress");
 
         return tournament;
@@ -81,10 +81,10 @@ public class TournamentValidationService(
     {
         var tournament = await ValidateTournamentExistsAsync(tournamentId);
 
-        if (tournament.Status == TournamentStatus.Completed.ToString())
+        if (tournament.Status == (int)TournamentStatus.Completed)
             throw new ForbiddenException("Tournament registration is closed");
 
-        if (tournament.Status == TournamentStatus.InProgress.ToString())
+        if (tournament.Status == (int)TournamentStatus.InProgress)
             throw new ForbiddenException("Tournament has already started");
 
         return tournament;
@@ -98,10 +98,10 @@ public class TournamentValidationService(
         if (tournament.OrganizerId != userId)
             throw new ForbiddenException("You don't have permission to update tournament status");
 
-        if (newStatus == TournamentStatus.InProgress && tournament.Status == TournamentStatus.Completed.ToString())
+        if (newStatus == TournamentStatus.InProgress && tournament.Status == (int)TournamentStatus.Completed)
             throw new ForbiddenException("Cannot change status from completed to in progress");
 
-        if (newStatus == TournamentStatus.Completed && tournament.Status != TournamentStatus.InProgress.ToString())
+        if (newStatus == TournamentStatus.Completed && tournament.Status != (int)TournamentStatus.InProgress)
             throw new ForbiddenException("Can only mark tournament as completed if it is in progress");
 
         return tournament;
@@ -139,7 +139,7 @@ public class TeamValidationService(
     {
         var team = await ValidateCanManageTeamAsync(userId, teamId);
         var tournaments = await _tournamentTeamRepository.GetTournamentsByTeamAsync(team.Id);
-        var activeTournaments = tournaments.Where(t => t.Status != TournamentStatus.Completed.ToString()).ToList();
+        var activeTournaments = tournaments.Where(t => t.Status != (int)TournamentStatus.Completed).ToList();
 
         if (activeTournaments.Any())
         {
@@ -191,7 +191,7 @@ public class MatchValidationService(
             throw new ForbiddenException("You don't have permission to update this match");
 
         // Cannot update completed matches
-        if (match.Status == MatchStatus.Completed.ToString())
+        if (match.Status == (int)MatchStatus.Completed)
             throw new ForbiddenException("Cannot update completed matches");
 
         return match;
@@ -206,7 +206,7 @@ public class MatchValidationService(
             throw new ForbiddenException("You don't have permission to delete this match");
 
         // Cannot delete matches that have started or completed
-        if (match.Status == MatchStatus.InProgress.ToString() || match.Status == MatchStatus.Completed.ToString())
+        if (match.Status == (int)MatchStatus.InProgress || match.Status == (int)MatchStatus.Completed)
             throw new ForbiddenException("Cannot delete matches that have started or completed");
 
         return match;
@@ -221,7 +221,7 @@ public class MatchValidationService(
             throw new ForbiddenException("You don't have permission to update match results");
 
         // Match must be in progress or completed to update results
-        if (match.Status == MatchStatus.Scheduled.ToString())
+        if (match.Status == (int)MatchStatus.Scheduled)
             throw new ForbiddenException("Cannot update results for scheduled matches");
 
         return match;
@@ -233,7 +233,6 @@ public class MatchValidationService(
         if (homeTeamId == awayTeamId)
             throw new ValidationException("A team cannot play against itself");
 
-        // Check if both teams are registered in the tournament
         var homeTeamRegistration = await _tournamentTeamRepository.GetRegistrationAsync(tournamentId, homeTeamId);
         var awayTeamRegistration = await _tournamentTeamRepository.GetRegistrationAsync(tournamentId, awayTeamId);
 
@@ -243,23 +242,20 @@ public class MatchValidationService(
         if (awayTeamRegistration == null)
             throw new ValidationException("Away team is not registered in this tournament");
 
-        // Check if teams are approved in the tournament
-        if (homeTeamRegistration.Status != TeamRegistrationStatus.Approved.ToString())
+        if (homeTeamRegistration.Status != (int)TeamRegistrationStatus.Approved)
             throw new ValidationException("Home team is not approved in this tournament");
 
-        if (awayTeamRegistration.Status != TeamRegistrationStatus.Approved.ToString())
+        if (awayTeamRegistration.Status != (int)TeamRegistrationStatus.Approved)
             throw new ValidationException("Away team is not approved in this tournament");
     }
 
     public async Task ValidateMatchSchedulingAsync(Guid homeTeamId, Guid awayTeamId, DateTime matchDate, Guid? excludeMatchId = null)
     {
-        // Check if teams already have a match scheduled on the same date
         var hasConflictingMatch = await _matchRepository.TeamsHaveMatchOnDateAsync(homeTeamId, awayTeamId, matchDate, excludeMatchId);
 
         if (hasConflictingMatch)
             throw new ConflictException("Teams already have a match scheduled on this date");
 
-        // Match date should be in the future (for new matches)
         if (!excludeMatchId.HasValue && matchDate <= DateTime.UtcNow)
             throw new ValidationException("Match date must be in the future");
     }
@@ -275,7 +271,7 @@ public class MatchValidationService(
             throw new ForbiddenException("You don't have permission to manage matches for this tournament");
 
         // Tournament must be in the right state for match management
-        if (tournament.Status == TournamentStatus.Completed.ToString())
+        if (tournament.Status == (int)TournamentStatus.Completed)
             throw new ForbiddenException("Cannot manage matches for completed tournaments");
 
         return tournament;

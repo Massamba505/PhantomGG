@@ -37,7 +37,7 @@ public class TournamentTeamService(
         {
             if (status.HasValue)
             {
-                var teamsWithStatus = await _tournamentTeamRepository.GetByTournamentAndStatusAsync(tournamentId, status.Value.ToString());
+                var teamsWithStatus = await _tournamentTeamRepository.GetByTournamentAndStatusAsync(tournamentId, (int)status);
                 return teamsWithStatus.Select(tt => tt.ToDto());
             }
 
@@ -65,7 +65,7 @@ public class TournamentTeamService(
         {
             TournamentId = tournamentId,
             TeamId = teamId,
-            Status = TeamRegistrationStatus.Pending.ToString(),
+            Status = (int)TeamRegistrationStatus.Pending,
             RequestedAt = DateTime.UtcNow,
             CreatedAt = DateTime.UtcNow
         };
@@ -89,11 +89,11 @@ public class TournamentTeamService(
         switch (action)
         {
             case TeamAction.Approve:
-                if (registration.Status != TeamRegistrationStatus.Pending.ToString())
+                if (registration.Status != (int)TeamRegistrationStatus.Pending)
                 {
                     throw new ForbiddenException("Only pending registrations can be approved");
                 }
-                registration.Status = TeamRegistrationStatus.Approved.ToString();
+                registration.Status = (int)TeamRegistrationStatus.Approved;
                 registration.AcceptedAt = DateTime.UtcNow;
                 //Todo: send email to Team
                 await _tournamentTeamRepository.UpdateAsync(registration);
@@ -101,11 +101,11 @@ public class TournamentTeamService(
                 break;
 
             case TeamAction.Reject:
-                if (registration.Status != TeamRegistrationStatus.Pending.ToString())
+                if (registration.Status != (int)TeamRegistrationStatus.Pending)
                 {
                     throw new ForbiddenException("Only pending registrations can be rejected");
                 }
-                registration.Status = TeamRegistrationStatus.Rejected.ToString();
+                registration.Status = (int)TeamRegistrationStatus.Rejected;
                 await _tournamentTeamRepository.UpdateAsync(registration);
                 await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournamentId);
                 //Todo: send email to Team
@@ -137,6 +137,6 @@ public class TournamentTeamService(
 
     public async Task<int> GetTeamCountAsync(Guid tournamentId, TeamRegistrationStatus status)
     {
-        return await _tournamentTeamRepository.GetCountByStatusAsync(tournamentId, status.ToString());
+        return await _tournamentTeamRepository.GetCountByStatusAsync(tournamentId, (int)status);
     }
 }

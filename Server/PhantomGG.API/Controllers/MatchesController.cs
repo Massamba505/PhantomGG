@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Models.DTOs.MatchEvent;
@@ -93,13 +94,13 @@ public class MatchesController(
     [HttpGet("{id:guid}/events")]
     public async Task<ActionResult<IEnumerable<MatchEventDto>>> GetMatchEvents(
         Guid id,
-        [FromQuery] string? type)
+        [FromQuery] MatchEventType? type)
     {
         var events = await _matchEventService.GetMatchEventsAsync(id);
 
-        if (!string.IsNullOrEmpty(type))
+        if (type.HasValue)
         {
-            events = events.Where(e => e.EventType.Equals(type, StringComparison.OrdinalIgnoreCase));
+            events = events.Where(e => e.EventType == type);
         }
 
         return Ok(events);

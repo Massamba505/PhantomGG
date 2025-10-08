@@ -46,7 +46,7 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
     /// Send password reset link to user's email
     /// </summary>
     [HttpPost("forgot-password")]
-    public async Task<ActionResult<ApiResponse>> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
         await _authVerificationService.InitiatePasswordResetAsync(request.Email);
 

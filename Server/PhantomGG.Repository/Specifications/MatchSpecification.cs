@@ -1,4 +1,5 @@
 using PhantomGG.Repository.Entities;
+using PhantomGG.Common.Enums;
 using System.Linq.Expressions;
 
 namespace PhantomGG.Repository.Specifications;
@@ -8,7 +9,7 @@ public class MatchSpecification
     public string? SearchTerm { get; set; }
     public Guid? TournamentId { get; set; }
     public Guid? TeamId { get; set; }
-    public string? Status { get; set; }
+    public MatchStatus? Status { get; set; }
     public DateTime? DateFrom { get; set; }
     public DateTime? DateTo { get; set; }
     public int Page { get; set; }
@@ -28,7 +29,7 @@ public class MatchSpecification
                 m.HomeTeamId == TeamId.Value ||
                 m.AwayTeamId == TeamId.Value) &&
 
-            (string.IsNullOrEmpty(Status) || m.Status == Status) &&
+            (!Status.HasValue || m.Status == (int)Status) &&
 
             (!DateFrom.HasValue || m.MatchDate >= DateFrom.Value) &&
             (!DateTo.HasValue || m.MatchDate <= DateTo.Value);

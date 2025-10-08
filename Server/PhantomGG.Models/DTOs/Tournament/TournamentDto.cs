@@ -17,9 +17,9 @@ public class TournamentDto
     public int MaxTeams { get; set; }
     public string? BannerUrl { get; set; }
     public string? LogoUrl { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public TournamentStatus Status { get; set; }
     public Guid OrganizerId { get; set; }
-    public UserDto? Organizer { get; set; }
+    public OrganizerDto? Organizer { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public bool IsPublic { get; set; }
@@ -30,5 +30,5 @@ public class TournamentDto
 
 public record TeamRegistrationRequest(Guid TeamId);
 public record GenerateFixturesRequest(TournamentFormats Format);
-public record FixtureStatusResponse(string Status);
+public record FixtureStatusResponse(int Status);
 public record TeamManagementRequest(TeamAction Action);

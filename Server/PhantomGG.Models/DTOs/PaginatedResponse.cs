@@ -5,6 +5,8 @@ public class PagedResult<T>
     public IEnumerable<T> Data { get; set; } = new List<T>();
     public PaginationMeta Meta { get; set; } = new();
 
+    public PagedResult() { }
+
     public PagedResult(IEnumerable<T> data, int page, int pageSize, int totalRecords)
     {
         this.Data = data;

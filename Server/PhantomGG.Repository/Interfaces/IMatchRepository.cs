@@ -8,7 +8,7 @@ public interface IMatchRepository
 {
     Task<Match?> GetByIdAsync(Guid id);
     Task<IEnumerable<Match>> GetByTournamentAsync(Guid tournamentId);
-    Task<IEnumerable<Match>> GetByTournamentAndStatusAsync(Guid tournamentId, string status);
+    Task<IEnumerable<Match>> GetByTournamentAndStatusAsync(Guid tournamentId, int status);
     Task<PagedResult<Match>> SearchAsync(MatchSpecification specification);
     Task<Match> CreateAsync(Match match);
     Task<Match> UpdateAsync(Match match);

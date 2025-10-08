@@ -32,7 +32,7 @@ public class TournamentsController(
     public async Task<ActionResult<PagedResult<TournamentDto>>> GetTournaments([FromQuery] TournamentQuery query)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        Guid? userId = currentUser?.Role == UserRoles.Organizer.ToString() ? currentUser?.Id : null;
+        Guid? userId = currentUser?.Role == UserRoles.Organizer ? currentUser?.Id : null;
 
         var tournaments = await _tournamentService.SearchAsync(query, userId);
         return Ok(tournaments);

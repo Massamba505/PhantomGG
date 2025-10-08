@@ -2,8 +2,6 @@ using PhantomGG.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Repository.Interfaces;
-using PhantomGG.Common.Enums;
-using PhantomGG.Common.Helpers;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Repository.Entities;
 using System.Text.RegularExpressions;
@@ -46,7 +44,7 @@ public class AuthService(
             Email = request.Email.ToLower(),
             PasswordHash = _passwordHasher.HashPassword(request.Password),
             ProfilePictureUrl = request.ProfilePictureUrl ?? $"https://eu.ui-avatars.com/api/?name={request.FirstName}+{request.LastName}&size=250",
-            Role = request.Role.ToString(),
+            Role = (int)request.Role,
             CreatedAt = DateTime.UtcNow,
             IsActive = true,
             EmailVerified = false,
@@ -127,11 +125,6 @@ public class AuthService(
         if (!IsValidPassword(request.Password))
         {
             errors.Add("Password must be at least 8 characters with uppercase, lowercase, number, and special character");
-        }
-
-        if (!EnumHelper.ToEnum<UserRoles>(request.Role).HasValue)
-        {
-            errors.Add("Invalid role");
         }
 
         if (errors.Any())

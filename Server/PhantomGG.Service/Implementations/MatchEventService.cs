@@ -103,7 +103,7 @@ public class MatchEventService(
         await _matchValidationService.ValidateCanUpdateMatchAsync(existingEvent.MatchId, userId);
 
         if (updateDto.EventType.HasValue)
-            existingEvent.EventType = updateDto.EventType.Value.ToString();
+            existingEvent.EventType = (int)updateDto.EventType.Value;
 
         if (updateDto.Minute.HasValue)
             existingEvent.Minute = updateDto.Minute.Value;

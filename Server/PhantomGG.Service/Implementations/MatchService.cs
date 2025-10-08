@@ -40,7 +40,7 @@ public class MatchService(
     {
         if (status.HasValue)
         {
-            var matches = await _matchRepository.GetByTournamentAndStatusAsync(tournamentId, status.Value.ToString());
+            var matches = await _matchRepository.GetByTournamentAndStatusAsync(tournamentId, (int)status.Value);
             return matches.Select(m => m.ToDto());
         }
 
@@ -54,7 +54,7 @@ public class MatchService(
 
         match.HomeScore = resultDto.HomeScore;
         match.AwayScore = resultDto.AwayScore;
-        match.Status = Common.Enums.MatchStatus.Completed.ToString();
+        match.Status = (int)MatchStatus.Completed;
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);
 
@@ -151,7 +151,7 @@ public class MatchService(
     {
         var tournament = await _matchValidationService.ValidateTournamentForMatchAsync(tournamentId, organizerId);
 
-        var approvedTournamentTeams = await _tournamentTeamRepository.GetByTournamentAndStatusAsync(tournamentId, TeamRegistrationStatus.Approved.ToString());
+        var approvedTournamentTeams = await _tournamentTeamRepository.GetByTournamentAndStatusAsync(tournamentId, (int)TeamRegistrationStatus.Approved);
         var teams = approvedTournamentTeams.Select(tt => tt.Team).ToList();
 
         if (teams.Count < 2)
@@ -207,7 +207,7 @@ public class MatchService(
                     HomeTeamId = homeTeam.Id,
                     AwayTeamId = awayTeam.Id,
                     MatchDate = roundDate.AddHours(15),
-                    Status = MatchStatus.Scheduled.ToString(),
+                    Status = (int)MatchStatus.Scheduled,
                     HomeScore = null,
                     AwayScore = null
                 };

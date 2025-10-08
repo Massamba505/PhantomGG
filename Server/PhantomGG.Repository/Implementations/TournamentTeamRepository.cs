@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PhantomGG.Repository.Data;
 using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
+using PhantomGG.Common.Enums;
 
 namespace PhantomGG.Repository.Implementations;
 
@@ -21,14 +22,14 @@ public class TournamentTeamRepository(PhantomContext context) : ITournamentTeamR
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<TournamentTeam>> GetByTournamentAndStatusAsync(Guid tournamentId, string status)
+    public async Task<IEnumerable<TournamentTeam>> GetByTournamentAndStatusAsync(Guid tournamentId, int status)
     {
         return await _context.TournamentTeams
             .Include(tt => tt.Team)
                 .ThenInclude(t => t.User)
             .Include(tt => tt.Team)
                 .ThenInclude(t => t.Players)
-            .Where(tt => tt.TournamentId == tournamentId && tt.Status == status)
+            .Where(tt => tt.TournamentId == tournamentId && tt.Status == (int)status)
             .OrderBy(tt => tt.RequestedAt)
             .ToListAsync();
     }
@@ -67,10 +68,10 @@ public class TournamentTeamRepository(PhantomContext context) : ITournamentTeamR
         await _context.SaveChangesAsync();
     }
 
-    public async Task<int> GetCountByStatusAsync(Guid tournamentId, string status)
+    public async Task<int> GetCountByStatusAsync(Guid tournamentId, int status)
     {
         return await _context.TournamentTeams
-            .CountAsync(tt => tt.TournamentId == tournamentId && tt.Status == status);
+            .CountAsync(tt => tt.TournamentId == tournamentId && tt.Status == (int)status);
     }
 
     public async Task<IEnumerable<Tournament>> GetTournamentsByTeamAsync(Guid teamId)

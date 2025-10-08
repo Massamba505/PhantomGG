@@ -25,14 +25,14 @@ public static class TournamentMappings
             MaxTeams = tournament.MaxTeams,
             BannerUrl = tournament.BannerUrl,
             LogoUrl = tournament.LogoUrl,
-            Status = tournament.Status,
+            Status = (TournamentStatus)tournament.Status,
             OrganizerId = tournament.OrganizerId,
             Organizer = tournament.Organizer?.ToOrganizerDto(),
             CreatedAt = tournament.CreatedAt,
             UpdatedAt = tournament.UpdatedAt,
             IsPublic = tournament.IsPublic,
-            TeamCount = tournament.TournamentTeams?.Where(t => t.Status == TeamRegistrationStatus.Approved.ToString()).Count() ?? 0,
-            PendingTeamCount = tournament.TournamentTeams?.Where(t => t.Status == TeamRegistrationStatus.Pending.ToString()).Count() ?? 0,
+            TeamCount = tournament.TournamentTeams?.Where(t => t.Status == (int)TeamRegistrationStatus.Approved).Count() ?? 0,
+            PendingTeamCount = tournament.TournamentTeams?.Where(t => t.Status == (int)TeamRegistrationStatus.Pending).Count() ?? 0,
             MatchCount = tournament.Matches?.Count ?? 0
         };
     }
@@ -53,7 +53,7 @@ public static class TournamentMappings
             MaxTeams = createDto.MaxTeams,
             BannerUrl = $"https://placehold.co/1200x400?text={createDto.Name}",
             LogoUrl = "https://placehold.co/200x200",
-            Status = TournamentStatus.Draft.ToString(),
+            Status = (int)TournamentStatus.Draft,
             OrganizerId = organizerId,
             IsPublic = createDto.IsPublic,
             CreatedAt = DateTime.UtcNow

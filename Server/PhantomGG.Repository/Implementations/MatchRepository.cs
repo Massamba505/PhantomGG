@@ -33,14 +33,14 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Match>> GetByTournamentAndStatusAsync(Guid tournamentId, string status)
+    public async Task<IEnumerable<Match>> GetByTournamentAndStatusAsync(Guid tournamentId, int status)
     {
         return await _context.Matches
             .Include(m => m.HomeTeam)
             .Include(m => m.AwayTeam)
             .Where(m => m.TournamentId == tournamentId &&
                        m.MatchDate > DateTime.UtcNow &&
-                       m.Status == status)
+                       m.Status == (int)status)
             .Include(m => m.Tournament)
             .OrderBy(m => m.MatchDate)
             .ToListAsync();

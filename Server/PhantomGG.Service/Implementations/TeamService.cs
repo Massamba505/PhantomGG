@@ -114,7 +114,7 @@ public class TeamService(
             await _teamValidationService.ValidateUserTeamNameUniqueness(updateDto.Name, userId);
 
             var tournaments = await _tournamentTeamRepository.GetTournamentsByTeamAsync(existingTeam.Id);
-            tournaments = tournaments.Where(t => t.Status != TournamentStatus.Completed.ToString());
+            tournaments = tournaments.Where(t => t.Status != (int)TournamentStatus.Completed);
             foreach (var tournament in tournaments)
             {
                 var existingTeams = await _tournamentTeamRepository.GetByTournamentAsync(tournament.Id);

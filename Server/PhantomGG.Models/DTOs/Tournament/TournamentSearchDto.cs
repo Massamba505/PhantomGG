@@ -1,3 +1,4 @@
+using PhantomGG.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.Models.DTOs.Tournament;
@@ -5,7 +6,7 @@ namespace PhantomGG.Models.DTOs.Tournament;
 public class TournamentQuery
 {
     public string? Q { get; set; }
-    public string? Status { get; set; }
+    public TournamentStatus? Status { get; set; }
     public string? Location { get; set; }
     public DateTime? StartFrom { get; set; }
     public DateTime? StartTo { get; set; }

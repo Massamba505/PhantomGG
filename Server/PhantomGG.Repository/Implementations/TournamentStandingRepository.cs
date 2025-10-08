@@ -13,7 +13,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
     public async Task<IEnumerable<TournamentStandingDto>> GetByTournamentAsync(Guid tournamentId)
     {
         var completedMatches = await _context.Matches
-            .Where(m => m.TournamentId == tournamentId && m.Status == MatchStatus.Completed.ToString())
+            .Where(m => m.TournamentId == tournamentId && (MatchStatus)m.Status == MatchStatus.Completed)
             .ToListAsync();
 
         var teams = await _context.Teams
@@ -86,7 +86,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
     public async Task<IEnumerable<PlayerGoalStandingDto>> GetPlayerGoalStandingsAsync(Guid tournamentId)
     {
         var completedMatches = await _context.Matches
-            .Where(m => m.TournamentId == tournamentId && m.Status == MatchStatus.Completed.ToString())
+            .Where(m => m.TournamentId == tournamentId && (MatchStatus)m.Status == MatchStatus.Completed)
             .ToListAsync();
 
         var matchesPlayedByTeam = completedMatches
@@ -96,7 +96,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
 
         var goalGroups = await _context.MatchEvents
             .Where(me => me.Match.TournamentId == tournamentId &&
-                         me.EventType == MatchEventType.Goal.ToString())
+                         (MatchEventType)me.EventType == MatchEventType.Goal)
             .GroupBy(me => new { me.TeamId })
             .Select(g => new
             {
@@ -148,7 +148,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
     {
         var assistStandings = await _context.MatchEvents
             .Where(me => me.Match.TournamentId == tournamentId &&
-                        me.EventType == MatchEventType.Assist.ToString())
+                        (MatchEventType)me.EventType == MatchEventType.Assist)
             .GroupBy(me => new { me.TeamId })
             .Select(g => new
             {
@@ -169,7 +169,7 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
                     MatchesPlayed = _context.Matches
                         .Where(m => m.TournamentId == tournamentId &&
                                    (m.HomeTeamId == assists.TeamId || m.AwayTeamId == assists.TeamId) &&
-                                   m.Status == MatchStatus.Completed.ToString())
+                                   m.Status == (int)MatchStatus.Completed)
                         .Count()
                 })
             .Where(p => p.Assists > 0)

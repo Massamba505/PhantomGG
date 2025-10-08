@@ -19,7 +19,7 @@ public static class AuthMappings
             Email = registerDto.Email.ToLower(),
             PasswordHash = hashedPassword,
             ProfilePictureUrl = registerDto.ProfilePictureUrl ?? $"https://eu.ui-avatars.com/api/?name={registerDto.FirstName}+{registerDto.LastName}&size=250",
-            Role = !string.IsNullOrEmpty(registerDto.Role) ? registerDto.Role : "User",
+            Role = (int)registerDto.Role,
             CreatedAt = DateTime.UtcNow,
             IsActive = true,
             EmailVerified = false,

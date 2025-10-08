@@ -1,3 +1,4 @@
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Player;
 using PhantomGG.Repository.Entities;
 
@@ -12,7 +13,7 @@ public static class PlayerMappings
             Id = player.Id,
             FirstName = player.FirstName,
             LastName = player.LastName,
-            Position = player.Position,
+            Position = (PlayerPosition)player.Position,
             PhotoUrl = player.PhotoUrl,
             TeamId = player.TeamId,
             TeamName = player.Team.Name,
@@ -27,7 +28,7 @@ public static class PlayerMappings
             Id = Guid.NewGuid(),
             FirstName = createDto.FirstName,
             LastName = createDto.LastName,
-            Position = createDto.Position,
+            Position = (int)createDto.Position,
             Email = createDto.Email,
             TeamId = createDto.TeamId,
             CreatedAt = DateTime.UtcNow
@@ -41,7 +42,7 @@ public static class PlayerMappings
         if (!string.IsNullOrEmpty(updateDto.LastName))
             player.LastName = updateDto.LastName;
         if (updateDto.Position != null)
-            player.Position = updateDto.Position;
+            player.Position = (int)updateDto.Position;
         if (updateDto.Email != null)
             player.Email = updateDto.Email;
     }

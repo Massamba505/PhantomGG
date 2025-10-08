@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using PhantomGG.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.Models.DTOs.Player;
@@ -13,8 +14,8 @@ public class UpdatePlayerDto
     [StringLength(100)]
     public string LastName { get; set; } = null!;
 
-    [StringLength(30)]
-    public string? Position { get; set; }
+    [Required]
+    public PlayerPosition? Position { get; set; }
 
     [StringLength(100)]
     public string? Email { get; set; }
