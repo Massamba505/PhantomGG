@@ -27,6 +27,13 @@ public enum TournamentStatus
     Cancelled
 }
 
+
+public enum TournamentFormats
+{
+    SingleElimination,
+    RoundRobin,
+}
+
 public enum TeamRegistrationStatus
 {
     Pending,

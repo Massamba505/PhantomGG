@@ -1,7 +1,6 @@
 using PhantomGG.API.Extensions;
 using PhantomGG.API.Middleware;
-using System.Threading.RateLimiting;
-using Microsoft.Extensions.Caching.Hybrid;
+using PhantomGG.Validation.Middleware;
 
 namespace PhantomGG.API;
 
@@ -16,13 +15,10 @@ public class Program
         builder.Services.AddHttpContextAccessor();
 
         // Configure application services
-        builder.Services.AddApplicationSettings(builder.Configuration);
+        builder.Services.AddApplicationDependencies(builder.Configuration);
         builder.Services.AddSwaggerDocumentation();
         builder.Services.AddCorsPolicy();
-        builder.Services.AddDatabase(builder.Configuration);
         builder.Services.AddJwtAuthentication(builder.Configuration);
-        builder.Services.AddApplicationRepositories();
-        builder.Services.AddApplicationServices();
         builder.Services.AddRateLimiting();
         builder.Services.AddHybridCache();
 
@@ -33,6 +29,7 @@ public class Program
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseCors("CorsPolicy");
+        app.UseMiddleware<ValidationMiddleware>();
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseAuthentication();
         app.UseAuthorization();
