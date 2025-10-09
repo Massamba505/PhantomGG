@@ -41,7 +41,7 @@ export interface UpdateMatchDto {
   awayTeamId?: string;
   matchDate?: string;
   venue?: string;
-  status?: string;
+  status?: MatchStatus;
 }
 
 export interface MatchResultDto {

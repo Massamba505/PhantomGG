@@ -5,6 +5,7 @@ import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { Team } from '@/app/api/models/team.models';
 import { Match, MatchStatus } from '@/app/api/models';
 import { UpdateMatch } from '@/app/api/models/match.models';
+import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-edit-match-modal',
@@ -53,16 +54,16 @@ import { UpdateMatch } from '@/app/api/models/match.models';
             class="input-field"
           />
         </div>
-        <div>
-          <label class="block text-sm font-medium mb-2">Match Status</label>
-          <select formControlName="status" class="input-select">
-              @for(matchStatus of matchStatuses; track matchStatus){
-              <option [value]="matchStatus">
-                  {{ matchStatus }}
-              </option>
-              }
-          </select>
-        </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Match Status</label>
+            <select formControlName="status" class="input-select">
+                @for(matchStatus of matchStatuses; track matchStatus.value){
+                <option [value]="matchStatus.value">
+                    {{ matchStatus.label }}
+                </option>
+                }
+            </select>
+          </div>
         <div>
           <label class="block text-sm font-medium mb-2">Venue</label>
           <input
@@ -98,7 +99,7 @@ export class EditMatchModalComponent {
   teams = input.required<Team[]>();
   startDate = input.required<string | null>();
   selectedMatch = input.required<Match | null>();
-  matchStatuses = Object.values(MatchStatus);
+  matchStatuses = getEnumOptions(MatchStatus);
 
   close = output<void>();
   update = output<{ matchId: string; updateData: UpdateMatch }>();
@@ -137,7 +138,7 @@ export class EditMatchModalComponent {
       awayTeamId: formValue.awayTeamId,
       matchDate: formValue.matchDate,
       venue: formValue.venue,
-      status: formValue.status
+      status: parseInt(formValue.status) 
     };
 
     this.update.emit({

@@ -4,6 +4,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Match } from '@/app/api/models/match.models';
 import { MatchStatus } from '@/app/api/models';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 export type MatchUserRole = 'Organizer' | 'User' | 'Public';
 
@@ -71,6 +72,9 @@ export class MatchCard {
   isCompleted(): boolean {
     const matchStatus = this.match().status;
     return matchStatus === MatchStatus.Completed;
+  }
+  getStatus(){
+    return getEnumLabel(MatchStatus, this.match().status);
   }
 
   getScoreDisplay(): string {

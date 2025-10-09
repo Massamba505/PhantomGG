@@ -106,7 +106,7 @@ export class TournamentTeamManagementComponent implements OnInit {
   removeTeam(team: TournamentTeam) {
     this.setActionLoading(team.id, true);
     
-    this.tournamentService.rejectTeam(this.tournamentId(), team.id).subscribe({
+    this.tournamentService.removeTeam(this.tournamentId(), team.id).subscribe({
       next: () => {
         this.toastService.success(`${team.name} has been removed from the tournament`);
         this.loadTeams();

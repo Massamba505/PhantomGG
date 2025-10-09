@@ -102,7 +102,7 @@ import { GenerateFixtures } from '@/app/api/models/match.models';
     </app-modal>
   `
 })
-export class GenerateFixturesModalComponent implements OnInit {
+export class GenerateFixturesModalComponent {
   isOpen = input.required<boolean>();
   teams = input.required<Team[]>();
   tournament = input.required<Tournament | null>();
@@ -114,7 +114,12 @@ export class GenerateFixturesModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   readonly icons = LucideIcons;
   
-  generateFixturesForm!: FormGroup;
+  generateFixturesForm: FormGroup = this.fb.group({
+      startDate: ['', Validators.required],
+      daysBetweenMatches: [3, [Validators.min(1)]],
+      defaultVenue: [''],
+      includeReturnMatches: [false]
+    });
 
   singleRoundMatches = computed(() => {
     const teamCount = this.teams().length;
@@ -126,14 +131,16 @@ export class GenerateFixturesModalComponent implements OnInit {
     return teamCount * (teamCount - 1);
   });
 
-  ngOnInit() {
-    this.generateFixturesForm = this.fb.group({
-      startDate: ['', Validators.required],
-      daysBetweenMatches: [3, [Validators.min(1)]],
-      defaultVenue: [''],
-      includeReturnMatches: [false]
+  constructor() {
+    effect(() => {
+      const tournament = this.tournament();
+      if (tournament && this.generateFixturesForm) {
+        this.generateFixturesForm.patchValue({
+          startDate: new Date(tournament.startDate).toISOString().slice(0, 16),
+          defaultVenue: tournament.location || '',
+        });
+      }
     });
-
   }
 
   onSubmit() {

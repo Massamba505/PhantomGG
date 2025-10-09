@@ -151,6 +151,10 @@ export class TournamentService {
     return this.manageTeamParticipation(tournamentId, teamId, { action: TeamAction.Reject });
   }
 
+  removeTeam(tournamentId: string, teamId: string): Observable<void> {
+    return this.manageTeamParticipation(tournamentId, teamId, { action: TeamAction.Withdraw });
+  }
+
   registerForTournament(tournamentId: string, teamId: string): Observable<void> {
     return this.registerTeamForTournament(tournamentId, teamId);
   }
