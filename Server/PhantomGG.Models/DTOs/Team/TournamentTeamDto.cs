@@ -14,6 +14,7 @@ public class TournamentTeamDto
     public DateTime? AcceptedAt { get; set; }
     public string? ManagerName { get; set; }
     public Guid? ManagerId { get; set; }
+    public int CountPlayers { get; set; } = 0;
     public IEnumerable<PlayerDto> Players { get; set; } = new List<PlayerDto>();
 
 }

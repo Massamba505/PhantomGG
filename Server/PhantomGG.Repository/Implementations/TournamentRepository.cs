@@ -15,6 +15,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         return await _context.Tournaments
             .Include(t => t.Organizer)
+            .Include(t => t.TournamentTeams)
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
@@ -45,6 +46,7 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
     {
         var query = _context.Tournaments
             .Include(t => t.Organizer)
+            .Include(t => t.TournamentTeams)
             .Where(spec.ToExpression());
 
         var totalRecords = await query.CountAsync();

@@ -127,7 +127,7 @@ public class TeamValidationService(
 
     public async Task<Team> ValidateCanManageTeamAsync(Guid userId, Guid teamId)
     {
-        var team = await ValidateTeamExistsAsync(userId);
+        var team = await ValidateTeamExistsAsync(teamId);
 
         if (team.UserId != userId)
             throw new ForbiddenException("You don't have permission to manage this teams");

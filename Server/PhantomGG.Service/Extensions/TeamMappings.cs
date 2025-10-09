@@ -22,6 +22,7 @@ public static class TeamMappings
             UserId = team.UserId,
             CreatedAt = team.CreatedAt,
             UpdatedAt = team.UpdatedAt,
+            CountPlayers = team.Players.Count,
             players = players
         };
     }
@@ -63,8 +64,8 @@ public static class TeamMappings
             AcceptedAt = tournamentTeam.AcceptedAt,
             ManagerName = $"{tournamentTeam.Team.User.FirstName} {tournamentTeam.Team.User.LastName}".Trim(),
             ManagerId = tournamentTeam.Team.UserId,
+            CountPlayers = players.Count(),
             Players = players
-
         };
     }
 
