@@ -6,6 +6,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models/match.models';
 import { MatchStatus } from '@/app/api/models';
+import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-update-result-modal',
@@ -63,16 +64,16 @@ import { MatchStatus } from '@/app/api/models';
                 />
               </div>
             </div>
-            <!-- <div>
+            <div>
               <label class="block text-sm font-medium mb-2">Match Status</label>
               <select formControlName="status" class="input-select">
-                  @for(matchStatus of matchStatuses; track matchStatus.id){
-                  <option [value]="matchStatus.id">
-                      {{ matchStatus.value }}
+                  @for(matchStatus of matchStatuses; track matchStatus.value){
+                  <option [value]="matchStatus.value">
+                      {{ matchStatus.label }}
                   </option>
                   }
               </select>
-            </div> -->
+            </div>
 
             <div class="flex gap-2 pt-4">
               <button
@@ -138,7 +139,7 @@ export class UpdateResultModalComponent implements OnInit {
   isOpen = input.required<boolean>();
   selectedMatch = input.required<Match | null>();
   matchEvents = input.required<MatchEvent[]>();
-  matchStatuses = []//(MatchStatus);
+  matchStatuses = getEnumOptions(MatchStatus);
   
   close = output<void>();
   updateResult = output<{ matchId: string; result: MatchResult }>();

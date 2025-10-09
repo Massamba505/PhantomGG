@@ -47,7 +47,7 @@ export interface UpdateMatchDto {
 export interface MatchResultDto {
   homeScore: number;
   awayScore: number;
-  status?: MatchStatus;
+  status: MatchStatus;
 }
 
 export interface MatchEventDto {

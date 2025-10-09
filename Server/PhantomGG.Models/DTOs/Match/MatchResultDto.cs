@@ -10,5 +10,5 @@ public class MatchResultDto
 
     [Required]
     public int AwayScore { get; set; }
-    public MatchStatus? Status { get; set; }
+    public MatchStatus Status { get; set; }
 }

@@ -54,7 +54,7 @@ public class MatchService(
 
         match.HomeScore = resultDto.HomeScore;
         match.AwayScore = resultDto.AwayScore;
-        match.Status = (int)MatchStatus.Completed;
+        match.Status = (int)resultDto.Status;
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);
 
