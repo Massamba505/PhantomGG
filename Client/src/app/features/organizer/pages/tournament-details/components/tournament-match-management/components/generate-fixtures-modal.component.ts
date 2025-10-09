@@ -1,4 +1,4 @@
-import { Component, input, output, OnInit, inject, computed } from '@angular/core';
+import { Component, input, output, OnInit, inject, computed, effect, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
@@ -22,16 +22,15 @@ import { GenerateFixtures } from '@/app/api/models/match.models';
         (ngSubmit)="onSubmit()"
         class="space-y-4"
       >
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <div class="card">
           <div class="flex items-center gap-2 mb-2">
             <lucide-angular
               size="16"
               [img]="icons.AlertCircle"
-              class="text-blue-600"
             />
-            <span class="text-sm font-medium text-blue-800">Tournament Info</span>
+            <span class="text-sm font-medium">Tournament Info</span>
           </div>
-          <p class="text-sm text-blue-700">
+          <p class="text-sm ">
             {{ teams().length }} teams registered. This will generate
             {{ singleRoundMatches() }} matches
             @if (generateFixturesForm.get('includeReturnMatches')?.value) {
@@ -44,7 +43,7 @@ import { GenerateFixtures } from '@/app/api/models/match.models';
           <label class="block text-sm font-medium mb-2">Start Date</label>
           <input
             type="date"
-            [min]="tournament()?.startDate"
+            [min]="getMinDate()"
             formControlName="startDate"
             class="input-field"
           />
@@ -134,6 +133,7 @@ export class GenerateFixturesModalComponent implements OnInit {
       defaultVenue: [''],
       includeReturnMatches: [false]
     });
+
   }
 
   onSubmit() {
@@ -156,5 +156,13 @@ export class GenerateFixturesModalComponent implements OnInit {
       daysBetweenMatches: 3,
       includeReturnMatches: false
     });
+  }
+
+  getMinDate(): string {
+    const tournament = this.tournament();
+    if (tournament?.startDate) {
+      return tournament.startDate.split('T')[0];
+    }
+    return new Date().toISOString().split('T')[0];
   }
 }

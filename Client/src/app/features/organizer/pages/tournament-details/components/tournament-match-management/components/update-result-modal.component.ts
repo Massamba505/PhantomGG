@@ -6,7 +6,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models/match.models';
 import { MatchStatus } from '@/app/api/models';
-import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
+import { getEnumOptions, getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-update-result-modal',
@@ -187,13 +187,12 @@ export class UpdateResultModalComponent implements OnInit {
     });
   }
 
-  formatEventType(eventType: string): string {
-    return eventType.replace(/([A-Z])/g, ' $1').trim();
+  formatEventType(eventType: string | number): string {
+    return getEnumLabel(MatchEventType, eventType) || eventType.toString();
   }
 
-  getEventIcon(eventType: string): any {
-    const enumValue = this.stringToMatchEventType(eventType);
-    switch (enumValue) {
+  getEventIcon(eventType: MatchEventType): any {
+    switch (eventType) {
       case MatchEventType.Goal:
         return this.icons.Target;
       case MatchEventType.YellowCard:
@@ -209,9 +208,8 @@ export class UpdateResultModalComponent implements OnInit {
     }
   }
 
-  getEventIconClass(eventType: string): string {
-    const enumValue = this.stringToMatchEventType(eventType);
-    switch (enumValue) {
+  getEventIconClass(eventType: MatchEventType): string {
+    switch (eventType) {
       case MatchEventType.Goal:
         return 'text-green-600';
       case MatchEventType.YellowCard:
@@ -225,17 +223,5 @@ export class UpdateResultModalComponent implements OnInit {
       default:
         return 'text-blue-600';
     }
-  }
-
-  private stringToMatchEventType(eventType: string): MatchEventType | undefined {
-    const eventMap: Record<string, MatchEventType> = {
-      'Goal': MatchEventType.Goal,
-      'Assist': MatchEventType.Assist,
-      'YellowCard': MatchEventType.YellowCard,
-      'RedCard': MatchEventType.RedCard,
-      'Foul': MatchEventType.Foul,
-      'Substitution': MatchEventType.Substitution
-    };
-    return eventMap[eventType];
   }
 }

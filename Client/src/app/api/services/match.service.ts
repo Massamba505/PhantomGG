@@ -13,7 +13,8 @@ import {
   CreateMatchEventDto,
   UpdateMatchEventDto,
   PlayerEventsSummary,
-  TeamEventsSummary
+  TeamEventsSummary,
+  MatchEventType
 } from '../models/match.models';
 
 @Injectable({
@@ -128,11 +129,11 @@ export class MatchService {
             playerName: events[0]?.playerName || 'Unknown Player',
             teamId: events[0]?.teamId || '',
             teamName: events[0]?.teamName || 'Unknown Team',
-            goals: events.filter((e: MatchEventDto) => e.eventType === 'Goal').length,
-            assists: events.filter((e: MatchEventDto) => e.eventType === 'Assist').length,
-            yellowCards: events.filter((e: MatchEventDto) => e.eventType === 'YellowCard').length,
-            redCards: events.filter((e: MatchEventDto) => e.eventType === 'RedCard').length,
-            fouls: events.filter((e: MatchEventDto) => e.eventType === 'Foul').length,
+            goals: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Goal).length,
+            assists: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Assist).length,
+            yellowCards: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.YellowCard).length,
+            redCards: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.RedCard).length,
+            fouls: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Foul).length,
             totalEvents: events.length
           };
           observer.next(summary);
@@ -148,7 +149,7 @@ export class MatchService {
       this.getTeamEvents(teamId).subscribe({
         next: (events: MatchEventDto[]) => {
           const playerGoals = events
-            .filter((e: MatchEventDto) => e.eventType === 'Goal')
+            .filter((e: MatchEventDto) => e.eventType === MatchEventType.Goal)
             .reduce((acc: Record<string, number>, event: MatchEventDto) => {
               acc[event.playerId] = (acc[event.playerId] || 0) + 1;
               return acc;
@@ -166,12 +167,12 @@ export class MatchService {
           const summary: TeamEventsSummary = {
             teamId,
             teamName: events[0]?.teamName || 'Unknown Team',
-            totalGoals: events.filter((e: MatchEventDto) => e.eventType === 'Goal').length,
-            totalAssists: events.filter((e: MatchEventDto) => e.eventType === 'Assist').length,
-            totalYellowCards: events.filter((e: MatchEventDto) => e.eventType === 'YellowCard').length,
-            totalRedCards: events.filter((e: MatchEventDto) => e.eventType === 'RedCard').length,
-            totalFouls: events.filter((e: MatchEventDto) => e.eventType === 'Foul').length,
-            totalSubstitutions: events.filter((e: MatchEventDto) => e.eventType === 'Substitution').length,
+            totalGoals: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Goal).length,
+            totalAssists: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Assist).length,
+            totalYellowCards: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.YellowCard).length,
+            totalRedCards: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.RedCard).length,
+            totalFouls: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Foul).length,
+            totalSubstitutions: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Substitution).length,
             totalEvents: events.length,
             topScorer
           };

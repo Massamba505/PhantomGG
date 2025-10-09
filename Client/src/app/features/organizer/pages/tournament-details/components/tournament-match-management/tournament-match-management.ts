@@ -258,6 +258,7 @@ export class TournamentMatchManagementComponent implements OnInit {
     this.matchService.createMatchEvent(matchId, eventData).subscribe({
       next: (event) => {
         this.toastService.success('Match event added successfully');
+        this.showAddEventModal.set(false);
         this.loadMatchEvents(this.selectedMatch()!.id);
       },
       error: (error) => {

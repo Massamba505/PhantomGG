@@ -53,7 +53,7 @@ export interface MatchResultDto {
 export interface MatchEventDto {
   id: string;
   matchId: string;
-  eventType: string;
+  eventType: MatchEventType;
   minute: number;
   teamId: string;
   teamName: string;
