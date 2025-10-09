@@ -14,7 +14,7 @@ export interface TournamentDto {
   maxTeams: number;
   bannerUrl?: string;
   logoUrl?: string;
-  status: string;
+  status: TournamentStatus;
   organizerId: string;
   organizer?: UserDto;
   createdAt: string;

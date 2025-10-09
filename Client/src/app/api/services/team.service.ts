@@ -95,7 +95,7 @@ export class TeamService {
     formData.append('firstName', updates.firstName);
     formData.append('lastName', updates.lastName);
     if (updates.position) {
-      formData.append('position', updates.position);
+      formData.append('position', updates.position.toString());
     }
     if (updates.email) {
       formData.append('email', updates.email);

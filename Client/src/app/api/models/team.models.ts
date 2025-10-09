@@ -1,8 +1,10 @@
+import { PlayerPosition } from "./common.models";
+
 export interface PlayerDto {
   id: string;
   firstName: string;
   lastName: string;
-  position?: string;
+  position?: PlayerPosition;
   email?: string;
   photoUrl?: string;
   teamId: string;
@@ -22,7 +24,7 @@ export interface CreatePlayerDto {
 export interface UpdatePlayerDto {
   firstName: string;
   lastName: string;
-  position?: string;
+  position?: PlayerPosition;
   email?: string;
   photoUrl?: File;
 }
@@ -35,6 +37,7 @@ export interface TeamDto {
   userId: string;
   createdAt: string;
   updatedAt?: string;
+  countPlayers: number;
   players: PlayerDto[];
 }
 
@@ -48,6 +51,7 @@ export interface TournamentTeamDto {
   acceptedAt?: string;
   managerName?: string;
   managerId?: string;
+  countPlayers: number;
   players: PlayerDto[];
 }
 

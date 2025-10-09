@@ -1,8 +1,10 @@
-import { Component, Output, EventEmitter, signal, effect, inject, OnInit, computed } from '@angular/core';
+import { Component, Output, EventEmitter, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TournamentFormat, TournamentSearch } from '@/app/api/models/tournament.models';
+import { TournamentSearch } from '@/app/api/models/tournament.models';
 import { TournamentService } from '@/app/api/services';
+import { TournamentStatus, TournamentFormats } from '@/app/api/models/common.models';
+import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-tournament-search',
@@ -10,7 +12,7 @@ import { TournamentService } from '@/app/api/services';
   templateUrl: './tournament-search.component.html',
   styleUrl: './tournament-search.component.css'
 })
-export class TournamentSearchComponent implements OnInit {
+export class TournamentSearchComponent {
   @Output() searchChange = new EventEmitter<Partial<TournamentSearch>>();
   @Output() clearFiltersSearch = new EventEmitter<void>();
   private tournamentService = inject(TournamentService);
@@ -19,10 +21,12 @@ export class TournamentSearchComponent implements OnInit {
   selectedStatus = signal<string | undefined>(undefined);
   location = signal('');
   format = signal<string | undefined>(undefined);
-  formats = signal<TournamentFormat[]>([]);
   startDateFrom = signal<string | undefined>(undefined);
   startDateTo = signal<string | undefined>(undefined);
   isPublic = signal<boolean | undefined>(undefined);
+
+  statusOptions = getEnumOptions(TournamentStatus);
+  formatOptions = getEnumOptions(TournamentFormats);
 
     searchCriteria = computed<Partial<TournamentSearch>>(() => {
     return {
@@ -30,20 +34,11 @@ export class TournamentSearchComponent implements OnInit {
         status: this.selectedStatus() || undefined,
         location: this.location()?.trim() || undefined,
         format: this.format() || undefined,
-        startDateFrom: this.startDateFrom() || undefined,
-        startDateTo: this.startDateTo() || undefined,
+        startFrom: this.startDateFrom() || undefined,
+        startTo: this.startDateTo() || undefined,
         isPublic: this.isPublic() || undefined,
       };
     });
-
-  ngOnInit() {
-    this.getTournamentFormats();
-  }
-
-  getTournamentFormats() {
-    const formats = this.tournamentService.getTournamentFormats();
-    this.formats.set(formats);
-  }
 
 
   onSearchInput(event: Event) {
@@ -64,10 +59,7 @@ export class TournamentSearchComponent implements OnInit {
 
   onFormatChange(event: Event) {
     const target = event.target as HTMLSelectElement;
-    let value: string | undefined = target.value;
-    if(value == "All") {
-        value = undefined;
-    }
+    const value = target.value || undefined;
     this.format.set(value);
   }
 

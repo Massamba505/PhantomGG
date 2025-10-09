@@ -157,7 +157,7 @@
 >
   <app-player-form
     [player]="editingPlayer()"
-    [teamId]="team()!.id"
+    [teamId]="team()?.id || ''"
     (save)="onPlayerSave($event)"
     (cancel)="onClosePlayerModal()"
   ></app-player-form>

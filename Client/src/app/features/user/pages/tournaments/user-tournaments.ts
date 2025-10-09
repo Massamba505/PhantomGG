@@ -13,6 +13,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamSelectionModalComponent } from './components/team-selection-modal/team-selection-modal.component';
 import { TournamentCard } from '@/app/shared/components/cards/tournament-card/tournament-card';
 import { TournamentSearchComponent } from './components/tournament-search/tournament-search.component';
+import { TournamentStatus } from '@/app/api/models';
 
 @Component({
   selector: 'app-user-tournaments',
@@ -207,16 +208,11 @@ export class UserTournaments implements OnInit {
 
   canJoinTournament(tournament: Tournament): boolean {
     return (
-      tournament.status === 'RegistrationOpen' &&
+      tournament.status === TournamentStatus.RegistrationOpen &&
       tournament.teamCount < tournament.maxTeams &&
       this.myTeams().length > 0
     );
   }
-
-  getRegistrationStatus(tournament: Tournament): string {
-    return tournament.status;
-  }
-
 
   onTournamentJoin(tournament: Tournament) {
     this.joinTournament(tournament);

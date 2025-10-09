@@ -20,11 +20,9 @@
           (change)="onStatusChange($event)"
         >
           <option value="">All Status</option>
-          <option value="Draft">Draft</option>
-          <option value="RegistrationOpen">Registration Open</option>
-          <option value="RegistrationClosed">Registration Closed</option>
-          <option value="InProgress">In Progress</option>
-          <option value="Completed">Completed</option>
+          @for (option of statusOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+          }
         </select>
       </div>
 
@@ -75,9 +73,9 @@
             [value]="format() || ''"
             (change)="onFormatChange($event)"
           >
-            <option value="All">All Formats</option>
-            @for (format of formats(); track format.id) {
-            <option [value]="format.name">{{ format.name }}</option>
+            <option value="">All Formats</option>
+            @for (option of formatOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
             }
           </select>
         </div>

@@ -147,6 +147,7 @@ export class TournamentTeamManagementComponent implements OnInit {
       userId: tournamentTeam.managerId || '',
       createdAt: tournamentTeam.registeredAt,
       updatedAt: undefined,
+      countPlayers: tournamentTeam.players.length,
       players: tournamentTeam.players
     };
   }

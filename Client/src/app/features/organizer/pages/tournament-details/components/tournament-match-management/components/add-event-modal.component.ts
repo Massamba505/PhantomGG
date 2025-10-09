@@ -21,6 +21,8 @@ import {
   CreateMatchEvent,
   MatchEventType
 } from '@/app/api/models/match.models';
+import { PlayerPosition } from '@/app/api/models';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-add-event-modal',
@@ -48,7 +50,7 @@ import {
             <option [ngValue]="null" disabled>Select player</option>
             @for (player of playersForSelectedTeam(); track player.id) {
               <option [ngValue]="player.id">
-                {{ player.firstName }} {{ player.lastName }} ({{ player.position }})
+                {{ player.firstName }} {{ player.lastName }} ({{ getPosition(player.position) }})
               </option>
             }
           </select>
@@ -120,6 +122,11 @@ export class AddEventModalComponent implements OnInit {
       (team) => team.id === match.homeTeamId || team.id === match.awayTeamId
     );
   });
+
+  getPosition(position: PlayerPosition | undefined){
+    if(position == undefined) return 'None';
+    return getEnumLabel(PlayerPosition, position) ?? 'none';
+  }
 
   playersForSelectedTeam = computed(() => {
     const teamId = this.selectedTeamId();

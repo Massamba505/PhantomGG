@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Tournament } from '@/app/api/models/tournament.models';
-import { UserRoles } from '@/app/api/models';
+import { TournamentStatus } from '@/app/api/models';
 
 export type CardRoles = 'Organizer' | 'User' | 'Public';
 
@@ -22,6 +22,7 @@ export class TournamentCard {
   join = output<Tournament>();
   leave = output<Tournament>();
   view = output<Tournament>();
+
 
   readonly icons = LucideIcons;
 
@@ -58,21 +59,22 @@ export class TournamentCard {
     const regDeadline = t.registrationDeadline
       ? new Date(t.registrationDeadline)
       : new Date(t.startDate);
-
+     console.log(this.tournament().status)
     return (
-      this.role() === UserRoles.User.toString() &&
-      t.status === 'RegistrationOpen' &&
+      this.role() === 'User' &&
+      t.status === TournamentStatus.RegistrationOpen &&
       now < regDeadline &&
       t.teamCount < t.maxTeams
     );
   }
 
   isOrganizer(): boolean {
-    return this.role() === UserRoles.Organizer.toString();
+    return this.role() === 'Organizer';
   }
 
   isUser(): boolean {
-    return this.role() === UserRoles.User.toString();
+     console.log(this.role() )
+    return this.role() === 'User';
   }
   isPublic(): boolean {
     return this.role() === 'Public';

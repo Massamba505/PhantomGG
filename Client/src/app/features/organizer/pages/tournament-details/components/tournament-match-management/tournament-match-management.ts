@@ -141,6 +141,7 @@ export class TournamentMatchManagementComponent implements OnInit {
           userId: tt.managerId || '',
           createdAt: tt.registeredAt,
           players: tt.players,
+          countPlayers: tt.players.length,
           updatedAt: undefined
         }));
         this.tournamentTeams.set(convertedTeams);
@@ -161,37 +162,7 @@ export class TournamentMatchManagementComponent implements OnInit {
       }
     });
   }
-
-  loadPlayersForMatch(match: Match) {
-    const mockPlayers = this.generateMockPlayersForTeams(match.homeTeamId, match.awayTeamId);
-  }
-
-  generateMockPlayersForTeams(homeTeamId: string, awayTeamId: string): { homeTeam: Player[], awayTeam: Player[] } {
-    const positions = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'];
-    
-    const generatePlayersForTeam = (teamId: string, teamName: string): Player[] => {
-      return Array.from({ length: 11 }, (_, i) => ({
-        id: `${teamId}_player_${i + 1}`,
-        firstName: `Player`,
-        lastName: `${i + 1}`,
-        position: positions[i % positions.length],
-        email: `player${i + 1}@${teamName.toLowerCase().replace(' ', '')}.com`,
-        photoUrl: undefined,
-        teamId,
-        teamName,
-        joinedAt: new Date().toISOString()
-      }));
-    };
-
-    const homeTeam = this.tournamentTeams().find(t => t.id === homeTeamId);
-    const awayTeam = this.tournamentTeams().find(t => t.id === awayTeamId);
-
-    return {
-      homeTeam: homeTeam ? generatePlayersForTeam(homeTeamId, homeTeam.name) : [],
-      awayTeam: awayTeam ? generatePlayersForTeam(awayTeamId, awayTeam.name) : []
-    };
-  }
-
+  
   onTabChange(tab: MatchTab) {
     this.activeTab.set(tab);
   }

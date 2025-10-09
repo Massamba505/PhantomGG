@@ -79,6 +79,7 @@ export class TournamentDetails implements OnInit {
       userId: tournamentTeam.managerId || '',
       createdAt: tournamentTeam.registeredAt,
       updatedAt: undefined,
+      countPlayers: tournamentTeam.countPlayers,
       players: tournamentTeam.players
     };
   }

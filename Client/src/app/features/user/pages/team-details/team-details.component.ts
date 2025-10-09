@@ -91,6 +91,10 @@ export class TeamDetailsComponent implements OnInit {
   }
 
   onShowAddPlayer() {
+    if (!this.team()) {
+      this.toastService.error('Please wait for team details to load');
+      return;
+    }
     this.editingPlayer.set(null);
     this.showPlayerModal.set(true);
   }
