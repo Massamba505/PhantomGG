@@ -10,7 +10,6 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-edit-team',
-  standalone: true,
   imports: [CommonModule, TeamFormComponent, LucideAngularModule],
   templateUrl: "./edit-team.html"
 })

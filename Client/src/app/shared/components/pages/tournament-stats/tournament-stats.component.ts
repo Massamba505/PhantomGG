@@ -16,7 +16,6 @@ export type StatsTab = 'table' | 'goals' | 'assists';
 
 @Component({
   selector: 'app-tournament-stats',
-  standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './tournament-stats.component.html',
   styleUrl: './tournament-stats.component.css'

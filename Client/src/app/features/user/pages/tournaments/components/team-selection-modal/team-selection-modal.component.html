@@ -71,7 +71,7 @@
       </button>
       <button
         (click)="confirmSelection()"
-        [disabled]="!selectedTeam() || isJoining"
+        [disabled]="!selectedTeam() || isJoining()"
         class="px-6 py-2 btn btn-primary disabled:cursor-not-allowed"
       >
         <span>{{ isJoining() ? "Registering..." : "Register Team" }}</span>

@@ -9,7 +9,6 @@ import { Modal } from "@/app/shared/components/ui/modal/modal";
 
 @Component({
   selector: 'app-team-selection-modal',
-  standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule, Modal],
   templateUrl: "./team-selection-modal.component.html",
   styleUrl: './team-selection-modal.component.css'
@@ -28,8 +27,8 @@ export class TeamSelectionModalComponent {
   selectedTeam = signal<Team | null>(null);
 
   getModalTitle(): string {
-    if (this.tournament) {
-      return `Select Team for ${this.tournament.name}`;
+    if (this.tournament()) {
+      return `Select Team for ${this.tournament()?.name}`;
     }
     return 'Select Team';
   }

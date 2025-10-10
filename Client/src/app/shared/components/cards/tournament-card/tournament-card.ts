@@ -10,7 +10,6 @@ export type CardRoles = 'Organizer' | 'User' | 'Public';
 
 @Component({
   selector: 'app-tournament-card',
-  standalone: true,
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './tournament-card.html',
   styleUrls: ['./tournament-card.css'],

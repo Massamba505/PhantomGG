@@ -13,7 +13,6 @@ import { PlayerForm } from '@/app/shared/components/forms/player-form/player-for
 
 @Component({
   selector: 'app-team-details',
-  standalone: true,
   imports: [
     CommonModule,
     RouterModule,

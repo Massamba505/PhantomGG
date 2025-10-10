@@ -10,7 +10,6 @@ export type MatchUserRole = 'Organizer' | 'User' | 'Public';
 
 @Component({
   selector: 'app-match-card',
-  standalone: true,
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './match-card.html',
   styleUrls: ['./match-card.css'],
