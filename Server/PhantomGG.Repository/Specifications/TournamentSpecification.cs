@@ -18,15 +18,18 @@ public class TournamentSpecification
 
     public Expression<Func<Tournament, bool>> ToExpression()
     {
+        var searchTerm = SearchTerm?.ToLower();
+        var locationTerm = Location?.ToLower();
+
         return t =>
-            (string.IsNullOrEmpty(SearchTerm) ||
-                ((t.Name != null && t.Name.Contains(SearchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                 (t.Description != null && t.Description.Contains(SearchTerm, StringComparison.CurrentCultureIgnoreCase)))) &&
+            (string.IsNullOrEmpty(searchTerm) ||
+                ((t.Name != null && t.Name.ToLower().Contains(searchTerm)) ||
+                 (t.Description != null && t.Description.ToLower().Contains(searchTerm)))) &&
 
             (!Status.HasValue || t.Status == (int)Status.Value) &&
 
-            (string.IsNullOrEmpty(Location) ||
-                (t.Location != null && t.Location.Contains(Location, StringComparison.CurrentCultureIgnoreCase))) &&
+            (string.IsNullOrEmpty(locationTerm) ||
+                (t.Location != null && t.Location.ToLower().Contains(locationTerm))) &&
 
             (!StartDateFrom.HasValue || t.StartDate >= StartDateFrom.Value) &&
             (!StartDateTo.HasValue || t.StartDate <= StartDateTo.Value) &&

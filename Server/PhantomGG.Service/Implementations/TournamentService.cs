@@ -35,7 +35,7 @@ public class TournamentService(
             StartDateFrom = query.StartFrom,
             StartDateTo = query.StartTo,
             OrganizerId = userId,
-            IsPublic = userId.HasValue ? null : true,
+            IsPublic = !userId.HasValue || query.IsPublic,
             Page = query.Page,
             PageSize = query.PageSize
         };
