@@ -77,25 +77,13 @@ public class MatchService(
             PageSize = query.PageSize
         };
 
-        var cacheKey = spec.GetDeterministicKey();
+        var result = await _matchRepository.SearchAsync(spec);
 
-        return await _cache.GetOrCreateAsync(
-            cacheKey,
-            async _ =>
-            {
-                var result = await _matchRepository.SearchAsync(spec);
-
-                return new PagedResult<MatchDto>(
-                    result.Data.Select(m => m.ToDto()),
-                    result.Meta.Page,
-                    result.Meta.PageSize,
-                    result.Meta.TotalRecords
-                );
-            },
-            new HybridCacheEntryOptions
-            {
-                Expiration = TimeSpan.FromMinutes(2)
-            }
+        return new PagedResult<MatchDto>(
+            result.Data.Select(m => m.ToDto()),
+            result.Meta.Page,
+            result.Meta.PageSize,
+            result.Meta.TotalRecords
         );
     }
 
