@@ -1,93 +1,129 @@
-<div class="tournament-browse-container">
-  <div class="search-section">
-    <div class="search-input-container flex items-center">
-      <lucide-icon
-        [img]="icons.Search"
-        class="absolute top-1 left-1"
-      ></lucide-icon>
-      <input
-        type="text"
-        class="input-field pl-10"
-        placeholder="Search tournaments by name or description..."
-        [ngModel]="searchTerm()"
-        (ngModelChange)="searchTerm.set($event)"
-        (input)="onSearchChange()"
-      />
-    </div>
-  </div>
+<div class="relative h-full flex flex-col p-6">
+  <app-tournament-search
+    (clearFiltersSearch)="onClearSearch()"
+    (searchChange)="onSearchChange($event)"
+  />
 
-  <div *ngIf="loading()" class="loading-container">
-    <div class="loading-spinner">
-      <lucide-icon [img]="icons.Loader2" class="animate-spin"></lucide-icon>
-    </div>
-    <p class="loading-text">Loading tournaments...</p>
-  </div>
-
-  <div *ngIf="error() && !loading()" class="error-container">
-    <lucide-icon [img]="icons.AlertCircle" class="error-icon"></lucide-icon>
-    <p class="error-text">{{ error() }}</p>
-    <button class="retry-button" (click)="loadTournaments()">
-      <lucide-icon [img]="icons.RefreshCw" class="button-icon"></lucide-icon>
-      Try Again
-    </button>
-  </div>
-
-  <div *ngIf="!loading() && !error()" class="tournaments-section">
-    <div class="results-info">
-      <p class="results-text">
-        Showing {{ tournaments().length }} of {{ totalCount() }} tournaments
-      </p>
-    </div>
-
+  @if (isLoading()) {
+  <div class="text-center py-12">
     <div
-      *ngIf="tournaments().length > 0"
-      class="flex flex-wrap lg:justify-start justify-center gap-6"
+      class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"
+    ></div>
+    <p class="text-muted">Loading tournaments...</p>
+  </div>
+  } @if (!isLoading() && tournaments().length === 0) {
+  <div class="text-center py-12">
+    <div class="text-muted mb-3">
+      <lucide-angular
+        [img]="icons.Trophy"
+        [size]="64"
+        class="mx-auto"
+      ></lucide-angular>
+    </div>
+    <h3 class="text-xl font-semibold mb-2">No public tournaments found</h3>
+    @if (searchCriteria().searchTerm || searchCriteria().status) {
+    <p class="text-muted mb-4">No tournaments match your search criteria.</p>
+    <button class="btn btn-secondary" (click)="onClearSearch()">
+      Clear Filters
+    </button>
+    } @else {
+    <p class="text-muted">
+      Check back later for new public tournaments to explore.
+    </p>
+    }
+  </div>
+  } @if (!isLoading() && tournaments().length > 0) {
+  <div class="flex items-center mb-4">
+    @if (totalRecords() > 0) {
+    <span class="text-sm text-muted">
+      {{ totalRecords() }} Public Tournaments
+    </span>
+    }
+  </div>
+
+  <div class="flex-1">
+    <div
+      class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
     >
+      @for (tournament of tournaments(); track tournament.id) {
       <app-tournament-card
-        *ngFor="let tournament of tournaments(); trackBy: trackByTournamentId"
         [tournament]="tournament"
         role="Public"
         (view)="onTournamentView($event)"
-      >
-      </app-tournament-card>
-    </div>
-
-    <div *ngIf="tournaments().length === 0" class="empty-state">
-      <lucide-icon [img]="icons.Search" class="empty-icon"></lucide-icon>
-      <h3 class="empty-title">No tournaments found</h3>
-      <p class="empty-text">
-        Try adjusting your search filters or check back later for new
-        tournaments.
-      </p>
-    </div>
-
-    <div
-      *ngIf="tournaments().length > 0 && totalPages() > 1"
-      class="pagination-section"
-    >
-      <div class="pagination">
-        <button
-          class="pagination-button"
-          [disabled]="currentPage() <= 1"
-          (click)="onPageChange(currentPage() - 1)"
-        >
-          <lucide-icon [img]="icons.ChevronLeft"></lucide-icon>
-          Previous
-        </button>
-
-        <div class="pagination-info">
-          Page {{ currentPage() }} of {{ totalPages() }}
-        </div>
-
-        <button
-          class="pagination-button"
-          [disabled]="currentPage() >= totalPages()"
-          (click)="onPageChange(currentPage() + 1)"
-        >
-          Next
-          <lucide-icon [img]="icons.ChevronRight"></lucide-icon>
-        </button>
-      </div>
+      />
+      }
     </div>
   </div>
+
+  <div
+    class="flex flex-col sm:flex-row justify-between flex-wrap items-center gap-4 pt-4 border-t mt-auto"
+  >
+    <div class="flex items-center gap-2 mx-auto">
+      <label class="text-sm font-medium">Show:</label>
+      <select
+        class="input-field text-sm py-1 px-2 min-w-0"
+        [value]="searchCriteria().pageSize"
+        (change)="onPageSizeSelectChange($event)"
+      >
+        <option value="6">6 per page</option>
+        <option value="12">12 per page</option>
+        <option value="24">24 per page</option>
+        <option value="48">48 per page</option>
+      </select>
+    </div>
+
+    @if (totalPages() > 1) {
+    <div class="text-sm text-muted mx-auto">
+      Page {{ currentPage() }} of {{ totalPages() }} ({{ totalRecords() }}
+      total)
+    </div>
+    <div class="flex items-center gap-1 mx-auto">
+      <button
+        class="btn btn-secondary btn-sm"
+        [disabled]="!hasPreviousPage()"
+        (click)="onPageChange(1)"
+        title="First page"
+      >
+        <lucide-angular [img]="icons.ChevronsLeft" size="16" />
+      </button>
+      <button
+        class="btn btn-secondary btn-sm"
+        [disabled]="!hasPreviousPage()"
+        (click)="onPageChange(currentPage() - 1)"
+        title="Previous page"
+      >
+        <lucide-angular [img]="icons.ChevronLeft" size="16" />
+      </button>
+
+      @for (pageNum of getPageNumbers(); track pageNum) {
+      <button
+        class="btn btn-sm"
+        [class.btn-primary]="pageNum === currentPage()"
+        [class.btn-secondary]="pageNum !== currentPage()"
+        (click)="onPageChange(pageNum)"
+      >
+        {{ pageNum }}
+      </button>
+      }
+
+      <button
+        class="btn btn-secondary btn-sm"
+        [disabled]="!hasNextPage()"
+        (click)="onPageChange(currentPage() + 1)"
+        title="Next page"
+      >
+        <lucide-angular [img]="icons.ChevronRight" size="16" />
+      </button>
+      <button
+        class="btn btn-secondary btn-sm"
+        [disabled]="!hasNextPage()"
+        (click)="onPageChange(totalPages())"
+        title="Last page"
+      >
+        <lucide-angular [img]="icons.ChevronsRight" size="16" />
+      </button>
+    </div>
+    }
+  </div>
+  }
 </div>

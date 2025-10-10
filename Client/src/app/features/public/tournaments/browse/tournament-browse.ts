@@ -1,114 +1,148 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-
-import { TournamentCard } from '@/app/shared/components/cards/tournament-card/tournament-card';
-import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
+import { ToastService } from '@/app/shared/services/toast.service';
+import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
+import { PagedResult } from '@/app/api/models/api.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { TournamentCard } from '@/app/shared/components/cards/tournament-card/tournament-card';
+import { TournamentSearchComponent } from '@/app/shared/components/search';
+import { TournamentStatus } from '@/app/api/models';
 
 @Component({
   selector: 'app-tournament-browse',
-  templateUrl: './tournament-browse.html',
-  styleUrls: ['./tournament-browse.css'],
   imports: [
     CommonModule,
+    RouterModule,
     FormsModule,
     LucideAngularModule,
     TournamentCard,
+    TournamentSearchComponent
   ],
+  templateUrl: './tournament-browse.html',
+  styleUrls: ['./tournament-browse.css']
 })
 export class TournamentBrowse implements OnInit {
+  private tournamentService = inject(TournamentService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
+  
+  readonly icons = LucideIcons;
+  
   tournaments = signal<Tournament[]>([]);
-  loading = signal(false);
-  error = signal<string | null>(null);
-  searchTerm = signal('');
-
-  currentPage = signal(1);
-  pageSize = signal(12);
-  totalCount = signal(0);
-  totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize()));
-
-  searchFilters = signal<TournamentSearch>({
-    isPublic: true,
+  isLoading = signal(false);
+  
+  searchCriteria = signal<TournamentSearch>({
+    searchTerm: undefined,
+    status: undefined,
+    location: undefined,
+    startFrom: undefined,
+    startTo: undefined,
+    isPublic: true, // Only show public tournaments
     page: 1,
-    pageSize: 12
+    pageSize: 6
   });
 
-  readonly icons = LucideIcons;
-
-  constructor(
-    private tournamentService: TournamentService,
-    private router: Router
-  ) {}
+  paginationData = signal<PagedResult<Tournament> | null>(null);
+  
+  totalRecords = computed(() => this.paginationData()?.meta.totalRecords ?? 0);
+  totalPages = computed(() => this.paginationData()?.meta.totalPages ?? 0);
+  currentPage = computed(() => this.paginationData()?.meta.page ?? 1);
+  hasNextPage = computed(() => this.paginationData()?.meta.hasNextPage ?? false);
+  hasPreviousPage = computed(() => this.paginationData()?.meta.hasPreviousPage ?? false);
 
   ngOnInit() {
     this.loadTournaments();
   }
 
-  async loadTournaments() {
-    this.loading.set(true);
-    this.error.set(null);
+  loadTournaments() {
+    this.isLoading.set(true);
     
-    try {
-      const filters = {
-        ...this.searchFilters(),
-        pageNumber: this.currentPage(),
-        pageSize: this.pageSize()
-      };
-      
-      const result = await this.tournamentService.getTournaments(filters).toPromise();
-      this.tournaments.set(result?.data || []);
-      this.totalCount.set(result?.meta.totalRecords || 0);
-    } catch (error) {
-      this.error.set('Failed to load tournaments. Please try again.');
-    } finally {
-      this.loading.set(false);
-    }
+    this.tournamentService.getTournaments(this.searchCriteria()).subscribe({
+      next: (response) => {
+        this.tournaments.set(response.data);
+        this.paginationData.set(response);
+      },
+      error: (error) => {
+        this.toastService.error('Failed to load tournaments');
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
+    });
   }
 
-  onFiltersChanged(filters: TournamentSearch) {
-    this.searchFilters.set({ ...filters, isPublic: true });
-    this.currentPage.set(1);
+  onSearchChange(searchCriteria: Partial<TournamentSearch>) {
+    this.searchCriteria.update(current => ({
+      ...current,
+      ...searchCriteria,
+      isPublic: true, // Always ensure public filter
+      page: 1
+    }));
     this.loadTournaments();
+  }
+
+  onClearSearch() {
+    this.searchCriteria.set({
+      searchTerm: undefined,
+      status: undefined,
+      location: undefined,
+      startFrom: undefined,
+      startTo: undefined,
+      isPublic: true,
+      page: 1,
+      pageSize: 6
+    });
+    this.loadTournaments();
+  }
+
+  onPageChange(pageNumber: number) {
+    this.searchCriteria.update(current => ({
+      ...current,
+      page: pageNumber
+    }));
+    this.loadTournaments();
+  }
+
+  onPageSizeChange(pageSize: number) {
+    this.searchCriteria.update(current => ({
+      ...current,
+      pageSize,
+      page: 1
+    }));
+    this.loadTournaments();
+  }
+
+  onPageSizeSelectChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.onPageSizeChange(+target.value);
+  }
+
+  getPageNumbers(): number[] {
+    const current = this.currentPage();
+    const total = this.totalPages();
+    const delta = 2;
+    
+    const range: number[] = [];
+    const start = Math.max(1, current - delta);
+    const end = Math.min(total, current + delta);
+    
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    
+    return range;
   }
 
   onTournamentView(tournament: Tournament) {
     this.router.navigate(['/public/tournaments', tournament.id]);
   }
 
-  onPageChange(page: number) {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
-      this.loadTournaments();
-    }
-  }
-
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
-      case 'RegistrationOpen':
-        return 'badge-success';
-      case 'InProgress':
-        return 'badge-warning';
-      case 'Completed':
-        return 'badge-secondary';
-      default:
-        return 'badge-primary';
-    }
-  }
-
-  trackByTournamentId(index: number, tournament: Tournament): string {
-    return tournament.id;
-  }
-
-  onSearchChange() {
-    this.searchFilters.set({
-      ...this.searchFilters(),
-      q: this.searchTerm() || undefined
-    });
-    this.currentPage.set(1);
-    this.loadTournaments();
+  canJoinTournament(tournament: Tournament): boolean {
+    return tournament.status === TournamentStatus.RegistrationOpen &&
+           tournament.teamCount < tournament.maxTeams;
   }
 }
