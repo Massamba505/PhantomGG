@@ -17,8 +17,8 @@ export type StatsTab = 'table' | 'goals' | 'assists';
 @Component({
   selector: 'app-tournament-stats',
   imports: [CommonModule, RouterModule, LucideAngularModule],
-  templateUrl: './tournament-stats.component.html',
-  styleUrl: './tournament-stats.component.css'
+  templateUrl: './tournament-stats.html',
+  styleUrl: './tournament-stats.css'
 })
 export class TournamentStatsComponent implements OnInit {
 
@@ -51,26 +51,13 @@ export class TournamentStatsComponent implements OnInit {
     return this.tournament()?.name || 'Tournament Statistics';
   });
 
-
-  computedBackRoute = computed(() => {
-    if (this.backRoute()) return this.backRoute();
-    const url = this.router.url;
-    const tournamentId = this.getTournamentId();
-    
-    if (url.includes('/public/tournaments/')) {
-      return `/public/tournaments/${tournamentId}`;
-    } else if (url.includes('/organizer/tournaments/')) {
-      return `/organizer/tournaments/${tournamentId}`;
-    } else if (url.includes('/user/tournaments/')) {
-      return `/user/tournaments/${tournamentId}`;
+  goBack() {
+    if (this.backRoute()) {
+      this.router.navigate([this.backRoute()]);
+    } else {
+      window.history.back();
     }
-    
-    return '';
-  });
-
-  computedShowBackButton = computed(() => {
-    return this.showBackButton() && this.computedBackRoute() !== '';
-  });
+  }
 
   topScorer = computed(() => {
     const goals = this.goalStandings();

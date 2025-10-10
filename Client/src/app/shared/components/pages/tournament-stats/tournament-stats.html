@@ -2,12 +2,10 @@
   <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-4">
-      @if (computedShowBackButton()) {
-      <button class="btn btn-outline btn-sm" [routerLink]="computedBackRoute()">
+      <button class="btn btn-outline btn-sm" (click)="goBack()">
         <lucide-angular [img]="icons.ArrowLeft" [size]="16" />
         Back
       </button>
-      }
       <div>
         <h1 class="text-2xl font-bold">{{ tournamentName() }} Statistics</h1>
         @if (tournament()) {

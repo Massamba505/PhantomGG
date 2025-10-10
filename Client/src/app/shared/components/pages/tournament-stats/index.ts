@@ -1,1 +1,1 @@
-export * from './tournament-stats.component';
+export * from './tournament-stats';

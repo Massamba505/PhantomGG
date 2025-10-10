@@ -91,7 +91,7 @@ export class TournamentDetails implements OnInit {
   }
 
   onBackToTournaments() {
-    if (window.history.length > 1) {
+    if (window.history.length >= 1) {
       this.router.navigate(['../']);
     } else {
       this.router.navigate(['/public/tournaments']);
@@ -101,7 +101,7 @@ export class TournamentDetails implements OnInit {
   onViewStatistics() {
     const tournamentId = this.route.snapshot.paramMap.get('id');
     if (tournamentId) {
-      this.router.navigate(['/public/tournaments', tournamentId, 'statistics']);
+      this.router.navigate(['statistics'], { relativeTo: this.route });
     }
   }
 }
