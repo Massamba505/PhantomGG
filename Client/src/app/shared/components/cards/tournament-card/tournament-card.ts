@@ -4,6 +4,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Tournament } from '@/app/api/models/tournament.models';
 import { TournamentStatus } from '@/app/api/models';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 export type CardRoles = 'Organizer' | 'User' | 'Public';
 
@@ -78,5 +79,9 @@ export class TournamentCard {
   }
   isPublic(): boolean {
     return this.role() === 'Public';
+  }
+
+  getStatus(){
+    return getEnumLabel(TournamentStatus, this.tournament().status);
   }
 }
