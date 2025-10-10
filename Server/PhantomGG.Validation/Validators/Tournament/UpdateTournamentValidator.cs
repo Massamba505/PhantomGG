@@ -12,10 +12,6 @@ public class UpdateTournamentValidator : AbstractValidator<UpdateTournamentDto>
             .Matches(@"^[a-zA-Z0-9\s\-_\.]+$").WithMessage("Tournament name contains invalid characters")
             .When(x => !string.IsNullOrEmpty(x.Name));
 
-        RuleFor(x => x.Description)
-            .Length(10, 2000).WithMessage("Tournament description must be between 10 and 2000 characters")
-            .When(x => !string.IsNullOrEmpty(x.Description));
-
         RuleFor(x => x.Location)
             .Length(0, 200).WithMessage("Location must not exceed 200 characters")
             .When(x => !string.IsNullOrEmpty(x.Location));

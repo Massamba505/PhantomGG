@@ -8,7 +8,6 @@ public class UpdateTournamentDto
     [StringLength(200, MinimumLength = 3)]
     public string? Name { get; set; }
 
-    [StringLength(2000, MinimumLength = 10)]
     public string? Description { get; set; }
 
     [StringLength(200)]
