@@ -28,7 +28,7 @@ export interface TournamentDto {
 export interface TournamentQuery {
   q?: string;
   searchTerm?: string;
-  status?: string;
+  status?: TournamentStatus;
   location?: string;
   startFrom?: string;
   startTo?: string;

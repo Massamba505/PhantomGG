@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, inject, signal, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
 import { CreateTeam, UpdateTeam, Team } from '@/app/api/models/team.models';
@@ -10,10 +10,10 @@ import { CreateTeam, UpdateTeam, Team } from '@/app/api/models/team.models';
   styleUrl: './team-form.component.css'
 })
 export class TeamFormComponent implements OnInit, OnChanges {
-  @Input() team: Team | null = null;
-  @Input() tournamentId: string | null = null;
-  @Output() formSubmit = new EventEmitter<CreateTeam | UpdateTeam>();
-  @Output() formCancel = new EventEmitter<void>();
+  team = input<Team | null>(null);
+  tournamentId = input<string | null>(null);
+  formSubmit = output<CreateTeam | UpdateTeam>();
+  formCancel = output<void>();
   
   private fb = inject(FormBuilder);
   
@@ -34,7 +34,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
   }
 
   private initializeForm() {
-    const team = this.team;
+    const team = this.team();
     
     this.teamForm = this.fb.group({
       name: [

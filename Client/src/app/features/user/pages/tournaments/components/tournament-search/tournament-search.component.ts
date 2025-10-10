@@ -1,8 +1,7 @@
-import { Component, Output, EventEmitter, signal, inject, computed } from '@angular/core';
+import { Component, signal, computed, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TournamentSearch } from '@/app/api/models/tournament.models';
-import { TournamentService } from '@/app/api/services';
 import { TournamentStatus, TournamentFormats } from '@/app/api/models/common.models';
 import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
 
@@ -13,12 +12,11 @@ import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
   styleUrl: './tournament-search.component.css'
 })
 export class TournamentSearchComponent {
-  @Output() searchChange = new EventEmitter<Partial<TournamentSearch>>();
-  @Output() clearFiltersSearch = new EventEmitter<void>();
-  private tournamentService = inject(TournamentService);
+  searchChange = output<Partial<TournamentSearch>>();
+  clearFiltersSearch = output<void>();
 
   searchTerm = signal('');
-  selectedStatus = signal<string | undefined>(undefined);
+  selectedStatus = signal<TournamentStatus | undefined>(undefined);
   location = signal('');
   format = signal<string | undefined>(undefined);
   startDateFrom = signal<string | undefined>(undefined);
@@ -48,7 +46,8 @@ export class TournamentSearchComponent {
 
   onStatusChange(event: Event) {
     const target = event.target as HTMLSelectElement;
-    const value = target.value || undefined;
+    const value = target.value? parseInt(target.value): undefined;
+
     this.selectedStatus.set(value);
   }
 

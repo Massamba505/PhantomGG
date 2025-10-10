@@ -1,4 +1,4 @@
-<app-modal [isOpen]="isOpen" [title]="getModalTitle()" (close)="closeModal()">
+<app-modal [isOpen]="isOpen()" [title]="getModalTitle()" (close)="closeModal()">
   @if (teams.length === 0) {
   <div class="text-center py-12">
     <lucide-angular
@@ -18,7 +18,7 @@
   } @if (teams.length > 0) {
   <div class="space-y-4">
     <div class="space-y-3 max-h-96 overflow-y-auto">
-      @for (team of teams; track team.id) {
+      @for (team of teams(); track team.id) {
       <div class="card rounded-lg cursor-pointer" (click)="selectTeam(team)">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
@@ -65,7 +65,7 @@
       <button
         (click)="closeModal()"
         class="px-4 py-2 btn btn-outline"
-        [disabled]="isJoining"
+        [disabled]="isJoining()"
       >
         Cancel
       </button>
@@ -74,7 +74,7 @@
         [disabled]="!selectedTeam() || isJoining"
         class="px-6 py-2 btn btn-primary disabled:cursor-not-allowed"
       >
-        <span>{{ isJoining ? "Registering..." : "Register Team" }}</span>
+        <span>{{ isJoining() ? "Registering..." : "Register Team" }}</span>
       </button>
     </div>
   </div>
