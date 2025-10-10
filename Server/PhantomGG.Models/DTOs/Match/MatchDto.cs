@@ -1,3 +1,5 @@
+using PhantomGG.Common.Enums;
+
 namespace PhantomGG.Models.DTOs.Match;
 
 public class MatchDto
@@ -13,7 +15,7 @@ public class MatchDto
     public string? AwayTeamLogo { get; set; }
     public DateTime MatchDate { get; set; }
     public string? Venue { get; set; }
-    public string Status { get; set; } = null!;
+    public MatchStatus Status { get; set; }
     public int? HomeScore { get; set; }
     public int? AwayScore { get; set; }
 }

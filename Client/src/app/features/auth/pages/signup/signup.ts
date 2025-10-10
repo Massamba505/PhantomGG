@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import {
   FormBuilder,
-  FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -14,7 +13,7 @@ import { matchPasswordsValidator } from '@/app/shared/validators/match-passwords
 import { getPasswordScore } from '@/app/shared/utils/PasswordScore';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { Roles } from '@/app/shared/constants/roles';
+import { UserRoles } from '@/app/api/models';
 
 @Component({
   selector: 'app-signup',
@@ -49,7 +48,7 @@ export class Signup {
         '',
         [Validators.required, Validators.email, strictEmailValidator],
       ],
-      role: [Roles.User],
+      role: [UserRoles.User],
       password: ['', [Validators.required, passwordStrengthValidator]],
       confirmPassword: ['', Validators.required],
     },
@@ -73,7 +72,6 @@ export class Signup {
 
   onSubmit() {
     this.submitted.set(true);
-    debugger;
     if (this.signupForm.invalid) {
       return;
     }

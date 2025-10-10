@@ -10,7 +10,6 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-edit-team',
-  standalone: true,
   imports: [CommonModule, TeamFormComponent, LucideAngularModule],
   templateUrl: "./edit-team.html"
 })
@@ -44,7 +43,6 @@ export class EditTeamComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading team:', error);
         this.toastService.error('Failed to load team details');
         this.isLoading.set(false);
       }
@@ -56,7 +54,6 @@ export class EditTeamComponent implements OnInit {
 
     this.isSaving.set(true);
     
-    // For edit team component, we expect UpdateTeam data
     const updateData = teamData as UpdateTeam;
     
     this.teamService.updateTeam(this.teamId, updateData).subscribe({
@@ -65,7 +62,6 @@ export class EditTeamComponent implements OnInit {
         this.router.navigate(['/user/teams']);
       },
       error: (error) => {
-        console.error('Error updating team:', error);
         this.toastService.error('Failed to update team. Please try again.');
         this.isSaving.set(false);
       }

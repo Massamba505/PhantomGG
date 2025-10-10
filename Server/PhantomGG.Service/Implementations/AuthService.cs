@@ -1,13 +1,12 @@
-using PhantomGG.Service.Interfaces;
 using Microsoft.AspNetCore.Http;
-using PhantomGG.Service.Exceptions;
-using PhantomGG.Repository.Interfaces;
-using PhantomGG.Common.Enums;
-using PhantomGG.Common.Helpers;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Repository.Entities;
-using System.Text.RegularExpressions;
+using PhantomGG.Repository.Interfaces;
+using PhantomGG.Service.Exceptions;
+using PhantomGG.Service.Interfaces;
 using PhantomGG.Service.Mappings;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -28,7 +27,7 @@ public class AuthService(
     private readonly IEmailService _emailService = emailService;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    public async Task<AuthDto> RegisterAsync(RegisterRequestDto request)
+    public async Task RegisterAsync(RegisterRequestDto request)
     {
         ValidateRegisterRequest(request);
 
@@ -46,7 +45,7 @@ public class AuthService(
             Email = request.Email.ToLower(),
             PasswordHash = _passwordHasher.HashPassword(request.Password),
             ProfilePictureUrl = request.ProfilePictureUrl ?? $"https://eu.ui-avatars.com/api/?name={request.FirstName}+{request.LastName}&size=250",
-            Role = request.Role.ToString(),
+            Role = (int)request.Role,
             CreatedAt = DateTime.UtcNow,
             IsActive = true,
             EmailVerified = false,
@@ -58,8 +57,6 @@ public class AuthService(
         await _userRepository.CreateAsync(user);
 
         await _emailService.SendEmailVerificationAsync(user.Email, user.FirstName, user.EmailVerificationToken!);
-
-        return await GenerateTokensAsync(user);
     }
 
     public async Task<AuthDto> LoginAsync(LoginRequestDto request)
@@ -129,11 +126,6 @@ public class AuthService(
             errors.Add("Password must be at least 8 characters with uppercase, lowercase, number, and special character");
         }
 
-        if (!EnumHelper.ToEnum<UserRoles>(request.Role).HasValue)
-        {
-            errors.Add("Invalid role");
-        }
-
         if (errors.Any())
         {
             throw new ValidationException(string.Join("; ", errors));
@@ -162,7 +154,11 @@ public class AuthService(
 
     private static string GenerateSecureToken()
     {
-        return Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+        var bytes = RandomNumberGenerator.GetBytes(32);
+        return Convert.ToBase64String(bytes)
+            .Replace("+", "-")
+            .Replace("/", "_")
+            .Replace("=", "");
     }
 
     private async Task HandleFailedLoginAsync(string email)

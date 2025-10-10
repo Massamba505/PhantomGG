@@ -1,8 +1,9 @@
 import { Component, signal, inject, OnInit, computed, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TournamentFormat, TournamentSearch } from '@/app/api/models/tournament.models';
-import { TournamentService } from '@/app/api/services';
+import { Tournament, TournamentFormat, TournamentSearch } from '@/app/api/models/tournament.models';
+import { TournamentService, TournamentStatus } from '@/app/api/services';
+import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-tournament-search',
@@ -17,7 +18,8 @@ export class TournamentSearchComponent implements OnInit {
   private tournamentService = inject(TournamentService);
 
   searchTerm = signal('');
-  selectedStatus = signal<string | undefined>(undefined);
+  selectedStatus = signal<TournamentStatus | undefined>(undefined);
+  statusOptions = getEnumOptions(TournamentStatus);
   location = signal('');
   format = signal<string | undefined>(undefined);
   formats = signal<TournamentFormat[]>([]);
@@ -54,7 +56,7 @@ export class TournamentSearchComponent implements OnInit {
 
   onStatusChange(event: Event) {
     const target = event.target as HTMLSelectElement;
-    const value = target.value || undefined;
+    const value = target.value? parseInt(target.value): undefined;
     this.selectedStatus.set(value);
   }
 

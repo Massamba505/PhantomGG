@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthStateService } from '@/app/store/AuthStateService';
-import { Roles } from '@/app/shared/constants/roles';
+import { UserRoles } from '@/app/api/models';
 
 @Component({
   selector: 'app-dashboard-selection',
@@ -16,13 +16,13 @@ export class DashboardSelectionComponent implements OnInit {
 
   ngOnInit() {
       switch(this.user()?.role){
-        case Roles.Organizer:
+        case UserRoles.Organizer:
             this.navigateTo("/organizer");
             break;
-        case Roles.Admin:
+        case UserRoles.Admin:
             this.navigateTo("/admin");
             break;
-        case Roles.User:
+        case UserRoles.User:
             this.navigateTo("/user");
             break;
         default:

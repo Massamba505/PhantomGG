@@ -13,7 +13,6 @@ import { PlayerForm } from '@/app/shared/components/forms/player-form/player-for
 
 @Component({
   selector: 'app-team-details',
-  standalone: true,
   imports: [
     CommonModule,
     RouterModule,
@@ -57,7 +56,6 @@ export class TeamDetailsComponent implements OnInit {
         this.error.set(null);
       },
       error: (error) => {
-        console.error('Failed to load team:', error);
         this.error.set('Failed to load team details');
         this.toastService.error('Failed to load team details');
       },
@@ -73,7 +71,6 @@ export class TeamDetailsComponent implements OnInit {
         this.players.set(players);
       },
       error: (error) => {
-        console.error('Failed to load players:', error);
         this.toastService.error('Failed to load team players');
       }
     });
@@ -90,8 +87,11 @@ export class TeamDetailsComponent implements OnInit {
     }
   }
 
-  // Player management methods
   onShowAddPlayer() {
+    if (!this.team()) {
+      this.toastService.error('Please wait for team details to load');
+      return;
+    }
     this.editingPlayer.set(null);
     this.showPlayerModal.set(true);
   }
@@ -123,7 +123,6 @@ export class TeamDetailsComponent implements OnInit {
           this.onClosePlayerModal();
         },
         error: (error) => {
-          console.error('Failed to update player:', error);
           this.toastService.error('Failed to update player');
         }
       });
@@ -135,7 +134,6 @@ export class TeamDetailsComponent implements OnInit {
           this.onClosePlayerModal();
         },
         error: (error) => {
-          console.error('Failed to add player:', error);
           this.toastService.error('Failed to add player');
         }
       });
@@ -153,14 +151,12 @@ export class TeamDetailsComponent implements OnInit {
           this.toastService.success('Player removed successfully');
         },
         error: (error) => {
-          console.error('Failed to remove player:', error);
           this.toastService.error('Failed to remove player');
         }
       });
     }
   }
 
-  // Utility methods
   isManager(): boolean {
     const user = this.authStateService.user();
     const team = this.team();

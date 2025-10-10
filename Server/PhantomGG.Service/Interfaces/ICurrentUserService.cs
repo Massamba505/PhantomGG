@@ -4,7 +4,7 @@ namespace PhantomGG.Service.Interfaces;
 
 public interface ICurrentUserService
 {
-    CurrentUserDto GetCurrentUser();
+    CurrentUserDto? GetCurrentUser();
     bool IsAuthenticated();
     bool IsInRole(string role);
 }

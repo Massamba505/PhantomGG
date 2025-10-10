@@ -38,6 +38,12 @@ export const organizerRoutes: Routes = [
             data:{title:"Tournament Details"}
           },
           {
+            path: ':id/statistics',
+            loadComponent: () => import('../../shared/components/pages/tournament-stats/tournament-stats').then(m => m.TournamentStatsComponent),
+            title: 'Tournament Statistics - PhantomGG',
+            data:{title:"Tournament Statistics"}
+          },
+          {
             path: ':id/edit',
             loadComponent: () => import('./pages/edit-tournament/edit-tournament').then(m => m.EditTournamentPage),
             title: 'Edit Tournament - PhantomGG',

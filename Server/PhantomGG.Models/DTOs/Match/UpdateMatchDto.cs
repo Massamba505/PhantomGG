@@ -1,3 +1,4 @@
+using PhantomGG.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.Models.DTOs.Match;
@@ -10,6 +11,6 @@ public class UpdateMatchDto
     [StringLength(200)]
     public string? Venue { get; set; }
 
-    [StringLength(20)]
-    public string Status { get; set; } = "Scheduled";
+    [Required]
+    public MatchStatus Status { get; set; }
 }

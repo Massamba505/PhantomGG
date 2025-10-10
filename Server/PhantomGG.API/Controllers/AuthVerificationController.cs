@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Service.Interfaces;
 
@@ -15,69 +14,57 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
 {
     private readonly IAuthVerificationService _authVerificationService = authVerificationService;
 
+    /// <summary>
+    /// Confirm user's email using a verification token
+    /// </summary>
     [HttpPost("verify-email")]
-    public async Task<ActionResult<ApiResponse>> VerifyEmail([FromBody] VerifyEmailRequest request)
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
     {
         var success = await _authVerificationService.VerifyEmailAsync(request.Token);
 
         if (!success)
         {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = "Invalid or expired verification token"
-            });
+            return BadRequest(new { message = "Invalid or expired verification token" });
         }
 
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Message = "Email verified successfully"
-        });
+        return Ok(new { message = "Email verified successfully" });
     }
 
+    /// <summary>
+    /// Send a new email verification link
+    /// </summary>
     [HttpPost("resend-verification")]
-    public async Task<ActionResult<ApiResponse>> ResendVerification([FromBody] ResendVerificationRequest request)
+    public async Task<IActionResult> ResendVerification([FromBody] ResendVerificationRequest request)
     {
         await _authVerificationService.ResendEmailVerificationAsync(request.Email);
 
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Message = "Verification email sent"
-        });
+        return Ok(new { message = "Verification email sent" });
     }
 
+    /// <summary>
+    /// Send password reset link to user's email
+    /// </summary>
     [HttpPost("forgot-password")]
-    public async Task<ActionResult<ApiResponse>> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
         await _authVerificationService.InitiatePasswordResetAsync(request.Email);
 
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Message = "If an account exists with that email, a password reset link has been sent"
-        });
+        return Ok(new { message = "If an account exists with that email, a password reset link has been sent" });
     }
 
+    /// <summary>
+    /// Reset password using reset token and new password
+    /// </summary>
     [HttpPost("reset-password")]
-    public async Task<ActionResult<ApiResponse>> ResetPassword([FromBody] ResetPasswordRequest request)
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         var success = await _authVerificationService.ResetPasswordAsync(request.Token, request.NewPassword);
 
         if (!success)
         {
-            return BadRequest(new ApiResponse
-            {
-                Success = false,
-                Message = "Invalid or expired reset token"
-            });
+            return BadRequest(new { message = "Invalid or expired reset token" });
         }
 
-        return Ok(new ApiResponse
-        {
-            Success = true,
-            Message = "Password reset successfully"
-        });
+        return Ok(new { message = "Password reset successfully" });
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using PhantomGG.Models.DTOs.User;
 using PhantomGG.Service.Exceptions;
 using System.Security.Claims;
+using PhantomGG.Common.Enums;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -11,11 +12,11 @@ public class CurrentUserService(
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    public CurrentUserDto GetCurrentUser()
+    public CurrentUserDto? GetCurrentUser()
     {
         if (!IsAuthenticated())
         {
-            throw new UnauthorizedException("User is not authenticated");
+            return null;
         }
 
         var user = _httpContextAccessor.HttpContext?.User!;
@@ -29,11 +30,16 @@ public class CurrentUserService(
             throw new UnauthorizedException("Required claims are missing");
         }
 
+        if (!Enum.TryParse<UserRoles>(roleClaim.Value, ignoreCase: true, out var role))
+        {
+            throw new UnauthorizedException("Invalid role claim");
+        }
+
         return new CurrentUserDto
         {
             Id = Guid.Parse(idClaim.Value),
             Email = emailClaim.Value,
-            Role = roleClaim.Value
+            Role = role
         };
     }
 

@@ -18,7 +18,6 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
     FormsModule,
     LucideAngularModule,
     TournamentCard,
-    // TournamentFilter
   ],
 })
 export class TournamentBrowse implements OnInit {
@@ -26,17 +25,15 @@ export class TournamentBrowse implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   searchTerm = signal('');
-  
-  // Pagination
+
   currentPage = signal(1);
   pageSize = signal(12);
   totalCount = signal(0);
   totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize()));
-  
-  // Search and filters
+
   searchFilters = signal<TournamentSearch>({
     isPublic: true,
-    pageNumber: 1,
+    page: 1,
     pageSize: 12
   });
 
@@ -65,9 +62,8 @@ export class TournamentBrowse implements OnInit {
       
       const result = await this.tournamentService.getTournaments(filters).toPromise();
       this.tournaments.set(result?.data || []);
-      this.totalCount.set(result?.totalRecords || 0);
+      this.totalCount.set(result?.meta.totalRecords || 0);
     } catch (error) {
-      console.error('Error loading tournaments:', error);
       this.error.set('Failed to load tournaments. Please try again.');
     } finally {
       this.loading.set(false);
@@ -111,7 +107,7 @@ export class TournamentBrowse implements OnInit {
   onSearchChange() {
     this.searchFilters.set({
       ...this.searchFilters(),
-      searchTerm: this.searchTerm() || undefined
+      q: this.searchTerm() || undefined
     });
     this.currentPage.set(1);
     this.loadTournaments();

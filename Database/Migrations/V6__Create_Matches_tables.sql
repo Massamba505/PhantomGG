@@ -4,7 +4,7 @@ CREATE TABLE Matches (
     HomeTeamId UNIQUEIDENTIFIER NOT NULL,
     AwayTeamId UNIQUEIDENTIFIER NOT NULL,
     MatchDate DATETIME2 NOT NULL,
-    Status VARCHAR(20) NOT NULL DEFAULT 'Scheduled',
+    Status INT NOT NULL DEFAULT 1,
     HomeScore INT NULL DEFAULT 0,
     AwayScore INT NULL DEFAULT 0,
     
@@ -19,3 +19,4 @@ CREATE TABLE Matches (
 
 CREATE INDEX IX_Matches_TournamentId ON Matches (TournamentId);
 CREATE INDEX IX_Matches_MatchDate ON Matches (MatchDate);
+CREATE INDEX IX_Matches_Status ON Matches (Status);

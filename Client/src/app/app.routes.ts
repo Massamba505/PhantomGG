@@ -2,11 +2,11 @@ import { Routes } from '@angular/router';
 import { authRoutes } from './features/auth/auth.routes';
 import { authGuard } from './core/guards/auth.guard';
 import { NotFoundComponent } from './features/not-found/not-found';
-import { Roles } from './shared/constants/roles';
 import { userRoutes } from './features/user/user.routes';
 import { publicRoutes } from './features/public/public.routes';
 import { organizerRoutes } from './features/organizer/organizer.routes';
 import { publicGuard } from './core/guards/public.guard';
+import { UserRoles } from './api/models';
 
 export const routes: Routes = [
   {
@@ -35,13 +35,13 @@ export const routes: Routes = [
   {
     path: 'user',
     canActivate: [authGuard],
-    data: { roles: [Roles.User] },
+    data: { roles: [UserRoles.User] },
     children: userRoutes,
   },
   {
     path: 'organizer',
     canActivate: [authGuard],
-    data: { roles: [Roles.Organizer] },
+    data: { roles: [UserRoles.Organizer] },
     children: organizerRoutes,
   },
   {

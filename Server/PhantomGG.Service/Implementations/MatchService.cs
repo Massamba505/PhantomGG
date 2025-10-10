@@ -1,51 +1,34 @@
 using PhantomGG.Service.Interfaces;
 using PhantomGG.Models.DTOs.Match;
-using PhantomGG.Models.DTOs.MatchEvent;
+using PhantomGG.Models.DTOs;
 using PhantomGG.Repository.Interfaces;
+using PhantomGG.Repository.Specifications;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Repository.Entities;
 using PhantomGG.Service.Mappings;
+using PhantomGG.Common.Enums;
 using Microsoft.Extensions.Caching.Hybrid;
 
 namespace PhantomGG.Service.Implementations;
 
-public class MatchService : IMatchService
+public class MatchService(
+    IMatchRepository matchRepository,
+    IMatchEventRepository matchEventRepository,
+    ITournamentTeamRepository tournamentTeamRepository,
+    IMatchValidationService matchValidationService,
+    ICacheInvalidationService cacheInvalidationService,
+    HybridCache cache) : IMatchService
 {
-    private readonly IMatchRepository _matchRepository;
-    private readonly ITournamentRepository _tournamentRepository;
-    private readonly ITeamRepository _teamRepository;
-    private readonly IMatchEventRepository _matchEventRepository;
-    private readonly IPlayerRepository _playerRepository;
-    private readonly ICurrentUserService _currentUserService;
-    private readonly ICacheInvalidationService _cacheInvalidationService;
-    private readonly HybridCache _cache;
-
-    public MatchService(
-        IMatchRepository matchRepository,
-        ITournamentRepository tournamentRepository,
-        ITeamRepository teamRepository,
-        IMatchEventRepository matchEventRepository,
-        IPlayerRepository playerRepository,
-        ICurrentUserService currentUserService,
-        ICacheInvalidationService cacheInvalidationService,
-        HybridCache cache)
-    {
-        _matchRepository = matchRepository;
-        _tournamentRepository = tournamentRepository;
-        _teamRepository = teamRepository;
-        _matchEventRepository = matchEventRepository;
-        _playerRepository = playerRepository;
-        _currentUserService = currentUserService;
-        _cacheInvalidationService = cacheInvalidationService;
-        _cache = cache;
-    }
+    private readonly IMatchRepository _matchRepository = matchRepository;
+    private readonly IMatchEventRepository _matchEventRepository = matchEventRepository;
+    private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
+    private readonly IMatchValidationService _matchValidationService = matchValidationService;
+    private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
+    private readonly HybridCache _cache = cache;
 
     public async Task<MatchDto> GetByIdAsync(Guid id)
     {
-        var match = await _matchRepository.GetByIdAsync(id);
-        if (match == null)
-            throw new NotFoundException("Match not found");
-
+        var match = await _matchValidationService.ValidateMatchExistsAsync(id);
         return match.ToDto();
     }
 
@@ -55,421 +38,191 @@ public class MatchService : IMatchService
         return matches.Select(m => m.ToDto());
     }
 
-    public async Task<MatchDto> UpdateResultAsync(Guid matchId, object resultDto, Guid organizerId)
+    public async Task<IEnumerable<MatchDto>> GetByTournamentAndStatusAsync(Guid tournamentId, MatchStatus? status)
     {
-        var match = await _matchRepository.GetByIdAsync(matchId);
-        if (match == null)
-            throw new NotFoundException("Match not found");
+        if (status.HasValue)
+        {
+            var matches = await _matchRepository.GetByTournamentAndStatusAsync(tournamentId, (int)status.Value);
+            return matches.Select(m => m.ToDto());
+        }
 
-        var tournament = await _tournamentRepository.GetByIdAsync(match.TournamentId);
-        if (tournament == null)
-            throw new NotFoundException("Tournament not found");
+        var allmMtches = await _matchRepository.GetByTournamentAsync(tournamentId);
+        return allmMtches.Select(m => m.ToDto());
+    }
 
-        if (tournament.OrganizerId != organizerId)
-            throw new UnauthorizedException("You don't have permission to update this match");
+    public async Task<MatchDto> UpdateResultAsync(Guid matchId, MatchResultDto resultDto, Guid organizerId)
+    {
+        var match = await _matchValidationService.ValidateCanUpdateResultAsync(matchId, organizerId);
 
-        if (resultDto is not MatchResultDto matchResult)
-            throw new ValidationException("Invalid result data");
+        // Calculate scores from goal events instead of accepting them directly
+        var matchEvents = await _matchEventRepository.GetByMatchIdAsync(matchId);
+        var goalEvents = matchEvents.Where(e => e.EventType == (int)MatchEventType.Goal);
 
-        match.HomeScore = matchResult.HomeScore;
-        match.AwayScore = matchResult.AwayScore;
-        match.Status = Common.Enums.MatchStatus.Completed.ToString();
+        var homeScore = goalEvents.Count(e => e.TeamId == match.HomeTeamId);
+        var awayScore = goalEvents.Count(e => e.TeamId == match.AwayTeamId);
+
+        match.HomeScore = homeScore;
+        match.AwayScore = awayScore;
+        match.Status = (int)resultDto.Status;
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);
 
         await _cacheInvalidationService.InvalidateMatchCacheAsync(matchId);
         await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(match.TournamentId);
-
         return updatedMatch.ToDto();
     }
 
-    public async Task<IEnumerable<MatchDto>> GenerateTournamentBracketAsync(Guid tournamentId, Guid organizerId)
+    public async Task<PagedResult<MatchDto>> SearchAsync(MatchQuery query)
     {
-        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
-        if (tournament == null)
-            throw new NotFoundException("Tournament not found");
+        var spec = new MatchSpecification
+        {
+            SearchTerm = query.Q,
+            TournamentId = query.TournamentId,
+            TeamId = query.TeamId,
+            Status = query.Status,
+            DateFrom = query.From,
+            DateTo = query.To,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
 
-        if (tournament.OrganizerId != organizerId)
-            throw new UnauthorizedException("You don't have permission to generate brackets for this tournament");
+        var result = await _matchRepository.SearchAsync(spec);
 
-        var existingMatches = await _matchRepository.GetByTournamentAsync(tournamentId);
-        return existingMatches.Select(m => m.ToDto());
-    }
-
-    public async Task<IEnumerable<MatchDto>> GetByTeamAsync(Guid teamId)
-    {
-        var matches = await _matchRepository.GetByTeamAsync(teamId);
-        return matches.Select(m => m.ToDto());
-    }
-
-    public async Task<IEnumerable<MatchDto>> GetUpcomingMatchesAsync(Guid tournamentId)
-    {
-        var matches = await _matchRepository.GetUpcomingMatchesAsync(tournamentId);
-        return matches.Select(m => m.ToDto());
-    }
-
-    public async Task<IEnumerable<MatchDto>> GetCompletedMatchesAsync(Guid tournamentId)
-    {
-        var matches = await _matchRepository.GetCompletedMatchesAsync(tournamentId);
-        return matches.Select(m => m.ToDto());
-    }
-
-    public async Task<IEnumerable<MatchDto>> SearchAsync(MatchSearchDto searchDto)
-    {
-        var matches = await _matchRepository.SearchAsync(searchDto);
-        return matches.Select(m => m.ToDto());
+        return new PagedResult<MatchDto>(
+            result.Data.Select(m => m.ToDto()),
+            result.Meta.Page,
+            result.Meta.PageSize,
+            result.Meta.TotalRecords
+        );
     }
 
     public async Task<MatchDto> CreateAsync(CreateMatchDto createDto, Guid userId)
     {
-        var tournament = await _tournamentRepository.GetByIdAsync(createDto.TournamentId);
-        if (tournament == null)
-            throw new NotFoundException("Tournament not found");
+        var tournament = await _matchValidationService.ValidateTournamentForMatchAsync(createDto.TournamentId, userId);
 
+        await _matchValidationService.ValidateTeamsCanPlayAsync(createDto.HomeTeamId, createDto.AwayTeamId, createDto.TournamentId);
 
-        var homeTeam = await _teamRepository.GetByIdAsync(createDto.HomeTeamId);
-        var awayTeam = await _teamRepository.GetByIdAsync(createDto.AwayTeamId);
-
-        if (homeTeam == null || awayTeam == null)
-            throw new NotFoundException("One or both teams not found");
-
-
-        if (await _matchRepository.TeamsHaveMatchOnDateAsync(createDto.HomeTeamId, createDto.AwayTeamId, createDto.MatchDate))
-            throw new ForbiddenException("Teams already have a match scheduled on this date");
+        await _matchValidationService.ValidateMatchSchedulingAsync(createDto.HomeTeamId, createDto.AwayTeamId, createDto.MatchDate);
 
         var match = createDto.ToEntity();
         var createdMatch = await _matchRepository.CreateAsync(match);
+
+        await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(createdMatch.TournamentId);
+
         return createdMatch.ToDto();
     }
 
     public async Task<MatchDto> UpdateAsync(Guid id, UpdateMatchDto updateDto, Guid userId)
     {
-        var match = await _matchRepository.GetByIdAsync(id);
-        if (match == null)
-            throw new NotFoundException("Match not found");
+        var match = await _matchValidationService.ValidateCanUpdateMatchAsync(id, userId);
 
+        if (updateDto.MatchDate != match.MatchDate)
+        {
+            await _matchValidationService.ValidateMatchSchedulingAsync(
+                match.HomeTeamId,
+                match.AwayTeamId,
+                updateDto.MatchDate,
+                id);
+        }
 
         updateDto.UpdateEntity(match);
         var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToDto();
-    }
 
-    public async Task<MatchDto> UpdateResultAsync(Guid id, MatchResultDto resultDto, Guid userId)
-    {
-        var match = await _matchRepository.GetByIdAsync(id);
-        if (match == null)
-            throw new NotFoundException("Match not found");
+        await _cacheInvalidationService.InvalidateMatchCacheAsync(id);
+        await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(match.TournamentId);
 
-
-        match.HomeScore = resultDto.HomeScore;
-        match.AwayScore = resultDto.AwayScore;
-        match.Status = "Completed";
-
-        var updatedMatch = await _matchRepository.UpdateAsync(match);
         return updatedMatch.ToDto();
     }
 
     public async Task DeleteAsync(Guid id, Guid userId)
     {
-        var match = await _matchRepository.GetByIdAsync(id);
-        if (match == null)
-            throw new NotFoundException("Match not found");
-
+        var match = await _matchValidationService.ValidateCanDeleteMatchAsync(id, userId);
 
         await _matchRepository.DeleteAsync(id);
+
+        await _cacheInvalidationService.InvalidateMatchCacheAsync(id);
+        await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(match.TournamentId);
     }
 
-
-    public async Task<IEnumerable<MatchDto>> GenerateRoundRobinFixturesAsync(GenerateFixturesDto generateDto, Guid userId)
+    public async Task CreateTournamentBracketAsync(Guid tournamentId, Guid organizerId)
     {
-        var tournament = await _tournamentRepository.GetByIdAsync(generateDto.TournamentId);
-        if (tournament == null)
-            throw new NotFoundException("Tournament not found");
+        var tournament = await _matchValidationService.ValidateTournamentForMatchAsync(tournamentId, organizerId);
 
+        var approvedTournamentTeams = await _tournamentTeamRepository.GetByTournamentAndStatusAsync(tournamentId, (int)TeamRegistrationStatus.Approved);
+        var teams = approvedTournamentTeams.Select(tt => tt.Team).ToList();
 
-        var teams = await _tournamentRepository.GetTournamentTeamsAsync(generateDto.TournamentId);
-        var teamsList = teams.ToList();
-
-        if (teamsList.Count < tournament.MinTeams)
-            throw new ForbiddenException($"At least {tournament.MinTeams} approved teams are required to generate fixtures");
-
-        var matches = new List<Match>();
-        var matchDate = generateDto.StartDate;
-
-        for (int i = 0; i < teamsList.Count; i++)
+        if (teams.Count < 2)
         {
-            for (int j = i + 1; j < teamsList.Count; j++)
+            throw new ValidationException("Tournament must have at least 2 approved teams to generate fixtures");
+        }
+
+        var existingMatches = await _matchRepository.GetByTournamentAsync(tournamentId);
+        if (existingMatches.Any())
+        {
+            throw new ValidationException("Tournament already has fixtures generated");
+        }
+
+        var fixtures = GenerateRoundRobinFixtures(teams, tournamentId);
+
+        foreach (var fixture in fixtures)
+        {
+            await _matchRepository.CreateAsync(fixture);
+        }
+
+        await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournamentId);
+    }
+
+    private static List<Match> GenerateRoundRobinFixtures(List<Team> teams, Guid tournamentId)
+    {
+        var fixtures = new List<Match>();
+        var teamCount = teams.Count;
+        var rounds = teamCount % 2 == 0 ? teamCount - 1 : teamCount;
+        var matchesPerRound = teamCount / 2;
+
+        var teamIndices = Enumerable.Range(0, teamCount).ToList();
+        var baseDate = DateTime.UtcNow.AddDays(7);
+
+        for (int round = 0; round < rounds; round++)
+        {
+            var roundDate = baseDate.AddDays(round * 7);
+
+            for (int match = 0; match < matchesPerRound; match++)
             {
-                var match = new Match
+                var homeIndex = teamIndices[match];
+                var awayIndex = teamIndices[teamCount - 1 - match];
+
+                if (homeIndex >= teamCount || awayIndex >= teamCount)
+                    continue;
+
+                var homeTeam = teams[homeIndex];
+                var awayTeam = teams[awayIndex];
+
+                var fixture = new Match
                 {
                     Id = Guid.NewGuid(),
-                    TournamentId = generateDto.TournamentId,
-                    HomeTeamId = teamsList[i].TeamId,
-                    AwayTeamId = teamsList[j].TeamId,
-                    MatchDate = matchDate,
-                    Status = "Scheduled",
+                    TournamentId = tournamentId,
+                    HomeTeamId = homeTeam.Id,
+                    AwayTeamId = awayTeam.Id,
+                    MatchDate = roundDate.AddHours(15),
+                    Status = (int)MatchStatus.Scheduled,
+                    HomeScore = null,
+                    AwayScore = null
                 };
 
-                matches.Add(match);
-                matchDate = matchDate.AddDays(generateDto.DaysBetweenMatches);
+                fixtures.Add(fixture);
             }
-        }
 
-        if (generateDto.IncludeReturnMatches)
-        {
-            for (int i = 0; i < teamsList.Count; i++)
+            if (teamCount > 2)
             {
-                for (int j = i + 1; j < teamsList.Count; j++)
+                var temp = teamIndices[1];
+                for (int i = 1; i < teamCount - 1; i++)
                 {
-                    var returnMatch = new Match
-                    {
-                        Id = Guid.NewGuid(),
-                        TournamentId = generateDto.TournamentId,
-                        HomeTeamId = teamsList[j].TeamId, // Swapped home and away
-                        AwayTeamId = teamsList[i].TeamId,
-                        MatchDate = matchDate,
-                        Status = "Scheduled",
-                    };
-
-                    matches.Add(returnMatch);
-                    matchDate = matchDate.AddDays(generateDto.DaysBetweenMatches);
+                    teamIndices[i] = teamIndices[i + 1];
                 }
+                teamIndices[teamCount - 1] = temp;
             }
         }
 
-        var createdMatches = new List<Match>();
-        foreach (var match in matches)
-        {
-            var createdMatch = await _matchRepository.CreateAsync(match);
-            createdMatches.Add(createdMatch);
-        }
-
-        return createdMatches.Select(m => m.ToDto());
-    }
-
-    public async Task<MatchDto> StartMatchAsync(Guid matchId, Guid userId)
-    {
-        var match = await _matchRepository.GetByIdAsync(matchId);
-        if (match == null)
-            throw new NotFoundException("Match not found");
-
-
-        match.Status = "In Progress";
-
-        var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToDto();
-    }
-
-    public async Task<MatchDto> EndMatchAsync(Guid matchId, Guid userId)
-    {
-        var match = await _matchRepository.GetByIdAsync(matchId);
-        if (match == null)
-            throw new NotFoundException("Match not found");
-
-
-        match.Status = "Completed";
-
-        var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToDto();
-    }
-
-    public async Task<MatchDto> CancelMatchAsync(Guid matchId, string reason, Guid userId)
-    {
-        var match = await _matchRepository.GetByIdAsync(matchId);
-        if (match == null)
-            throw new NotFoundException("Match not found");
-
-
-        match.Status = "Cancelled";
-
-        var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToDto();
-    }
-
-    public async Task<MatchDto> PostponeMatchAsync(Guid matchId, DateTime newDate, string reason, Guid userId)
-    {
-        var match = await _matchRepository.GetByIdAsync(matchId);
-        if (match == null)
-            throw new NotFoundException("Match not found");
-
-
-        match.MatchDate = newDate;
-        match.Status = "Postponed";
-
-        var updatedMatch = await _matchRepository.UpdateAsync(match);
-        return updatedMatch.ToDto();
-    }
-
-
-    private async Task ValidateTournamentOrganizerAsync(Guid tournamentId, Guid userId)
-    {
-        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
-        if (tournament == null)
-            throw new NotFoundException("Tournament not found");
-
-        if (tournament.OrganizerId != userId)
-            throw new UnauthorizedException("Only tournament organizers can perform this action");
-    }
-
-    private async Task ValidateMatchEventPermissionsAsync(Guid matchId, Guid userId)
-    {
-        var match = await _matchRepository.GetByIdAsync(matchId);
-        if (match == null)
-            throw new NotFoundException("Match not found");
-
-        await ValidateTournamentOrganizerAsync(match.TournamentId, userId);
-    }
-
-    private async Task ValidatePlayerTeamRelationshipAsync(Guid playerId, Guid teamId, Guid matchId)
-    {
-        var player = await _playerRepository.GetByIdAsync(playerId);
-        if (player == null)
-            throw new NotFoundException($"Player {playerId} not found");
-
-        if (player.TeamId != teamId)
-            throw new ValidationException($"Player {playerId} does not belong to team {teamId}");
-
-        var match = await _matchRepository.GetByIdAsync(matchId);
-        if (match == null)
-            throw new NotFoundException("Match not found");
-
-        if (teamId != match.HomeTeamId && teamId != match.AwayTeamId)
-            throw new ValidationException($"Team {teamId} is not playing in this match");
-    }
-
-
-
-    public async Task<IEnumerable<MatchEventDto>> GetMatchEventsAsync(Guid matchId)
-    {
-        var cacheKey = $"match_events_{matchId}";
-        var options = new HybridCacheEntryOptions
-        {
-            Expiration = TimeSpan.FromMinutes(5)
-        };
-
-        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
-        {
-            var events = await _matchEventRepository.GetByMatchIdAsync(matchId);
-            return events.Select(e => e.ToDto());
-        }, options);
-    }
-
-    public async Task<IEnumerable<MatchEventDto>> GetPlayerEventsAsync(Guid playerId)
-    {
-        var cacheKey = $"player_events_{playerId}";
-        var options = new HybridCacheEntryOptions
-        {
-            Expiration = TimeSpan.FromMinutes(5)
-        };
-
-        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
-        {
-            var events = await _matchEventRepository.GetByPlayerIdAsync(playerId);
-            return events.Select(e => e.ToDto());
-        }, options);
-    }
-
-    public async Task<IEnumerable<MatchEventDto>> GetTeamEventsAsync(Guid teamId)
-    {
-        var cacheKey = $"team_events_{teamId}";
-        var options = new HybridCacheEntryOptions
-        {
-            Expiration = TimeSpan.FromMinutes(5)
-        };
-
-        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
-        {
-            var events = await _matchEventRepository.GetByTeamIdAsync(teamId);
-            return events.Select(e => e.ToDto());
-        }, options);
-    }
-
-    public async Task<MatchEventDto> GetMatchEventByIdAsync(Guid id)
-    {
-        var cacheKey = $"match_event_{id}";
-        var options = new HybridCacheEntryOptions
-        {
-            Expiration = TimeSpan.FromMinutes(5)
-        };
-
-        return await _cache.GetOrCreateAsync(cacheKey, async _ =>
-        {
-            var matchEvent = await _matchEventRepository.GetByIdAsync(id);
-            if (matchEvent == null)
-                throw new NotFoundException("Match event not found");
-
-            return matchEvent.ToDto();
-        }, options);
-    }
-
-    public async Task<MatchEventDto> CreateMatchEventAsync(CreateMatchEventDto createDto, Guid userId)
-    {
-        await ValidateMatchEventPermissionsAsync(createDto.MatchId, userId);
-
-        await ValidatePlayerTeamRelationshipAsync(createDto.PlayerId, createDto.TeamId, createDto.MatchId);
-
-        var matchEvent = createDto.ToEntity();
-        var createdEvent = await _matchEventRepository.CreateAsync(matchEvent);
-
-        await _cacheInvalidationService.InvalidateMatchCacheAsync(createDto.MatchId);
-
-        return createdEvent.ToDto();
-    }
-
-    public async Task<MatchEventDto> UpdateMatchEventAsync(Guid id, UpdateMatchEventDto updateDto, Guid userId)
-    {
-        var existingEvent = await _matchEventRepository.GetByIdAsync(id);
-        if (existingEvent == null)
-            throw new NotFoundException("Match event not found");
-
-        await ValidateMatchEventPermissionsAsync(existingEvent.MatchId, userId);
-
-        if (updateDto.EventType.HasValue)
-            existingEvent.EventType = updateDto.EventType.Value.ToString();
-
-        if (updateDto.Minute.HasValue)
-            existingEvent.Minute = updateDto.Minute.Value;
-
-        if (updateDto.PlayerId.HasValue)
-        {
-            await ValidatePlayerTeamRelationshipAsync(updateDto.PlayerId.Value, existingEvent.TeamId, existingEvent.MatchId);
-            existingEvent.PlayerId = updateDto.PlayerId.Value;
-        }
-
-        var updatedEvent = await _matchEventRepository.UpdateAsync(existingEvent);
-
-        await _cacheInvalidationService.InvalidateMatchCacheAsync(existingEvent.MatchId);
-
-        return updatedEvent.ToDto();
-    }
-
-    public async Task DeleteMatchEventAsync(Guid id, Guid userId)
-    {
-        var existingEvent = await _matchEventRepository.GetByIdAsync(id);
-        if (existingEvent == null)
-            throw new NotFoundException("Match event not found");
-
-        await ValidateMatchEventPermissionsAsync(existingEvent.MatchId, userId);
-
-        await _matchEventRepository.DeleteAsync(id);
-
-        await _cacheInvalidationService.InvalidateMatchCacheAsync(existingEvent.MatchId);
-    }
-
-
-    public async Task<FixtureGenerationStatusDto> GetFixtureGenerationStatusAsync(Guid tournamentId)
-    {
-        var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
-        if (tournament == null)
-            throw new NotFoundException("Tournament not found");
-
-        return new FixtureGenerationStatusDto
-        {
-            TournamentId = tournamentId,
-            TournamentName = tournament.Name,
-            RequiredTeams = tournament.MinTeams,
-            MaxTeams = tournament.MaxTeams,
-            Status = tournament.Status,
-        };
+        return fixtures;
     }
 }

@@ -1,3 +1,4 @@
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.User;
 using PhantomGG.Repository.Entities;
 
@@ -13,14 +14,14 @@ public static class UserMappings
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email,
-            Role = user.Role,
+            Role = (UserRoles)user.Role,
             ProfilePictureUrl = user.ProfilePictureUrl
         };
     }
 
-    public static UserDto ToOrganizerDto(this User user)
+    public static OrganizerDto ToOrganizerDto(this User user)
     {
-        return new UserDto
+        return new OrganizerDto
         {
             Id = user.Id,
             FirstName = user.FirstName,

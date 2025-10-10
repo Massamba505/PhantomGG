@@ -3,7 +3,7 @@
   (ngSubmit)="onSubmit()"
   class="flex flex-col space-y-3"
 >
-  @if (previewData()!.photoUrl) {
+  @if (previewData()?.photoUrl) {
   <img
     [src]="previewData()!.photoUrl"
     [alt]="getFullName()"
@@ -45,14 +45,17 @@
 
   <div>
     <label class="input-label" for="position">Position</label>
-    <input
+    <select
       id="position"
-      type="text"
       formControlName="position"
       class="input-field"
       [class.error]="getFieldError('position')"
-      placeholder="e.g., Forward, Midfielder, Defender, Goalkeeper"
-    />
+    >
+      <option value="">Select a position (Optional)</option>
+      @for (option of positionOptions; track option.value) {
+      <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
     @if (getFieldError('position')) {
     <span class="error-message">{{ getFieldError("position") }}</span>
     }

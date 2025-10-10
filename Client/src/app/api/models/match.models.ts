@@ -1,4 +1,6 @@
-export interface Match {
+import { MatchEventType, MatchStatus } from './common.models';
+
+export interface MatchDto {
   id: string;
   tournamentId: string;
   tournamentName: string;
@@ -10,12 +12,23 @@ export interface Match {
   awayTeamLogo?: string;
   matchDate: string;
   venue?: string;
-  status: string;
+  status: MatchStatus;
   homeScore?: number;
   awayScore?: number;
 }
 
-export interface CreateMatch {
+export interface MatchQuery {
+  q?: string;
+  tournamentId?: string;
+  teamId?: string;
+  status?: string;
+  from?: string;
+  to?: string;
+  page: number;
+  pageSize: number;
+}
+
+export interface CreateMatchDto {
   tournamentId: string;
   homeTeamId: string;
   awayTeamId: string;
@@ -23,29 +36,54 @@ export interface CreateMatch {
   venue?: string;
 }
 
-export interface UpdateMatch {
+export interface UpdateMatchDto {
   homeTeamId?: string;
   awayTeamId?: string;
   matchDate?: string;
   venue?: string;
+  status?: MatchStatus;
 }
 
-export interface MatchSearch {
-  searchTerm?: string;
-  tournamentId?: string;
-  teamId?: string;
-  status?: string;
-  matchDateFrom?: string;
-  matchDateTo?: string;
-  venue?: string;
-  pageNumber?: number;
-  pageSize?: number;
+export interface MatchResultDto {
+  status: MatchStatus;
 }
 
-export interface MatchResult {
-  homeScore: number;
-  awayScore: number;
+export interface MatchEventDto {
+  id: string;
+  matchId: string;
+  eventType: MatchEventType;
+  minute: number;
+  teamId: string;
+  teamName: string;
+  playerId: string;
+  playerName: string;
 }
+
+export interface CreateMatchEventDto {
+  matchId: string;
+  eventType: MatchEventType;
+  minute: number;
+  teamId: string;
+  playerId: string;
+  description?: string;
+}
+
+export interface UpdateMatchEventDto {
+  eventType?: MatchEventType;
+  minute?: number;
+  playerId?: string;
+}
+
+export type Match = MatchDto;
+export type CreateMatch = CreateMatchDto;
+export type UpdateMatch = UpdateMatchDto;
+export type MatchSearch = MatchQuery;
+export type MatchResult = MatchResultDto;
+export type MatchEvent = MatchEventDto;
+export type CreateMatchEvent = CreateMatchEventDto;
+export type UpdateMatchEvent = UpdateMatchEventDto;
+
+export { MatchEventType } from './common.models';
 
 export interface AutoGenerateFixtures {
   tournamentId: string;
@@ -77,43 +115,6 @@ export interface FixtureGenerationStatus {
   status: string;
   canGenerateFixtures: boolean;
   message?: string;
-}
-
-export enum MatchEventType {
-  Goal = 'Goal',
-  Assist = 'Assist',
-  YellowCard = 'YellowCard',
-  RedCard = 'RedCard',
-  Foul = 'Foul',
-  Substitution = 'Substitution'
-}
-
-export interface MatchEvent {
-  id: string;
-  matchId: string;
-  eventType: MatchEventType;
-  minute: number;
-  teamId: string;
-  teamName?: string;
-  playerId: string;
-  playerName?: string;
-  description?: string;
-  createdAt: string;
-}
-
-export interface CreateMatchEvent {
-  matchId: string;
-  eventType: MatchEventType;
-  minute: number;
-  teamId: string;
-  playerId: string;
-}
-
-export interface UpdateMatchEvent {
-  eventType?: MatchEventType;
-  minute?: number;
-  playerId?: string;
-  description?: string;
 }
 
 export interface PlayerEventsSummary {

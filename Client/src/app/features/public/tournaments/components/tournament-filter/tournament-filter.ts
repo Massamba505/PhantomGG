@@ -5,6 +5,8 @@ import { LucideAngularModule } from 'lucide-angular';
 
 import { TournamentSearch } from '@/app/api/models/tournament.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
+import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
+import { TournamentStatus } from '@/app/api/models';
 
 @Component({
   selector: 'app-tournament-filter',
@@ -16,29 +18,24 @@ export class TournamentFilter {
   filtersChanged = output<TournamentSearch>();
   
   searchTerm = signal('');
-  status = signal('');
+  status = signal(null);
   location = signal('');
   startDateFrom = signal('');
   startDateTo = signal('');
   
   readonly icons = LucideIcons;
   
-  readonly statusOptions = [
-    { value: '', label: 'All Statuses' },
-    { value: 'RegistrationOpen', label: 'Registration Open' },
-    { value: 'InProgress', label: 'In Progress' },
-    { value: 'Completed', label: 'Completed' }
-  ];
+  readonly statusOptions = getEnumOptions(TournamentStatus);
 
   onSearch() {
     const filters: TournamentSearch = {
       searchTerm: this.searchTerm() || undefined,
       status: this.status() || undefined,
       location: this.location() || undefined,
-      startDateFrom: this.startDateFrom() || undefined,
-      startDateTo: this.startDateTo() || undefined,
+      startFrom: this.startDateFrom() || undefined,
+      startTo: this.startDateTo() || undefined,
       isPublic: true,
-      pageNumber: 1,
+      page: 1,
       pageSize: 12
     };
     
@@ -47,7 +44,7 @@ export class TournamentFilter {
 
   onClear() {
     this.searchTerm.set('');
-    this.status.set('');
+    this.status.set(null);
     this.location.set('');
     this.startDateFrom.set('');
     this.startDateTo.set('');

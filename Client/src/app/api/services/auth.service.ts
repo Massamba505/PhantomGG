@@ -3,10 +3,11 @@ import { Observable } from 'rxjs';
 import { ApiClient } from '../base/api-client.service';
 import { API_ENDPOINTS } from '../base/api-endpoints';
 import {
-  Auth,
-  LoginRequest,
-  RegisterRequest,
-  User,
+  AuthDto,
+  LoginRequestDto,
+  RegisterRequestDto,
+  UserDto,
+  RefreshTokenResponse,
   VerifyEmailRequest,
   ResendVerificationRequest,
   ForgotPasswordRequest,
@@ -19,20 +20,20 @@ import {
 export class AuthService {
   private apiClient = inject(ApiClient);
 
-  register(request: RegisterRequest): Observable<Auth> {
-    return this.apiClient.post<Auth>(API_ENDPOINTS.AUTH.REGISTER, request);
+  register(request: RegisterRequestDto): Observable<AuthDto> {
+    return this.apiClient.post<AuthDto>(API_ENDPOINTS.AUTH.REGISTER, request);
   }
 
-  login(request: LoginRequest): Observable<Auth> {
-    return this.apiClient.post<Auth>(API_ENDPOINTS.AUTH.LOGIN, request);
+  login(request: LoginRequestDto): Observable<AuthDto> {
+    return this.apiClient.post<AuthDto>(API_ENDPOINTS.AUTH.LOGIN, request);
   }
 
-  refreshToken(): Observable<{ accessToken: string }> {
-    return this.apiClient.post<{ accessToken: string }>(API_ENDPOINTS.AUTH.REFRESH, {});
+  refreshToken(): Observable<RefreshTokenResponse> {
+    return this.apiClient.post<RefreshTokenResponse>(API_ENDPOINTS.AUTH.REFRESH, {});
   }
 
-  getCurrentUser(): Observable<User> {
-    return this.apiClient.get<User>(API_ENDPOINTS.AUTH.ME);
+  getCurrentUser(): Observable<UserDto> {
+    return this.apiClient.get<UserDto>(API_ENDPOINTS.AUTH.ME);
   }
 
   logout(): Observable<void> {

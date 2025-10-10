@@ -1,6 +1,7 @@
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Team;
-using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Repository.Entities;
+using PhantomGG.Repository.Specifications;
 using System.Text;
 using System.Text.Json;
 
@@ -10,7 +11,7 @@ public static class TeamMappings
 {
     public static TeamDto ToDto(this Team team)
     {
-        var players = team.Players.Select(p=>p.ToDto());
+        var players = team.Players.Select(p => p.ToDto());
 
         return new TeamDto
         {
@@ -21,6 +22,7 @@ public static class TeamMappings
             UserId = team.UserId,
             CreatedAt = team.CreatedAt,
             UpdatedAt = team.UpdatedAt,
+            CountPlayers = team.Players.Count,
             players = players
         };
     }
@@ -32,8 +34,8 @@ public static class TeamMappings
             Id = Guid.NewGuid(),
             Name = createDto.Name,
             ShortName = createDto.ShortName ?? string.Empty,
-            //LogoUrl = createDto.LogoUrl,
             UserId = userId,
+            LogoUrl = $"https://placehold.co/200x200?text={createDto.Name}",
             CreatedAt = DateTime.UtcNow
         };
     }
@@ -44,8 +46,6 @@ public static class TeamMappings
             team.Name = updateDto.Name;
         if (!string.IsNullOrEmpty(updateDto.ShortName))
             team.ShortName = updateDto.ShortName;
-        //if (updateDto.LogoUrl != null)
-        //    team.LogoUrl = updateDto.LogoUrl;
 
         team.UpdatedAt = DateTime.UtcNow;
     }
@@ -59,16 +59,17 @@ public static class TeamMappings
             Name = tournamentTeam.Team.Name,
             ShortName = tournamentTeam.Team.ShortName,
             LogoUrl = tournamentTeam.Team.LogoUrl,
-            Status = tournamentTeam.Status,
+            Status = (TeamRegistrationStatus)tournamentTeam.Status,
             RegisteredAt = tournamentTeam.RequestedAt,
             AcceptedAt = tournamentTeam.AcceptedAt,
             ManagerName = $"{tournamentTeam.Team.User.FirstName} {tournamentTeam.Team.User.LastName}".Trim(),
             ManagerId = tournamentTeam.Team.UserId,
+            CountPlayers = players.Count(),
             Players = players
-
         };
     }
-    public static string GetDeterministicKey(this TeamSearchDto dto)
+
+    public static string GetDeterministicKey(this TeamSpecification dto)
     {
         return Convert.ToBase64String(
             Encoding.UTF8.GetBytes(JsonSerializer.Serialize(dto))

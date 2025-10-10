@@ -1,52 +1,10 @@
-export interface Team {
-  id: string;
-  name: string;
-  shortName?: string;
-  logoUrl?: string;
-  userId: string;
-  createdAt: string;
-  updatedAt?: string;
-  players?:Player[]
-}
+import { PlayerPosition } from "./common.models";
 
-export interface TournamentTeam {
-  id: string;
-  name: string;
-  shortName?: string;
-  logoUrl?: string;
-  status: 'Approved' | 'Pending' | 'Rejected' | 'RegistrationOpen';
-  registeredAt: string;
-  managerName?: string;
-  managerId?: string;
-  players?:Player[]
-}
-
-export interface CreateTeam {
-  name: string;
-  shortName?: string;
-  logoUrl?: File;
-  teamPhotoUrl?: File;
-}
-
-export interface UpdateTeam {
-  name: string;
-  shortName?: string;
-  logoUrl?: File;
-  teamPhotoUrl?: File;
-}
-
-export interface TeamSearch {
-  searchTerm?: string;
-  scope?: 'public' | 'my' | 'all';
-  pageNumber?: number;
-  pageSize?: number;
-}
-
-export interface Player {
+export interface PlayerDto {
   id: string;
   firstName: string;
   lastName: string;
-  position?: string;
+  position?: PlayerPosition;
   email?: string;
   photoUrl?: string;
   teamId: string;
@@ -54,7 +12,7 @@ export interface Player {
   joinedAt: string;
 }
 
-export interface CreatePlayer {
+export interface CreatePlayerDto {
   firstName: string;
   lastName: string;
   position?: string;
@@ -63,10 +21,69 @@ export interface CreatePlayer {
   teamId: string;
 }
 
-export interface UpdatePlayer {
+export interface UpdatePlayerDto {
   firstName: string;
   lastName: string;
-  position?: string;
+  position?: PlayerPosition;
   email?: string;
   photoUrl?: File;
 }
+
+export interface TeamDto {
+  id: string;
+  name: string;
+  shortName: string;
+  logoUrl?: string;
+  userId: string;
+  createdAt: string;
+  updatedAt?: string;
+  countPlayers: number;
+  players: PlayerDto[];
+}
+
+export interface TournamentTeamDto {
+  id: string;
+  name: string;
+  shortName?: string;
+  logoUrl?: string;
+  status: string;
+  registeredAt: string;
+  acceptedAt?: string;
+  managerName?: string;
+  managerId?: string;
+  countPlayers: number;
+  players: PlayerDto[];
+}
+
+export interface CreateTeamDto {
+  name: string;
+  shortName?: string;
+  logoUrl?: File;
+  teamPhotoUrl?: File;
+}
+
+export interface UpdateTeamDto {
+  name: string;
+  shortName?: string;
+  logoUrl?: File;
+  teamPhotoUrl?: File;
+}
+
+export interface TeamQuery {
+  q?: string;
+  tournamentId?: string;
+  status?: string;
+  page: number;
+  pageSize: number;
+  sort?: string;
+  isPublic?: boolean;
+}
+
+export type Team = TeamDto;
+export type TournamentTeam = TournamentTeamDto;
+export type CreateTeam = CreateTeamDto;
+export type UpdateTeam = UpdateTeamDto;
+export type TeamSearch = TeamQuery;
+export type Player = PlayerDto;
+export type CreatePlayer = CreatePlayerDto;
+export type UpdatePlayer = UpdatePlayerDto;

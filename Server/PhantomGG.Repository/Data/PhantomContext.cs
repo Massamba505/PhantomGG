@@ -34,15 +34,14 @@ public partial class PhantomContext : DbContext
         {
             entity.HasIndex(e => e.MatchDate, "IX_Matches_MatchDate");
 
+            entity.HasIndex(e => e.Status, "IX_Matches_Status");
+
             entity.HasIndex(e => e.TournamentId, "IX_Matches_TournamentId");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.AwayScore).HasDefaultValue(0);
             entity.Property(e => e.HomeScore).HasDefaultValue(0);
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasDefaultValue("Scheduled");
+            entity.Property(e => e.Status).HasDefaultValue(1);
 
             entity.HasOne(d => d.AwayTeam).WithMany(p => p.MatchAwayTeams)
                 .HasForeignKey(d => d.AwayTeamId)
@@ -61,12 +60,11 @@ public partial class PhantomContext : DbContext
 
         modelBuilder.Entity<MatchEvent>(entity =>
         {
+            entity.HasIndex(e => e.EventType, "IX_MatchEvents_EventType");
+
             entity.HasIndex(e => e.MatchId, "IX_MatchEvents_MatchId");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.EventType)
-                .HasMaxLength(20)
-                .IsUnicode(false);
 
             entity.HasOne(d => d.Match).WithMany(p => p.MatchEvents)
                 .HasForeignKey(d => d.MatchId)
@@ -103,9 +101,6 @@ public partial class PhantomContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.PhotoUrl).IsUnicode(false);
-            entity.Property(e => e.Position)
-                .HasMaxLength(30)
-                .IsUnicode(false);
 
             entity.HasOne(d => d.Team).WithMany(p => p.Players)
                 .HasForeignKey(d => d.TeamId)
@@ -175,10 +170,7 @@ public partial class PhantomContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(200)
                 .IsUnicode(false);
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasDefaultValue("Draft");
+            entity.Property(e => e.Status).HasDefaultValue(1);
 
             entity.HasOne(d => d.Organizer).WithMany(p => p.Tournaments)
                 .HasForeignKey(d => d.OrganizerId)
@@ -199,10 +191,7 @@ public partial class PhantomContext : DbContext
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.RequestedAt).HasDefaultValueSql("(sysutcdatetime())");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasDefaultValue("Pending");
+            entity.Property(e => e.Status).HasDefaultValue(1);
 
             entity.HasOne(d => d.Team).WithMany(p => p.TournamentTeams)
                 .HasForeignKey(d => d.TeamId)
@@ -247,10 +236,7 @@ public partial class PhantomContext : DbContext
             entity.Property(e => e.ProfilePictureUrl)
                 .HasMaxLength(255)
                 .IsUnicode(false);
-            entity.Property(e => e.Role)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasDefaultValue("Organizer");
+            entity.Property(e => e.Role).HasDefaultValue(2);
         });
 
         OnModelCreatingPartial(modelBuilder);

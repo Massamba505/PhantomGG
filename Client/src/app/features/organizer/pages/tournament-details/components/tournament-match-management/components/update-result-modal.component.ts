@@ -5,6 +5,8 @@ import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models/match.models';
+import { MatchStatus } from '@/app/api/models';
+import { getEnumOptions, getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-update-result-modal',
@@ -12,7 +14,7 @@ import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models
   template: `
     <app-modal
       [isOpen]="isOpen()"
-      title="Update Match Result"
+      title="Update Match Status"
       (close)="close.emit()"
     >
       @if (selectedMatch()) {
@@ -23,12 +25,14 @@ import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models
                 {{ selectedMatch()!.homeTeamName }}
               </div>
               <div class="text-xl font-bold">
-                {{ updateResultForm.get("homeScore")?.value }} -
-                {{ updateResultForm.get("awayScore")?.value }}
+                {{ calculateScore('home') }} - {{ calculateScore('away') }}
               </div>
               <div class="text-sm font-medium">
                 {{ selectedMatch()!.awayTeamName }}
               </div>
+            </div>
+            <div class="text-xs text-muted mt-2">
+              Score is calculated from match events
             </div>
           </div>
 
@@ -37,30 +41,15 @@ import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models
             (ngSubmit)="onSubmit()"
             class="space-y-4"
           >
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium mb-2">
-                  {{ selectedMatch()!.homeTeamName }} Score
-                </label>
-                <input
-                  type="number"
-                  formControlName="homeScore"
-                  min="0"
-                  class="input-field"
-                />
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium mb-2">
-                  {{ selectedMatch()!.awayTeamName }} Score
-                </label>
-                <input
-                  type="number"
-                  formControlName="awayScore"
-                  min="0"
-                  class="input-field"
-                />
-              </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Match Status</label>
+              <select formControlName="status" class="input-select">
+                  @for(matchStatus of matchStatuses; track matchStatus.value){
+                  <option [value]="matchStatus.value">
+                      {{ matchStatus.label }}
+                  </option>
+                  }
+              </select>
             </div>
 
             <div class="flex gap-2 pt-4">
@@ -76,7 +65,7 @@ import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models
                 class="btn btn-primary flex-1"
                 [disabled]="updateResultForm.invalid"
               >
-                Update Result
+                Update Status
               </button>
             </div>
           </form>
@@ -93,7 +82,7 @@ import { Match, MatchResult, MatchEvent, MatchEventType } from '@/app/api/models
             @if (matchEvents().length === 0) {
               <p class="text-center text-muted py-4">No events recorded yet</p>
             } @else {
-              <div class="space-y-2 max-h-60 overflow-y-auto">\
+              <div class="space-y-2 max-h-60 overflow-y-auto">
                 @for(event of matchEvents(); track event.id){
                     <div
                     class="flex items-center justify-between p-3 border rounded-lg"
@@ -127,6 +116,7 @@ export class UpdateResultModalComponent implements OnInit {
   isOpen = input.required<boolean>();
   selectedMatch = input.required<Match | null>();
   matchEvents = input.required<MatchEvent[]>();
+  matchStatuses = getEnumOptions(MatchStatus);
   
   close = output<void>();
   updateResult = output<{ matchId: string; result: MatchResult }>();
@@ -142,8 +132,7 @@ export class UpdateResultModalComponent implements OnInit {
       const match = this.selectedMatch();
       if (match && this.updateResultForm) {
         this.updateResultForm.patchValue({
-          homeScore: match.homeScore || 0,
-          awayScore: match.awayScore || 0
+          status: match.status
         });
       }
     });
@@ -151,9 +140,20 @@ export class UpdateResultModalComponent implements OnInit {
 
   ngOnInit() {
     this.updateResultForm = this.fb.group({
-      homeScore: [0, [Validators.required, Validators.min(0)]],
-      awayScore: [0, [Validators.required, Validators.min(0)]]
+      status: [MatchStatus.Scheduled, [Validators.required]]
     });
+  }
+
+  calculateScore(team: 'home' | 'away'): number {
+    const match = this.selectedMatch();
+    if (!match) return 0;
+    
+    const events = this.matchEvents();
+    const teamId = team === 'home' ? match.homeTeamId : match.awayTeamId;
+    
+    return events.filter(event => 
+      event.eventType === MatchEventType.Goal && event.teamId === teamId
+    ).length;
   }
 
   onSubmit() {
@@ -161,8 +161,7 @@ export class UpdateResultModalComponent implements OnInit {
     
     const formValue = this.updateResultForm.value;
     const resultData: MatchResult = {
-      homeScore: formValue.homeScore,
-      awayScore: formValue.awayScore
+      status: parseInt(formValue.status) 
     };
 
     this.updateResult.emit({
@@ -171,8 +170,8 @@ export class UpdateResultModalComponent implements OnInit {
     });
   }
 
-  formatEventType(eventType: MatchEventType): string {
-    return eventType.replace(/([A-Z])/g, ' $1').trim();
+  formatEventType(eventType: string | number): string {
+    return getEnumLabel(MatchEventType, eventType) || eventType.toString();
   }
 
   getEventIcon(eventType: MatchEventType): any {

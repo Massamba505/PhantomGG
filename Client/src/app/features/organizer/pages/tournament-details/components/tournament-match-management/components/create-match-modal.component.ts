@@ -1,9 +1,8 @@
-import { Component, input, output, OnInit, inject } from '@angular/core';
+import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { Team } from '@/app/api/models/team.models';
-import { Tournament } from '@/app/api/models';
 import { CreateMatch } from '@/app/api/models/match.models';
 
 @Component({
@@ -24,20 +23,20 @@ import { CreateMatch } from '@/app/api/models/match.models';
             <div>
                 <label class="block text-sm font-medium mb-2">Home Team</label>
                 <select formControlName="homeTeamId" class="input-select">
-                    <option disabled selected [ngValue]="null">Select home team</option>
-                    @for (team of teams(); track team.id) {
-                    <option [value]="team.id">{{ team.name }}</option>
-                    }
+                  <option disabled selected [ngValue]="null">Select home team</option>
+                  @for (team of teams(); track team.id) {
+                  <option [value]="team.id">{{ team.name }}</option>
+                  }
                 </select>
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-2">Away Team</label>
                 <select formControlName="awayTeamId" class="input-select">
-                    <option disabled selected [ngValue]="null">Select away team</option>
-                    @for (team of teams(); track team.id) {
-                    <option [value]="team.id">{{ team.name }}</option>
-                    }
+                  <option disabled selected [ngValue]="null">Select away team</option>
+                  @for (team of teams(); track team.id) {
+                  <option [value]="team.id">{{ team.name }}</option>
+                  }
                 </select>
             </div>
         </div>
@@ -46,7 +45,7 @@ import { CreateMatch } from '@/app/api/models/match.models';
           <label class="block text-sm font-medium mb-2">Match Date & Time</label>
           <input
             type="datetime-local"
-            [min]="tournament()?.startDate"
+            [min]="startDate()"
             formControlName="matchDate"
             class="input-field"
           />
@@ -72,27 +71,21 @@ import { CreateMatch } from '@/app/api/models/match.models';
     </app-modal>
   `
 })
-export class CreateMatchModalComponent implements OnInit {
+export class CreateMatchModalComponent {
   isOpen = input.required<boolean>();
   teams = input.required<Team[]>();
-  tournament = input.required<Tournament | null>();
   tournamentId = input.required<string>();
+  startDate = input.required<string>();
   
   close = output<void>();
   create = output<CreateMatch>();
   
   private fb = inject(FormBuilder);
-  
-  createMatchForm!: FormGroup;
-
-  ngOnInit() {
-    this.createMatchForm = this.fb.group({
+  createMatchForm: FormGroup = this.fb.group({
       homeTeamId: ['', Validators.required],
       awayTeamId: ['', Validators.required],
-      matchDate: [this.tournament()?.startDate ?? '', Validators.required],
-      venue: [this.tournament()?.location ?? '']
+      matchDate: ['', Validators.required]
     });
-  }
 
   onSubmit() {
     if (this.createMatchForm.invalid) return;
@@ -102,8 +95,7 @@ export class CreateMatchModalComponent implements OnInit {
       tournamentId: this.tournamentId(),
       homeTeamId: formValue.homeTeamId,
       awayTeamId: formValue.awayTeamId,
-      matchDate: formValue.matchDate,
-      venue: this.tournament()?.location
+      matchDate: formValue.matchDate
     };
 
     this.create.emit(createData);

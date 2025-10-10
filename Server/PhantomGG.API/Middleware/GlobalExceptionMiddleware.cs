@@ -1,4 +1,3 @@
-using PhantomGG.Models.DTOs;
 using PhantomGG.Service.Exceptions;
 using System.Net;
 using System.Text.Json;
@@ -38,15 +37,15 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
             _ => (HttpStatusCode.InternalServerError, "An internal server error occurred")
         };
 
-        var apiResponse = new ApiResponse
+        var errorResponse = new
         {
-            Success = false,
-            Message = message
+            error = message,
+            statusCode = (int)statusCode
         };
 
         response.StatusCode = (int)statusCode;
 
-        var jsonResponse = JsonSerializer.Serialize(apiResponse, new JsonSerializerOptions
+        var jsonResponse = JsonSerializer.Serialize(errorResponse, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });

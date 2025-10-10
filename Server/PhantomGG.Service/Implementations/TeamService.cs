@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Hybrid;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
+using PhantomGG.Models.DTOs.Image;
 using PhantomGG.Models.DTOs.Player;
 using PhantomGG.Models.DTOs.Team;
-using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
+using PhantomGG.Repository.Specifications;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Interfaces;
 using PhantomGG.Service.Mappings;
@@ -14,54 +14,43 @@ namespace PhantomGG.Service.Implementations;
 
 public class TeamService(
     ITeamRepository teamRepository,
-    ITournamentRepository tournamentRepository,
+    ITournamentTeamRepository tournamentTeamRepository,
     IImageService imageService,
     IPlayerService playerService,
+    ITeamValidationService teamValidationService,
     IPlayerRepository playerRepository,
+    ICacheInvalidationService cacheInvalidationService,
     HybridCache cache) : ITeamService
 {
     private readonly ITeamRepository _teamRepository = teamRepository;
-    private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
+    private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
     private readonly IImageService _imageService = imageService;
     private readonly IPlayerService _playerService = playerService;
     private readonly IPlayerRepository _playerRepository = playerRepository;
+    private readonly ITeamValidationService _teamValidationService = teamValidationService;
     private readonly HybridCache _cache = cache;
+    private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
 
-    public async Task<PaginatedResponse<TeamDto>> SearchAsync(TeamSearchDto searchDto, Guid? userId = null)
+    public async Task<PagedResult<TeamDto>> SearchAsync(TeamQuery query, Guid? userId = null)
     {
-        if (userId.HasValue)
+        var spec = new TeamSpecification
         {
-            var myTeams = await _teamRepository.SearchAsync(searchDto, userId: userId.Value);
-            return new PaginatedResponse<TeamDto>(
-                myTeams.Items.Select(t => t.ToDto()),
-                searchDto.Page,
-                searchDto.PageSize,
-                totalRecords: myTeams.TotalRecords
-            );
-        }
+            SearchTerm = query.Q,
+            TournamentId = query.TournamentId,
+            Status = query.Status,
+            UserId = userId,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
 
-        searchDto.IsPublic = true;
-        string cacheKey = $"teams_search_{searchDto.GetDeterministicKey()}_{searchDto.Page}_{searchDto.PageSize}";
-        return await _cache.GetOrCreateAsync(
-            cacheKey,
-            async cancel =>
-            {
-                var publicTeams = await _teamRepository.SearchAsync(searchDto);
-                return new PaginatedResponse<TeamDto>(
-                    publicTeams.Items.Select(t => t.ToDto()),
-                    searchDto.Page,
-                    searchDto.PageSize,
-                    totalRecords: publicTeams.TotalRecords
-                );
-            },
-            options: new HybridCacheEntryOptions
-            {
-                Expiration = TimeSpan.FromMinutes(5)
-            },
-            cancellationToken: CancellationToken.None
+        var teams = await _teamRepository.SearchAsync(spec);
+        return new PagedResult<TeamDto>(
+            teams.Data.Select(t => t.ToDto()),
+            query.Page,
+            query.PageSize,
+            teams.Meta.TotalRecords
         );
     }
-
 
     public async Task<TeamDto> GetByIdAsync(Guid teamId)
     {
@@ -69,7 +58,7 @@ public class TeamService(
             $"team_{teamId}",
             async cancel =>
             {
-                var team = await ValidateTeamExistsAsync(teamId);
+                var team = await _teamValidationService.ValidateTeamExistsAsync(teamId);
                 return team.ToDto();
             },
             options: new HybridCacheEntryOptions
@@ -82,39 +71,43 @@ public class TeamService(
 
     public async Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid managerId)
     {
-        await ValidateUserTeamNameUniqueness(createDto.Name, managerId);
+        await _teamValidationService.ValidateUserTeamNameUniqueness(createDto.Name, managerId);
         var team = createDto.ToEntity(managerId);
 
         await _teamRepository.CreateAsync(team);
 
         if (createDto.LogoUrl != null)
         {
-            team.LogoUrl = await UploadLogoAsync(team, createDto.LogoUrl);
-        }
-        else
-        {
-            team.LogoUrl = $"https://placehold.co/200x200?text={team.Name}";
+            var uploadImage = new UploadImageRequest
+            {
+                OldFileUrl = team.LogoUrl,
+                File = createDto.LogoUrl,
+                ImageType = ImageType.TournamentBanner,
+                Id = team.Id
+            };
+
+            team.LogoUrl = await _imageService.UploadImageAsync(uploadImage);
         }
 
         await _teamRepository.UpdateAsync(team);
+        await _cacheInvalidationService.InvalidateTeamRelatedCacheAsync(team.Id);
 
         return team.ToDto();
     }
 
     public async Task<TeamDto> UpdateAsync(Guid teamId, UpdateTeamDto updateDto, Guid userId)
     {
-        var existingTeam = await ValidateTeamExistsAsync(teamId);
-        ValidateTeamOwnership(existingTeam, userId);
+        var existingTeam = await _teamValidationService.ValidateCanManageTeamAsync(userId, teamId);
 
         if (!string.IsNullOrEmpty(updateDto.Name) && updateDto.Name != existingTeam.Name)
         {
-            await ValidateUserTeamNameUniqueness(updateDto.Name, userId);
+            await _teamValidationService.ValidateUserTeamNameUniqueness(updateDto.Name, userId);
 
-            var tournaments = await _tournamentRepository.GetTournamentsByTeamAsync(existingTeam.Id);
-            tournaments = tournaments.Where(t => t.Status != TournamentStatus.Completed.ToString());
+            var tournaments = await _tournamentTeamRepository.GetTournamentsByTeamAsync(existingTeam.Id);
+            tournaments = tournaments.Where(t => t.Status != (int)TournamentStatus.Completed);
             foreach (var tournament in tournaments)
             {
-                var existingTeams = await _tournamentRepository.GetTournamentTeamsAsync(tournament.Id);
+                var existingTeams = await _tournamentTeamRepository.GetByTournamentAsync(tournament.Id);
                 if (existingTeams.Any(tt => tt.Team.Name.Equals(updateDto.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     throw new ConflictException($"A team with this name is already registered in the tournament '{tournament.Name}'");
@@ -125,20 +118,26 @@ public class TeamService(
         updateDto.UpdateEntity(existingTeam);
         if (updateDto.LogoUrl != null)
         {
-            existingTeam.LogoUrl = await UploadLogoAsync(existingTeam, updateDto.LogoUrl);
+            var uploadImage = new UploadImageRequest
+            {
+                OldFileUrl = existingTeam.LogoUrl,
+                File = updateDto.LogoUrl,
+                ImageType = ImageType.TournamentBanner,
+                Id = existingTeam.Id
+            };
+            existingTeam.LogoUrl = await _imageService.UploadImageAsync(uploadImage);
         }
 
         var updatedTeam = await _teamRepository.UpdateAsync(existingTeam);
+        await _cacheInvalidationService.InvalidateTeamRelatedCacheAsync(updatedTeam.Id);
         return updatedTeam.ToDto();
     }
 
     public async Task DeleteAsync(Guid teamId, Guid userId)
     {
-        var team = await ValidateTeamExistsAsync(teamId);
-        ValidateTeamOwnership(team, userId);
-        await ValidateTeamCanBeDeleted(team);
-
-        await _teamRepository.DeleteAsync(teamId);
+        var team = await _teamValidationService.ValidateTeamCanBeDeleted(teamId, userId);
+        await _teamRepository.DeleteAsync(team.Id);
+        await _cacheInvalidationService.InvalidateTeamRelatedCacheAsync(team.Id);
     }
 
     public async Task<IEnumerable<PlayerDto>> GetTeamPlayersAsync(Guid teamId)
@@ -147,7 +146,7 @@ public class TeamService(
             $"team_players_{teamId}",
             async cancel =>
             {
-                var team = await ValidateTeamExistsAsync(teamId);
+                var team = await _teamValidationService.ValidateTeamExistsAsync(teamId);
                 var players = await _playerRepository.GetByTeamAsync(teamId);
                 return players.Select(p => p.ToDto());
             },
@@ -161,10 +160,9 @@ public class TeamService(
 
     public async Task<PlayerDto> AddPlayerToTeamAsync(Guid teamId, CreatePlayerDto playerDto, Guid userId)
     {
-        var team = await ValidateTeamExistsAsync(teamId);
-        ValidateTeamOwnership(team, userId);
+        var team = await _teamValidationService.ValidateCanManageTeamAsync(userId, teamId);
 
-        var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(teamId);
+        var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(team.Id);
         if (currentPlayerCount >= 11)
         {
             throw new ValidationException("Team already has the maximum number of players (11)");
@@ -176,74 +174,23 @@ public class TeamService(
         }
 
         var player = await _playerService.CreateAsync(playerDto);
+        await _cacheInvalidationService.InvalidateTeamCacheAsync(teamId);
         return player;
     }
 
     public async Task<PlayerDto> UpdateTeamPlayerAsync(Guid teamId, Guid playerId, UpdatePlayerDto updateDto, Guid userId)
     {
-        var team = await ValidateTeamExistsAsync(teamId);
-        ValidateTeamOwnership(team, userId);
+        var team = await _teamValidationService.ValidateCanManageTeamAsync(userId, teamId);
 
         var updatedPlayer = await _playerService.UpdateAsync(updateDto, playerId);
+        await _cacheInvalidationService.InvalidateTeamCacheAsync(team.Id);
         return updatedPlayer;
     }
 
     public async Task RemovePlayerFromTeamAsync(Guid teamId, Guid playerId, Guid userId)
     {
-        var team = await ValidateTeamExistsAsync(teamId);
-        ValidateTeamOwnership(team, userId);
-
-        await _playerService.DeleteAsync(teamId, playerId);
-    }
-
-    public async Task<string> UploadLogoAsync(Team team, IFormFile file)
-    {
-        if (!string.IsNullOrEmpty(team.LogoUrl))
-        {
-            await _imageService.DeleteImageAsync(team.LogoUrl);
-        }
-
-        var logoUrl = await _imageService.SaveImageAsync(file, ImageType.TeamLogo, team.Id);
-        return logoUrl;
-    }
-
-    private async Task ValidateUserTeamNameUniqueness(string teamName, Guid managerId)
-    {
-        var existingTeams = await _teamRepository.GetByUserAsync(managerId);
-        if (existingTeams.Any(t => t.Name.Equals(teamName, StringComparison.OrdinalIgnoreCase)))
-        {
-            throw new ConflictException("A team with this name is already available");
-        }
-    }
-
-    private void ValidateTeamOwnership(Team team, Guid userId)
-    {
-        if (team.UserId != userId)
-        {
-            throw new ForbiddenException("You don't have permission to modify this team");
-        }
-    }
-
-    private async Task ValidateTeamCanBeDeleted(Team team)
-    {
-        var tournaments = await _tournamentRepository.GetTournamentsByTeamAsync(team.Id);
-        var activeTournaments = tournaments.Where(t => t.Status != TournamentStatus.Completed.ToString()).ToList();
-
-        if (activeTournaments.Any())
-        {
-            var tournamentNames = string.Join(", ", activeTournaments.Select(t => t.Name));
-            throw new ForbiddenException($"Cannot delete team. Team is registered in tournaments: {tournamentNames}");
-        }
-    }
-
-    private async Task<Team> ValidateTeamExistsAsync(Guid teamId)
-    {
-        var team = await _teamRepository.GetByIdAsync(teamId);
-        if (team == null)
-        {
-            throw new NotFoundException("Team not found.");
-        }
-
-        return team;
+        var team = await _teamValidationService.ValidateCanManageTeamAsync(userId, teamId);
+        await _playerService.DeleteAsync(team.Id, playerId);
+        await _cacheInvalidationService.InvalidateTeamCacheAsync(team.Id);
     }
 }

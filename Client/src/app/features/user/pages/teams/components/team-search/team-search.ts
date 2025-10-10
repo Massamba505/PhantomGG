@@ -27,7 +27,7 @@ export class TeamSearchComponent {
     const searchCriteria: Partial<TeamSearch> = {};
     
     if (this.searchTerm().trim()) {
-      searchCriteria.searchTerm = this.searchTerm().trim();
+      searchCriteria.q = this.searchTerm().trim();
     }
     
     this.searchChange.emit(searchCriteria);

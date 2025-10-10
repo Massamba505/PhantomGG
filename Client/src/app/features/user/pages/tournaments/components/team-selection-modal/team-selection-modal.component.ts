@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
+import { Component, signal, input, output, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
@@ -9,27 +9,26 @@ import { Modal } from "@/app/shared/components/ui/modal/modal";
 
 @Component({
   selector: 'app-team-selection-modal',
-  standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule, Modal],
   templateUrl: "./team-selection-modal.component.html",
   styleUrl: './team-selection-modal.component.css'
 })
 export class TeamSelectionModalComponent {
-  @Input() isOpen = false;
-  @Input() teams: Team[] = [];
-  @Input() tournament: Tournament | null = null;
-  @Input() isJoining = false;
+  isOpen = input(false);
+  teams = input<Team[]>([]);
+  tournament = input<Tournament | null>(null);
+  isJoining = input(false);
   
-  @Output() teamSelected = new EventEmitter<Team>();
-  @Output() modalClosed = new EventEmitter<void>();
-  @Output() createTeamClicked = new EventEmitter<void>();
+  teamSelected = output<Team>();
+  modalClosed = output<void>();
+  createTeamClicked = output<void>();
   
   readonly icons = LucideIcons;
   selectedTeam = signal<Team | null>(null);
 
   getModalTitle(): string {
-    if (this.tournament) {
-      return `Select Team for ${this.tournament.name}`;
+    if (this.tournament()) {
+      return `Select Team for ${this.tournament()?.name}`;
     }
     return 'Select Team';
   }

@@ -1,22 +1,11 @@
-export interface ApiResponse<T = any> {
-  data?: T;
-  success: boolean;
-  message: string;
-  details?: string;
-  errors?: string[];
-}
+import { PagedResult, PaginationMeta } from './common.models';
 
-export interface PaginatedResponse<T> {
-  data: T[];
-  pageNumber: number;
-  pageSize: number;
-  totalPages: number;
-  totalRecords: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
+
+
 
 export interface PaginationRequest {
-  pageNumber?: number;
+  page?: number;
   pageSize?: number;
 }
+
+export type { PagedResult, PaginationMeta };

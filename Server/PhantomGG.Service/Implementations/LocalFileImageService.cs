@@ -1,8 +1,9 @@
-using PhantomGG.Service.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using PhantomGG.Common.Enums;
+using PhantomGG.Models.DTOs.Image;
 using PhantomGG.Service.Exceptions;
+using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -13,7 +14,7 @@ public class LocalFileImageService(
     private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    private readonly long _maxFileSize = 5 * 1024 * 1024; // 5MB
+    private readonly long _maxFileSize = 5 * 1024 * 1024;
     private readonly string[] _supportedTypes = { "image/jpeg", "image/png", "image/gif", "image/webp" };
 
     public async Task<string> SaveImageAsync(IFormFile file, ImageType imageType, Guid? entityId = null)
@@ -70,6 +71,18 @@ public class LocalFileImageService(
         {
             return false;
         });
+    }
+
+    public async Task<string> UploadImageAsync(UploadImageRequest uploadImage)
+    {
+        if (!string.IsNullOrEmpty(uploadImage.OldFileUrl))
+        {
+            await DeleteImageAsync(uploadImage.OldFileUrl);
+        }
+
+        var imageUrl = await SaveImageAsync(uploadImage.File, uploadImage.ImageType, uploadImage.Id);
+
+        return imageUrl;
     }
 
     private void ValidateFile(IFormFile file)

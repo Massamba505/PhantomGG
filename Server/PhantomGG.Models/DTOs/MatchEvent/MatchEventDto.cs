@@ -6,7 +6,7 @@ public class MatchEventDto
 {
     public Guid Id { get; set; }
     public Guid MatchId { get; set; }
-    public string EventType { get; set; } = String.Empty;
+    public MatchEventType EventType { get; set; }
     public int Minute { get; set; }
     public Guid TeamId { get; set; }
     public string TeamName { get; set; } = null!;

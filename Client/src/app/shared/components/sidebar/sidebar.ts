@@ -10,14 +10,14 @@ import {
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { Roles } from '../../constants/roles';
 import { LucideIcons } from '../ui/icons/lucide-icons';
+import { UserRoles } from '@/app/api/models';
 
 interface MenuItem {
   title: string;
   url: string;
   icon: any;
-  roles: Roles[];
+  roles: UserRoles[];
   badge?: string;
 }
 
@@ -27,7 +27,7 @@ interface MenuItem {
   templateUrl: './sidebar.html',
 })
 export class Sidebar implements OnInit, OnDestroy {
-  userRole = input.required<Roles>();
+  userRole = input.required<UserRoles>();
   toggle = output<void>();
   stateChange = output<boolean>();
   
@@ -45,43 +45,43 @@ export class Sidebar implements OnInit, OnDestroy {
       title: 'Dashboard',
       url: '/organizer/dashboard',
       icon: this.icons.Home,
-      roles: [Roles.Organizer],
+      roles: [UserRoles.Organizer],
     },
     {
       title: 'Dashboard',
       url: '/user/dashboard',
       icon: this.icons.Home,
-      roles: [Roles.User],
+      roles: [UserRoles.User],
     },
     {
       title: 'My Tournaments',
       url: '/organizer/tournaments',
       icon: this.icons.Trophy,
-      roles: [Roles.Organizer],
+      roles: [UserRoles.Organizer],
     },
     {
       title: 'My Teams',
       url: '/user/teams',
       icon: this.icons.Users,
-      roles: [Roles.User],
+      roles: [UserRoles.User],
     },
     {
       title: 'Tournaments',
       url: '/user/tournaments',
       icon: this.icons.Trophy,
-      roles: [Roles.User],
+      roles: [UserRoles.User],
     },
     {
       title: 'Fixtures',
       url: '/fixtures',
       icon: this.icons.Calendar,
-      roles: [Roles.Organizer, Roles.User],
+      roles: [UserRoles.Organizer, UserRoles.User],
     },
     {
       title: 'Notifications',
       url: '/notifications',
       icon: this.icons.Bell,
-      roles: [Roles.Organizer, Roles.User],
+      roles: [UserRoles.Organizer, UserRoles.User],
     },
   ];
 
@@ -90,13 +90,13 @@ export class Sidebar implements OnInit, OnDestroy {
       title: 'Create Tournament',
       url: '/organizer/tournaments/create',
       icon: this.icons.CirclePlus,
-      roles: [Roles.Organizer],
+      roles: [UserRoles.Organizer],
     },
     {
       title: 'Create Team',
       url: '/user/teams/create',
       icon: this.icons.UserPlus,
-      roles: [Roles.User],
+      roles: [UserRoles.User],
     }
   ];
   

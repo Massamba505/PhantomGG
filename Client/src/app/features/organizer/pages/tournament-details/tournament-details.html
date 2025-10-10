@@ -6,6 +6,10 @@
 
   @if (tournament()) {
   <div class="flex gap-2">
+    <button class="btn btn-outline" (click)="onViewStatistics()">
+      <lucide-angular [img]="icons.BarChart3" [size]="20"></lucide-angular>
+      Statistics
+    </button>
     <button class="btn btn-primary" (click)="editTournament()">
       Edit Tournament
     </button>
@@ -79,7 +83,7 @@
             <lucide-angular [img]="icons.Activity" [size]="16"></lucide-angular>
             Status:
           </span>
-          <span class="status-badge">{{ tournament()!.status }}</span>
+          <span class="status-badge">{{ getStatus() }}</span>
         </div>
 
         <div class="flex justify-between">

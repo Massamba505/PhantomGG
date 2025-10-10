@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Match } from '@/app/api/models/match.models';
-import { Roles } from '@/app/shared/constants/roles';
+import { MatchStatus } from '@/app/api/models';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 export type MatchUserRole = 'Organizer' | 'User' | 'Public';
 
 @Component({
   selector: 'app-match-card',
-  standalone: true,
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './match-card.html',
   styleUrls: ['./match-card.css'],
@@ -42,11 +42,11 @@ export class MatchCard {
   }
 
   isOrganizer(): boolean {
-    return this.role() === Roles.Organizer.toString();
+    return this.role() === 'Organizer';
   }
 
   isUser(): boolean {
-    return this.role() === Roles.User.toString();
+    return this.role() === 'User';
   }
 
   isPublic(): boolean {
@@ -54,23 +54,26 @@ export class MatchCard {
   }
 
   canUpdateResult(): boolean {
-    const matchStatus = this.match().status?.toLowerCase();
-    return this.isOrganizer() && (matchStatus === 'inprogress');
+    const matchStatus = this.match().status;
+    return this.isOrganizer() && (matchStatus === MatchStatus.InProgress);
   }
 
   canEdit(): boolean {
-    const matchStatus = this.match().status?.toLowerCase();
-    return this.isOrganizer() && (matchStatus === 'scheduled');
+    const matchStatus = this.match().status;
+    return this.isOrganizer() && (matchStatus === MatchStatus.Scheduled);
   }
 
   isInProgress(): boolean {
-    const matchStatus = this.match().status?.toLowerCase();
-    return matchStatus === 'inprogress';
+    const matchStatus = this.match().status;
+    return matchStatus === MatchStatus.InProgress;
   }
 
   isCompleted(): boolean {
-    const matchStatus = this.match().status?.toLowerCase();
-    return matchStatus === 'completed';
+    const matchStatus = this.match().status;
+    return matchStatus === MatchStatus.Completed;
+  }
+  getStatus(){
+    return getEnumLabel(MatchStatus, this.match().status);
   }
 
   getScoreDisplay(): string {

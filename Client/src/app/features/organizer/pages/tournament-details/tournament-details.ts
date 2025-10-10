@@ -5,11 +5,12 @@ import { Tournament } from '@/app/api/models/tournament.models';
 import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
-import { TournamentService } from '@/app/api/services';
+import { TournamentService, TournamentStatus } from '@/app/api/services';
 import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentTeamManagementComponent } from './components/tournament-team-management/tournament-team-management';
 import { TournamentMatchManagementComponent } from './components/tournament-match-management/tournament-match-management';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-tournament-details',
@@ -68,6 +69,12 @@ export class TournamentDetailsComponent implements OnInit {
     this.router.navigate(['/organizer/tournaments']);
   }
 
+  onViewStatistics() {
+    if (this.tournamentId()) {
+      this.router.navigate(['/organizer/tournaments', this.tournamentId(), 'statistics']);
+    }
+  }
+
   deleteTournament() {
     if (!this.tournament()) return;
     this.showDeleteModal.set(true);
@@ -75,6 +82,9 @@ export class TournamentDetailsComponent implements OnInit {
 
   closeDeleteModal() {
     this.showDeleteModal.set(false);
+  }
+  getStatus(){
+    return getEnumLabel(TournamentStatus, this.tournament()!.status);
   }
 
   confirmDelete() {
