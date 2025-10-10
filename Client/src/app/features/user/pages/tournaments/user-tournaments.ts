@@ -79,7 +79,6 @@ export class UserTournaments implements OnInit {
         this.paginationData.set(response);
       },
       error: (error) => {
-        console.error('Failed to load tournaments:', error);
         this.toastService.error('Failed to load tournaments');
       },
       complete: () => {
@@ -92,9 +91,6 @@ export class UserTournaments implements OnInit {
     this.teamService.getTeams().subscribe({
       next: (response: any) => {
         this.myTeams.set(response.data);
-      },
-      error: (error: any) => {
-        console.error('Failed to load teams:', error);
       }
     });
   }
@@ -162,6 +158,7 @@ export class UserTournaments implements OnInit {
 
   joinTournament(tournament: Tournament) {
     const teams = this.myTeams();
+    
     if (teams.length === 0) {
       this.toastService.error('You need to create a team first before joining tournaments');
       return;

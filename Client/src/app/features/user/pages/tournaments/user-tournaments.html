@@ -95,7 +95,56 @@
       total)
     </div>
 
-    <div class="flex items-center gap-2 mx-auto">
+    @if (totalPages() > 1) {
+    <div class="flex items-center gap-1 mx-auto">
+      <button
+        class="btn btn-secondary btn-sm"
+        [disabled]="!hasPreviousPage()"
+        (click)="onPageChange(1)"
+        title="First page"
+      >
+        <lucide-angular [img]="icons.ChevronsLeft" size="16" />
+      </button>
+      <button
+        class="btn btn-secondary btn-sm"
+        [disabled]="!hasPreviousPage()"
+        (click)="onPageChange(currentPage() - 1)"
+        title="Previous page"
+      >
+        <lucide-angular [img]="icons.ChevronLeft" size="16" />
+      </button>
+
+      @for (pageNum of getPageNumbers(); track pageNum) {
+      <button
+        class="btn btn-sm"
+        [class.btn-primary]="pageNum === currentPage()"
+        [class.btn-secondary]="pageNum !== currentPage()"
+        (click)="onPageChange(pageNum)"
+      >
+        {{ pageNum }}
+      </button>
+      }
+
+      <button
+        class="btn btn-secondary btn-sm"
+        [disabled]="!hasNextPage()"
+        (click)="onPageChange(currentPage() + 1)"
+        title="Next page"
+      >
+        <lucide-angular [img]="icons.ChevronRight" size="16" />
+      </button>
+      <button
+        class="btn btn-secondary btn-sm"
+        [disabled]="!hasNextPage()"
+        (click)="onPageChange(totalPages())"
+        title="Last page"
+      >
+        <lucide-angular [img]="icons.ChevronsRight" size="16" />
+      </button>
+    </div>
+    }
+
+    <!-- <div class="flex items-center gap-2 mx-auto">
       <button
         class="btn btn-secondary btn-sm"
         [disabled]="!hasPreviousPage()"
@@ -136,7 +185,7 @@
       >
         Last
       </button>
-    </div>
+    </div> -->
   </div>
   }
 </div>

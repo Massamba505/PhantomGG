@@ -68,6 +68,12 @@ export class TournamentDetailsComponent implements OnInit {
     this.router.navigate(['/organizer/tournaments']);
   }
 
+  onViewStatistics() {
+    if (this.tournamentId()) {
+      this.router.navigate(['/organizer/tournaments', this.tournamentId(), 'statistics']);
+    }
+  }
+
   deleteTournament() {
     if (!this.tournament()) return;
     this.showDeleteModal.set(true);

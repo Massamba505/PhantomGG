@@ -115,6 +115,13 @@ export class TournamentDetails implements OnInit {
     this.router.navigate(['/public/tournaments']);
   }
 
+  onViewStatistics() {
+    const tournamentId = this.route.snapshot.paramMap.get('id');
+    if (tournamentId) {
+      this.router.navigate(['/public/tournaments', tournamentId, 'statistics']);
+    }
+  }
+
   getStatusBadgeClass(status: string): string {
     switch (status) {
       case 'RegistrationOpen':

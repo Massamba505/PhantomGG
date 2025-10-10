@@ -13,12 +13,14 @@ namespace PhantomGG.Service.Implementations;
 
 public class MatchService(
     IMatchRepository matchRepository,
+    IMatchEventRepository matchEventRepository,
     ITournamentTeamRepository tournamentTeamRepository,
     IMatchValidationService matchValidationService,
     ICacheInvalidationService cacheInvalidationService,
     HybridCache cache) : IMatchService
 {
     private readonly IMatchRepository _matchRepository = matchRepository;
+    private readonly IMatchEventRepository _matchEventRepository = matchEventRepository;
     private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
     private readonly IMatchValidationService _matchValidationService = matchValidationService;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
@@ -52,8 +54,15 @@ public class MatchService(
     {
         var match = await _matchValidationService.ValidateCanUpdateResultAsync(matchId, organizerId);
 
-        match.HomeScore = resultDto.HomeScore;
-        match.AwayScore = resultDto.AwayScore;
+        // Calculate scores from goal events instead of accepting them directly
+        var matchEvents = await _matchEventRepository.GetByMatchIdAsync(matchId);
+        var goalEvents = matchEvents.Where(e => e.EventType == (int)MatchEventType.Goal);
+
+        var homeScore = goalEvents.Count(e => e.TeamId == match.HomeTeamId);
+        var awayScore = goalEvents.Count(e => e.TeamId == match.AwayTeamId);
+
+        match.HomeScore = homeScore;
+        match.AwayScore = awayScore;
         match.Status = (int)resultDto.Status;
 
         var updatedMatch = await _matchRepository.UpdateAsync(match);

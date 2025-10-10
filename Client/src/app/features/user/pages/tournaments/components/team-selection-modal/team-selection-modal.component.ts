@@ -1,4 +1,4 @@
-import { Component, signal, input, output } from '@angular/core';
+import { Component, signal, input, output, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';

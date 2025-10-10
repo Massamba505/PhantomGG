@@ -14,7 +14,7 @@ import { getEnumOptions, getEnumLabel } from '@/app/shared/utils/enumConvertor';
   template: `
     <app-modal
       [isOpen]="isOpen()"
-      title="Update Match Result"
+      title="Update Match Status"
       (close)="close.emit()"
     >
       @if (selectedMatch()) {
@@ -25,12 +25,14 @@ import { getEnumOptions, getEnumLabel } from '@/app/shared/utils/enumConvertor';
                 {{ selectedMatch()!.homeTeamName }}
               </div>
               <div class="text-xl font-bold">
-                {{ updateResultForm.get("homeScore")?.value }} -
-                {{ updateResultForm.get("awayScore")?.value }}
+                {{ calculateScore('home') }} - {{ calculateScore('away') }}
               </div>
               <div class="text-sm font-medium">
                 {{ selectedMatch()!.awayTeamName }}
               </div>
+            </div>
+            <div class="text-xs text-muted mt-2">
+              Score is calculated from match events
             </div>
           </div>
 
@@ -39,31 +41,6 @@ import { getEnumOptions, getEnumLabel } from '@/app/shared/utils/enumConvertor';
             (ngSubmit)="onSubmit()"
             class="space-y-4"
           >
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium mb-2">
-                  {{ selectedMatch()!.homeTeamName }} Score
-                </label>
-                <input
-                  type="number"
-                  formControlName="homeScore"
-                  min="0"
-                  class="input-field"
-                />
-              </div>
-
-              <div>
-                <label class="block text-sm font-medium mb-2">
-                  {{ selectedMatch()!.awayTeamName }} Score
-                </label>
-                <input
-                  type="number"
-                  formControlName="awayScore"
-                  min="0"
-                  class="input-field"
-                />
-              </div>
-            </div>
             <div>
               <label class="block text-sm font-medium mb-2">Match Status</label>
               <select formControlName="status" class="input-select">
@@ -88,7 +65,7 @@ import { getEnumOptions, getEnumLabel } from '@/app/shared/utils/enumConvertor';
                 class="btn btn-primary flex-1"
                 [disabled]="updateResultForm.invalid"
               >
-                Update Result
+                Update Status
               </button>
             </div>
           </form>
@@ -105,7 +82,7 @@ import { getEnumOptions, getEnumLabel } from '@/app/shared/utils/enumConvertor';
             @if (matchEvents().length === 0) {
               <p class="text-center text-muted py-4">No events recorded yet</p>
             } @else {
-              <div class="space-y-2 max-h-60 overflow-y-auto">\
+              <div class="space-y-2 max-h-60 overflow-y-auto">
                 @for(event of matchEvents(); track event.id){
                     <div
                     class="flex items-center justify-between p-3 border rounded-lg"
@@ -155,8 +132,6 @@ export class UpdateResultModalComponent implements OnInit {
       const match = this.selectedMatch();
       if (match && this.updateResultForm) {
         this.updateResultForm.patchValue({
-          homeScore: match.homeScore || 0,
-          awayScore: match.awayScore || 0,
           status: match.status
         });
       }
@@ -165,10 +140,20 @@ export class UpdateResultModalComponent implements OnInit {
 
   ngOnInit() {
     this.updateResultForm = this.fb.group({
-      homeScore: [0, [Validators.required, Validators.min(0)]],
-      awayScore: [0, [Validators.required, Validators.min(0)]],
       status: [MatchStatus.Scheduled, [Validators.required]]
     });
+  }
+
+  calculateScore(team: 'home' | 'away'): number {
+    const match = this.selectedMatch();
+    if (!match) return 0;
+    
+    const events = this.matchEvents();
+    const teamId = team === 'home' ? match.homeTeamId : match.awayTeamId;
+    
+    return events.filter(event => 
+      event.eventType === MatchEventType.Goal && event.teamId === teamId
+    ).length;
   }
 
   onSubmit() {
@@ -176,8 +161,6 @@ export class UpdateResultModalComponent implements OnInit {
     
     const formValue = this.updateResultForm.value;
     const resultData: MatchResult = {
-      homeScore: parseInt(formValue.homeScore),
-      awayScore: parseInt(formValue.awayScore),
       status: parseInt(formValue.status) 
     };
 

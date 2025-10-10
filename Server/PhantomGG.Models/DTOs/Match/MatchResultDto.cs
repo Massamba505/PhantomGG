@@ -5,10 +5,9 @@ namespace PhantomGG.Models.DTOs.Match;
 
 public class MatchResultDto
 {
+    /// <summary>
+    /// Match status - scores are automatically calculated from goal events
+    /// </summary>
     [Required]
-    public int HomeScore { get; set; }
-
-    [Required]
-    public int AwayScore { get; set; }
     public MatchStatus Status { get; set; }
 }

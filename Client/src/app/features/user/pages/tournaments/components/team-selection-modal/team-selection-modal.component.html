@@ -1,5 +1,5 @@
 <app-modal [isOpen]="isOpen()" [title]="getModalTitle()" (close)="closeModal()">
-  @if (teams.length === 0) {
+  @if (teams().length === 0) {
   <div class="text-center py-12">
     <lucide-angular
       [img]="icons.Users"
@@ -15,7 +15,7 @@
       Create Team
     </button>
   </div>
-  } @if (teams.length > 0) {
+  } @else {
   <div class="space-y-4">
     <div class="space-y-3 max-h-96 overflow-y-auto">
       @for (team of teams(); track team.id) {

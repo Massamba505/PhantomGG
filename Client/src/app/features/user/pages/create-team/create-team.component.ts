@@ -38,7 +38,6 @@ export class CreateTeamComponent {
         this.saving.set(false);
       },
       error: (error) => {
-        console.error('Failed to create team:', error);
         this.toastService.error('Failed to create team. Please try again.');
         this.saving.set(false);
       }

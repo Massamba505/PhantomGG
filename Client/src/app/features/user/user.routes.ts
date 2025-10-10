@@ -51,6 +51,12 @@ export const userRoutes: Routes = [
         loadComponent: () => import('../public/tournaments/details/tournament-details').then(m => m.TournamentDetails),
         title: 'Tournaments - PhantomGG',
         data:{title:"Tournaments"}
+      },
+      {
+        path: 'tournaments/:id/statistics',
+        loadComponent: () => import('../../shared/components/pages/tournament-stats/tournament-stats.component').then(m => m.TournamentStatsComponent),
+        title: 'Tournament Statistics - PhantomGG',
+        data:{title:"Tournament Statistics"}
       }
     ]
   }

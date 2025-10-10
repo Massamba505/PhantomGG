@@ -64,7 +64,6 @@ export class TournamentBrowse implements OnInit {
       this.tournaments.set(result?.data || []);
       this.totalCount.set(result?.meta.totalRecords || 0);
     } catch (error) {
-      console.error('Error loading tournaments:', error);
       this.error.set('Failed to load tournaments. Please try again.');
     } finally {
       this.loading.set(false);

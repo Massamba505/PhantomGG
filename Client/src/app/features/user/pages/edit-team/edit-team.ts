@@ -44,7 +44,6 @@ export class EditTeamComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading team:', error);
         this.toastService.error('Failed to load team details');
         this.isLoading.set(false);
       }
@@ -64,7 +63,6 @@ export class EditTeamComponent implements OnInit {
         this.router.navigate(['/user/teams']);
       },
       error: (error) => {
-        console.error('Error updating team:', error);
         this.toastService.error('Failed to update team. Please try again.');
         this.isSaving.set(false);
       }

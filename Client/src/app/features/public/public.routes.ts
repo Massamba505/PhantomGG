@@ -16,4 +16,9 @@ export const publicRoutes: Routes = [
     loadComponent: () => import('./tournaments/details/tournament-details').then(m => m.TournamentDetails),
     title: 'Tournament Details - PhantomGG'
   },
+  {
+    path: 'tournaments/:id/statistics',
+    loadComponent: () => import('../../shared/components/pages/tournament-stats/tournament-stats.component').then(m => m.TournamentStatsComponent),
+    title: 'Tournament Statistics - PhantomGG'
+  },
 ];

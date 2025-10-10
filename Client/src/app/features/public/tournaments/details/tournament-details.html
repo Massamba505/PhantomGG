@@ -4,6 +4,13 @@
       <lucide-angular [img]="icons.ArrowLeft" [size]="20"></lucide-angular>
       Back to Tournaments
     </button>
+
+    @if (tournament()) {
+    <button class="btn btn-primary" (click)="onViewStatistics()">
+      <lucide-angular [img]="icons.BarChart3" [size]="20"></lucide-angular>
+      View Statistics
+    </button>
+    }
   </div>
 
   @if (loading()) {

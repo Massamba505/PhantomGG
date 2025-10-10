@@ -60,7 +60,6 @@ export class TournamentCard {
     const regDeadline = t.registrationDeadline
       ? new Date(t.registrationDeadline)
       : new Date(t.startDate);
-     console.log(this.tournament().status)
     return (
       this.role() === 'User' &&
       t.status === TournamentStatus.RegistrationOpen &&
@@ -74,7 +73,6 @@ export class TournamentCard {
   }
 
   isUser(): boolean {
-     console.log(this.role() )
     return this.role() === 'User';
   }
   isPublic(): boolean {

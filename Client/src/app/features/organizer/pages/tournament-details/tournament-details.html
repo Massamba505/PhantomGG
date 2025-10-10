@@ -6,6 +6,10 @@
 
   @if (tournament()) {
   <div class="flex gap-2">
+    <button class="btn btn-outline" (click)="onViewStatistics()">
+      <lucide-angular [img]="icons.BarChart3" [size]="20"></lucide-angular>
+      Statistics
+    </button>
     <button class="btn btn-primary" (click)="editTournament()">
       Edit Tournament
     </button>

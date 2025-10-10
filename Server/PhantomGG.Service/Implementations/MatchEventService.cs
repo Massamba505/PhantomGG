@@ -3,6 +3,7 @@ using PhantomGG.Models.DTOs.MatchEvent;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Mappings;
+using PhantomGG.Common.Enums;
 using Microsoft.Extensions.Caching.Hybrid;
 
 namespace PhantomGG.Service.Implementations;
@@ -83,6 +84,12 @@ public class MatchEventService(
         var matchEvent = createDto.ToEntity();
         var createdEvent = await _matchEventRepository.CreateAsync(matchEvent);
 
+        // Recalculate match scores if this is a goal event
+        if (createDto.EventType == MatchEventType.Goal)
+        {
+            await RecalculateMatchScoresAsync(createDto.MatchId);
+        }
+
         var matchEntity = await _matchRepository.GetByIdAsync(createDto.MatchId);
         if (matchEntity != null)
         {
@@ -102,8 +109,18 @@ public class MatchEventService(
 
         await _matchValidationService.ValidateCanUpdateMatchAsync(existingEvent.MatchId, userId);
 
+        var wasGoalEvent = existingEvent.EventType == (int)MatchEventType.Goal;
+        var willBeGoalEvent = false;
+
         if (updateDto.EventType.HasValue)
+        {
             existingEvent.EventType = (int)updateDto.EventType.Value;
+            willBeGoalEvent = updateDto.EventType.Value == MatchEventType.Goal;
+        }
+        else
+        {
+            willBeGoalEvent = wasGoalEvent;
+        }
 
         if (updateDto.Minute.HasValue)
             existingEvent.Minute = updateDto.Minute.Value;
@@ -115,6 +132,12 @@ public class MatchEventService(
         }
 
         var updatedEvent = await _matchEventRepository.UpdateAsync(existingEvent);
+
+        // Recalculate match scores if this was or is now a goal event
+        if (wasGoalEvent || willBeGoalEvent)
+        {
+            await RecalculateMatchScoresAsync(existingEvent.MatchId);
+        }
 
         var matchEntity = await _matchRepository.GetByIdAsync(existingEvent.MatchId);
         if (matchEntity != null)
@@ -135,7 +158,15 @@ public class MatchEventService(
 
         await _matchValidationService.ValidateCanUpdateMatchAsync(existingEvent.MatchId, userId);
 
+        var wasGoalEvent = existingEvent.EventType == (int)MatchEventType.Goal;
+
         await _matchEventRepository.DeleteAsync(id);
+
+        // Recalculate match scores if this was a goal event
+        if (wasGoalEvent)
+        {
+            await RecalculateMatchScoresAsync(existingEvent.MatchId);
+        }
 
         var matchEntity = await _matchRepository.GetByIdAsync(existingEvent.MatchId);
         if (matchEntity != null)
@@ -144,5 +175,28 @@ public class MatchEventService(
         }
 
         await _cacheInvalidationService.InvalidateMatchCacheAsync(existingEvent.MatchId);
+    }
+
+    /// <summary>
+    /// Recalculate and update match scores based on goal events
+    /// </summary>
+    private async Task RecalculateMatchScoresAsync(Guid matchId)
+    {
+        var match = await _matchRepository.GetByIdAsync(matchId);
+        if (match == null) return;
+
+        var matchEvents = await _matchEventRepository.GetByMatchIdAsync(matchId);
+        var goalEvents = matchEvents.Where(e => e.EventType == (int)MatchEventType.Goal);
+
+        var homeScore = goalEvents.Count(e => e.TeamId == match.HomeTeamId);
+        var awayScore = goalEvents.Count(e => e.TeamId == match.AwayTeamId);
+
+        // Only update if scores have changed
+        if (match.HomeScore != homeScore || match.AwayScore != awayScore)
+        {
+            match.HomeScore = homeScore;
+            match.AwayScore = awayScore;
+            await _matchRepository.UpdateAsync(match);
+        }
     }
 }
