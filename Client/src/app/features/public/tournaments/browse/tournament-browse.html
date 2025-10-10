@@ -39,7 +39,10 @@
       </p>
     </div>
 
-    <div *ngIf="tournaments().length > 0" class="tournaments-grid">
+    <div
+      *ngIf="tournaments().length > 0"
+      class="flex flex-wrap lg:justify-start justify-center gap-6"
+    >
       <app-tournament-card
         *ngFor="let tournament of tournaments(); trackBy: trackByTournamentId"
         [tournament]="tournament"

@@ -90,9 +90,7 @@ export class MatchService {
   }
 
   generateFixtures(fixtureData: any): Observable<MatchDto[]> {
-    return new Observable(observer => {
-      observer.next([]);
-      observer.complete();
-    });
+    const tournamentId = fixtureData.tournamentId;
+    return this.apiClient.post<MatchDto[]>(API_ENDPOINTS.TOURNAMENTS.GENERATE_FIXTURES(tournamentId), {});
   }
 }

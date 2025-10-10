@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
@@ -92,7 +92,7 @@ export class TournamentDetails implements OnInit {
 
   onBackToTournaments() {
     if (window.history.length >= 1) {
-      this.router.navigate(['../']);
+      window.history.back();
     } else {
       this.router.navigate(['/public/tournaments']);
     }

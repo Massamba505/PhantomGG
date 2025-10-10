@@ -122,7 +122,7 @@ public class TeamsController(
     [Authorize]
     public async Task<ActionResult> RemovePlayerFromTeam(Guid teamId, Guid playerId)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         await _teamService.RemovePlayerFromTeamAsync(teamId, playerId, currentUser.Id);
         return NoContent();
     }

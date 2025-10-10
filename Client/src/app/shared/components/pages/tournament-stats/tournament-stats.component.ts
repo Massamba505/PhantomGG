@@ -154,23 +154,6 @@ export class TournamentStatsComponent implements OnInit {
     return baseClass + (this.activeTab() === tab ? activeClass : inactiveClass);
   }
 
-  getTeamInitials(teamName: string): string {
-    return teamName
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 3);
-  }
-
-  getPlayerInitials(playerName: string): string {
-    const names = playerName.split(' ');
-    if (names.length >= 2) {
-      return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
-    }
-    return playerName.slice(0, 2).toUpperCase();
-  }
-
   getPositionClass(position: number): string {
     switch (position) {
       case 1:
