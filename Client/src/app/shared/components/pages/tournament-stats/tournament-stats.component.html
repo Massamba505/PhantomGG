@@ -9,11 +9,9 @@
       </button>
       }
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          {{ tournamentName() }} Statistics
-        </h1>
+        <h1 class="text-2xl font-bold">{{ tournamentName() }} Statistics</h1>
         @if (tournament()) {
-        <p class="text-sm text-gray-600 dark:text-gray-400">
+        <p class="text-sm text-muted">
           {{ formatDate(tournament()!.startDate) }} -
           {{ formatDate(tournament()!.endDate) }}
         </p>
@@ -37,7 +35,7 @@
 
   <!-- Stats Overview -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border">
+    <div class="rounded-lg p-4 border">
       <div class="flex items-center gap-3">
         <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
           <lucide-angular
@@ -47,45 +45,45 @@
           />
         </div>
         <div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Teams</p>
-          <p class="text-xl font-bold">{{ standings().length }}</p>
+          <p class="text-sm text-muted">Teams</p>
+          <p class="text-xl font-bold text-muted">{{ standings().length }}</p>
         </div>
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border">
+    <div class="rounded-lg p-4 border">
       <div class="flex items-center gap-3">
         <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
           <lucide-angular
             [img]="icons.Activity"
             [size]="20"
-            class="text-green-600 dark:text-green-400"
+            class="text-success"
           />
         </div>
         <div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Matches</p>
-          <p class="text-xl font-bold">{{ totalMatches() }}</p>
+          <p class="text-sm text-muted">Matches</p>
+          <p class="text-xl font-bold text-muted">{{ totalMatches() }}</p>
         </div>
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border">
+    <div class="rounded-lg p-4 border">
       <div class="flex items-center gap-3">
         <div class="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
           <lucide-angular
             [img]="icons.Target"
             [size]="20"
-            class="text-yellow-600 dark:text-yellow-400"
+            class="text-warning"
           />
         </div>
         <div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Total Goals</p>
-          <p class="text-xl font-bold">{{ totalGoals() }}</p>
+          <p class="text-sm text-muted">Total Goals</p>
+          <p class="text-xl font-bold text-muted">{{ totalGoals() }}</p>
         </div>
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border">
+    <div class="rounded-lg p-4 border">
       <div class="flex items-center gap-3">
         <div class="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
           <lucide-angular
@@ -95,13 +93,11 @@
           />
         </div>
         <div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">Top Scorer</p>
-          <p class="text-sm font-medium">
+          <p class="text-sm text-muted">Top Scorer</p>
+          <p class="text-md font-medium text-muted">
             {{ topScorer()?.playerName || "N/A" }}
             @if (topScorer()) {
-            <span class="text-xs text-gray-500"
-              >({{ topScorer()!.goals }})</span
-            >
+            <span class="text-xs text-muted">({{ topScorer()!.goals }})</span>
             }
           </p>
         </div>
@@ -110,7 +106,7 @@
   </div>
 
   <!-- Tabs -->
-  <div class="flex flex-wrap gap-0 sm:gap-2 border-b mb-6">
+  <div class="flex flex-wrap gap-0 sm:gap-2 text-muted border-b mb-6">
     <button (click)="onTabChange('table')" [class]="getTabClass('table')">
       <lucide-angular [img]="icons.BarChart3" [size]="16" class="inline mr-2" />
       League Table
@@ -134,7 +130,6 @@
     </button>
   </div>
 
-  <!-- Content -->
   <div class="flex-1 overflow-hidden">
     @if (isLoading()) {
     <div class="flex items-center justify-center h-64">
@@ -147,69 +142,67 @@
         <span>Loading statistics...</span>
       </div>
     </div>
-    } @else {
-    <!-- League Table -->
-    @if (activeTab() === 'table') {
-    <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border">
+    } @else { @if (activeTab() === 'table') {
+    <div class="rounded-lg overflow-hidden border">
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-50 dark:bg-gray-700">
+          <thead class="border-b">
             <tr>
               <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
               >
                 Pos
               </th>
               <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
               >
                 Team
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 MP
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 W
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 D
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 L
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 GF
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 GA
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 GD
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 Pts
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+          <tbody class="divide-y">
             @for (team of standings(); track team.id; let i = $index) {
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+            <tr class="btn-outline">
               <td class="px-4 py-3 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <span
@@ -229,40 +222,24 @@
               </td>
               <td class="px-4 py-3 whitespace-nowrap">
                 <div class="flex items-center gap-3">
-                  @if (team.teamLogo) {
                   <img
                     [src]="team.teamLogo"
                     [alt]="team.teamName"
                     class="w-8 h-8 rounded-full object-cover"
                   />
-                  } @else {
-                  <div
-                    class="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center"
-                  >
-                    <span class="text-xs font-medium">{{
-                      getTeamInitials(team.teamName)
-                    }}</span>
-                  </div>
-                  }
                   <span class="text-sm font-medium">{{ team.teamName }}</span>
                 </div>
               </td>
               <td class="px-4 py-3 text-center text-sm">
                 {{ team.matchesPlayed }}
               </td>
-              <td
-                class="px-4 py-3 text-center text-sm text-green-600 dark:text-green-400"
-              >
+              <td class="px-4 py-3 text-center text-sm text-success">
                 {{ team.wins }}
               </td>
-              <td
-                class="px-4 py-3 text-center text-sm text-yellow-600 dark:text-yellow-400"
-              >
+              <td class="px-4 py-3 text-center text-sm text-warning">
                 {{ team.draws }}
               </td>
-              <td
-                class="px-4 py-3 text-center text-sm text-red-600 dark:text-red-400"
-              >
+              <td class="px-4 py-3 text-center text-sm text-destructive">
                 {{ team.losses }}
               </td>
               <td class="px-4 py-3 text-center text-sm">{{ team.goalsFor }}</td>
@@ -271,10 +248,8 @@
               </td>
               <td
                 class="px-4 py-3 text-center text-sm"
-                [class.text-green-600]="team.goalDifference > 0"
-                [class.text-red-600]="team.goalDifference < 0"
-                [class.dark:text-green-400]="team.goalDifference > 0"
-                [class.dark:text-red-400]="team.goalDifference < 0"
+                [class.text-success]="team.goalDifference > 0"
+                [class.text-destructive]="team.goalDifference < 0"
               >
                 {{ team.goalDifference > 0 ? "+" : ""
                 }}{{ team.goalDifference }}
@@ -285,10 +260,7 @@
             </tr>
             } @if (standings().length === 0) {
             <tr>
-              <td
-                colspan="10"
-                class="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
-              >
+              <td colspan="10" class="px-4 py-8 text-center text-muted">
                 No standings data available
               </td>
             </tr>
@@ -301,47 +273,47 @@
 
     <!-- Top Scorers -->
     @if (activeTab() === 'goals') {
-    <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border">
+    <div class="rounded-lg overflow-hidden border">
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-50 dark:bg-gray-700">
+          <thead class="border-b">
             <tr>
               <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
               >
                 Rank
               </th>
               <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
               >
                 Player
               </th>
               <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
               >
                 Team
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 Goals
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 Matches
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 Avg
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+          <tbody class="divide-y">
             @for (player of goalStandings(); track player.playerId; let i =
             $index) {
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+            <tr class="btn-outline">
               <td class="px-4 py-3 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <span
@@ -361,21 +333,11 @@
               </td>
               <td class="px-4 py-3 whitespace-nowrap">
                 <div class="flex items-center gap-3">
-                  @if (player.playerPhoto) {
                   <img
                     [src]="player.playerPhoto"
                     [alt]="player.playerName"
                     class="w-8 h-8 rounded-full object-cover"
                   />
-                  } @else {
-                  <div
-                    class="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center"
-                  >
-                    <span class="text-xs font-medium">{{
-                      getPlayerInitials(player.playerName)
-                    }}</span>
-                  </div>
-                  }
                   <span class="text-sm font-medium">{{
                     player.playerName
                   }}</span>
@@ -383,19 +345,15 @@
               </td>
               <td class="px-4 py-3 whitespace-nowrap">
                 <div class="flex items-center gap-2">
-                  @if (player.teamLogo) {
                   <img
                     [src]="player.teamLogo"
                     [alt]="player.teamName"
                     class="w-6 h-6 rounded-full object-cover"
                   />
-                  }
                   <span class="text-sm">{{ player.teamName }}</span>
                 </div>
               </td>
-              <td
-                class="px-4 py-3 text-center text-sm font-bold text-green-600 dark:text-green-400"
-              >
+              <td class="px-4 py-3 text-center text-sm font-bold text-success">
                 {{ player.goals }}
               </td>
               <td class="px-4 py-3 text-center text-sm">
@@ -411,10 +369,7 @@
             </tr>
             } @if (goalStandings().length === 0) {
             <tr>
-              <td
-                colspan="6"
-                class="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
-              >
+              <td colspan="6" class="px-4 py-8 text-center text-muted">
                 No goal data available
               </td>
             </tr>
@@ -427,47 +382,47 @@
 
     <!-- Top Assists -->
     @if (activeTab() === 'assists') {
-    <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border">
+    <div class="rounded-lg overflow-hidden border">
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-50 dark:bg-gray-700">
+          <thead class="border-b">
             <tr>
               <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
               >
                 Rank
               </th>
               <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
               >
                 Player
               </th>
               <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium text-muted uppercase"
               >
                 Team
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 Assists
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 Matches
               </th>
               <th
-                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-4 py-3 text-center text-xs font-medium text-muted uppercase"
               >
                 Avg
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+          <tbody class="divide-y">
             @for (player of assistStandings(); track player.playerId; let i =
             $index) {
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+            <tr class="btn-outline">
               <td class="px-4 py-3 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <span
@@ -487,21 +442,11 @@
               </td>
               <td class="px-4 py-3 whitespace-nowrap">
                 <div class="flex items-center gap-3">
-                  @if (player.playerPhoto) {
                   <img
                     [src]="player.playerPhoto"
                     [alt]="player.playerName"
                     class="w-8 h-8 rounded-full object-cover"
                   />
-                  } @else {
-                  <div
-                    class="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center"
-                  >
-                    <span class="text-xs font-medium">{{
-                      getPlayerInitials(player.playerName)
-                    }}</span>
-                  </div>
-                  }
                   <span class="text-sm font-medium">{{
                     player.playerName
                   }}</span>
@@ -509,13 +454,11 @@
               </td>
               <td class="px-4 py-3 whitespace-nowrap">
                 <div class="flex items-center gap-2">
-                  @if (player.teamLogo) {
                   <img
                     [src]="player.teamLogo"
                     [alt]="player.teamName"
                     class="w-6 h-6 rounded-full object-cover"
                   />
-                  }
                   <span class="text-sm">{{ player.teamName }}</span>
                 </div>
               </td>
@@ -533,10 +476,7 @@
             </tr>
             } @if (assistStandings().length === 0) {
             <tr>
-              <td
-                colspan="6"
-                class="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
-              >
+              <td colspan="6" class="px-4 py-8 text-center text-muted">
                 No assist data available
               </td>
             </tr>

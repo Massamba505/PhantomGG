@@ -143,49 +143,6 @@
       </button>
     </div>
     }
-
-    <!-- <div class="flex items-center gap-2 mx-auto">
-      <button
-        class="btn btn-secondary btn-sm"
-        [disabled]="!hasPreviousPage()"
-        (click)="onPageChange(1)"
-      >
-        First
-      </button>
-      <button
-        class="btn btn-secondary btn-sm"
-        [disabled]="!hasPreviousPage()"
-        (click)="onPageChange(currentPage() - 1)"
-      >
-        Previous
-      </button>
-
-      @for (pageNum of getPageNumbers(); track pageNum) {
-      <button
-        class="btn btn-sm"
-        [class.btn-primary]="pageNum === currentPage()"
-        [class.btn-secondary]="pageNum !== currentPage()"
-        (click)="onPageChange(pageNum)"
-      >
-        {{ pageNum }}
-      </button>
-      }
-
-      <button
-        class="btn btn-secondary btn-sm"
-        [disabled]="!hasNextPage()"
-        (click)="onPageChange(currentPage() + 1)"
-      >
-        Next
-      </button>
-      <button
-        class="btn btn-secondary btn-sm"
-        [disabled]="!hasNextPage()"
-        (click)="onPageChange(totalPages())"
-      >
-        Last
-      </button>
-    </div> -->
   </div>
   }
 </div>

@@ -8,6 +8,8 @@ import { TournamentService } from '@/app/api/services/tournament.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamCard, TeamRole } from "@/app/shared/components/cards/team-card/team-card";
 import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
+import { TournamentStatus } from '@/app/api/models';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-tournament-details',
@@ -28,32 +30,9 @@ export class TournamentDetails implements OnInit {
 
   readonly icons = LucideIcons;
 
-  tournamentStatus = computed(() => {
-    const t = this.tournament();
-    if (!t) return 'Unknown';
-    
-    const now = new Date();
-    const startDate = new Date(t.startDate);
-    const endDate = new Date(t.endDate);
-    
-    if (now < startDate) return 'Upcoming';
-    if (now >= startDate && now <= endDate) return 'In Progress';
-    if (now > endDate) return 'Completed';
-    
-    return t.status;
-  });
-
-  daysUntilStart = computed(() => {
-    const t = this.tournament();
-    if (!t) return null;
-    
-    const now = new Date();
-    const startDate = new Date(t.startDate);
-    const diffTime = startDate.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return diffDays > 0 ? diffDays : null;
-  });
+  getStatus(){
+    return getEnumLabel(TournamentStatus, this.tournament()!.status);
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -112,68 +91,17 @@ export class TournamentDetails implements OnInit {
   }
 
   onBackToTournaments() {
-    this.router.navigate(['/public/tournaments']);
+    if (window.history.length > 1) {
+      this.router.navigate(['../']);
+    } else {
+      this.router.navigate(['/public/tournaments']);
+    }
   }
 
   onViewStatistics() {
     const tournamentId = this.route.snapshot.paramMap.get('id');
     if (tournamentId) {
       this.router.navigate(['/public/tournaments', tournamentId, 'statistics']);
-    }
-  }
-
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
-      case 'RegistrationOpen':
-      case 'Upcoming':
-        return 'status-badge status-success';
-      case 'InProgress':
-        return 'status-badge status-warning';
-      case 'Completed':
-        return 'status-badge status-secondary';
-      default:
-        return 'status-badge status-primary';
-    }
-  }
-
-  formatDate(dateString: string): string {
-    if (!dateString) return '';
-    
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString;
-    
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
-  }
-
-  getProgressPercentage(): number {
-    const t = this.tournament();
-    if (!t) return 0;
-    return Math.min((t.teamCount / t.maxTeams) * 100, 100);
-  }
-
-  trackByTeamId(index: number, team: TournamentTeam): string {
-    return team.id;
-  }
-
-  getTeamInitials(name: string): string {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
-  }
-
-  retryLoad() {
-    const tournamentId = this.route.snapshot.paramMap.get('id');
-    if (tournamentId) {
-      this.loadTournamentDetails(tournamentId);
     }
   }
 }

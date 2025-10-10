@@ -27,9 +27,10 @@ export class PlayerCard {
   isManager(): boolean {
     return this.role() === 'Manager';
   }
+  
   getPosition(){
     if(this.player().position === undefined) return 'none';
-    return getEnumLabel(PlayerPosition, this.player().position!.toString())
+    return getEnumLabel(PlayerPosition, this.player().position!)
   }
 
   isTeamMember(): boolean {

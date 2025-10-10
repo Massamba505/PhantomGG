@@ -21,7 +21,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
   submitted = signal(false);
   logoPreview = signal<string | null>(null);
 
-  isEditMode = computed(() => this.team !== null);
+  isEditMode = computed(() => this.team() !== null);
 
   ngOnInit() {
     this.initializeForm();
