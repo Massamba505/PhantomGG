@@ -137,6 +137,14 @@ export class TournamentTeamManagementComponent implements OnInit {
         return 0;
     }
   }
+  
+  getTabClass(tab: TeamTab): string {
+    const baseClass = 'px-2 py-1 font-semibold border-b-2 cursor-pointer sm:text-md text-xs ';
+    const activeClass = 'border-primary text-primary';
+    const inactiveClass = 'border-transparent text-muted';
+    
+    return baseClass + (this.activeTab() === tab ? activeClass : inactiveClass);
+  }
 
   convertToTeam(tournamentTeam: TournamentTeam) {
     return {

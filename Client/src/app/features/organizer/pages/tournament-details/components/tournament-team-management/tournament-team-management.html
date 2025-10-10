@@ -17,30 +17,14 @@
 </div>
 
 <div class="flex border-b mb-6">
-  <button
-    (click)="setActiveTab('approved')"
-    [class]="
-      'px-4 py-2 font-medium transition-colors border-b-2 ' +
-      (activeTab() === 'approved'
-        ? 'border-primary text-primary'
-        : 'border-transparent text-muted hover:text-foreground hover:border-border')
-    "
-  >
+  <button (click)="setActiveTab('approved')" [class]="getTabClass('approved')">
     Approved
     <span class="btn btn-outline px-2 py-0.5 rounded-full">
       {{ getTeamCount("approved") }}
     </span>
   </button>
 
-  <button
-    (click)="setActiveTab('pending')"
-    [class]="
-      'px-4 py-2 font-medium transition-colors border-b-2 ' +
-      (activeTab() === 'pending'
-        ? 'border-primary text-primary'
-        : 'border-transparent text-muted hover:text-foreground hover:border-border')
-    "
-  >
+  <button (click)="setActiveTab('pending')" [class]="getTabClass('pending')">
     Pending
     <span class="btn btn-outline px-2 py-0.5 rounded-full">
       {{ getTeamCount("pending") }}

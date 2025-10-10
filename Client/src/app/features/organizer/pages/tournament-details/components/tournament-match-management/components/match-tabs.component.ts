@@ -64,9 +64,9 @@ export class MatchTabsComponent {
   }
 
   getTabClass(tab: MatchTab): string {
-    const baseClass = 'px-2 py-1 font-medium border-b-2 cursor-pointer sm:text-lg text-xs ';
+    const baseClass = 'px-2 py-1 font-semibold border-b-2 cursor-pointer sm:text-md text-xs ';
     const activeClass = 'border-primary text-primary';
-    const inactiveClass = 'border-transparent text-muted hover:text-foreground';
+    const inactiveClass = 'border-transparent text-muted';
     
     return baseClass + (this.activeTab() === tab ? activeClass : inactiveClass);
   }
