@@ -56,8 +56,7 @@ export class TournamentBrowse implements OnInit {
       const filters = {
         ...this.searchFilters(),
         pageNumber: this.currentPage(),
-        pageSize: this.pageSize(),
-        scope: 'public' as const
+        pageSize: this.pageSize()
       };
       
       const result = await this.tournamentService.getTournaments(filters).toPromise();

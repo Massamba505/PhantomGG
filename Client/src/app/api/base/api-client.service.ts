@@ -57,9 +57,6 @@ export class ApiClient {
       converted.page = converted.pageNumber;
       delete converted.pageNumber;
     }
-    
-    delete converted.scope;
-    
     return converted;
   }
   

@@ -5,7 +5,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
 import { PagedResult } from '@/app/api/models/api.models';
 import { TournamentCard } from '@/app/shared/components/cards';
-import { TournamentSearchComponent } from './components/tournament-search/tournament-search';
+import { TournamentSearchComponent } from '@/app/shared/components/search';
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
 import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentService, UserRoles } from '@/app/api/services';
@@ -71,7 +71,7 @@ export class TournamentListComponent implements OnInit {
   loadTournaments() {
     this.isLoading.set(true);
 
-    this.tournamentService.getTournaments({ ...this.searchCriteria(), scope: 'my' }).subscribe({
+    this.tournamentService.getTournaments(this.searchCriteria()).subscribe({
       next: (response: any) => {
         this.tournaments.set(response.data);
         this.paginationData.set(response);

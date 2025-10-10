@@ -90,12 +90,12 @@
       </select>
     </div>
 
+    @if (totalPages() > 0) {
     <div class="text-sm text-gray-600 dark:text-gray-400 mx-auto">
       Page {{ currentPage() }} of {{ totalPages() }} ({{ totalRecords() }}
       total)
     </div>
-
-    @if (totalPages() > 1) {
+    } @if (totalPages() > 1) {
     <div class="flex items-center gap-1 mx-auto">
       <button
         class="btn btn-secondary btn-sm"
