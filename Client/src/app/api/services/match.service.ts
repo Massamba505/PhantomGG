@@ -11,10 +11,7 @@ import {
   MatchResultDto,
   MatchEventDto,
   CreateMatchEventDto,
-  UpdateMatchEventDto,
-  PlayerEventsSummary,
-  TeamEventsSummary,
-  MatchEventType
+  UpdateMatchEventDto
 } from '../models/match.models';
 
 @Injectable({
@@ -96,91 +93,6 @@ export class MatchService {
     return new Observable(observer => {
       observer.next([]);
       observer.complete();
-    });
-  }
-
-  getLiveMatches(tournamentId?: string): Observable<PagedResult<MatchDto>> {
-    return this.getMatches({
-      tournamentId,
-      status: 'InProgress'
-    });
-  }
-  
-  getUpcomingMatches(tournamentId?: string): Observable<PagedResult<MatchDto>> {
-    return this.getMatches({
-      tournamentId,
-      status: 'Scheduled'
-    });
-  }
-  
-  getCompletedMatches(tournamentId?: string): Observable<PagedResult<MatchDto>> {
-    return this.getMatches({
-      tournamentId,
-      status: 'Completed'
-    });
-  }
-  
-  getPlayerStatistics(playerId: string): Observable<PlayerEventsSummary> {
-    return new Observable(observer => {
-      this.getPlayerEvents(playerId).subscribe({
-        next: (events: MatchEventDto[]) => {
-          const summary: PlayerEventsSummary = {
-            playerId,
-            playerName: events[0]?.playerName || 'Unknown Player',
-            teamId: events[0]?.teamId || '',
-            teamName: events[0]?.teamName || 'Unknown Team',
-            goals: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Goal).length,
-            assists: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Assist).length,
-            yellowCards: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.YellowCard).length,
-            redCards: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.RedCard).length,
-            fouls: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Foul).length,
-            totalEvents: events.length
-          };
-          observer.next(summary);
-          observer.complete();
-        },
-        error: (error) => observer.error(error)
-      });
-    });
-  }
-  
-  getTeamStatistics(teamId: string): Observable<TeamEventsSummary> {
-    return new Observable(observer => {
-      this.getTeamEvents(teamId).subscribe({
-        next: (events: MatchEventDto[]) => {
-          const playerGoals = events
-            .filter((e: MatchEventDto) => e.eventType === MatchEventType.Goal)
-            .reduce((acc: Record<string, number>, event: MatchEventDto) => {
-              acc[event.playerId] = (acc[event.playerId] || 0) + 1;
-              return acc;
-            }, {} as Record<string, number>);
-
-          const topScorerEntry = Object.entries(playerGoals)
-            .sort(([,a], [,b]) => (b as number) - (a as number))[0];
-
-          const topScorer = topScorerEntry ? {
-            playerId: topScorerEntry[0],
-            playerName: events.find((e: MatchEventDto) => e.playerId === topScorerEntry[0])?.playerName || 'Unknown',
-            goals: topScorerEntry[1] as number
-          } : undefined;
-
-          const summary: TeamEventsSummary = {
-            teamId,
-            teamName: events[0]?.teamName || 'Unknown Team',
-            totalGoals: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Goal).length,
-            totalAssists: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Assist).length,
-            totalYellowCards: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.YellowCard).length,
-            totalRedCards: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.RedCard).length,
-            totalFouls: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Foul).length,
-            totalSubstitutions: events.filter((e: MatchEventDto) => e.eventType === MatchEventType.Substitution).length,
-            totalEvents: events.length,
-            topScorer
-          };
-          observer.next(summary);
-          observer.complete();
-        },
-        error: (error) => observer.error(error)
-      });
     });
   }
 }
