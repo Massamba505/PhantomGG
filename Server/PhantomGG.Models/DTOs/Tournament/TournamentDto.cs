@@ -28,7 +28,5 @@ public class TournamentDto
     public int MatchCount { get; set; }
 }
 
-public record TeamRegistrationRequest(Guid TeamId);
 public record GenerateFixturesRequest(TournamentFormats Format);
-public record FixtureStatusResponse(int Status);
 public record TeamManagementRequest(TeamAction Action);
