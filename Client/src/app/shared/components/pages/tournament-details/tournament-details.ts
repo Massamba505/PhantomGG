@@ -94,7 +94,7 @@ export class TournamentDetailsComponent implements OnInit {
 
   onViewStatistics() {
     if (this.tournamentId()) {
-      this.router.navigate(['/user/tournaments', this.tournamentId(), 'statistics']);
+      this.router.navigate(['/public/tournaments', this.tournamentId(), 'statistics']);
     }
   }
 
