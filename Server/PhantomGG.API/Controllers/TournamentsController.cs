@@ -179,7 +179,7 @@ public class TournamentsController(
     public async Task<ActionResult> GenerateFixtures(Guid id, [FromBody] GenerateFixturesRequest request)
     {
         var currentUser = _currentUserService.GetCurrentUser();
-        await _matchService.CreateTournamentBracketAsync(id, currentUser.Id);
+        await _matchService.CreateTournamentBracketAsync(id, currentUser!.Id);
 
         return Accepted();
     }

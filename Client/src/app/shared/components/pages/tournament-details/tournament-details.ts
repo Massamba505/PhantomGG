@@ -1,107 +1,132 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Tournament } from '@/app/api/models/tournament.models';
-import { TournamentTeam } from '@/app/api/models/team.models';
-import { TournamentService } from '@/app/api/services/tournament.service';
+import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { TeamCard, TeamRole } from "@/app/shared/components/cards/team-card/team-card";
 import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
-import { TournamentStatus } from '@/app/api/models';
+import { TournamentService, TournamentStatus } from '@/app/api/services';
+import { ToastService } from '@/app/shared/services/toast.service';
+import { TournamentTeamManagementComponent } from './components/tournament-team-management/tournament-team-management';
+import { TournamentMatchManagementComponent } from './components/tournament-match-management/tournament-match-management';
+import { MatchDetailsModalComponent } from './components/match-details-modal/match-details-modal';
+import { TeamDetailsModalComponent } from './components/team-details-modal/team-details-modal';
 import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
-  selector: 'app-tournament-details',
+  selector: 'app-public-tournament-details',
+  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, TournamentTeamManagementComponent, TournamentMatchManagementComponent, MatchDetailsModalComponent, TeamDetailsModalComponent],
   templateUrl: './tournament-details.html',
-  styleUrls: ['./tournament-details.css'],
-  imports: [
-    CommonModule,
-    LucideAngularModule,
-    TeamCard,
-    LineBreaksPipe
-],
+  styleUrl: './tournament-details.css'
 })
-export class TournamentDetails implements OnInit {
-  tournament = signal<Tournament | null>(null);
-  teams = signal<TournamentTeam[]>([]);
-  loading = signal(false);
-  error = signal<string | null>(null);
+export class TournamentDetailsComponent implements OnInit {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private tournamentService = inject(TournamentService);
+  private toastService = inject(ToastService);
 
-  readonly icons = LucideIcons;
+  tournament = signal<Tournament | null>(null);
+  loading = signal(true);
+  tournamentId = signal<string>('');
+  icons = LucideIcons;
+  
+  showDeleteModal = signal(false);
+  isDeleting = signal(false);
+
+  // Modal states
+  showMatchModal = signal(false);
+  showTeamModal = signal(false);
+  selectedMatchId = signal<string>('');
+  selectedTeamId = signal<string>('');
+
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      this.tournamentId.set(params['id']);
+      this.loadTournament();
+    });
+  }
+  
+
+  readonly DESCRIPTION_LIMIT = 300;
+
+  showFullDescription = signal(false);
+  isLongDescription = signal(false);
+  displayedDescription = signal<string>('');
+
+  toggleDescription() {
+    this.showFullDescription.update(prev => !prev);
+    this.updateDisplayedDescription();
+  }
+
+  private updateDisplayedDescription() {
+    const fullDesc = this.tournament()?.description || '';
+    const plainText = fullDesc.replace(/<[^>]*>/g, '');
+    
+    this.isLongDescription.set(plainText.length > this.DESCRIPTION_LIMIT);
+
+    if (this.showFullDescription()) {
+      this.displayedDescription.set(fullDesc);
+    } else {
+      const shortText = plainText.slice(0, this.DESCRIPTION_LIMIT) + '...';
+      this.displayedDescription.set(shortText);
+    }
+  }
+
+  loadTournament() {
+    if (!this.tournamentId()) return;
+    
+    this.loading.set(true);
+    
+    this.tournamentService.getTournament(this.tournamentId()).subscribe({
+      next: (tournament: any) => {
+        this.tournament.set(tournament);
+        const banner = this.tournament()!.bannerUrl?.split(" ").join("+");
+        const logo = this.tournament()!.logoUrl?.split(" ").join("+");
+        this.tournament.update(current => ({
+          ...current!,
+          bannerUrl: banner,
+          logoUrl: logo
+        }));
+      this.updateDisplayedDescription();
+      },
+      complete:()=>{
+        this.loading.set(false);
+      },
+    });
+  }
+
+  goBack() {
+    window.history.back();
+  }
+
+  onViewStatistics() {
+    if (this.tournamentId()) {
+      this.router.navigate(['/public/tournaments', this.tournamentId(), 'statistics']);
+    }
+  }
 
   getStatus(){
     return getEnumLabel(TournamentStatus, this.tournament()!.status);
   }
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private tournamentService: TournamentService
-  ) {}
-
-  ngOnInit() {
-    const tournamentId = this.route.snapshot.paramMap.get('id');
-    if (tournamentId) {
-      this.loadTournamentDetails(tournamentId);
-    } else {
-      this.router.navigate(['/public/tournaments']);
-    }
+  // Modal handlers
+  openMatchModal(matchId: string) {
+    this.selectedMatchId.set(matchId);
+    this.showMatchModal.set(true);
   }
 
-  convertToTeam(tournamentTeam: TournamentTeam) {
-    return {
-      id: tournamentTeam.id,
-      name: tournamentTeam.name,
-      shortName: tournamentTeam.shortName || '',
-      logoUrl: tournamentTeam.logoUrl,
-      userId: tournamentTeam.managerId || '',
-      createdAt: tournamentTeam.registeredAt,
-      updatedAt: undefined,
-      countPlayers: tournamentTeam.countPlayers,
-      players: tournamentTeam.players
-    };
-  }
-  
-  getTeamRole(): TeamRole {
-    return 'Public';
+  closeMatchModal() {
+    this.showMatchModal.set(false);
+    this.selectedMatchId.set('');
   }
 
-  async loadTournamentDetails(tournamentId: string) {
-    this.loading.set(true);
-    this.error.set(null);
-    
-    try {
-      const [tournament, teams] = await Promise.all([
-        this.tournamentService.getTournament(tournamentId).toPromise(),
-        this.tournamentService.getTournamentTeams(tournamentId).toPromise()
-      ]);
-      
-      this.tournament.set(tournament || null);
-      this.teams.set(teams || []);
-    } catch (error) {
-      this.loading.set(false);
-    } finally {
-      this.loading.set(false);
-    }
+  openTeamModal(teamId: string) {
+    this.selectedTeamId.set(teamId);
+    this.showTeamModal.set(true);
   }
 
-  onTeamView(team: TournamentTeam) {
-    console.log('View team:', team);
-  }
-
-  onBackToTournaments() {
-    if (window.history.length >= 1) {
-      this.router.navigate(['../']);
-    } else {
-      this.router.navigate(['/public/tournaments']);
-    }
-  }
-
-  onViewStatistics() {
-    const tournamentId = this.route.snapshot.paramMap.get('id');
-    if (tournamentId) {
-      this.router.navigate(['statistics'], { relativeTo: this.route });
-    }
+  closeTeamModal() {
+    this.showTeamModal.set(false);
+    this.selectedTeamId.set('');
   }
 }

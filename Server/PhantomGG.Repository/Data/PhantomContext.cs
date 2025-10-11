@@ -159,9 +159,7 @@ public partial class PhantomContext : DbContext
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");
             entity.Property(e => e.BannerUrl).IsUnicode(false);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
-            entity.Property(e => e.Description)
-                .HasMaxLength(200)
-                .IsUnicode(false);
+            entity.Property(e => e.Description).IsUnicode(false);
             entity.Property(e => e.IsPublic).HasDefaultValue(true);
             entity.Property(e => e.Location)
                 .HasMaxLength(200)

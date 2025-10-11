@@ -61,6 +61,15 @@
         class="leading-relaxed"
         [innerHTML]="tournament()!.description | appLineBreaks"
       ></p>
+
+      @if (isLongDescription()) {
+      <a
+        class="text-primary font-semibold underline cursor-pointer mt-2 inline-block"
+        (click)="toggleDescription()"
+      >
+        {{ showFullDescription() ? "View Less" : "View More" }}
+      </a>
+      }
     </div>
 
     <div class="card">
@@ -163,7 +172,7 @@
             <lucide-angular [img]="icons.UserPlus" [size]="16"></lucide-angular>
             Players/Team:
           </span>
-          <span> 11 (Standard team size) </span>
+          <span> 11 </span>
         </div>
       </div>
     </div>

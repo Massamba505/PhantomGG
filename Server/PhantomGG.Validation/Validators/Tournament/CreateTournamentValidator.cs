@@ -12,10 +12,6 @@ public class CreateTournamentValidator : AbstractValidator<CreateTournamentDto>
             .Length(3, 200).WithMessage("Tournament name must be between 3 and 200 characters")
             .Matches(@"^[a-zA-Z0-9\s\-_\.]+$").WithMessage("Tournament name contains invalid characters");
 
-        RuleFor(x => x.Description)
-            .NotEmpty().WithMessage("Tournament description is required")
-            .Length(10, 2000).WithMessage("Tournament description must be between 10 and 2000 characters");
-
         RuleFor(x => x.Location)
             .Length(0, 200).WithMessage("Location must not exceed 200 characters")
             .When(x => !string.IsNullOrEmpty(x.Location));

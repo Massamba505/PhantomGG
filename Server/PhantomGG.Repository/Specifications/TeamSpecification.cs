@@ -18,8 +18,8 @@ public class TeamSpecification
     {
         return t =>
             (string.IsNullOrEmpty(SearchTerm) ||
-                ((t.Name != null && t.Name.Contains(SearchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                 (t.ShortName != null && t.ShortName.Contains(SearchTerm, StringComparison.CurrentCultureIgnoreCase)))) &&
+                ((t.Name != null && t.Name.ToLower().Contains(SearchTerm.ToLower())) ||
+                 (t.ShortName != null && t.ShortName.ToLower().Contains(SearchTerm.ToLower())))) &&
 
             (!TournamentId.HasValue ||
                 t.TournamentTeams.Any(tt => tt.TournamentId == TournamentId.Value)) &&

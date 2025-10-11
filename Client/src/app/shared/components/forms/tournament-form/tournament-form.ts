@@ -74,7 +74,7 @@ export class TournamentForm implements OnInit, OnChanges {
         ],
         description: [
           t?.description || '',
-          [Validators.required, Validators.minLength(10), Validators.maxLength(2000)],
+          [Validators.required, Validators.minLength(10)],
         ],
         location: [t?.location || '', [Validators.maxLength(200), Validators.required]],
         registrationStartDate: [

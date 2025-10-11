@@ -12,7 +12,7 @@ import { PagedResult } from '@/app/api/models/api.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamSelectionModalComponent } from './components/team-selection-modal/team-selection-modal.component';
 import { TournamentCard } from '@/app/shared/components/cards/tournament-card/tournament-card';
-import { TournamentSearchComponent } from './components/tournament-search/tournament-search.component';
+import { TournamentSearchComponent } from '@/app/shared/components/search';
 import { TournamentStatus } from '@/app/api/models';
 
 @Component({

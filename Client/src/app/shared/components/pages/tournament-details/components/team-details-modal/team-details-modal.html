@@ -1,0 +1,102 @@
+<app-modal
+  [isOpen]="isOpen()"
+  [title]="team()?.name || 'Team Details'"
+  (close)="onClose()"
+>
+  @if (loading()) {
+  <div class="flex justify-center items-center py-8">
+    <lucide-angular
+      [img]="icons.Loader2"
+      size="24"
+      class="animate-spin text-primary"
+    ></lucide-angular>
+    <span class="ml-2">Loading team details...</span>
+  </div>
+  } @else if (team()) {
+  <div class="space-y-6">
+    <div class="card text-center">
+      <div class="flex flex-col items-center space-y-4">
+        <img
+          [src]="team()!.logoUrl"
+          [alt]="team()!.name"
+          class="w-20 h-20 rounded-full object-cover border-4"
+        />
+
+        <div>
+          <h2 class="text-2xl font-bold">{{ team()!.name }}</h2>
+          @if (team()!.shortName) {
+          <p class="text-muted">
+            {{ team()!.shortName }}
+          </p>
+          }
+        </div>
+
+        <div class="flex items-center space-x-4 text-sm text-muted">
+          <div class="flex items-center space-x-1">
+            <lucide-angular [img]="icons.Users" size="16"></lucide-angular>
+            <span>{{ team()!.countPlayers }} Players</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="font-semibold mb-4 flex items-center space-x-2">
+        <lucide-angular [img]="icons.Users2" size="20"></lucide-angular>
+        <span>Team Roster</span>
+      </h3>
+
+      @if (team()!.players && team()!.players.length > 0) {
+      <div class="grid gap-3">
+        @for (player of team()!.players; track player.id) {
+        <div
+          class="flex items-center space-x-3 p-3 btn-outline cursor-pointer rounded border"
+        >
+          <img
+            [src]="player.photoUrl"
+            [alt]="formatPlayerName(player)"
+            class="w-12 h-12 rounded-full object-cover"
+          />
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center space-x-2">
+              <h4 class="text-sm font-semibold truncate">
+                {{ formatPlayerName(player) }}
+              </h4>
+              @if (player.position) {
+              <span class="px-2 py-1 text-xs border rounded-full">
+                {{ getPosition(player.position) }}
+              </span>
+              }
+            </div>
+
+            @if (player.email) {
+            <div class="flex items-center space-x-1 text-xs text-muted mt-1">
+              <lucide-angular [img]="icons.Mail" size="12"></lucide-angular>
+              <span class="truncate">{{ player.email }}</span>
+            </div>
+            }
+
+            <div class="flex items-center space-x-1 text-xs text-muted mt-1">
+              <lucide-angular [img]="icons.Calendar" size="12"></lucide-angular>
+              <span>Joined {{ player.joinedAt | date : "mediumDate" }}</span>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="text-center text-muted py-8">
+        <lucide-angular
+          [img]="icons.Users"
+          size="32"
+          class="mx-auto mb-3 opacity-50"
+        ></lucide-angular>
+        <p class="text-lg font-medium mb-2">No Players</p>
+        <p class="text-sm">This team hasn't added any players yet.</p>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</app-modal>

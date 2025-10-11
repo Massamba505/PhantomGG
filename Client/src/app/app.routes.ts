@@ -11,10 +11,14 @@ import { UserRoles } from './api/models';
 export const routes: Routes = [
   {
     path: '',
-    pathMatch: 'full',
-    loadComponent: () =>
-      import('./features/public/landing/landing').then((m) => m.Landing),
-    title: 'PhantomGG - Esports Tournament Platform',
+    loadComponent: () => import('./shared/components/layouts/public-layout/public-layout').then((m) => m.PublicLayout),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/public/landing/landing').then((m) => m.Landing),
+        title: 'PhantomGG - Esports Tournament Platform',
+      }
+    ]
   },
   {
     path: 'auth',

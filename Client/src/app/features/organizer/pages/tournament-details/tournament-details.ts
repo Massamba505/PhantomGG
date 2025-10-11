@@ -38,6 +38,32 @@ export class TournamentDetailsComponent implements OnInit {
       this.loadTournament();
     });
   }
+  
+
+  readonly DESCRIPTION_LIMIT = 300;
+
+  showFullDescription = signal(false);
+  isLongDescription = signal(false);
+  displayedDescription = signal<string>('');
+
+  toggleDescription() {
+    this.showFullDescription.update(prev => !prev);
+    this.updateDisplayedDescription();
+  }
+
+  private updateDisplayedDescription() {
+    const fullDesc = this.tournament()?.description || '';
+    const plainText = fullDesc.replace(/<[^>]*>/g, '');
+    
+    this.isLongDescription.set(plainText.length > this.DESCRIPTION_LIMIT);
+
+    if (this.showFullDescription()) {
+      this.displayedDescription.set(fullDesc);
+    } else {
+      const shortText = plainText.slice(0, this.DESCRIPTION_LIMIT) + '...';
+      this.displayedDescription.set(shortText);
+    }
+  }
 
   loadTournament() {
     if (!this.tournamentId()) return;
@@ -54,6 +80,7 @@ export class TournamentDetailsComponent implements OnInit {
           bannerUrl: banner,
           logoUrl: logo
         }));
+      this.updateDisplayedDescription();
       },
       complete:()=>{
         this.loading.set(false);

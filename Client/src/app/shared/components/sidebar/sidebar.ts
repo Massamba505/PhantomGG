@@ -33,7 +33,7 @@ export class Sidebar implements OnInit, OnDestroy {
   
   readonly icons = LucideIcons;
 
-  isOpen = signal(window.innerWidth > 900);
+  isOpen = signal(window.innerWidth > 1400);
 
   private stateEffect = effect(() => {
     this.stateChange.emit(this.isOpen());
@@ -109,7 +109,7 @@ export class Sidebar implements OnInit, OnDestroy {
   }
 
   handleResize = () => {
-    this.isOpen.set(window.innerWidth > 900);
+    this.isOpen.set(window.innerWidth > 1400);
   };
 
   onToggle() {

@@ -36,7 +36,6 @@ export interface TournamentQuery {
   pageNumber?: number;
   pageSize: number;
   isPublic?: boolean;
-  scope?: string;
 }
 
 export interface CreateTournamentDto {
