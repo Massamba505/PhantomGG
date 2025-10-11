@@ -48,7 +48,7 @@ export const userRoutes: Routes = [
       },
       {
         path: 'tournaments/:id',
-        loadComponent: () => import('../../shared/components/pages/tournament-details/tournament-details').then(m => m.TournamentDetails),
+        loadComponent: () => import('../../shared/components/pages/tournament-details/tournament-details').then(m => m.TournamentDetailsComponent),
         title: 'Tournaments - PhantomGG',
         data:{title:"Tournaments"}
       },

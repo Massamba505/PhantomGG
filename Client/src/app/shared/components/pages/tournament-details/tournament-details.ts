@@ -1,34 +1,43 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Tournament } from '@/app/api/models/tournament.models';
-import { TournamentTeam } from '@/app/api/models/team.models';
-import { TournamentService } from '@/app/api/services/tournament.service';
+import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { TeamCard, TeamRole } from "@/app/shared/components/cards/team-card/team-card";
 import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
-import { TournamentStatus } from '@/app/api/models';
+import { TournamentService, TournamentStatus } from '@/app/api/services';
+import { ToastService } from '@/app/shared/services/toast.service';
+import { TournamentTeamManagementComponent } from './components/tournament-team-management/tournament-team-management';
+import { TournamentMatchManagementComponent } from './components/tournament-match-management/tournament-match-management';
 import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
-  selector: 'app-tournament-details',
+  selector: 'app-public-tournament-details',
+  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, TournamentTeamManagementComponent, TournamentMatchManagementComponent],
   templateUrl: './tournament-details.html',
-  styleUrls: ['./tournament-details.css'],
-  imports: [
-    CommonModule,
-    LucideAngularModule,
-    TeamCard,
-    LineBreaksPipe
-],
+  styleUrl: './tournament-details.css'
 })
-export class TournamentDetails implements OnInit {
-  tournament = signal<Tournament | null>(null);
-  teams = signal<TournamentTeam[]>([]);
-  loading = signal(false);
-  error = signal<string | null>(null);
+export class TournamentDetailsComponent implements OnInit {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private tournamentService = inject(TournamentService);
+  private toastService = inject(ToastService);
 
-  readonly icons = LucideIcons;
+  tournament = signal<Tournament | null>(null);
+  loading = signal(true);
+  tournamentId = signal<string>('');
+  icons = LucideIcons;
+  
+  showDeleteModal = signal(false);
+  isDeleting = signal(false);
+
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      this.tournamentId.set(params['id']);
+      this.loadTournament();
+    });
+  }
+  
 
   readonly DESCRIPTION_LIMIT = 300;
 
@@ -55,80 +64,41 @@ export class TournamentDetails implements OnInit {
     }
   }
 
-  getStatus(){
-    return getEnumLabel(TournamentStatus, this.tournament()!.status);
-  }
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private tournamentService: TournamentService
-  ) {}
-
-  ngOnInit() {
-    const tournamentId = this.route.snapshot.paramMap.get('id');
-    if (tournamentId) {
-      this.loadTournamentDetails(tournamentId);
-    } else {
-      this.router.navigate(['/public/tournaments']);
-    }
-  }
-
-  convertToTeam(tournamentTeam: TournamentTeam) {
-    return {
-      id: tournamentTeam.id,
-      name: tournamentTeam.name,
-      shortName: tournamentTeam.shortName || '',
-      logoUrl: tournamentTeam.logoUrl,
-      userId: tournamentTeam.managerId || '',
-      createdAt: tournamentTeam.registeredAt,
-      updatedAt: undefined,
-      countPlayers: tournamentTeam.countPlayers,
-      players: tournamentTeam.players
-    };
-  }
-  
-  getTeamRole(): TeamRole {
-    return 'Public';
-  }
-
-  async loadTournamentDetails(tournamentId: string) {
-    this.loading.set(true);
-    this.error.set(null);
+  loadTournament() {
+    if (!this.tournamentId()) return;
     
-    try {
-      const [tournament, teams] = await Promise.all([
-        this.tournamentService.getTournament(tournamentId).toPromise(),
-        this.tournamentService.getTournamentTeams(tournamentId).toPromise()
-      ]);
-      
-      this.tournament.set(tournament || null);
-      this.teams.set(teams || []);
+    this.loading.set(true);
+    
+    this.tournamentService.getTournament(this.tournamentId()).subscribe({
+      next: (tournament: any) => {
+        this.tournament.set(tournament);
+        const banner = this.tournament()!.bannerUrl?.split(" ").join("+");
+        const logo = this.tournament()!.logoUrl?.split(" ").join("+");
+        this.tournament.update(current => ({
+          ...current!,
+          bannerUrl: banner,
+          logoUrl: logo
+        }));
+        debugger
       this.updateDisplayedDescription();
-
-    } catch (error) {
-      this.loading.set(false);
-    } finally {
-      this.loading.set(false);
-    }
+      },
+      complete:()=>{
+        this.loading.set(false);
+      },
+    });
   }
 
-  onTeamView(team: TournamentTeam) {
-    console.log('View team:', team);
-  }
-
-  onBackToTournaments() {
-    if (window.history.length >= 1) {
-      window.history.back();
-    } else {
-      this.router.navigate(['/public/tournaments']);
-    }
+  goBack() {
+    this.router.navigate(['/user/tournaments']);
   }
 
   onViewStatistics() {
-    const tournamentId = this.route.snapshot.paramMap.get('id');
-    if (tournamentId) {
-      this.router.navigate(['statistics'], { relativeTo: this.route });
+    if (this.tournamentId()) {
+      this.router.navigate(['/user/tournaments', this.tournamentId(), 'statistics']);
     }
+  }
+
+  getStatus(){
+    return getEnumLabel(TournamentStatus, this.tournament()!.status);
   }
 }
