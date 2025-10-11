@@ -89,7 +89,7 @@ export class TournamentDetailsComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/user/tournaments']);
+    window.history.back();
   }
 
   onViewStatistics() {
