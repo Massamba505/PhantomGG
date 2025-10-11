@@ -7,6 +7,7 @@
 
       <div class="flex items-center gap-2">
         <app-theme-toggle></app-theme-toggle>
+        @if(!isAuthenticated()){
         <button (click)="goToAuth()" class="btn btn-outline">
           <lucide-angular
             [img]="icons.LogIn"
@@ -23,6 +24,7 @@
           ></lucide-angular>
           Sign Up
         </button>
+        }
       </div>
     </header>
 

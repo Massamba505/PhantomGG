@@ -5,6 +5,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ThemeToggle } from '../../ui/theme-toggle/theme-toggle';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { filter, map } from 'rxjs';
+import { AuthStateService } from '@/app/store/AuthStateService';
 
 @Component({
   selector: 'app-public-layout',
@@ -15,6 +16,8 @@ import { filter, map } from 'rxjs';
 export class PublicLayout implements OnInit {
   readonly router = inject(Router);
   private route = inject(ActivatedRoute);
+  private readonly authState = inject(AuthStateService);
+  isAuthenticated = signal(this.authState.isAuthenticated());
   
   readonly icons = LucideIcons;
   pageTitle = signal('PhantomGG');

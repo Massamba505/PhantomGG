@@ -61,6 +61,15 @@
         class="leading-relaxed"
         [innerHTML]="tournament()!.description | appLineBreaks"
       ></p>
+
+      @if (isLongDescription()) {
+      <a
+        class="text-primary font-semibold underline cursor-pointer mt-2 inline-block"
+        (click)="toggleDescription()"
+      >
+        {{ showFullDescription() ? "View Less" : "View More" }}
+      </a>
+      }
     </div>
 
     <div class="card">

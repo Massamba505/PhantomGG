@@ -30,6 +30,31 @@ export class TournamentDetails implements OnInit {
 
   readonly icons = LucideIcons;
 
+  readonly DESCRIPTION_LIMIT = 300;
+
+  showFullDescription = signal(false);
+  isLongDescription = signal(false);
+  displayedDescription = signal<string>('');
+
+  toggleDescription() {
+    this.showFullDescription.update(prev => !prev);
+    this.updateDisplayedDescription();
+  }
+
+  private updateDisplayedDescription() {
+    const fullDesc = this.tournament()?.description || '';
+    const plainText = fullDesc.replace(/<[^>]*>/g, '');
+    
+    this.isLongDescription.set(plainText.length > this.DESCRIPTION_LIMIT);
+
+    if (this.showFullDescription()) {
+      this.displayedDescription.set(fullDesc);
+    } else {
+      const shortText = plainText.slice(0, this.DESCRIPTION_LIMIT) + '...';
+      this.displayedDescription.set(shortText);
+    }
+  }
+
   getStatus(){
     return getEnumLabel(TournamentStatus, this.tournament()!.status);
   }
@@ -79,6 +104,8 @@ export class TournamentDetails implements OnInit {
       
       this.tournament.set(tournament || null);
       this.teams.set(teams || []);
+      this.updateDisplayedDescription();
+
     } catch (error) {
       this.loading.set(false);
     } finally {
