@@ -1,4 +1,4 @@
-import { Component, input, signal, OnInit, inject, computed, viewChild } from '@angular/core';
+import { Component, input, signal, OnInit, inject, computed, viewChild, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '@/app/shared/services/toast.service';
 
@@ -36,6 +36,7 @@ export class TournamentMatchManagementComponent implements OnInit {
   private matchService = inject(MatchService);
   private tournamentService = inject(TournamentService);
   private toastService = inject(ToastService);
+  matchView = output<string>();
   
   matches = signal<Match[]>([]);
   tournament = signal<Tournament | null>(null);
@@ -143,6 +144,10 @@ export class TournamentMatchManagementComponent implements OnInit {
   
   onTabChange(tab: MatchTab) {
     this.activeTab.set(tab);
+  }
+
+  onMatchView(match: Match) {
+    this.matchView.emit(match.id);
   }
 
 }

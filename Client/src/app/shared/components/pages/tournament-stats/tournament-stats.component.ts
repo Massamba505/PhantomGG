@@ -22,7 +22,7 @@ export type StatsTab = 'table' | 'goals' | 'assists';
 })
 export class TournamentStatsComponent implements OnInit {
 
-  tournamentId = input<string>('');
+  tournamentId = signal<string>('');
   tournament = input<Tournament | null>(null);
   showBackButton = input<boolean>(true);
   backRoute = input<string>('');
@@ -31,7 +31,6 @@ export class TournamentStatsComponent implements OnInit {
   getTournamentId = computed(() => {
     return this.tournamentId() || this._tournamentId();
   });
-
 
   private tournamentService = inject(TournamentService);
   private toastService = inject(ToastService);
@@ -45,11 +44,6 @@ export class TournamentStatsComponent implements OnInit {
   standings = signal<TournamentStandingDto[]>([]);
   goalStandings = signal<PlayerGoalStandingDto[]>([]);
   assistStandings = signal<PlayerAssistStandingDto[]>([]);
-
-
-  tournamentName = computed(() => {
-    return this.tournament()?.name || 'Tournament Statistics';
-  });
 
   goBack() {
     if (this.backRoute()) {
@@ -78,12 +72,10 @@ export class TournamentStatsComponent implements OnInit {
   });
 
   ngOnInit() {
-    const routeTournamentId = this.route.snapshot.paramMap.get('id');
-    if (routeTournamentId) {
-      this._tournamentId.set(routeTournamentId);
-    }
-    
-    this.loadAllStatistics();
+    this.route.params.subscribe(params => {
+      this.tournamentId.set(params['id']);
+      this.loadAllStatistics();
+    });
   }
 
   loadAllStatistics() {
@@ -103,10 +95,6 @@ export class TournamentStatsComponent implements OnInit {
         next: (data) => {
           this.standings.set(data);
           resolve();
-        },
-        error: (error) => {
-          this.toastService.error('Failed to load standings');
-          resolve();
         }
       });
     });
@@ -118,10 +106,6 @@ export class TournamentStatsComponent implements OnInit {
         next: (data) => {
           this.goalStandings.set(data);
           resolve();
-        },
-        error: (error) => {
-          this.toastService.error('Failed to load goal standings');
-          resolve();
         }
       });
     });
@@ -132,10 +116,6 @@ export class TournamentStatsComponent implements OnInit {
       this.tournamentService.getPlayerAssistStandings(this.getTournamentId()).subscribe({
         next: (data) => {
           this.assistStandings.set(data);
-          resolve();
-        },
-        error: (error) => {
-          this.toastService.error('Failed to load assist standings');
           resolve();
         }
       });

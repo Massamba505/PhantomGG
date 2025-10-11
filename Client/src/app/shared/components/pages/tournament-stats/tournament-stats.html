@@ -6,15 +6,6 @@
         <lucide-angular [img]="icons.ArrowLeft" [size]="16" />
         Back
       </button>
-      <div>
-        <h1 class="text-2xl font-bold">{{ tournamentName() }} Statistics</h1>
-        @if (tournament()) {
-        <p class="text-sm text-muted">
-          {{ formatDate(tournament()!.startDate) }} -
-          {{ formatDate(tournament()!.endDate) }}
-        </p>
-        }
-      </div>
     </div>
 
     <button

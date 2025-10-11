@@ -1,4 +1,4 @@
-import { Component, input, signal, OnInit, inject } from '@angular/core';
+import { Component, input, signal, OnInit, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { TournamentTeam } from '@/app/api/models/team.models';
@@ -23,6 +23,7 @@ export class TournamentTeamManagementComponent implements OnInit {
   private toastService = inject(ToastService);
   
   readonly icons = LucideIcons;
+  teamView = output<string>();
   
   activeTab = signal<TeamTab>('approved');
   approvedTeams = signal<TournamentTeam[]>([]);
@@ -170,6 +171,6 @@ export class TournamentTeamManagementComponent implements OnInit {
   }
 
   onTeamView(team: any) {
-    console.log('View team:', team);
+    this.teamView.emit(team.id);
   }
 }

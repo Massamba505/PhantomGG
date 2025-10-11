@@ -19,6 +19,7 @@
   [matches]="filteredMatches()"
   [activeTab]="activeTab()"
   [isLoading]="isLoading()"
+  (view)="onMatchView($event)"
 />
 
 <app-update-result-modal

@@ -9,11 +9,13 @@ import { TournamentService, TournamentStatus } from '@/app/api/services';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentTeamManagementComponent } from './components/tournament-team-management/tournament-team-management';
 import { TournamentMatchManagementComponent } from './components/tournament-match-management/tournament-match-management';
+import { MatchDetailsModalComponent } from './components/match-details-modal/match-details-modal';
+import { TeamDetailsModalComponent } from './components/team-details-modal/team-details-modal';
 import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-public-tournament-details',
-  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, TournamentTeamManagementComponent, TournamentMatchManagementComponent],
+  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, TournamentTeamManagementComponent, TournamentMatchManagementComponent, MatchDetailsModalComponent, TeamDetailsModalComponent],
   templateUrl: './tournament-details.html',
   styleUrl: './tournament-details.css'
 })
@@ -30,6 +32,12 @@ export class TournamentDetailsComponent implements OnInit {
   
   showDeleteModal = signal(false);
   isDeleting = signal(false);
+
+  // Modal states
+  showMatchModal = signal(false);
+  showTeamModal = signal(false);
+  selectedMatchId = signal<string>('');
+  selectedTeamId = signal<string>('');
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -79,7 +87,6 @@ export class TournamentDetailsComponent implements OnInit {
           bannerUrl: banner,
           logoUrl: logo
         }));
-        debugger
       this.updateDisplayedDescription();
       },
       complete:()=>{
@@ -100,5 +107,26 @@ export class TournamentDetailsComponent implements OnInit {
 
   getStatus(){
     return getEnumLabel(TournamentStatus, this.tournament()!.status);
+  }
+
+  // Modal handlers
+  openMatchModal(matchId: string) {
+    this.selectedMatchId.set(matchId);
+    this.showMatchModal.set(true);
+  }
+
+  closeMatchModal() {
+    this.showMatchModal.set(false);
+    this.selectedMatchId.set('');
+  }
+
+  openTeamModal(teamId: string) {
+    this.selectedTeamId.set(teamId);
+    this.showTeamModal.set(true);
+  }
+
+  closeTeamModal() {
+    this.showTeamModal.set(false);
+    this.selectedTeamId.set('');
   }
 }

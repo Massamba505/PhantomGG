@@ -67,13 +67,17 @@
     </div>
 
     <div class="card">
-      <app-tournament-team-management [tournamentId]="tournament()!.id">
-      </app-tournament-team-management>
+      <app-tournament-team-management
+        [tournamentId]="tournamentId()"
+        (teamView)="openTeamModal($event)"
+      />
     </div>
 
     <div class="card">
-      <app-tournament-match-management [tournamentId]="tournament()!.id">
-      </app-tournament-match-management>
+      <app-tournament-match-management
+        [tournamentId]="tournamentId()"
+        (matchView)="openMatchModal($event)"
+      />
     </div>
   </div>
 
@@ -108,7 +112,6 @@
           <span>{{ tournament()!.startDate | date : "short" }}</span>
         </div>
 
-        <!-- Entry fee and prize pool sections removed - not supported in backend -->
         @if (tournament()!.location) {
         <div class="flex justify-between">
           <span class="opacity-75 flex items-center gap-2">
@@ -166,7 +169,7 @@
             <lucide-angular [img]="icons.UserPlus" [size]="16"></lucide-angular>
             Players/Team:
           </span>
-          <span> 11 (Standard team size) </span>
+          <span> 11 </span>
         </div>
       </div>
     </div>
@@ -209,4 +212,16 @@
     </div>
   </div>
 </div>
+
+<app-match-details-modal
+  [isOpen]="showMatchModal()"
+  [matchId]="selectedMatchId()"
+  (close)="closeMatchModal()"
+/>
+
+<app-team-details-modal
+  [isOpen]="showTeamModal()"
+  [teamId]="selectedTeamId()"
+  (close)="closeTeamModal()"
+/>
 }
