@@ -1,6 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.Json;
 
@@ -24,28 +24,34 @@ public class ValidationMiddleware(RequestDelegate next)
 
     private static async Task HandleValidationExceptionAsync(HttpContext context, ValidationException ex)
     {
-        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
         context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-        var errors = ex.Errors.GroupBy(e => e.PropertyName)
+        var errors = ex.Errors
+            .GroupBy(e => e.PropertyName)
             .ToDictionary(
                 g => g.Key,
                 g => g.Select(e => e.ErrorMessage).ToArray()
             );
 
-        var response = new
+        var problemDetails = new ValidationProblemDetails
         {
-            type = "validation_error",
-            title = "One or more validation errors occurred",
-            status = 400,
-            errors = errors
+            Status = (int)HttpStatusCode.BadRequest,
+            Title = "One or more validation errors occurred.",
+            Instance = context.Request.Path,
         };
 
-        var jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions
+        foreach (var error in errors)
+        {
+            problemDetails.Errors.Add(error.Key, error.Value);
+        }
+
+        var jsonResponse = JsonSerializer.Serialize(problemDetails, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
 
         await context.Response.WriteAsync(jsonResponse);
     }
+
 }
