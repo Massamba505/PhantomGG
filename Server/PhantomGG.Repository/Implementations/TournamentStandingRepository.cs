@@ -85,7 +85,6 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
 
     public async Task<IEnumerable<PlayerGoalStandingDto>> GetPlayerGoalStandingsAsync(Guid tournamentId)
     {
-        // Get all goal events for the tournament
         var goalEvents = await _context.MatchEvents
             .Include(me => me.Match)
             .Include(me => me.Player)
@@ -94,12 +93,9 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
                          (MatchEventType)me.EventType == MatchEventType.Goal)
             .ToListAsync();
 
-        // Get completed matches for the tournament to calculate matches played
         var completedMatches = await _context.Matches
             .Where(m => m.TournamentId == tournamentId && (MatchStatus)m.Status == MatchStatus.Completed)
             .ToListAsync();
-
-        // Group by player and calculate statistics
         var playerGoalGroups = goalEvents
             .GroupBy(ge => ge.PlayerId)
             .Select(g =>
@@ -108,7 +104,6 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
                 var player = firstEvent.Player;
                 var team = firstEvent.Team;
 
-                // Calculate matches played by this player's team
                 var teamMatches = completedMatches
                     .Where(m => m.HomeTeamId == team.Id || m.AwayTeamId == team.Id)
                     .Count();
@@ -129,7 +124,6 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
             .ThenBy(p => p.PlayerName)
             .ToList();
 
-        // Set positions
         for (int i = 0; i < playerGoalGroups.Count; i++)
         {
             playerGoalGroups[i].Position = i + 1;
@@ -141,7 +135,6 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
 
     public async Task<IEnumerable<PlayerAssistStandingDto>> GetPlayerAssistStandingsAsync(Guid tournamentId)
     {
-        // Get all assist events for the tournament
         var assistEvents = await _context.MatchEvents
             .Include(me => me.Match)
             .Include(me => me.Player)
@@ -150,12 +143,10 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
                          (MatchEventType)me.EventType == MatchEventType.Assist)
             .ToListAsync();
 
-        // Get completed matches for the tournament to calculate matches played
         var completedMatches = await _context.Matches
             .Where(m => m.TournamentId == tournamentId && (MatchStatus)m.Status == MatchStatus.Completed)
             .ToListAsync();
 
-        // Group by player and calculate statistics
         var playerAssistGroups = assistEvents
             .GroupBy(ae => ae.PlayerId)
             .Select(g =>
@@ -164,7 +155,6 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
                 var player = firstEvent.Player;
                 var team = firstEvent.Team;
 
-                // Calculate matches played by this player's team
                 var teamMatches = completedMatches
                     .Where(m => m.HomeTeamId == team.Id || m.AwayTeamId == team.Id)
                     .Count();
@@ -185,7 +175,6 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
             .ThenByDescending(p => p.AssistsPerMatch)
             .ToList();
 
-        // Set positions
         for (int i = 0; i < playerAssistGroups.Count; i++)
         {
             playerAssistGroups[i].Position = i + 1;

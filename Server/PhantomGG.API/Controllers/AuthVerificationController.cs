@@ -36,7 +36,12 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
     [HttpPost("resend-verification")]
     public async Task<IActionResult> ResendVerification([FromBody] ResendVerificationRequest request)
     {
-        await _authVerificationService.ResendEmailVerificationAsync(request.Email);
+        var success = await _authVerificationService.ResendEmailVerificationAsync(request.Email);
+
+        if (!success)
+        {
+            return BadRequest(new { message = "Invalid email" });
+        }
 
         return Ok(new { message = "Verification email sent" });
     }

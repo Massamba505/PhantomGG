@@ -1,4 +1,5 @@
 using PhantomGG.Repository.Interfaces;
+using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.Service.Implementations;
@@ -22,6 +23,11 @@ public class AuthVerificationService(
             return false;
         }
 
+        if (user.EmailVerified)
+        {
+            throw new UnauthorizedException("Email is already verified.");
+        }
+
         user.EmailVerified = true;
         user.EmailVerificationToken = null;
         user.EmailVerificationTokenExpiry = null;
@@ -35,9 +41,14 @@ public class AuthVerificationService(
     public async Task<bool> ResendEmailVerificationAsync(string email)
     {
         var user = await _userRepository.GetByEmailAsync(email.ToLower());
-        if (user == null || user.EmailVerified)
+        if (user == null)
         {
             return false;
+        }
+
+        if(user.EmailVerified)
+        {
+            throw new UnauthorizedException("Email is already verified.");
         }
 
         var emailVerificationToken = _tokenService.GenerateEmailVerificationToken();
