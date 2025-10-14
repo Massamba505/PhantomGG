@@ -6,9 +6,6 @@ namespace PhantomGG.Models.DTOs.MatchEvent;
 public class UpdateMatchEventDto
 {
     public MatchEventType? EventType { get; set; }
-
-    [Range(0, 120)]
     public int? Minute { get; set; }
-
     public Guid? PlayerId { get; set; }
 }

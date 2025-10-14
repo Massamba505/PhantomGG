@@ -1,12 +1,12 @@
 using FluentValidation;
-using PhantomGG.Models.DTOs.User;
+using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Validation.Regex;
 
-namespace PhantomGG.Validation.Validators.User;
+namespace PhantomGG.Validation.Validators.Auth;
 
-public class UpdateUserProfileValidator : AbstractValidator<UpdateUserProfileRequest>
+public class RegisterRequestValidator : AbstractValidator<RegisterRequestDto>
 {
-    public UpdateUserProfileValidator()
+    public RegisterRequestValidator()
     {
         RuleFor(x => x.FirstName)
             .NotEmpty()
@@ -31,5 +31,21 @@ public class UpdateUserProfileValidator : AbstractValidator<UpdateUserProfileReq
             .WithMessage("Invalid email format")
             .MaximumLength(100)
             .WithMessage("Email cannot exceed 100 characters");
+
+        RuleFor(x => x.Password)
+            .NotEmpty()
+            .WithMessage("Password is required")
+            .MaximumLength(255)
+            .WithMessage("Password cannot exceed 255 characters")
+            .Matches(RegexPatterns.PasswordPattern)
+            .WithMessage("Password must be at least 8 characters and include upper/lowercase, digit, and symbol");
+
+        RuleFor(x => x.ProfilePictureUrl)
+            .MaximumLength(255)
+            .WithMessage("Profile picture URL cannot exceed 255 characters");
+
+        RuleFor(x => x.Role)
+            .IsInEnum()
+            .WithMessage("Invalid role specified");
     }
 }
