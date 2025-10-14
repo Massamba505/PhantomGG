@@ -7,6 +7,10 @@ public interface ITokenService
 {
     AccessTokenDto GenerateAccessToken(User user);
     RefreshTokenDto GenerateRefreshToken();
+    EmailVerificationTokenDto GenerateEmailVerificationToken();
+    PasswordResetTokenDto GeneratePasswordResetToken();
     DateTime GetAccessTokenExpiry(DateTime dateTime);
     DateTime GetRefreshTokenExpiry(DateTime dateTime);
+    DateTime GetEmailVerificationTokenExpiry(DateTime dateTime);
+    DateTime GetPasswordResetTokenExpiry(DateTime dateTime);
 }

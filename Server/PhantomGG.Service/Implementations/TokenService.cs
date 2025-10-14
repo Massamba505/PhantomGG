@@ -85,4 +85,45 @@ public class TokenService(
     {
         return dateTime.AddDays(_jwtSettings.RefreshTokenLifetimeDays);
     }
+
+    public EmailVerificationTokenDto GenerateEmailVerificationToken()
+    {
+        var currentDate = DateTime.UtcNow;
+
+        return new EmailVerificationTokenDto
+        {
+            Token = GenerateSecureToken(),
+            ExpiresAt = GetEmailVerificationTokenExpiry(currentDate)
+        };
+    }
+
+    public PasswordResetTokenDto GeneratePasswordResetToken()
+    {
+        var currentDate = DateTime.UtcNow;
+
+        return new PasswordResetTokenDto
+        {
+            Token = GenerateSecureToken(),
+            ExpiresAt = GetPasswordResetTokenExpiry(currentDate)
+        };
+    }
+
+    public DateTime GetEmailVerificationTokenExpiry(DateTime dateTime)
+    {
+        return dateTime.AddDays(1);
+    }
+
+    public DateTime GetPasswordResetTokenExpiry(DateTime dateTime)
+    {
+        return dateTime.AddMinutes(30);
+    }
+
+    private static string GenerateSecureToken()
+    {
+        var bytes = RandomNumberGenerator.GetBytes(32);
+        return Convert.ToBase64String(bytes)
+            .Replace("+", "-")
+            .Replace("/", "_")
+            .Replace("=", "");
+    }
 }

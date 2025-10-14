@@ -1,15 +1,11 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 using PhantomGG.Models.DTOs.Auth;
-using PhantomGG.Models.DTOs.User;
 using PhantomGG.Repository.Entities;
-using System.Data;
 
 namespace PhantomGG.Service.Mappings;
 
 public static class AuthMappings
 {
-    public static User ToEntity(this RegisterRequestDto registerDto, string hashedPassword, string token)
+    public static User ToEntity(this RegisterRequestDto registerDto, string hashedPassword)
     {
         return new User
         {
@@ -23,8 +19,8 @@ public static class AuthMappings
             CreatedAt = DateTime.UtcNow,
             IsActive = true,
             EmailVerified = false,
-            EmailVerificationToken = token,
-            EmailVerificationTokenExpiry = DateTime.UtcNow.AddDays(1),
+            EmailVerificationToken = null,
+            EmailVerificationTokenExpiry = null,
             FailedLoginAttempts = 0
         };
     }

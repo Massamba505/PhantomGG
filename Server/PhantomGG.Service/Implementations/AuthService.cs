@@ -5,8 +5,6 @@ using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Interfaces;
 using PhantomGG.Service.Mappings;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -17,10 +15,12 @@ public class AuthService(
     ITokenService tokenService,
     ICookieService cookieService,
     IEmailService emailService,
+    IAuthVerificationService authVerificationService,
     IHttpContextAccessor httpContextAccessor) : IAuthService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
+    private readonly IAuthVerificationService _authVerificationService = authVerificationService;
     private readonly ITokenService _tokenService = tokenService;
     private readonly IRefreshTokenService _refreshTokeService = refreshTokeService;
     private readonly ICookieService _cookieService = cookieService;
@@ -29,42 +29,30 @@ public class AuthService(
 
     public async Task RegisterAsync(RegisterRequestDto request)
     {
-        ValidateRegisterRequest(request);
+        await ValidateUniqueEmailAsync(request.Email);
+        string passwordHash = _passwordHasher.HashPassword(request.Password);
 
-        var emailExist = await _userRepository.EmailExistsAsync(request.Email.ToLower());
-        if (emailExist)
-        {
-            throw new ConflictException("Email address is already registered");
-        }
-
-        var user = new User
-        {
-            Id = Guid.NewGuid(),
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            Email = request.Email.ToLower(),
-            PasswordHash = _passwordHasher.HashPassword(request.Password),
-            ProfilePictureUrl = request.ProfilePictureUrl ?? $"https://eu.ui-avatars.com/api/?name={request.FirstName}+{request.LastName}&size=250",
-            Role = (int)request.Role,
-            CreatedAt = DateTime.UtcNow,
-            IsActive = true,
-            EmailVerified = false,
-            EmailVerificationToken = GenerateSecureToken(),
-            EmailVerificationTokenExpiry = DateTime.UtcNow.AddDays(1),
-            FailedLoginAttempts = 0
-        };
+        var user = request.ToEntity(passwordHash);
 
         await _userRepository.CreateAsync(user);
-
-        await _emailService.SendEmailVerificationAsync(user.Email, user.FirstName, user.EmailVerificationToken!);
+        await _authVerificationService.ResendEmailVerificationAsync(user.Email);
     }
 
     public async Task<AuthDto> LoginAsync(LoginRequestDto request)
     {
-        var user = await _userRepository.GetByEmailAsync(request.Email.ToLower());
+        var user = await ValidateUserLoginAsync(request.Email, request.Password);
+
+        await HandleSuccessfulLoginAsync(user);
+        return await GenerateTokensAsync(user, rememberMe: request.RememberMe);
+    }
+
+    private async Task<User> ValidateUserLoginAsync(string email, string password)
+    {
+        var user = await _userRepository.GetByEmailAsync(email.ToLower());
+
         if (user == null || !user.IsActive)
         {
-            await HandleFailedLoginAsync(request.Email.ToLower());
+            await HandleFailedLoginAsync(email.ToLower());
             throw new UnauthorizedException("Invalid email or password");
         }
 
@@ -78,15 +66,14 @@ public class AuthService(
             throw new UnauthorizedException("Please verify your email address");
         }
 
-        var validPassword = _passwordHasher.VerifyPassword(request.Password, user.PasswordHash);
+        var validPassword = _passwordHasher.VerifyPassword(password, user.PasswordHash);
         if (!validPassword)
         {
             await HandleFailedLoginAsync(user);
             throw new UnauthorizedException("Invalid email or password");
         }
 
-        await HandleSuccessfulLoginAsync(user);
-        return await GenerateTokensAsync(user, rememberMe: request.RememberMe);
+        return user;
     }
 
     public async Task<AuthDto> RefreshAsync(string refreshTokenFromCookie)
@@ -102,39 +89,13 @@ public class AuthService(
         await _refreshTokeService.DeleteAsync(refreshTokenFromCookie);
     }
 
-    private static void ValidateRegisterRequest(RegisterRequestDto request)
+    private async Task ValidateUniqueEmailAsync(string email)
     {
-        var errors = new List<string>();
-
-        if (string.IsNullOrWhiteSpace(request.FirstName) || request.FirstName.Length > 50)
+        var emailExist = await _userRepository.EmailExistsAsync(email.ToLower());
+        if (emailExist)
         {
-            errors.Add("FirstName is required and must be 1-50 characters");
+            throw new ConflictException("Email address is already registered");
         }
-
-        if (string.IsNullOrWhiteSpace(request.LastName) || request.LastName.Length > 50)
-        {
-            errors.Add("LastName is required and must be 1-50 characters");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.Email) || request.Email.Length > 100)
-        {
-            errors.Add("Email is required and must be valid and no more than 100 characters");
-        }
-
-        if (!IsValidPassword(request.Password))
-        {
-            errors.Add("Password must be at least 8 characters with uppercase, lowercase, number, and special character");
-        }
-
-        if (errors.Any())
-        {
-            throw new ValidationException(string.Join("; ", errors));
-        }
-    }
-
-    private static bool IsValidPassword(string password)
-    {
-        return Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$");
     }
 
     private async Task<AuthDto> GenerateTokensAsync(User user, bool rememberMe = true)
@@ -150,15 +111,6 @@ public class AuthService(
         _cookieService.SetRefreshToken(_httpContextAccessor.HttpContext!.Response, refreshToken.Token, rememberMe);
 
         return result;
-    }
-
-    private static string GenerateSecureToken()
-    {
-        var bytes = RandomNumberGenerator.GetBytes(32);
-        return Convert.ToBase64String(bytes)
-            .Replace("+", "-")
-            .Replace("/", "_")
-            .Replace("=", "");
     }
 
     private async Task HandleFailedLoginAsync(string email)

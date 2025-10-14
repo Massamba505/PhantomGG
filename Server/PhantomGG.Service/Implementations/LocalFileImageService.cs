@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Image;
-using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Interfaces;
 
 namespace PhantomGG.Service.Implementations;
@@ -14,18 +13,10 @@ public class LocalFileImageService(
     private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    private readonly long _maxFileSize = 5 * 1024 * 1024;
-    private readonly string[] _supportedTypes = { "image/jpeg", "image/png" };
-
     public async Task<string> SaveImageAsync(IFormFile file, ImageType imageType, Guid? entityId = null)
     {
-        ValidateFile(file);
-
         var folderName = GetFolderName(imageType);
         var uploadsPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", folderName);
-
-        Console.WriteLine($"Uploads path: {uploadsPath}");
-        Console.WriteLine($"Entity ID: {entityId}");
 
         if (!Directory.Exists(uploadsPath))
         {
@@ -35,14 +26,10 @@ public class LocalFileImageService(
         var fileName = GenerateFileName(file.FileName, entityId);
         var filePath = Path.Combine(uploadsPath, fileName);
 
-        Console.WriteLine($"Generated file name: {fileName}");
-        Console.WriteLine($"Full file path: {filePath}");
-
         using var stream = new FileStream(filePath, FileMode.Create);
         await file.CopyToAsync(stream);
 
         var imageUrl = GenerateImageUrl(folderName, fileName);
-        Console.WriteLine($"Generated image URL: {imageUrl}");
 
         return imageUrl;
     }
@@ -83,24 +70,6 @@ public class LocalFileImageService(
         var imageUrl = await SaveImageAsync(uploadImage.File, uploadImage.ImageType, uploadImage.Id);
 
         return imageUrl;
-    }
-
-    private void ValidateFile(IFormFile file)
-    {
-        if (file == null || file.Length == 0)
-        {
-            throw new ValidationException("No file provided");
-        }
-
-        if (!_supportedTypes.Contains(file.ContentType))
-        {
-            throw new ValidationException("Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed");
-        }
-
-        if (file.Length > _maxFileSize)
-        {
-            throw new ValidationException("File size cannot exceed 5MB");
-        }
     }
 
     private string GetFolderName(ImageType imageType)
