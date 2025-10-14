@@ -6,6 +6,7 @@ using PhantomGG.Models.DTOs.User;
 using PhantomGG.Common.Enums;
 using PhantomGG.Service.Mappings;
 using Microsoft.Extensions.Caching.Hybrid;
+using PhantomGG.Repository.Entities;
 
 namespace PhantomGG.Service.Implementations;
 
@@ -48,14 +49,7 @@ public class UserService(
             throw new NotFoundException("User not found");
         }
 
-        if (user.Email != request.Email)
-        {
-            var emailExists = await _userRepository.EmailExistsAsync(request.Email);
-            if (emailExists)
-            {
-                throw new ConflictException("Email address is already in use");
-            }
-        }
+        await ValidateEmailUniquenessForUserAsync(request.Email, userId);
 
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
@@ -73,11 +67,7 @@ public class UserService(
             throw new NotFoundException("User not found");
         }
 
-        var validePassword = _passwordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash);
-        if (!validePassword)
-        {
-            throw new ValidationException("Current password is incorrect");
-        }
+        await ValidateCurrentPasswordAsync(user, request.CurrentPassword);
 
         user.PasswordHash = _passwordHasher.HashPassword(request.NewPassword);
         await _userRepository.UpdateAsync(user);
@@ -105,5 +95,28 @@ public class UserService(
         {
             ProfilePictureUrl = imageUrl
         };
+    }
+
+    private async Task ValidateEmailUniquenessForUserAsync(string email, Guid userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user!.Email != email)
+        {
+            var emailExists = await _userRepository.EmailExistsAsync(email);
+            if (emailExists)
+            {
+                throw new ConflictException("Email address is already in use");
+            }
+        }
+    }
+
+    private Task ValidateCurrentPasswordAsync(User user, string currentPassword)
+    {
+        var validPassword = _passwordHasher.VerifyPassword(currentPassword, user.PasswordHash);
+        if (!validPassword)
+        {
+            throw new ValidationException("Current password is incorrect");
+        }
+        return Task.CompletedTask;
     }
 }

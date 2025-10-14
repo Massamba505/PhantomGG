@@ -10,15 +10,13 @@ public class UpdateMatchValidator : AbstractValidator<UpdateMatchDto>
         RuleFor(x => x.MatchDate)
             .NotEmpty()
             .WithMessage("Match date is required")
-            .GreaterThan(DateTime.UtcNow.AddHours(-2))
-            .WithMessage("Match date cannot be too far in the past");
-
-        RuleFor(x => x.Venue)
-            .MaximumLength(200)
-            .WithMessage("Venue cannot exceed 200 characters");
+            .GreaterThan(DateTime.UtcNow.AddHours(-1))
+            .WithMessage("Match date cannot be in the past");
 
         RuleFor(x => x.Status)
             .NotEmpty()
-            .WithMessage("Status is required");
+            .WithMessage("Status is required")
+            .IsInEnum()
+            .WithMessage("Invalid role specified");
     }
 }

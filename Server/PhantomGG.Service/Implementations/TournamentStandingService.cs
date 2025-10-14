@@ -16,7 +16,7 @@ public class TournamentStandingService(
 
     public async Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid tournamentId)
     {
-        await _validationService.ValidateTournamentExistsAsync(tournamentId);
+        var tournament = await _validationService.ValidateTournamentExistsAsync(tournamentId);
 
         var cacheKey = $"tournament_standings_{tournamentId}";
         var options = new HybridCacheEntryOptions

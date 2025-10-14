@@ -71,6 +71,7 @@ public class TeamService(
 
     public async Task<TeamDto> CreateAsync(CreateTeamDto createDto, Guid managerId)
     {
+        await ValidateMaxTeamsPerUserAsync(managerId);
         await _teamValidationService.ValidateUserTeamNameUniqueness(createDto.Name, managerId);
         var team = createDto.ToEntity(managerId);
 
@@ -102,17 +103,7 @@ public class TeamService(
         if (!string.IsNullOrEmpty(updateDto.Name) && updateDto.Name != existingTeam.Name)
         {
             await _teamValidationService.ValidateUserTeamNameUniqueness(updateDto.Name, userId);
-
-            var tournaments = await _tournamentTeamRepository.GetTournamentsByTeamAsync(existingTeam.Id);
-            tournaments = tournaments.Where(t => t.Status != (int)TournamentStatus.Completed);
-            foreach (var tournament in tournaments)
-            {
-                var existingTeams = await _tournamentTeamRepository.GetByTournamentAsync(tournament.Id);
-                if (existingTeams.Any(tt => tt.Team.Name.Equals(updateDto.Name, StringComparison.OrdinalIgnoreCase)))
-                {
-                    throw new ConflictException($"A team with this name is already registered in the tournament '{tournament.Name}'");
-                }
-            }
+            await ValidateTeamNameInActiveTournamentsAsync(existingTeam, updateDto.Name);
         }
 
         updateDto.UpdateEntity(existingTeam);
@@ -192,5 +183,29 @@ public class TeamService(
         var team = await _teamValidationService.ValidateCanManageTeamAsync(userId, teamId);
         await _playerService.DeleteAsync(team.Id, playerId);
         await _cacheInvalidationService.InvalidateTeamCacheAsync(team.Id);
+    }
+
+    private async Task ValidateMaxTeamsPerUserAsync(Guid managerId)
+    {
+        var existingTeams = await _teamRepository.GetByUserAsync(managerId);
+        if (existingTeams.Count() >= 3)
+        {
+            throw new ForbiddenException("You cannot create more than 3 teams. Please delete an existing team first.");
+        }
+    }
+
+    private async Task ValidateTeamNameInActiveTournamentsAsync(PhantomGG.Repository.Entities.Team existingTeam, string newName)
+    {
+        var tournaments = await _tournamentTeamRepository.GetTournamentsByTeamAsync(existingTeam.Id);
+        var activeTournaments = tournaments.Where(t => t.Status != (int)TournamentStatus.Completed);
+
+        foreach (var tournament in activeTournaments)
+        {
+            var existingTeams = await _tournamentTeamRepository.GetByTournamentAsync(tournament.Id);
+            if (existingTeams.Any(tt => tt.Team.Name.Equals(newName, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new ConflictException($"A team with this name is already registered in the tournament '{tournament.Name}'");
+            }
+        }
     }
 }

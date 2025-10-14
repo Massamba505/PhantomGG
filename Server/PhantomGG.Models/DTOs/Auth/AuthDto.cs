@@ -8,4 +8,4 @@ public class AuthDto
     public UserDto User { get; set; } = null!;
 }
 
-public record RefreshTokenResponse(string accessToken);
+public record RefreshTokenResponse(string AccessToken);

@@ -3,7 +3,6 @@ using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Image;
 using PhantomGG.Models.DTOs.Tournament;
-using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Repository.Specifications;
 using PhantomGG.Service.Exceptions;
@@ -68,6 +67,8 @@ public class TournamentService(
 
     public async Task<TournamentDto> CreateAsync(CreateTournamentDto createDto, Guid organizerId)
     {
+        await ValidateMaxTournamentsPerUserAsync(organizerId);
+
         var tournament = createDto.ToEntity(organizerId);
         if (createDto.BannerUrl != null)
         {
@@ -150,5 +151,16 @@ public class TournamentService(
     {
         var tournaments = await _tournamentRepository.GetByOrganizerAsync(organizerId);
         return tournaments.Select(t => t.ToDto());
+    }
+
+    private async Task ValidateMaxTournamentsPerUserAsync(Guid organizerId)
+    {
+        var tournaments = await _tournamentRepository.GetByOrganizerAsync(organizerId);
+        var activeTournaments = tournaments.Where(t => t.Status != (int)TournamentStatus.Completed).ToList();
+
+        if (activeTournaments.Count >= 5)
+        {
+            throw new ForbiddenException("You cannot create more than 5 active tournaments. Please complete or cancel an existing tournament first.");
+        }
     }
 }

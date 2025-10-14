@@ -7,11 +7,13 @@ namespace PhantomGG.Service.Implementations;
 public class AuthVerificationService(
     IUserRepository userRepository,
     IEmailService emailService,
-    IPasswordHasher passwordHasher) : IAuthVerificationService
+    IPasswordHasher passwordHasher,
+    ITokenService tokenService) : IAuthVerificationService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IEmailService _emailService = emailService;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
+    private readonly ITokenService _tokenService = tokenService;
 
     public async Task<bool> VerifyEmailAsync(string token)
     {
@@ -19,6 +21,11 @@ public class AuthVerificationService(
         if (user == null)
         {
             return false;
+        }
+
+        if (user.EmailVerified)
+        {
+            throw new UnauthorizedException("Email is already verified.");
         }
 
         user.EmailVerified = true;
@@ -34,13 +41,19 @@ public class AuthVerificationService(
     public async Task<bool> ResendEmailVerificationAsync(string email)
     {
         var user = await _userRepository.GetByEmailAsync(email.ToLower());
-        if (user == null || user.EmailVerified)
+        if (user == null)
         {
             return false;
         }
 
-        user.EmailVerificationToken = GenerateSecureToken();
-        user.EmailVerificationTokenExpiry = DateTime.UtcNow.AddDays(1);
+        if(user.EmailVerified)
+        {
+            throw new UnauthorizedException("Email is already verified.");
+        }
+
+        var emailVerificationToken = _tokenService.GenerateEmailVerificationToken();
+        user.EmailVerificationToken = emailVerificationToken.Token;
+        user.EmailVerificationTokenExpiry = emailVerificationToken.ExpiresAt;
 
         await _userRepository.UpdateAsync(user);
         await _emailService.SendEmailVerificationAsync(user.Email, user.FirstName, user.EmailVerificationToken);
@@ -56,8 +69,9 @@ public class AuthVerificationService(
             return true;
         }
 
-        user.PasswordResetToken = GenerateSecureToken();
-        user.PasswordResetTokenExpiry = DateTime.UtcNow.AddMinutes(30);
+        var passwordResetToken = _tokenService.GeneratePasswordResetToken();
+        user.PasswordResetToken = passwordResetToken.Token;
+        user.PasswordResetTokenExpiry = passwordResetToken.ExpiresAt;
 
         await _userRepository.UpdateAsync(user);
         await _emailService.SendPasswordResetAsync(user.Email, user.FirstName, user.PasswordResetToken);
@@ -73,11 +87,6 @@ public class AuthVerificationService(
             return false;
         }
 
-        if (!IsValidPassword(newPassword))
-        {
-            throw new ValidationException("Password must be at least 8 characters and contain uppercase, lowercase, number, and special character");
-        }
-
         user.PasswordHash = _passwordHasher.HashPassword(newPassword);
         user.PasswordResetToken = null;
         user.PasswordResetTokenExpiry = null;
@@ -88,19 +97,5 @@ public class AuthVerificationService(
         await _emailService.SendSecurityAlertAsync(user.Email, user.FirstName, "Your password has been successfully reset.");
 
         return true;
-    }
-
-    private static string GenerateSecureToken()
-    {
-        return Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
-    }
-
-    private static bool IsValidPassword(string password)
-    {
-        return password.Length >= 8 &&
-               password.Any(char.IsUpper) &&
-               password.Any(char.IsLower) &&
-               password.Any(char.IsDigit) &&
-               password.Any(c => !char.IsLetterOrDigit(c));
     }
 }

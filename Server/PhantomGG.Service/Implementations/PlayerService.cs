@@ -25,6 +25,8 @@ namespace PhantomGG.Service.Implementations
 
         public async Task<PlayerDto> CreateAsync(CreatePlayerDto createDto)
         {
+            await ValidateMaxPlayersPerTeamAsync(createDto.TeamId);
+
             var player = createDto.ToEntity();
             if (createDto.PhotoUrl != null)
             {
@@ -55,10 +57,7 @@ namespace PhantomGG.Service.Implementations
         {
             var player = await ValidatePlayerExistsAsync(playerId);
 
-            if (player.TeamId != teamId)
-            {
-                throw new ArgumentException("Player does not belong to this team");
-            }
+            await ValidatePlayerBelongsToTeamAsync(player, teamId);
 
             if (!string.IsNullOrEmpty(player.PhotoUrl))
             {
@@ -92,10 +91,28 @@ namespace PhantomGG.Service.Implementations
             var player = await _playerRepository.GetByIdAsync(playerId);
             if (player == null)
             {
-                throw new NotFoundException("Player not found.");
+                throw new NotFoundException("Player not found");
             }
 
             return player;
+        }
+
+        private async Task ValidateMaxPlayersPerTeamAsync(Guid teamId)
+        {
+            var existingPlayers = await _playerRepository.GetByTeamAsync(teamId);
+            if (existingPlayers.Count() >= 15)
+            {
+                throw new ForbiddenException("A team cannot have more than 13 players. Please remove a player first");
+            }
+        }
+
+        private Task ValidatePlayerBelongsToTeamAsync(Player player, Guid teamId)
+        {
+            if (player.TeamId != teamId)
+            {
+                throw new ForbiddenException("Player does not belong to this team");
+            }
+            return Task.CompletedTask;
         }
     }
 }

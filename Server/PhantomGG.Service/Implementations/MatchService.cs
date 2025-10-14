@@ -32,12 +32,6 @@ public class MatchService(
         return match.ToDto();
     }
 
-    public async Task<IEnumerable<MatchDto>> GetByTournamentAsync(Guid tournamentId)
-    {
-        var matches = await _matchRepository.GetByTournamentAsync(tournamentId);
-        return matches.Select(m => m.ToDto());
-    }
-
     public async Task<IEnumerable<MatchDto>> GetByTournamentAndStatusAsync(Guid tournamentId, MatchStatus? status)
     {
         if (status.HasValue)
@@ -54,7 +48,6 @@ public class MatchService(
     {
         var match = await _matchValidationService.ValidateCanUpdateResultAsync(matchId, organizerId);
 
-        // Calculate scores from goal events instead of accepting them directly
         var matchEvents = await _matchEventRepository.GetByMatchIdAsync(matchId);
         var goalEvents = matchEvents.Where(e => e.EventType == (int)MatchEventType.Goal);
 
@@ -151,16 +144,8 @@ public class MatchService(
         var approvedTournamentTeams = await _tournamentTeamRepository.GetByTournamentAndStatusAsync(tournamentId, (int)TeamRegistrationStatus.Approved);
         var teams = approvedTournamentTeams.Select(tt => tt.Team).ToList();
 
-        if (teams.Count < 2)
-        {
-            throw new ValidationException("Tournament must have at least 2 approved teams to generate fixtures");
-        }
-
-        var existingMatches = await _matchRepository.GetByTournamentAsync(tournamentId);
-        if (existingMatches.Any())
-        {
-            throw new ValidationException("Tournament already has fixtures generated");
-        }
+        await ValidateMinimumTeamsForFixturesAsync(teams, tournament);
+        await ValidateNoExistingFixturesAsync(tournamentId);
 
         var fixtures = GenerateRoundRobinFixtures(teams, tournamentId);
 
@@ -224,5 +209,23 @@ public class MatchService(
         }
 
         return fixtures;
+    }
+
+    private Task ValidateMinimumTeamsForFixturesAsync(List<Team> teams, Tournament tournament)
+    {
+        if (teams.Count < tournament.MinTeams)
+        {
+            throw new ValidationException($"Tournament must have at least {tournament.MinTeams} approved teams to generate fixtures");
+        }
+        return Task.CompletedTask;
+    }
+
+    private async Task ValidateNoExistingFixturesAsync(Guid tournamentId)
+    {
+        var existingMatches = await _matchRepository.GetByTournamentAsync(tournamentId);
+        if (existingMatches.Any())
+        {
+            throw new ValidationException("Tournament already has fixtures generated");
+        }
     }
 }
