@@ -90,7 +90,7 @@ export class PlayerForm implements OnInit {
     this.form = this.fb.group({
       firstName: [player?.firstName || '', [Validators.required, Validators.maxLength(100)]],
       lastName: [player?.lastName || '', [Validators.required, Validators.maxLength(100)]],
-      position: [player?.position?.toString() || '', []],
+      position: [player?.position?.toString() || '', [Validators.required]],
       email: [player?.email || '', [Validators.email, Validators.maxLength(100)]],
       photoUrl: [null]
     });
@@ -142,6 +142,7 @@ export class PlayerForm implements OnInit {
         };
         this.save.emit(createData);
       }
+      this.clearFormData();
     }
   }
 

@@ -161,13 +161,11 @@ export class UserTeams implements OnInit {
     const team = this.teams().find(t => t.id === teamId);
     if (!team) return;
 
-    if (confirm(`Are you sure you want to delete ${team.name}? This action cannot be undone.`)) {
-      this.teamService.deleteTeam(teamId).subscribe({
-        next: () => {
-          this.toastService.success('Team deleted successfully');
-          this.loadMyTeams();
-        }
-      });
-    }
+    this.teamService.deleteTeam(teamId).subscribe({
+      next: () => {
+        this.toastService.success('Team deleted successfully');
+        this.loadMyTeams();
+      }
+    });
   }
 }
