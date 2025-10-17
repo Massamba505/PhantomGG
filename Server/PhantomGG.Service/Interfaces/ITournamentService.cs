@@ -11,4 +11,10 @@ public interface ITournamentService
     Task<TournamentDto> UpdateAsync(Guid id, UpdateTournamentDto updateDto, Guid organizerId);
     Task DeleteAsync(Guid id, Guid organizerId);
     Task<IEnumerable<TournamentDto>> GetByOrganizerAsync(Guid organizerId);
+    Task UpdateTournamentStatusesAsync();
+}
+
+public interface ITournamentBackgroundJobService
+{
+    Task UpdateTournamentStatusesAsync();
 }

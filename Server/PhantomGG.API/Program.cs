@@ -21,6 +21,7 @@ public class Program
         builder.Services.AddJwtAuthentication(builder.Configuration);
         builder.Services.AddRateLimiting();
         builder.Services.AddHybridCache();
+        builder.Services.AddHangfireServices(builder.Configuration);
 
         var app = builder.Build();
 
@@ -34,7 +35,9 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseRateLimiter();
+        app.UseHangfireDashboard(app.Environment);
         app.MapControllers();
+        app.ConfigureHangfireJobs();
 
         app.Run();
     }
