@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Logging;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Image;
@@ -16,13 +17,15 @@ public class TournamentService(
     IImageService imageService,
     ITournamentValidationService validationService,
     ICacheInvalidationService cacheInvalidationService,
-    HybridCache cache) : ITournamentService
+    HybridCache cache,
+    ILogger<TournamentService> logger) : ITournamentService
 {
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
     private readonly ITournamentValidationService _validationService = validationService;
     private readonly IImageService _imageService = imageService;
     private readonly HybridCache _cache = cache;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
+    private readonly ILogger<TournamentService> _logger = logger;
 
     public async Task<PagedResult<TournamentDto>> SearchAsync(TournamentQuery query, Guid? userId = null)
     {
@@ -162,5 +165,84 @@ public class TournamentService(
         {
             throw new ForbiddenException("You cannot create more than 5 active tournaments. Please complete or cancel an existing tournament first.");
         }
+    }
+
+    public async Task UpdateTournamentStatusesAsync()
+    {
+        _logger.LogInformation("Starting tournament status update job at {Timestamp}", DateTime.UtcNow);
+
+        try
+        {
+            var now = DateTime.UtcNow;
+            var updatedCount = 0;
+
+            var spec = new TournamentSpecification
+            {
+                Status = null,
+                Page = 1,
+                PageSize = int.MaxValue
+            };
+
+            var allTournaments = await _tournamentRepository.SearchAsync(spec);
+            var tournamentsToUpdate = allTournaments.Data.Where(t =>
+                t.Status != (int)TournamentStatus.Completed &&
+                t.Status != (int)TournamentStatus.Cancelled).ToList();
+
+            foreach (var tournament in tournamentsToUpdate)
+            {
+                var oldStatus = (TournamentStatus)tournament.Status;
+                var newStatus = DetermineNewStatus(tournament, now);
+
+                if (oldStatus != newStatus)
+                {
+                    _logger.LogInformation("Updating tournament {TournamentId} ({TournamentName}) status from {OldStatus} to {NewStatus}",
+                        tournament.Id, tournament.Name, oldStatus, newStatus);
+
+                    tournament.Status = (int)newStatus;
+                    tournament.UpdatedAt = now;
+
+                    await _tournamentRepository.UpdateAsync(tournament);
+                    await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournament.Id);
+
+                    updatedCount++;
+                }
+            }
+
+            _logger.LogInformation("Tournament status update job completed. Updated {UpdatedCount} tournaments", updatedCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred during tournament status update job");
+            throw;
+        }
+    }
+
+    private static TournamentStatus DetermineNewStatus(PhantomGG.Repository.Entities.Tournament tournament, DateTime now)
+    {
+        var currentStatus = (TournamentStatus)tournament.Status;
+
+        if (currentStatus == TournamentStatus.Draft && now >= tournament.RegistrationStartDate)
+        {
+            return TournamentStatus.RegistrationOpen;
+        }
+
+        if (currentStatus == TournamentStatus.RegistrationOpen && now >= tournament.RegistrationDeadline)
+        {
+            return TournamentStatus.RegistrationClosed;
+        }
+
+        if (currentStatus == TournamentStatus.RegistrationClosed && now >= tournament.StartDate)
+        {
+            return TournamentStatus.InProgress;
+        }
+
+        if (currentStatus == TournamentStatus.InProgress &&
+             tournament.EndDate.HasValue &&
+             now >= tournament.EndDate.Value)
+        {
+            return TournamentStatus.Completed;
+        }
+
+        return currentStatus;
     }
 }

@@ -31,6 +31,7 @@ public static class ServiceExtensions
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();
         services.AddScoped<ICacheInvalidationService, CacheInvalidationService>();
+        services.AddScoped<ITournamentBackgroundJobService, TournamentBackgroundJobService>();
 
         return services;
     }
