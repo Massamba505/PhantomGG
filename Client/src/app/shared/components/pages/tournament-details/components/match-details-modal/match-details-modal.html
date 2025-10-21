@@ -10,41 +10,52 @@
   </div>
   } @else if (match()) {
   <div class="space-y-2">
-    <div class="text-center card">
-      <div class="flex items-center justify-center space-x-4 mb-4">
-        <div class="flex items-center space-x-2">
-          @if (match()!.homeTeamLogo) {
+    <div class="py-4">
+      <div class="grid grid-cols-3 p-2">
+        <div class="flex items-center gap-3 flex-1">
           <img
             [src]="match()!.homeTeamLogo"
             [alt]="match()!.homeTeamName"
-            class="w-8 h-8 rounded-full object-cover"
+            class="w-10 h-10 object-cover rounded-md"
           />
-          }
-          <span class="font-semibold">{{ match()!.homeTeamName }}</span>
+          <div class="flex flex-col">
+            <span class="font-semibold text-sm line-clamp-1">{{
+              match()!.homeTeamName
+            }}</span>
+            <span class="text-xs text-muted">Home</span>
+          </div>
         </div>
 
-        <div class="flex items-center space-x-2 px-4 py-2 rounded-lg">
-          <span class="text-xl font-bold">{{ match()!.homeScore ?? 0 }}</span>
-          <span class="text-muted">-</span>
-          <span class="text-xl font-bold">{{ match()!.awayScore ?? 0 }}</span>
+        <div class="flex items-center justify-center px-4">
+          <span class="text-lg font-bold text-center min-w-[60px]">
+            {{ getScoreDisplay() }}
+          </span>
         </div>
 
-        <div class="flex items-center space-x-2">
-          <span class="font-semibold">{{ match()!.awayTeamName }}</span>
-          @if (match()!.awayTeamLogo) {
+        <div class="flex items-center gap-3 flex-1 justify-end">
+          <div class="flex flex-col text-right">
+            <span class="font-semibold text-sm line-clamp-1">{{
+              match()!.awayTeamName
+            }}</span>
+            <span class="text-xs text-muted">Away</span>
+          </div>
           <img
             [src]="match()!.awayTeamLogo"
             [alt]="match()!.awayTeamName"
-            class="w-8 h-8 rounded-full object-cover"
+            class="w-10 h-10 object-cover rounded-md"
           />
-          }
         </div>
       </div>
 
-      <div class="text-sm space-y-1 text-muted">
+      <div class="text-sm space-y-1 text-muted mt-2">
         <div class="flex items-center justify-center space-x-2">
-          <lucide-angular [img]="icons.Calendar" size="16"></lucide-angular>
-          <span>{{ match()!.matchDate | date : "medium" }}</span>
+          <lucide-angular size="16" [img]="icons.Calendar" />
+          <span class="text-sm font-medium">
+            {{ match()!.matchDate | date : "mediumDate" }}</span
+          >
+          <span class="text-xs text-muted">
+            {{ match()!.matchDate | date : "shortTime" }}</span
+          >
         </div>
         @if (match()!.venue) {
         <div class="flex items-center justify-center space-x-2">
@@ -58,25 +69,23 @@
     <div class="card">
       <h3 class="font-semibold mb-3">Match Events</h3>
       @if (matchEvents().length > 0) {
-      <div class="space-y-2 max-h-64 overflow-y-auto">
-        @for (event of matchEvents(); track event.id) {
-        <div class="flex items-center space-x-3 p-3 rounded-lg">
-          <div class="flex items-center space-x-2 min-w-0 flex-1">
+
+      <div class="space-y-2 max-h-60 overflow-y-auto">
+        @for(event of matchEvents(); track event.id){
+        <div class="flex items-center justify-between p-3 border rounded-lg">
+          <div class="flex items-center gap-3">
             <lucide-angular
-              [img]="getEventIcon(event.eventType)"
               size="16"
-              [class]="getEventColor(event.eventType)"
-            >
-            </lucide-angular>
-            <div class="min-w-0 flex-1">
-              <div class="text-sm font-medium">{{ event.playerName }}</div>
-              <div class="text-xs text-muted">{{ event.teamName }}</div>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-sm font-medium">{{ event.minute }}'</div>
-            <div class="text-xs text-muted capitalize">
-              {{ event.eventType }}
+              [img]="getEventIcon(event.eventType)"
+              [class]="getEventIconClass(event.eventType)"
+            />
+            <div>
+              <div class="text-sm font-medium">
+                {{ formatEventType(event.eventType) }} - {{ event.playerName }}
+              </div>
+              <div class="text-xs text-muted">
+                {{ event.minute }}' - {{ event.teamName }}
+              </div>
             </div>
           </div>
         </div>
@@ -94,10 +103,10 @@
       }
     </div>
 
-    <div class="card grid grid-cols-2 gap-6">
+    <div class="card grid grid-cols-2 gap-3">
       <div>
-        <h3 class="font-semibold mb-3 text-center">
-          {{ match()!.homeTeamName }} Squad
+        <h3 class="font-semibold mb-3 text-center line-clamp-1">
+          {{ match()!.homeTeamName }}
         </h3>
         <div class="space-y-2">
           @for (player of homeTeamPlayers(); track player.id) {
@@ -132,8 +141,8 @@
       </div>
 
       <div>
-        <h3 class="font-semibold mb-3 text-center">
-          {{ match()!.awayTeamName }} Squad
+        <h3 class="font-semibold mb-3 text-center line-clamp-1">
+          {{ match()!.awayTeamName }}
         </h3>
         <div class="space-y-2">
           @for (player of awayTeamPlayers(); track player.id) {

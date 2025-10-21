@@ -12,6 +12,7 @@
   </div>
 
   <app-tournament-search
+    [withDraft]="false"
     (clearFiltersSearch)="onClearSearch()"
     (searchChange)="onSearchChange($event)"
   />

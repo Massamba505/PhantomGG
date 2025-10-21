@@ -4,11 +4,11 @@ import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { MatchService } from '@/app/api/services/match.service';
-import { Match, MatchEvent } from '@/app/api/models/match.models';
+import { Match, MatchEvent, MatchEventType } from '@/app/api/models/match.models';
 import { Player } from '@/app/api/models/team.models';
 import { TeamService } from '@/app/api/services/team.service';
 import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
-import { PlayerPosition } from '@/app/api/models';
+import { MatchStatus, PlayerPosition } from '@/app/api/models';
 
 @Component({
   selector: 'app-match-details-modal',
@@ -97,6 +97,25 @@ export class MatchDetailsModalComponent implements OnInit {
       }
     });
   }
+  
+  isInProgress(): boolean {
+    const matchStatus = this.match()!.status;
+    return matchStatus === MatchStatus.InProgress;
+  }
+
+  isCompleted(): boolean {
+    const matchStatus = this.match()!.status;
+    return matchStatus === MatchStatus.Completed;
+  }
+
+  getScoreDisplay(): string {
+    if (this.isCompleted() || this.isInProgress()) {
+      const homeScore = this.match()!.homeScore ?? 0;
+      const awayScore = this.match()!.awayScore ?? 0;
+      return `${homeScore} - ${awayScore}`;
+    }
+    return 'vs';
+  }
 
   onClose() {
     this.close.emit();
@@ -124,6 +143,28 @@ export class MatchDetailsModalComponent implements OnInit {
     }
   }
 
+  getEventIconClass(eventType: MatchEventType): string {
+    switch (eventType) {
+      case MatchEventType.Goal:
+        return 'text-green-600';
+      case MatchEventType.YellowCard:
+        return 'text-yellow-600';
+      case MatchEventType.RedCard:
+        return 'text-red-600';
+      case MatchEventType.Foul:
+        return 'text-red-600';
+      case MatchEventType.Substitution:
+        return 'text-gray-600';
+      default:
+        return 'text-blue-600';
+    }
+  }
+
+  formatEventType(eventType: string | number): string {
+    return getEnumLabel(MatchEventType, eventType) || eventType.toString();
+  }
+
+  
   getEventColor(eventType: string | any): string {
     const eventTypeString = typeof eventType === 'string' ? eventType : eventType.toString();
     switch (eventTypeString.toLowerCase()) {
