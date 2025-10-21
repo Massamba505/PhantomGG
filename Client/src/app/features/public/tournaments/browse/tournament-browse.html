@@ -2,6 +2,7 @@
   <app-tournament-search
     (clearFiltersSearch)="onClearSearch()"
     (searchChange)="onSearchChange($event)"
+    [withDraft]="false"
   />
 
   @if (isLoading()) {

@@ -9,7 +9,7 @@
       class="w-12 h-12 object-contain rounded-md"
     />
     <div class="flex-1">
-      <span class="font-semibold text-md line-clamp-1">
+      <span class="font-semibold text-md line-clamp-2">
         {{ tournament().name }}
       </span>
     </div>
@@ -72,7 +72,7 @@
     </div>
     <div class="flex items-center gap-1">
       <lucide-angular size="12" [img]="icons.Calendar" />
-      <span>Start:</span>
+      <span>Tournament StartDate:</span>
       <span class="font-semibold">
         {{ tournament().startDate | date : "mediumDate" }}
       </span>
