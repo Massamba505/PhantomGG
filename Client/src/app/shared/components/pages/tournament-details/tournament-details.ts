@@ -7,10 +7,10 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
 import { TournamentService, TournamentStatus } from '@/app/api/services';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { TournamentTeamManagementComponent } from './components/tournament-team-management/tournament-team-management';
+import { TournamentTeamManagementComponent } from '../../tournament-team-management/tournament-team-management';
 import { TournamentMatchManagementComponent } from './components/tournament-match-management/tournament-match-management';
-import { MatchDetailsModalComponent } from './components/match-details-modal/match-details-modal';
-import { TeamDetailsModalComponent } from './components/team-details-modal/team-details-modal';
+import { MatchDetailsModalComponent } from '../../match-details-modal/match-details-modal';
+import { TeamDetailsModalComponent } from '../../team-details-modal/team-details-modal';
 import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
