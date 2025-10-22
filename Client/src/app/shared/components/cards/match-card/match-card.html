@@ -1,7 +1,4 @@
-<div
-  (click)="onView()"
-  class="card flex flex-col max-w-80 md:min-w-96 gap-3 p-3"
->
+<div (click)="onView()" class="card flex flex-col gap-3 p-3">
   <div class="flex items-center justify-between text-muted">
     <div class="flex items-center gap-2">
       <lucide-angular size="16" [img]="icons.Calendar" />
@@ -17,12 +14,12 @@
     </div>
   </div>
 
-  <div class="flex items-center justify-between p-2">
-    <div class="flex items-center gap-3 flex-1">
+  <div class="grid grid-cols-3 p-2">
+    <div class="flex items-center gap-2 flex-1">
       <img
         [src]="match().homeTeamLogo"
         [alt]="match().homeTeamName"
-        class="w-10 h-10 object-contain rounded-md"
+        class="w-10 h-10 object-cover rounded-md"
       />
       <div class="flex flex-col">
         <span class="font-semibold text-sm line-clamp-1">{{
@@ -38,7 +35,7 @@
       </span>
     </div>
 
-    <div class="flex items-center gap-3 flex-1 justify-end">
+    <div class="flex items-center gap-2 flex-1 justify-end">
       <div class="flex flex-col text-right">
         <span class="font-semibold text-sm line-clamp-1">{{
           match().awayTeamName
@@ -48,7 +45,7 @@
       <img
         [src]="match().awayTeamLogo"
         [alt]="match().awayTeamName"
-        class="w-10 h-10 object-contain rounded-md"
+        class="w-10 h-10 object-cover rounded-md"
       />
     </div>
   </div>
@@ -56,7 +53,9 @@
   <div
     class="border flex flex-col gap-3 px-3 py-2 btn-outline rounded-md text-muted"
   >
-    <div class="flex flex-row gap-1 text-xs font-semibold items-center">
+    <div
+      class="flex flex-row gap-1 text-xs font-semibold items-cente line-clamp-1r"
+    >
       <lucide-angular size="14" [img]="icons.Trophy" />
       <span class="line-clamp-1">{{ match().tournamentName }}</span>
     </div>

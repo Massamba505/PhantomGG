@@ -45,7 +45,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
         team?.shortName || '',
         [Validators.maxLength(10)],
       ],
-      logo: [null],
+      logo: [null,[Validators.required]],
     });
 
   

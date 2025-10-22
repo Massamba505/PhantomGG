@@ -29,6 +29,7 @@ public static class PlayerMappings
             FirstName = createDto.FirstName,
             LastName = createDto.LastName,
             Position = (int)createDto.Position,
+            PhotoUrl = $"https://placehold.co/1200x400?text={createDto.FirstName[0]}+{createDto.LastName[0]}",
             Email = createDto.Email,
             TeamId = createDto.TeamId,
             CreatedAt = DateTime.UtcNow

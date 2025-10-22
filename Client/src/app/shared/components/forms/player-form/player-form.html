@@ -13,7 +13,10 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
     <div>
-      <label class="input-label" for="firstName">First Name *</label>
+      <label class="input-label" for="firstName"
+        >First Name
+        <span class="required"><span class="required">*</span></span></label
+      >
       <input
         id="firstName"
         type="text"
@@ -28,7 +31,9 @@
     </div>
 
     <div>
-      <label class="input-label" for="lastName">Last Name *</label>
+      <label class="input-label" for="lastName"
+        >Last Name <span class="required">*</span></label
+      >
       <input
         id="lastName"
         type="text"
@@ -44,14 +49,16 @@
   </div>
 
   <div>
-    <label class="input-label" for="position">Position</label>
+    <label class="input-label" for="position"
+      >Position <span class="required">*</span></label
+    >
     <select
       id="position"
       formControlName="position"
       class="input-field"
       [class.error]="getFieldError('position')"
     >
-      <option value="">Select a position (Optional)</option>
+      <option value="">Select a position</option>
       @for (option of positionOptions; track option.value) {
       <option [value]="option.value">{{ option.label }}</option>
       }

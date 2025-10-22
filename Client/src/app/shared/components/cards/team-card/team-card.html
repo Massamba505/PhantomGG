@@ -1,12 +1,9 @@
-<div
-  (click)="onView()"
-  class="card flex flex-col md:min-w-96 max-w-80 gap-3 p-3"
->
+<div (click)="onView()" class="card flex flex-col gap-3 p-3">
   <div class="flex gap-2">
     <img
       [src]="team().logoUrl || 'assets/PhantomGG_LOGO.png'"
       [alt]="team().name"
-      class="w-12 h-12 object-contain rounded-md"
+      class="w-12 h-12 object-cover rounded-md"
     />
     <div class="flex-1">
       <span class="font-semibold text-md line-clamp-1">
@@ -20,7 +17,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-3 gap-2">
+  <div class="grid grid-cols-2 gap-2">
     <div
       class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
     >
@@ -28,16 +25,6 @@
       <div class="flex flex-col gap-1 text-center text-xs font-semibold">
         <span class="line-clamp-1">Members</span>
         <span class="line-clamp-1">{{ team().countPlayers }}</span>
-      </div>
-    </div>
-
-    <div
-      class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
-    >
-      <lucide-angular size="14" [img]="icons.Calendar" />
-      <div class="flex flex-col gap-1 text-center text-xs font-semibold">
-        <span class="line-clamp-1">Events</span>
-        <span class="line-clamp-1">8</span>
       </div>
     </div>
 
@@ -71,7 +58,6 @@
       <lucide-angular size="15" [img]="icons.Trash2" />
     </button>
     } @if (isOrganizer()) { @if (isPendingCard()) {
-    <!-- Pending team: Show approve and reject buttons -->
     <button
       (click)="onApproveTeam($event)"
       class="btn btn-primary flex justify-center items-center py-3 flex-1"
@@ -83,7 +69,6 @@
       <lucide-angular size="15" [img]="icons.X" />
     </button>
     } @else if (isApprovedCard()) {
-    <!-- Approved team: Show remove button only -->
     <button
       (click)="onRemoveTeam($event)"
       class="btn btn-destructive flex justify-center items-center flex-1"
@@ -92,7 +77,6 @@
       <span>Remove</span>
     </button>
     } @else {
-    <!-- Default organizer view: Show approve and reject -->
     <button
       (click)="onApproveTeam($event)"
       class="btn btn-primary flex justify-center items-center py-3 flex-1"

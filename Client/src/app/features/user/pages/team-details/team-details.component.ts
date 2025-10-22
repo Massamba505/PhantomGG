@@ -143,18 +143,15 @@ export class TeamDetailsComponent implements OnInit {
   onRemovePlayer(playerId: string) {
     const player = this.players().find(p => p.id === playerId);
     if (!player || !this.team()) return;
-    
-    if (confirm(`Are you sure you want to remove ${player.firstName} ${player.lastName} from the team?`)) {
-      this.teamService.removePlayerFromTeam(this.team()!.id, player.id).subscribe({
-        next: () => {
-          this.players.update(players => players.filter(p => p.id !== player.id));
-          this.toastService.success('Player removed successfully');
-        },
-        error: (error) => {
-          this.toastService.error('Failed to remove player');
-        }
-      });
-    }
+    this.teamService.removePlayerFromTeam(this.team()!.id, player.id).subscribe({
+      next: () => {
+        this.players.update(players => players.filter(p => p.id !== player.id));
+        this.toastService.success('Player removed successfully');
+      },
+      error: (error) => {
+        this.toastService.error('Failed to remove player');
+      }
+    });
   }
 
   isManager(): boolean {

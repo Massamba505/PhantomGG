@@ -1,4 +1,4 @@
-import { Component, signal, computed, output } from '@angular/core';
+import { Component, signal, computed, output, input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TournamentSearch } from '@/app/api/models/tournament.models';
@@ -11,10 +11,10 @@ import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
   templateUrl: './tournament-search.html',
   styleUrl: './tournament-search.css'
 })
-export class TournamentSearchComponent {
+export class TournamentSearchComponent implements OnInit {
   searchChange = output<Partial<TournamentSearch>>();
   clearFiltersSearch = output<void>();
-
+  withDraft = input.required<boolean>()
   searchTerm = signal('');
   selectedStatus = signal<TournamentStatus | undefined>(undefined);
   location = signal('');
@@ -23,8 +23,15 @@ export class TournamentSearchComponent {
   startDateTo = signal<string | undefined>(undefined);
   isPublic = signal<boolean | undefined>(undefined);
 
-  statusOptions = getEnumOptions(TournamentStatus);
+  statusOptions!: Array<{ label: string; value: TournamentStatus }>;
   formatOptions = getEnumOptions(TournamentFormats);
+
+  ngOnInit(): void {
+    this.statusOptions = getEnumOptions(TournamentStatus).filter(status => {
+      const isDraft = status.value === TournamentStatus.Draft;
+      return this.withDraft() || !isDraft;
+    });
+  }
 
   searchCriteria = computed<Partial<TournamentSearch>>(() => {
     return {

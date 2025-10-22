@@ -71,16 +71,6 @@
       </a>
       }
     </div>
-
-    <div class="card">
-      <app-tournament-team-management [tournamentId]="tournament()!.id">
-      </app-tournament-team-management>
-    </div>
-
-    <div class="card">
-      <app-tournament-match-management [tournamentId]="tournament()!.id">
-      </app-tournament-match-management>
-    </div>
   </div>
 
   <div class="space-y-6">
@@ -213,6 +203,18 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-8 mt-8">
+  <div class="card">
+    <app-tournament-team-management [tournamentId]="tournament()!.id">
+    </app-tournament-team-management>
+  </div>
+
+  <div class="card">
+    <app-tournament-match-management [tournamentId]="tournament()!.id">
+    </app-tournament-match-management>
   </div>
 </div>
 }

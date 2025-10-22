@@ -19,8 +19,8 @@
   <p>Loading tournament details...</p>
 </div>
 } @if (!loading() && tournament()) {
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-  <div class="lg:col-span-2 space-y-6">
+<div class="grid grid-cols-1 h-fit lg:grid-cols-1 xl:grid-cols-3 gap-6">
+  <div class="xl:col-span-2 lg:col-span-1 space-y-6">
     <div class="card">
       <div
         class="tournament-banner h-48 rounded-md"
@@ -64,20 +64,6 @@
         {{ showFullDescription() ? "View Less" : "View More" }}
       </a>
       }
-    </div>
-
-    <div class="card">
-      <app-tournament-team-management
-        [tournamentId]="tournamentId()"
-        (teamView)="openTeamModal($event)"
-      />
-    </div>
-
-    <div class="card">
-      <app-tournament-match-management
-        [tournamentId]="tournamentId()"
-        (matchView)="openMatchModal($event)"
-      />
     </div>
   </div>
 
@@ -210,6 +196,21 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-8 mt-8">
+  <div class="card">
+    <app-tournament-team-management
+      [tournamentId]="tournamentId()"
+      (teamView)="openTeamModal($event)"
+    />
+  </div>
+  <div class="card">
+    <app-tournament-match-management
+      [tournamentId]="tournamentId()"
+      (matchView)="openMatchModal($event)"
+    />
   </div>
 </div>
 

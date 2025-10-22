@@ -2,13 +2,13 @@ import { Component, input, signal, OnInit, inject, output } from '@angular/core'
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { TournamentTeam } from '@/app/api/models/team.models';
-import { TeamRegistrationStatus, UserRoles } from '@/app/api/models/common.models';
+import { TeamRegistrationStatus } from '@/app/api/models/common.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamCard, TeamRole, TeamCardType } from '@/app/shared/components/cards/team-card/team-card';
 
-type TeamTab = 'approved' | 'pending';
+type TeamTab = 'approved';
 
 @Component({
   selector: 'app-tournament-team-management',
@@ -27,7 +27,6 @@ export class TournamentTeamManagementComponent implements OnInit {
   
   activeTab = signal<TeamTab>('approved');
   approvedTeams = signal<TournamentTeam[]>([]);
-  pendingTeams = signal<TournamentTeam[]>([]);
   
   isLoading = signal(false);
   isActionLoading = signal<{ [key: string]: boolean }>({});
@@ -47,12 +46,6 @@ export class TournamentTeamManagementComponent implements OnInit {
         this.isLoading.set(false);
       }
     });
-
-    this.tournamentService.getTournamentTeams(this.tournamentId(), TeamRegistrationStatus.Pending).subscribe({
-      next: (teams) => {
-        this.pendingTeams.set(teams);
-      }
-    });
   }
 
   setActiveTab(tab: TeamTab) {
@@ -64,76 +57,15 @@ export class TournamentTeamManagementComponent implements OnInit {
     switch (tab) {
       case 'approved':
         return this.approvedTeams();
-      case 'pending':
-        return this.pendingTeams();
       default:
         return [];
     }
-  }
-
-  approveTeam(team: TournamentTeam) {
-    this.setActionLoading(team.id, true);
-    
-    this.tournamentService.approveTeam(this.tournamentId(), team.id).subscribe({
-      next: () => {
-        this.toastService.success(`${team.name} has been approved`);
-        this.loadTeams();
-      },
-      error: (error) => {
-        this.setActionLoading(team.id, false);
-      },
-      complete: () => {
-        this.setActionLoading(team.id, false);
-      }
-    });
-  }
-
-  rejectTeam(team: TournamentTeam) {
-    this.setActionLoading(team.id, true);
-    
-    this.tournamentService.rejectTeam(this.tournamentId(), team.id).subscribe({
-      next: () => {
-        this.toastService.success(`${team.name} has been rejected`);
-      },
-      error: (error) => {
-        this.setActionLoading(team.id, false);
-      },
-      complete: () => {
-        this.setActionLoading(team.id, false);
-      }
-    });
-  }
-
-  removeTeam(team: TournamentTeam) {
-    this.setActionLoading(team.id, true);
-    
-    this.tournamentService.removeTeam(this.tournamentId(), team.id).subscribe({
-      next: () => {
-        this.toastService.success(`${team.name} has been removed from the tournament`);
-        this.loadTeams();
-      },
-      error: () => {
-        this.setActionLoading(team.id, false);
-      },
-      complete: () => {
-        this.setActionLoading(team.id, false);
-      }
-    });
-  }
-
-  private setActionLoading(teamId: string, loading: boolean) {
-    this.isActionLoading.update(current => ({
-      ...current,
-      [teamId]: loading
-    }));
   }
 
   getTeamCount(tab: TeamTab): number {
     switch (tab) {
       case 'approved':
         return this.approvedTeams().length;
-      case 'pending':
-        return this.pendingTeams().length;
       default:
         return 0;
     }
@@ -167,7 +99,7 @@ export class TournamentTeamManagementComponent implements OnInit {
 
   getTeamCardType(): TeamCardType {
     const tab = this.activeTab();
-    return tab === 'pending' ? 'pending' : 'approved';
+    return tab === 'approved' ? 'approved' : 'approved';
   }
 
   onTeamView(team: any) {

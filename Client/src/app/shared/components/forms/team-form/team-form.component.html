@@ -1,7 +1,7 @@
 <form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="space-y-4 card">
   <div>
     <label class="block text-sm font-medium mb-2"
-      >Team Logo @if (!isEditMode()) {*}</label
+      >Team Logo <span class="required">*</span></label
     >
 
     @if (logoPreview()) {
@@ -9,7 +9,7 @@
       <img
         [src]="logoPreview()"
         alt="Team Logo"
-        class="h-32 w-32 object-contain rounded-lg shadow mx-auto"
+        class="h-32 w-32 object-cover rounded-lg shadow mx-auto"
       />
     </div>
     }
@@ -28,7 +28,9 @@
   </div>
 
   <div>
-    <label class="block text-sm font-medium mb-2">Team Name *</label>
+    <label class="block text-sm font-medium mb-2"
+      >Team Name <span class="required">*</span></label
+    >
     <input
       type="text"
       formControlName="name"
@@ -43,7 +45,7 @@
   </div>
 
   <div>
-    <label class="block text-sm font-medium mb-2">Short Name (Optional)</label>
+    <label class="block text-sm font-medium mb-2">Short Name</label>
     <input
       type="text"
       formControlName="shortName"
