@@ -201,16 +201,15 @@
 
 <div class="grid grid-cols-1 gap-8 mt-8">
   <div class="card">
-    <app-tournament-match-management
-      [tournamentId]="tournamentId()"
-      (matchView)="openMatchModal($event)"
-    />
-  </div>
-
-  <div class="card">
     <app-tournament-team-management
       [tournamentId]="tournamentId()"
       (teamView)="openTeamModal($event)"
+    />
+  </div>
+  <div class="card">
+    <app-tournament-match-management
+      [tournamentId]="tournamentId()"
+      (matchView)="openMatchModal($event)"
     />
   </div>
 </div>

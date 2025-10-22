@@ -11,7 +11,7 @@
   <div class="flex gap-2">
     <button class="btn btn-outline" disabled>
       <lucide-angular size="16" [img]="icons.Users" />
-      {{ approvedTeams().length + pendingTeams().length }} Teams
+      {{ approvedTeams().length }} Teams
     </button>
   </div>
 </div>
@@ -21,13 +21,6 @@
     Approved
     <span class="btn btn-outline px-2 py-0.5 rounded-full">
       {{ getTeamCount("approved") }}
-    </span>
-  </button>
-
-  <button (click)="setActiveTab('pending')" [class]="getTabClass('pending')">
-    Pending
-    <span class="btn btn-outline px-2 py-0.5 rounded-full">
-      {{ getTeamCount("pending") }}
     </span>
   </button>
 </div>
