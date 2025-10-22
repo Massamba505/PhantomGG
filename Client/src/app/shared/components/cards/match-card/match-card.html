@@ -1,7 +1,4 @@
-<div
-  (click)="onView()"
-  class="card flex flex-col max-w-80 md:min-w-96 gap-3 p-3"
->
+<div (click)="onView()" class="card flex flex-col gap-3 p-3">
   <div class="flex items-center justify-between text-muted">
     <div class="flex items-center gap-2">
       <lucide-angular size="16" [img]="icons.Calendar" />
@@ -18,7 +15,7 @@
   </div>
 
   <div class="grid grid-cols-3 p-2">
-    <div class="flex items-center gap-3 flex-1">
+    <div class="flex items-center gap-2 flex-1">
       <img
         [src]="match().homeTeamLogo"
         [alt]="match().homeTeamName"
@@ -38,7 +35,7 @@
       </span>
     </div>
 
-    <div class="flex items-center gap-3 flex-1 justify-end">
+    <div class="flex items-center gap-2 flex-1 justify-end">
       <div class="flex flex-col text-right">
         <span class="font-semibold text-sm line-clamp-1">{{
           match().awayTeamName
