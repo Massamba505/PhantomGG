@@ -1,8 +1,8 @@
-<div class="relative min-h-screen flex flex-col">
-  <main class="flex-1 flex flex-col w-full">
-    <app-toast class="fixed top-4 right-4 z-[9999]" />
+<div class="relative min-h-screen flex flex-col" data-cy="main-layout-container">
+  <main class="flex-1 flex flex-col w-full" data-cy="main-layout-content">
+    <app-toast class="fixed top-4 right-4 z-[9999]" data-cy="toast-container" />
 
-    <div class="flex-1">
+    <div class="flex-1" data-cy="main-layout-inner">
       <ng-content></ng-content>
     </div>
   </main>

@@ -1,13 +1,13 @@
-<div class="max-w-md mx-auto">
-  <div class="card">
-    <div class="text-center mb-6">
-      <h1 class="text-2xl font-bold mb-2">Create an Account</h1>
+<div class="max-w-md mx-auto" data-cy="signup-container">
+  <div class="card" data-cy="signup-card">
+    <div class="text-center mb-6" data-cy="signup-header">
+      <h1 class="text-2xl font-bold mb-2" data-cy="signup-title">Create an Account</h1>
     </div>
 
-    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="space-y-5">
-      <div class="flex flex-wrap gap-4 w-full">
-        <div class="w-full md:flex-1">
-          <label for="firstName" class="input-label">
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="space-y-5" data-cy="signup-form">
+      <div class="flex flex-wrap gap-4 w-full" data-cy="name-fields">
+        <div class="w-full md:flex-1" data-cy="first-name-field">
+          <label for="firstName" class="input-label" data-cy="first-name-label">
             First Name<span class="required ml-1">*</span>
           </label>
           <input
@@ -17,14 +17,15 @@
             name="firstName"
             placeholder="Massamba"
             formControlName="firstName"
+            data-cy="first-name-input"
           />
           @if (checkFieldError('firstName')) {
-          <p class="error-message">First name is required</p>
+          <p class="error-message" data-cy="first-name-error">First name is required</p>
           }
         </div>
 
-        <div class="w-full md:flex-1">
-          <label for="lastName" class="input-label">
+        <div class="w-full md:flex-1" data-cy="last-name-field">
+          <label for="lastName" class="input-label" data-cy="last-name-label">
             Last Name<span class="required ml-1">*</span>
           </label>
           <input
@@ -34,35 +35,36 @@
             name="lastName"
             placeholder="Maphalala"
             formControlName="lastName"
+            data-cy="last-name-input"
           />
-          @if (checkFieldError('firstName')) {
-          <p class="error-message">Last name is required</p>
+          @if (checkFieldError('lastName')) {
+          <p class="error-message" data-cy="last-name-error">Last name is required</p>
           }
         </div>
       </div>
 
-      <div>
-        <label for="email" class="input-label">
+      <div data-cy="email-field">
+        <label for="email" class="input-label" data-cy="email-label">
           Email<span class="required ml-1">*</span>
         </label>
         <input
           class="input-field"
           [class.error]="checkFieldError('email')"
           type="email"
-          name="email"
           placeholder="massamba.maphalala@gmail.com"
           formControlName="email"
+          data-cy="email-input"
         />
         @if (checkFieldError('email')) {
-        <p class="error-message">Please enter a valid email address</p>
+        <p class="error-message" data-cy="email-error">Please enter a valid email address</p>
         }
       </div>
 
-      <div>
-        <label for="password" class="input-label">
+      <div data-cy="password-field">
+        <label for="password" class="input-label" data-cy="password-label">
           Password<span class="required ml-1">*</span>
         </label>
-        <div class="relative">
+        <div class="relative" data-cy="password-input-container">
           <input
             class="input-field pr-10"
             [class.error]="checkFieldError('password') &&
@@ -71,40 +73,42 @@
             [type]="showPassword() ? 'text' : 'password'"
             placeholder="Create a strong password"
             formControlName="password"
+            data-cy="password-input"
           />
           <button
             type="button"
             (click)="togglePassword()"
             class="absolute right-3 top-1/2 transform -translate-y-1/2"
             aria-label="Toggle password visibility"
+            data-cy="password-toggle"
           >
             @if (!showPassword()) {
-            <lucide-angular [img]="icons.EyeOff" size="18"></lucide-angular>
+            <lucide-angular [img]="icons.EyeOff" size="18" data-cy="eye-off-icon"></lucide-angular>
             } @else {
-            <lucide-angular [img]="icons.Eye" size="18"></lucide-angular>
+            <lucide-angular [img]="icons.Eye" size="18" data-cy="eye-icon"></lucide-angular>
             }
           </button>
         </div>
         @if (checkFieldError('password') &&
         !signupForm.get('password')?.errors?.['weakPassword']) {
-        <p class="error-message">Password is required</p>
+        <p class="error-message" data-cy="password-required-error">Password is required</p>
         } @else if (signupForm.controls['password'].value) {
-        <p class="text-xs mt-1" [class]="passwordStrength.color">
+        <p class="text-xs mt-1" [class]="passwordStrength.color" data-cy="password-strength">
           {{ passwordStrength.label }}
         </p>
         } @if (checkFieldError('password')) {
-        <p class="text-sm error-message mt-1">
+        <p class="text-sm error-message mt-1" data-cy="password-validation-error">
           Password must be at least 8 characters with uppercase, lowercase,
           number, and special character
         </p>
         }
       </div>
 
-      <div>
-        <label for="confirmPassword" class="input-label">
+      <div data-cy="confirm-password-field">
+        <label for="confirmPassword" class="input-label" data-cy="confirm-password-label">
           Confirm Password<span class="required ml-1">*</span>
         </label>
-        <div class="relative">
+        <div class="relative" data-cy="confirm-password-input-container">
           <input
             class="input-field pr-10"
             [class.error]="signupForm.errors?.['passwordMismatch'] && 
@@ -114,24 +118,26 @@
             [type]="showConfirmPassword() ? 'text' : 'password'"
             placeholder="Confirm your password"
             formControlName="confirmPassword"
+            data-cy="confirm-password-input"
           />
           <button
             type="button"
             (click)="toggleConfirmPassword()"
             class="absolute right-3 top-1/2 transform -translate-y-1/2"
             aria-label="Toggle password visibility"
+            data-cy="confirm-password-toggle"
           >
             @if (!showConfirmPassword()) {
-            <lucide-angular [img]="icons.EyeOff" size="18"></lucide-angular>
+            <lucide-angular [img]="icons.EyeOff" size="18" data-cy="confirm-eye-off-icon"></lucide-angular>
             } @else {
-            <lucide-angular [img]="icons.Eye" size="18"></lucide-angular>
+            <lucide-angular [img]="icons.Eye" size="18" data-cy="confirm-eye-icon"></lucide-angular>
             }
           </button>
         </div>
         @if (signupForm.errors?.['passwordMismatch'] &&
         (signupForm.controls['confirmPassword'].touched ||
         signupForm.controls['password'].touched || submitted())) {
-        <p class="error-message">Passwords do not match</p>
+        <p class="error-message" data-cy="password-mismatch-error">Passwords do not match</p>
         }
       </div>
 
@@ -139,12 +145,13 @@
         type="submit"
         class="btn btn-primary py-2.5 mt-3 w-full"
         [disabled]="loading()"
+        data-cy="signup-submit-button"
       >
-        <span>Create Account</span>
+        <span data-cy="signup-button-text">Create Account</span>
       </button>
     </form>
 
-    <div class="flex items-center my-6">
+    <div class="flex items-center my-6" data-cy="divider">
       <div class="border-t border-border flex-1"></div>
       <span class="px-4 text-sm">OR</span>
       <div class="border-t border-border flex-1"></div>
@@ -152,6 +159,7 @@
 
     <button
       class="btn btn-secondary mb-4 flex items-center justify-center gap-2 w-full"
+      data-cy="google-signup-button"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -159,6 +167,7 @@
         height="16"
         viewBox="0 0 24 24"
         fill="currentColor"
+        data-cy="google-icon"
       >
         <path
           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -177,14 +186,15 @@
           fill="#EA4335"
         />
       </svg>
-      Continue with Google
+      <span data-cy="google-button-text">Continue with Google</span>
     </button>
 
-    <div class="text-center mt-6">
-      <span class="text-sm font-semibold">Already have an account? </span>
+    <div class="text-center mt-6" data-cy="login-link-section">
+      <span class="text-sm font-semibold" data-cy="login-prompt">Already have an account? </span>
       <a
         routerLink="/auth/login"
         class="hover:underline font-medium text-sm text-muted"
+        data-cy="login-link"
       >
         Log in
       </a>

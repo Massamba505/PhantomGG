@@ -1,10 +1,11 @@
 <div
   class="relative min-h-screen flex flex-col items-center justify-center p-4"
+  data-cy="auth-container"
 >
-  <header class="absolute top-5 right-4">
-    <app-theme-toggle></app-theme-toggle>
+  <header class="absolute top-5 right-4" data-cy="auth-header">
+    <app-theme-toggle data-cy="theme-toggle"></app-theme-toggle>
   </header>
-  <div class="w-full mx-auto">
-    <router-outlet></router-outlet>
+  <div class="w-full mx-auto" data-cy="auth-content">
+    <router-outlet data-cy="auth-router-outlet"></router-outlet>
   </div>
 </div>
