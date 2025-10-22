@@ -1,5 +1,4 @@
 {
-  "name": "Using fixtures to represent data",
-  "email": "hello@cypress.io",
-  "body": "Fixtures are a great way to mock data for responses to routes"
+  "note": "This file has been replaced with organized test data structure",
+  "see": "Check other fixture files for actual test data"
 }

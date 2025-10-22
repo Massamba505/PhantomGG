@@ -25,7 +25,7 @@ export function errorInterceptor(
           if (req.url.includes('/refresh')) {
             toast.error('Your session has expired. Please log in again.');
           } else {
-            toast.error(error.error?.error);
+            toast.error(error.error?.detail);
           }
         }
         return throwError(() => error);
@@ -35,10 +35,10 @@ export function errorInterceptor(
       } else if (error.status >= 500) {
         toast.error('Server error. Please try again later.');
       } else if (error.status >= 400) {
-        toast.error(error.error?.error || 'Something went wrong.');
+        toast.error(error.error?.detail || 'Something went wrong.');
       }
 
-      return throwError(() => error);
+      return throwError(() => error.error?.detail);
     })
   );
 }

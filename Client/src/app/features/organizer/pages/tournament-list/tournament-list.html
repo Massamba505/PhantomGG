@@ -44,7 +44,7 @@
 
   <div
     class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
-    data-cy="tournaments-grid">
+    data-cy="tournaments-list">
     @for (tournament of tournaments(); track tournament.id) {
     <app-tournament-card
       [tournament]="tournament"

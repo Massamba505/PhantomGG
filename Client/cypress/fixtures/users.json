@@ -1,0 +1,16 @@
+{
+  "organizer": {
+    "email": "hisow62261@fintehs.com",
+    "password": "Qwertyui@1"
+  },
+  "user": {
+    "email": "mack.wyman@hotmail.com",
+    "password": "Qwertyui@1"
+  },
+  "newUser": {
+    "firstName": "Test",
+    "lastName": "User",
+    "email": "newuser@phantomgg.com",
+    "password": "Password123!"
+  }
+}
