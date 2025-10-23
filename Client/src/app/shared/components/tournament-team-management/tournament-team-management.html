@@ -17,7 +17,7 @@
 </div>
 
 <div class="flex border-b mb-6">
-  <button (click)="setActiveTab('approved')" [class]="getTabClass('approved')">
+  <button data-cy="manage-teams-tab" (click)="setActiveTab('approved')" [class]="getTabClass('approved')">
     Approved
     <span class="btn btn-outline px-2 py-0.5 rounded-full">
       {{ getTeamCount("approved") }}
@@ -58,6 +58,7 @@
 </div>
 } @if (!isLoading() && getCurrentTeams().length > 0) {
 <div
+  data-cy="approved-teams-section"
   class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
 >
   @for(team of getCurrentTeams(); track team.id){

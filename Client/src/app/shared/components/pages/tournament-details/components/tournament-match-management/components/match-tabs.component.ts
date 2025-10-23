@@ -12,6 +12,7 @@ export type MatchTab = 'scheduled' | 'inprogress' | 'completed';
   template: `
     <div class="flex flex-wrap gap-0 sm:gap-2 border-b mb-6">
       <button
+        data-cy="inprogress-matches-tab"
         (click)="setActiveTab('inprogress')"
         [class]="getTabClass('inprogress')"
       >
@@ -21,6 +22,7 @@ export type MatchTab = 'scheduled' | 'inprogress' | 'completed';
         </span>
       </button>
       <button
+        data-cy="scheduled-matches-tab"
         (click)="setActiveTab('scheduled')"
         [class]="getTabClass('scheduled')"
       >
@@ -31,6 +33,7 @@ export type MatchTab = 'scheduled' | 'inprogress' | 'completed';
       </button>
 
       <button
+        data-cy="completed-matches-tab"
         (click)="setActiveTab('completed')"
         [class]="getTabClass('completed')"
       >
