@@ -58,10 +58,10 @@
     }
   </div>
 
-  <div class="flex-1" data-cy="teams-grid-container">
+  <div class="flex-1" data-cy="teams-list-container">
     <div
       class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
-      data-cy="teams-grid"
+      data-cy="teams-list"
      >
       @for (team of teams(); track team.id) {
       <app-team-card
@@ -154,3 +154,12 @@
   </div>
   }
 </div>
+
+<app-confirm-delete-modal
+  [isOpen]="showDeleteModal()"
+  [title]="'Delete Team'"
+  [entityName]="teamToDelete()?.name || 'Team'"
+  [isLoading]="isDeleting()"
+  (close)="closeDeleteModal()"
+  (confirm)="confirmDelete()"
+></app-confirm-delete-modal>

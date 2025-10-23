@@ -22,6 +22,7 @@
         type="text"
         formControlName="firstName"
         class="input-field"
+        data-cy="player-first-name-input"
         [class.error]="getFieldError('firstName')"
         placeholder="Enter first name"
       />
@@ -39,6 +40,7 @@
         type="text"
         formControlName="lastName"
         class="input-field"
+        data-cy="player-last-name-input"
         [class.error]="getFieldError('lastName')"
         placeholder="Enter last name"
       />
@@ -56,11 +58,12 @@
       id="position"
       formControlName="position"
       class="input-field"
+      data-cy="player-position-select"
       [class.error]="getFieldError('position')"
     >
       <option value="">Select a position</option>
       @for (option of positionOptions; track option.value) {
-      <option [value]="option.value">{{ option.label }}</option>
+      <option [attr.data-cy]='"position-option-" + option.value' [value]="option.value">{{ option.label }}</option>
       }
     </select>
     @if (getFieldError('position')) {
@@ -75,6 +78,7 @@
       type="email"
       formControlName="email"
       class="input-field"
+      data-cy="player-email-input"
       [class.error]="getFieldError('email')"
       placeholder="player@example.com"
     />
@@ -91,6 +95,7 @@
         type="file"
         accept="image/*"
         class="input-field"
+        data-cy="player-image-input"
         (change)="onFileSelect($event)"
       />
     </div>
@@ -100,7 +105,7 @@
     <button type="button" class="btn btn-outline" (click)="onCancel()">
       Cancel
     </button>
-    <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+    <button type="submit" data-cy="submit-button" class="btn btn-primary" [disabled]="!form.valid">
       <lucide-angular
         [img]="isEditMode ? icons.Save : icons.Plus"
         [size]="16"

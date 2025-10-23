@@ -10,6 +10,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamCard, TeamRole } from '@/app/shared/components/cards/team-card/team-card';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { TeamSearchComponent } from '@/app/shared/components/search';
+import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 
 @Component({
   selector: 'app-user-teams',
@@ -19,7 +20,8 @@ import { TeamSearchComponent } from '@/app/shared/components/search';
     FormsModule,
     LucideAngularModule,
     TeamCard,
-    TeamSearchComponent
+    TeamSearchComponent,
+    ConfirmDeleteModal
   ],
   templateUrl: './user-teams.html',
   styleUrl: './user-teams.css'
@@ -40,6 +42,9 @@ export class UserTeams implements OnInit {
   totalPages = signal(0);
   isLoading = signal(false);
   searchCriteria = signal<Partial<TeamSearch>>({});
+  showDeleteModal = signal(false);
+  isDeleting = signal(false);
+  teamToDelete = signal<Team | null>(null);
 
   getTeamRole(): TeamRole {
     return 'Manager';
@@ -160,11 +165,30 @@ export class UserTeams implements OnInit {
   onTeamDelete(teamId: string) {
     const team = this.teams().find(t => t.id === teamId);
     if (!team) return;
+    
+    this.teamToDelete.set(team);
+    this.showDeleteModal.set(true);
+  }
 
-    this.teamService.deleteTeam(teamId).subscribe({
+  closeDeleteModal() {
+    this.showDeleteModal.set(false);
+    this.teamToDelete.set(null);
+  }
+
+  confirmDelete() {
+    const team = this.teamToDelete();
+    if (!team) return;
+
+    this.isDeleting.set(true);
+    this.teamService.deleteTeam(team.id).subscribe({
       next: () => {
         this.toastService.success('Team deleted successfully');
+        this.closeDeleteModal();
         this.loadMyTeams();
+      },
+      error: (error) => {
+        this.toastService.error('Failed to delete team');
+        this.isDeleting.set(false);
       }
     });
   }

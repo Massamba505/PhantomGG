@@ -7,7 +7,9 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   selector: 'app-match-header',
   imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="flex flex-col md:flex-row justify-center md:justify-between items-start md:items-center gap-4 mb-6">
+    <div 
+      data-cy="tournament-matches"
+      class="flex flex-col md:flex-row justify-center md:justify-between items-start md:items-center gap-4 mb-6">
       <div>
         <h2 class="text-xl font-semibold mb-2">Match Management</h2>
         <p class="text-muted text-sm">

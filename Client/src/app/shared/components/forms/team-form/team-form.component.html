@@ -19,6 +19,7 @@
       accept="image/*"
       (change)="onLogoChange($event)"
       class="input-field w-full"
+      data-cy="team-image-input"
       [class.error]="isFieldInvalid('logo')"
     />
 
@@ -69,7 +70,7 @@
     <button
       type="submit"
       class="btn btn-primary flex-1"
-      data-cy = "create-team-submit-button"
+      data-cy = "team-submit-button"
       [disabled]="submitted() && teamForm.invalid"
     >
       {{ isEditMode() ? "Update Team" : "Create Team" }}
