@@ -1,62 +1,66 @@
 <div
   class="fixed left-0 top-0 h-full z-40 border-r"
   [ngClass]="isOpen() ? 'w-64' : 'w-16'"
+  data-cy="sidebar"
 >
-  <div class="h-16 flex items-center justify-between px-4">
-    <div class="flex items-center gap-2">
+  <div class="h-16 flex items-center justify-between px-4" data-cy="sidebar-header">
+    <div class="flex items-center gap-2" data-cy="sidebar-brand">
       @if (isOpen()) {
       <img
         src="PhantomGG_LOGO.png"
         alt="PhantomGG Logo"
         class="w-8 h-8 rounded-lg shadow-sm"
+        data-cy="sidebar-logo"
       />
-      <span class="font-bold text-lg truncate text-muted">PhantomGG</span>
+      <span class="font-bold text-lg truncate text-muted" data-cy="sidebar-brand-text">PhantomGG</span>
       }
     </div>
 
-    <button (click)="onToggle()" class="p-2 cursor-pointer rounded-lg">
-      <lucide-angular [img]="MenuIcon" class="h-5 w-5"></lucide-angular>
+    <button (click)="onToggle()" class="p-2 cursor-pointer rounded-lg" data-cy="sidebar-toggle">
+      <lucide-angular [img]="MenuIcon" class="h-5 w-5" data-cy="menu-icon"></lucide-angular>
     </button>
   </div>
 
-  <div class="p-3 pt-2">
+  <div class="p-3 pt-2" data-cy="sidebar-content">
     @if (isOpen()) {
-    <div class="text-xs uppercase font-medium mb-3 px-2">Navigation</div>
+    <div class="text-xs uppercase font-medium mb-3 px-2" data-cy="navigation-label">Navigation</div>
     }
 
-    <nav class="space-y-1">
+    <nav class="space-y-1" data-cy="main-navigation">
       @for (item of menuItems; track $index) {
       @if(item.roles.includes(userRole())) {
       <a
         [routerLink]="item.url"
         routerLinkActive="btn"
         class="flex w-full items-center gap-3 pl-2.5 pr-2 py-2 rounded-lg group text-sm font-medium btn-outline"
+        [attr.data-cy]="'nav-' + item.title.toLowerCase().split(' ').join('-')"
       >
-        <div class="w-5 h-5">
+        <div class="w-5 h-5" data-cy="nav-icon">
           <lucide-angular [img]="item.icon" class="h-5 w-5"></lucide-angular>
         </div>
 
         @if (isOpen()) {
-        <span class="truncate">{{ item.title }}</span>
+        <span class="truncate" data-cy="nav-title">{{ item.title }}</span>
         }
       </a>
       } }
     </nav>
 
-    <div class="mt-6 mb-2">
+    <div class="mt-6 mb-2" data-cy="quick-actions-section">
       @if (isOpen()) {
-      <div class="text-xs uppercase font-medium mb-3 px-2">Quick Actions</div>
+      <div class="text-xs uppercase font-medium mb-3 px-2" data-cy="quick-actions-label">Quick Actions</div>
       }
 
-      <nav class="space-y-1">
+      <nav class="space-y-1" data-cy="quick-actions-nav">
         @for (action of quickActions; track action.title) { @if
         (action.roles.includes(userRole())) {
         <a
           [routerLink]="action.url"
           routerLinkActive="btn"
           class="flex w-full items-center gap-3 pl-2.5 pr-2 py-2 rounded-lg group text-sm font-medium btn-outline"
+          [attr.data-cy]="'quick-action-' + action.title.toLowerCase().split(' ').join('-')"
         >
-          <div class="w-5 h-5 text-accent">
+          <div class="w-5 h-5 text-accent" data-cy="quick-action-icon">
             <lucide-angular
               [img]="action.icon"
               class="h-5 w-5"
@@ -64,7 +68,7 @@
           </div>
 
           @if (isOpen()) {
-          <span class="truncate">{{ action.title }}</span>
+          <span class="truncate" data-cy="quick-action-title">{{ action.title }}</span>
           }
         </a>
         } }

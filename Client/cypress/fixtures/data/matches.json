@@ -1,0 +1,33 @@
+{
+  "valid": {
+    "matchDate": "2025-12-05T15:00:00",
+    "venue": "Main Arena"
+  },
+  "update": {
+    "matchDate": "2025-12-06T18:00:00",
+    "venue": "Secondary Arena",
+    "status": 2
+  },
+  "events": {
+    "goal": {
+      "eventType": 1,
+      "minute": 15,
+      "description": "Amazing goal from outside the box"
+    },
+    "assist": {
+      "eventType": 2,
+      "minute": 15,
+      "description": "Great assist"
+    },
+    "yellowCard": {
+      "eventType": 3,
+      "minute": 30,
+      "description": "Dangerous tackle"
+    },
+    "redCard": {
+      "eventType": 4,
+      "minute": 75,
+      "description": "Second yellow card"
+    }
+  }
+}

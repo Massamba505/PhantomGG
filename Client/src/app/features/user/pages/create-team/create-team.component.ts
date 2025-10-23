@@ -34,7 +34,7 @@ export class CreateTeamComponent {
     this.teamService.createTeam(createTeamData).subscribe({
       next: (team) => {
         this.toastService.success('Team created successfully!');
-        this.router.navigate(['/user/teams']);
+        this.router.navigate(['/user/teams',team.id]);
         this.saving.set(false);
       },
       error: (error) => {

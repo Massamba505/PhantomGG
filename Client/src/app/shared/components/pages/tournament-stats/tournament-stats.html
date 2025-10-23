@@ -96,21 +96,21 @@
 
   <!-- Tabs -->
   <div class="flex flex-wrap gap-0 sm:gap-2 text-muted border-b mb-6">
-    <button (click)="onTabChange('table')" [class]="getTabClass('table')">
+    <button data-cy="standings-tab" (click)="onTabChange('table')" [class]="getTabClass('table')">
       <lucide-angular [img]="icons.BarChart3" [size]="16" class="inline mr-2" />
       League Table
       <span class="btn btn-outline px-2 py-0.5 ml-0.5 rounded-full">
         {{ standings().length }}
       </span>
     </button>
-    <button (click)="onTabChange('goals')" [class]="getTabClass('goals')">
+    <button data-cy="top-scorers-tab" (click)="onTabChange('goals')" [class]="getTabClass('goals')">
       <lucide-angular [img]="icons.Target" [size]="16" class="inline mr-2" />
       Top Scorers
       <span class="btn btn-outline px-2 py-0.5 ml-0.5 rounded-full">
         {{ goalStandings().length }}
       </span>
     </button>
-    <button (click)="onTabChange('assists')" [class]="getTabClass('assists')">
+    <button data-cy="top-assists-tab" (click)="onTabChange('assists')" [class]="getTabClass('assists')">
       <lucide-angular [img]="icons.Users" [size]="16" class="inline mr-2" />
       Top Assists
       <span class="btn btn-outline px-2 py-0.5 ml-0.5 rounded-full">
@@ -132,7 +132,7 @@
       </div>
     </div>
     } @else { @if (activeTab() === 'table') {
-    <div class="rounded-lg overflow-hidden border">
+    <div data-cy="tournament-standings" class="rounded-lg overflow-hidden border">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead class="border-b">

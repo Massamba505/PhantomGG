@@ -13,7 +13,7 @@
     <button class="btn btn-primary" (click)="editTournament()">
       Edit Tournament
     </button>
-    <button class="btn btn-destructive" (click)="deleteTournament()">
+    <button class="btn btn-destructive" data-cy="delete-tournament-button" (click)="deleteTournament()">
       Delete
     </button>
   </div>
@@ -25,7 +25,7 @@
   <p>Loading tournament details...</p>
 </div>
 } @if (!loading() && tournament()) {
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div data-cy="tournament-details" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-2 space-y-6">
     <div class="card">
       <div
@@ -207,12 +207,12 @@
 </div>
 
 <div class="grid grid-cols-1 gap-8 mt-8">
-  <div class="card">
+  <div class="card" data-cy="manage-teams-section">
     <app-tournament-team-management [tournamentId]="tournament()!.id">
     </app-tournament-team-management>
   </div>
 
-  <div class="card">
+  <div class="card" data-cy="matches-section">
     <app-tournament-match-management [tournamentId]="tournament()!.id">
     </app-tournament-match-management>
   </div>

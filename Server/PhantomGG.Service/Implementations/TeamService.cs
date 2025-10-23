@@ -188,7 +188,7 @@ public class TeamService(
     private async Task ValidateMaxTeamsPerUserAsync(Guid managerId)
     {
         var existingTeams = await _teamRepository.GetByUserAsync(managerId);
-        if (existingTeams.Count() >= 3)
+        if (existingTeams.Count() >= 100)
         {
             throw new ForbiddenException("You cannot create more than 3 teams. Please delete an existing team first.");
         }

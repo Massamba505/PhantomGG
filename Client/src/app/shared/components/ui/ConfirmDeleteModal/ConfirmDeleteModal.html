@@ -17,6 +17,7 @@
         class="btn btn-outline"
         [disabled]="isLoading()"
         (click)="handleClose()"
+        data-cy="cancel-delete-button"
       >
         Cancel
       </button>
@@ -24,6 +25,7 @@
         class="btn btn-destructive"
         [disabled]="isLoading()"
         (click)="handleConfirm()"
+        data-cy="confirm-delete-button"
       >
         Delete {{ entityName() }}
       </button>

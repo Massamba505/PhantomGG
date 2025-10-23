@@ -38,10 +38,12 @@ import { Match } from '@/app/api/models/match.models';
     } 
     @else {
       <div
+          data-cy="tournament-matches"
           class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
         >
         @for (match of matches(); track match.id) {
           <app-match-card
+            data-cy="match-card"
             [match]="match"
             (view)="view.emit(match)"
           />

@@ -10,6 +10,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { PlayerCard, PlayerRole } from '@/app/shared/components/cards/player-card/player-card';
 import { PlayerForm } from '@/app/shared/components/forms/player-form/player-form';
+import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 
 @Component({
   selector: 'app-team-details',
@@ -19,7 +20,8 @@ import { PlayerForm } from '@/app/shared/components/forms/player-form/player-for
     LucideAngularModule,
     Modal,
     PlayerCard,
-    PlayerForm
+    PlayerForm,
+    ConfirmDeleteModal
   ],
   templateUrl: './team-details.component.html',
   styleUrl: './team-details.component.css'
@@ -39,6 +41,8 @@ export class TeamDetailsComponent implements OnInit {
   error = signal<string | null>(null);
   showPlayerModal = signal(false);
   editingPlayer = signal<Player | null>(null);
+  showDeleteModal = signal(false);
+  isDeleting = signal(false);
 
   ngOnInit() {
     const teamId = this.route.snapshot.params['id'];
@@ -178,5 +182,30 @@ export class TeamDetailsComponent implements OnInit {
 
   getPlayerInitials(player: Player): string {
     return `${player.firstName.charAt(0)}${player.lastName.charAt(0)}`.toUpperCase();
+  }
+
+  onDeleteTeam() {
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal.set(false);
+  }
+
+  confirmDelete() {
+    const team = this.team();
+    if (!team) return;
+
+    this.isDeleting.set(true);
+    this.teamService.deleteTeam(team.id).subscribe({
+      next: () => {
+        this.toastService.success('Team deleted successfully');
+        this.router.navigate(['/user/teams']);
+      },
+      error: (error) => {
+        this.toastService.error('Failed to delete team');
+        this.isDeleting.set(false);
+      }
+    });
   }
 }

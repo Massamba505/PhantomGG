@@ -19,6 +19,7 @@
       accept="image/*"
       (change)="onLogoChange($event)"
       class="input-field w-full"
+      data-cy="team-image-input"
       [class.error]="isFieldInvalid('logo')"
     />
 
@@ -35,6 +36,7 @@
       type="text"
       formControlName="name"
       class="input-field w-full"
+      data-cy = "team-name-input"
       [class.error]="submitted() && teamForm.controls['name'].invalid"
     />
     @if (submitted() && teamForm.controls['name'].invalid) {
@@ -51,6 +53,7 @@
       formControlName="shortName"
       placeholder="Auto-generated if not provided"
       class="input-field w-full"
+      data-cy = "team-short-name-input"
       [class.error]="submitted() && teamForm.controls['shortName'].invalid"
     />
     @if (submitted() && teamForm.controls['shortName'].invalid) {
@@ -67,6 +70,7 @@
     <button
       type="submit"
       class="btn btn-primary flex-1"
+      data-cy = "team-submit-button"
       [disabled]="submitted() && teamForm.invalid"
     >
       {{ isEditMode() ? "Update Team" : "Create Team" }}
