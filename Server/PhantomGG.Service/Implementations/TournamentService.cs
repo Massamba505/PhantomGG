@@ -161,7 +161,7 @@ public class TournamentService(
         var tournaments = await _tournamentRepository.GetByOrganizerAsync(organizerId);
         var activeTournaments = tournaments.Where(t => t.Status != (int)TournamentStatus.Completed).ToList();
 
-        if (activeTournaments.Count >= 5)
+        if (activeTournaments.Count >= 500)
         {
             throw new ForbiddenException("You cannot create more than 5 active tournaments. Please complete or cancel an existing tournament first.");
         }
