@@ -6,7 +6,7 @@ namespace PhantomGG.Service.Domain.Tournaments.Interfaces;
 public interface ITournamentService
 {
     Task<PagedResult<TournamentDto>> SearchAsync(TournamentQuery query, Guid? userId = null);
-    Task<TournamentDto> GetByIdAsync(Guid id);
+    Task<TournamentDto> GetByIdAsync(Guid id, Guid? currentUserId = null);
     Task<TournamentDto> CreateAsync(CreateTournamentDto createDto, Guid organizerId);
     Task<TournamentDto> UpdateAsync(Guid id, UpdateTournamentDto updateDto, Guid organizerId);
     Task DeleteAsync(Guid id, Guid organizerId);

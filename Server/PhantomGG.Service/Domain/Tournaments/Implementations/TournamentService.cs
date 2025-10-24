@@ -8,6 +8,7 @@ using PhantomGG.Repository.Interfaces;
 using PhantomGG.Repository.Specifications;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Infrastructure.Caching.Interfaces;
+using PhantomGG.Service.Infrastructure.Email.Interfaces;
 using PhantomGG.Service.Infrastructure.Storage.Interfaces;
 using PhantomGG.Service.Mappings;
 using PhantomGG.Service.Validation.Interfaces;
@@ -20,6 +21,8 @@ public class TournamentService(
     IImageService imageService,
     ITournamentValidationService validationService,
     ICacheInvalidationService cacheInvalidationService,
+    IUserRepository userRepository,
+    IEmailService emailService,
     HybridCache cache,
     ILogger<TournamentService> logger) : ITournamentService
 {
@@ -28,6 +31,8 @@ public class TournamentService(
     private readonly IImageService _imageService = imageService;
     private readonly HybridCache _cache = cache;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IEmailService _emailService = emailService;
     private readonly ILogger<TournamentService> _logger = logger;
 
     public async Task<PagedResult<TournamentDto>> SearchAsync(TournamentQuery query, Guid? userId = null)
@@ -40,39 +45,48 @@ public class TournamentService(
             StartDateFrom = query.StartFrom,
             StartDateTo = query.StartTo,
             OrganizerId = userId,
-            IsPublic = !userId.HasValue || query.IsPublic,
+            IsPublic = query.IsPublic,
             Page = query.Page,
             PageSize = query.PageSize
         };
 
         var result = await _tournamentRepository.SearchAsync(spec);
+
+        var filteredData = result.Data;
+        if (!userId.HasValue)
+        {
+            filteredData = filteredData.Where(t => t.Status != (int)TournamentStatus.Draft).ToList();
+        }
+
         return new PagedResult<TournamentDto>(
-            result.Data.Select(t => t.ToDto()),
+            filteredData.Select(t => t.ToDto()),
             result.Meta.Page,
             result.Meta.PageSize,
-            result.Meta.TotalRecords
+            filteredData.Count()
         );
     }
 
-    public async Task<TournamentDto> GetByIdAsync(Guid id)
+    public async Task<TournamentDto> GetByIdAsync(Guid id, Guid? currentUserId = null)
     {
         string cacheKey = $"tournament_{id}";
-        return await _cache.GetOrCreateAsync(
-            cacheKey,
-            async cancel =>
-            {
-                var tournament = await _tournamentRepository.GetByIdAsync(id);
-                if (tournament == null)
-                    throw new NotFoundException($"Tournament not found");
+        var tournament = await _tournamentRepository.GetByIdAsync(id);
 
-                return tournament.ToDto();
-            },
-            new HybridCacheEntryOptions { Expiration = TimeSpan.FromMinutes(10) }
-        );
+        if (tournament == null)
+            throw new NotFoundException("Tournament not found");
+
+        if (tournament.Status == (int)TournamentStatus.Draft)
+        {
+            if (!currentUserId.HasValue || tournament.OrganizerId != currentUserId.Value)
+                throw new ForbiddenException("Draft tournaments are only visible to their organizers");
+        }
+
+        return tournament.ToDto();
     }
 
     public async Task<TournamentDto> CreateAsync(CreateTournamentDto createDto, Guid organizerId)
     {
+        await _validationService.ValidateTournamentDatesAsync(createDto.StartDate, createDto.EndDate);
+
         await ValidateMaxTournamentsPerUserAsync(organizerId);
 
         var tournament = createDto.ToEntity(organizerId);
@@ -162,11 +176,14 @@ public class TournamentService(
     private async Task ValidateMaxTournamentsPerUserAsync(Guid organizerId)
     {
         var tournaments = await _tournamentRepository.GetByOrganizerAsync(organizerId);
-        var activeTournaments = tournaments.Where(t => t.Status != (int)TournamentStatus.Completed).ToList();
+        var activeTournaments = tournaments.Where(t =>
+            t.Status != (int)TournamentStatus.Completed &&
+            t.Status != (int)TournamentStatus.Cancelled).ToList();
 
-        if (activeTournaments.Count >= 500)
+        const int maxActiveTournaments = 10;
+        if (activeTournaments.Count >= maxActiveTournaments)
         {
-            throw new ForbiddenException("You cannot create more than 5 active tournaments. Please complete or cancel an existing tournament first.");
+            throw new ForbiddenException($"You cannot create more than {maxActiveTournaments} active tournaments. Please complete or cancel an existing tournament first.");
         }
     }
 
@@ -206,6 +223,24 @@ public class TournamentService(
 
                     await _tournamentRepository.UpdateAsync(tournament);
                     await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournament.Id);
+
+                    try
+                    {
+                        var organizer = await _userRepository.GetByIdAsync(tournament.OrganizerId);
+                        if (organizer != null)
+                        {
+                            await _emailService.SendTournamentStatusChangedAsync(
+                                organizer.Email,
+                                organizer.FirstName,
+                                tournament.Name,
+                                oldStatus.ToString(),
+                                newStatus.ToString());
+                        }
+                    }
+                    catch (Exception emailEx)
+                    {
+                        _logger.LogWarning(emailEx, "Failed to send status change email for tournament {TournamentId}", tournament.Id);
+                    }
 
                     updatedCount++;
                 }

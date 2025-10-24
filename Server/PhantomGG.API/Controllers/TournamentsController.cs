@@ -46,7 +46,8 @@ public class TournamentsController(
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<TournamentDto>> GetTournament(Guid id)
     {
-        var tournament = await _tournamentService.GetByIdAsync(id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var tournament = await _tournamentService.GetByIdAsync(id, currentUser?.Id);
         return Ok(tournament);
     }
 

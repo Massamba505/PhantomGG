@@ -7,9 +7,11 @@ using PhantomGG.Service.Validation.Interfaces;
 namespace PhantomGG.Service.Validation.Implementations;
 
 public class TournamentValidationService(
-    ITournamentRepository tournamentRepository) : ITournamentValidationService
+    ITournamentRepository tournamentRepository,
+    ITournamentTeamRepository tournamentTeamRepository) : ITournamentValidationService
 {
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
+    private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
 
     public async Task<Tournament> ValidateTournamentExistsAsync(Guid tournamentId)
     {
@@ -103,5 +105,63 @@ public class TournamentValidationService(
             throw new ForbiddenException("Can only mark tournament as completed if it is in progress");
 
         return tournament;
+    }
+
+    public async Task ValidateMinimumTeamsAsync(Guid tournamentId, int minTeams = 2)
+    {
+        var teams = await _tournamentTeamRepository.GetByTournamentAndStatusAsync(tournamentId, (int)TeamRegistrationStatus.Approved);
+        if (teams.Count() < minTeams)
+            throw new ValidationException($"Tournament must have at least {minTeams} approved teams to start");
+    }
+
+    public async Task ValidateMaximumTeamsAsync(Guid tournamentId, int maxTeams = 32)
+    {
+        var teams = await _tournamentTeamRepository.GetByTournamentAndStatusAsync(tournamentId, (int)TeamRegistrationStatus.Approved);
+        if (teams.Count() >= maxTeams)
+            throw new ValidationException($"Tournament has reached the maximum limit of {maxTeams} teams");
+    }
+
+    public Task ValidateTournamentDatesAsync(DateTime startDate, DateTime endDate)
+    {
+        if (startDate <= DateTime.UtcNow)
+            throw new ValidationException("Tournament start date must be in the future");
+
+        if (endDate <= startDate)
+            throw new ValidationException("Tournament end date must be after start date");
+
+        var duration = (endDate - startDate).TotalDays;
+        if (duration > 365)
+            throw new ValidationException("Tournament duration cannot exceed 365 days");
+
+        if (duration < 1)
+            throw new ValidationException("Tournament must last at least 1 day");
+
+        return Task.CompletedTask;
+    }
+
+    public async Task ValidateCanStartTournamentAsync(Guid tournamentId)
+    {
+        var tournament = await ValidateTournamentExistsAsync(tournamentId);
+
+        if (tournament.Status != (int)TournamentStatus.RegistrationClosed)
+            throw new ForbiddenException("Tournament registration must be closed before starting");
+
+        await ValidateMinimumTeamsAsync(tournamentId, 2);
+
+        if (tournament.StartDate > DateTime.UtcNow)
+            throw new ForbiddenException("Cannot start tournament before its scheduled start date");
+    }
+
+    public async Task ValidateRegistrationStatusAsync(Guid tournamentId, bool shouldBeOpen)
+    {
+        var tournament = await ValidateTournamentExistsAsync(tournamentId);
+
+        var isOpen = tournament.Status == (int)TournamentStatus.RegistrationOpen;
+
+        if (shouldBeOpen && !isOpen)
+            throw new ValidationException("Tournament registration is not open");
+
+        if (!shouldBeOpen && isOpen)
+            throw new ValidationException("Tournament registration is still open");
     }
 }

@@ -49,6 +49,30 @@ public class EmailService(
         await SendEmailAsync(email, "Welcome to PhantomGG", htmlContent);
     }
 
+    public async Task SendTeamRegistrationRequestAsync(string organizerEmail, string organizerName, string teamName, string tournamentName)
+    {
+        var htmlContent = _templateService.GetTeamRegistrationRequestTemplate(organizerName, teamName, tournamentName);
+        await SendEmailAsync(organizerEmail, $"New Team Registration: {teamName}", htmlContent);
+    }
+
+    public async Task SendTeamApprovedAsync(string teamManagerEmail, string teamManagerName, string teamName, string tournamentName)
+    {
+        var htmlContent = _templateService.GetTeamApprovedTemplate(teamManagerName, teamName, tournamentName, null);
+        await SendEmailAsync(teamManagerEmail, $"Team Approved: {tournamentName}", htmlContent);
+    }
+
+    public async Task SendTeamRejectedAsync(string teamManagerEmail, string teamManagerName, string teamName, string tournamentName)
+    {
+        var htmlContent = _templateService.GetTeamRejectedTemplate(teamManagerName, teamName, tournamentName);
+        await SendEmailAsync(teamManagerEmail, $"Registration Update: {tournamentName}", htmlContent);
+    }
+
+    public async Task SendTournamentStatusChangedAsync(string organizerEmail, string organizerName, string tournamentName, string oldStatus, string newStatus)
+    {
+        var htmlContent = _templateService.GetTournamentStatusChangedTemplate(organizerName, tournamentName, oldStatus, newStatus);
+        await SendEmailAsync(organizerEmail, $"Tournament Status Changed: {tournamentName}", htmlContent);
+    }
+
     private async Task SendEmailAsync(string toEmail, string subject, string htmlContent)
     {
         var message = new MimeMessage();

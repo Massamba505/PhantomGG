@@ -7,6 +7,7 @@ using PhantomGG.Service.Mappings;
 using Microsoft.Extensions.Caching.Hybrid;
 using PhantomGG.Service.Validation.Interfaces;
 using PhantomGG.Service.Infrastructure.Caching.Interfaces;
+using PhantomGG.Service.Infrastructure.Email.Interfaces;
 using PhantomGG.Service.Domain.Tournaments.Interfaces;
 
 namespace PhantomGG.Service.Domain.Tournaments.Implementations;
@@ -16,12 +17,20 @@ public class TournamentTeamService(
     ITournamentValidationService validationService,
     ITeamValidationService teamValidationService,
     ICacheInvalidationService cacheInvalidationService,
+    ITeamRepository teamRepository,
+    ITournamentRepository tournamentRepository,
+    IUserRepository userRepository,
+    IEmailService emailService,
     HybridCache cache) : ITournamentTeamService
 {
     private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
     private readonly ITournamentValidationService _validationService = validationService;
     private readonly ITeamValidationService _teamValidationService = teamValidationService;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
+    private readonly ITeamRepository _teamRepository = teamRepository;
+    private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IEmailService _emailService = emailService;
     private readonly HybridCache _cache = cache;
 
     public async Task<IEnumerable<TournamentTeamDto>> GetTeamsAsync(Guid tournamentId, TeamRegistrationStatus? status = null)
@@ -56,12 +65,18 @@ public class TournamentTeamService(
     public async Task RegisterTeamAsync(Guid tournamentId, Guid teamId, Guid userId)
     {
         await _validationService.ValidateTeamCanRegisterAsync(tournamentId);
+
         await _teamValidationService.ValidateCanManageTeamAsync(userId, teamId);
+
+        await _teamValidationService.ValidateMinimumPlayersForTournamentAsync(teamId, 5);
+        await _teamValidationService.ValidateTeamHasRequiredPositionsAsync(teamId);
 
         if (await _tournamentTeamRepository.IsTeamRegisteredAsync(tournamentId, teamId))
         {
             throw new ConflictException("Team is already registered for this tournament");
         }
+
+        await _validationService.ValidateMaximumTeamsAsync(tournamentId);
 
         var registration = new TournamentTeam
         {
@@ -72,10 +87,27 @@ public class TournamentTeamService(
             CreatedAt = DateTime.UtcNow
         };
 
-        //Todo: send email to Organizer
-
         await _tournamentTeamRepository.CreateAsync(registration);
         await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournamentId);
+
+        try
+        {
+            var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+            var team = await _teamRepository.GetByIdAsync(teamId);
+            var organizer = await _userRepository.GetByIdAsync(tournament!.OrganizerId);
+
+            if (organizer != null && tournament != null && team != null)
+            {
+                await _emailService.SendTeamRegistrationRequestAsync(
+                    organizer.Email,
+                    organizer.FirstName,
+                    team.Name,
+                    tournament.Name);
+            }
+        }
+        catch (Exception)
+        {
+        }
     }
 
     public async Task ManageTeamAsync(Guid tournamentId, Guid teamId, TeamAction action, Guid userId)
@@ -95,11 +127,35 @@ public class TournamentTeamService(
                 {
                     throw new ForbiddenException("Only pending registrations can be approved");
                 }
+
+                await _validationService.ValidateMaximumTeamsAsync(tournamentId);
+
+                await _teamValidationService.ValidateMinimumPlayersForTournamentAsync(teamId, 5);
+                await _teamValidationService.ValidateTeamHasRequiredPositionsAsync(teamId);
+
                 registration.Status = (int)TeamRegistrationStatus.Approved;
                 registration.AcceptedAt = DateTime.UtcNow;
-                //Todo: send email to Team
                 await _tournamentTeamRepository.UpdateAsync(registration);
                 await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournamentId);
+
+                try
+                {
+                    var tournamentData = await _tournamentRepository.GetByIdAsync(tournamentId);
+                    var teamData = await _teamRepository.GetByIdAsync(teamId);
+                    var teamManager = teamData != null ? await _userRepository.GetByIdAsync(teamData.UserId) : null;
+
+                    if (teamManager != null && tournamentData != null && teamData != null)
+                    {
+                        await _emailService.SendTeamApprovedAsync(
+                            teamManager.Email,
+                            teamManager.FirstName,
+                            teamData.Name,
+                            tournamentData.Name);
+                    }
+                }
+                catch (Exception)
+                {
+                }
                 break;
 
             case TeamAction.Reject:
@@ -110,10 +166,34 @@ public class TournamentTeamService(
                 registration.Status = (int)TeamRegistrationStatus.Rejected;
                 await _tournamentTeamRepository.UpdateAsync(registration);
                 await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournamentId);
-                //Todo: send email to Team
+
+                try
+                {
+                    var tournamentData = await _tournamentRepository.GetByIdAsync(tournamentId);
+                    var teamData = await _teamRepository.GetByIdAsync(teamId);
+                    var teamManager = teamData != null ? await _userRepository.GetByIdAsync(teamData.UserId) : null;
+
+                    if (teamManager != null && tournamentData != null && teamData != null)
+                    {
+                        await _emailService.SendTeamRejectedAsync(
+                            teamManager.Email,
+                            teamManager.FirstName,
+                            teamData.Name,
+                            tournamentData.Name);
+                    }
+                }
+                catch (Exception)
+                {
+                }
                 break;
 
             case TeamAction.Withdraw:
+                var tournament = await _validationService.ValidateTournamentExistsAsync(tournamentId);
+                if (tournament.Status == (int)TournamentStatus.InProgress || tournament.Status == (int)TournamentStatus.Completed)
+                {
+                    throw new ForbiddenException("Cannot withdraw from a tournament that is in progress or completed");
+                }
+
                 await _tournamentTeamRepository.DeleteAsync(registration);
                 await _cacheInvalidationService.InvalidateTournamentRelatedCacheAsync(tournamentId);
                 break;

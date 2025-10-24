@@ -35,6 +35,9 @@ public static class ServiceExtensions
         services.AddScoped<ITournamentValidationService, TournamentValidationService>();
         services.AddScoped<ITeamValidationService, TeamValidationService>();
         services.AddScoped<IMatchValidationService, MatchValidationService>();
+        services.AddScoped<IPlayerValidationService, PlayerValidationService>();
+        services.AddScoped<IUserValidationService, UserValidationService>();
+        services.AddScoped<IMatchEventValidationService, MatchEventValidationService>();
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<IPlayerService, PlayerService>();
         services.AddScoped<IMatchService, MatchService>();

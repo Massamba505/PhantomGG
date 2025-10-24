@@ -8,10 +8,14 @@ namespace PhantomGG.Service.Validation.Implementations;
 
 public class TeamValidationService(
     ITeamRepository teamRepository,
-    ITournamentTeamRepository tournamentTeamRepository) : ITeamValidationService
+    ITournamentTeamRepository tournamentTeamRepository,
+    IPlayerRepository playerRepository,
+    IMatchRepository matchRepository) : ITeamValidationService
 {
     private readonly ITeamRepository _teamRepository = teamRepository;
     private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
+    private readonly IPlayerRepository _playerRepository = playerRepository;
+    private readonly IMatchRepository _matchRepository = matchRepository;
 
     public async Task<Team> ValidateTeamExistsAsync(Guid userId)
     {
@@ -54,5 +58,24 @@ public class TeamValidationService(
         {
             throw new ConflictException("A team with this name is already available");
         }
+    }
+
+    public async Task ValidateMinimumPlayersForTournamentAsync(Guid teamId, int minPlayers = 5)
+    {
+        var players = await _playerRepository.GetByTeamAsync(teamId);
+        if (players.Count() < minPlayers)
+            throw new ValidationException($"Team must have at least {minPlayers} players to participate in tournaments");
+    }
+
+    public async Task ValidateTeamHasRequiredPositionsAsync(Guid teamId)
+    {
+        var players = await _playerRepository.GetByTeamAsync(teamId);
+        var positions = players.Select(p => p.Position).Distinct().ToList();
+
+        if (!positions.Contains((int)PlayerPosition.Goalkeeper))
+            throw new ValidationException("Team must have at least one goalkeeper");
+
+        if (positions.Count < 2)
+            throw new ValidationException("Team must have players in at least 2 different positions");
     }
 }

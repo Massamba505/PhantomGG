@@ -86,7 +86,6 @@ public class MatchEventService(
         var matchEvent = createDto.ToEntity();
         var createdEvent = await _matchEventRepository.CreateAsync(matchEvent);
 
-        // Recalculate match scores if this is a goal event
         if (createDto.EventType == MatchEventType.Goal)
         {
             await RecalculateMatchScoresAsync(createDto.MatchId);
@@ -135,7 +134,6 @@ public class MatchEventService(
 
         var updatedEvent = await _matchEventRepository.UpdateAsync(existingEvent);
 
-        // Recalculate match scores if this was or is now a goal event
         if (wasGoalEvent || willBeGoalEvent)
         {
             await RecalculateMatchScoresAsync(existingEvent.MatchId);
@@ -164,7 +162,6 @@ public class MatchEventService(
 
         await _matchEventRepository.DeleteAsync(id);
 
-        // Recalculate match scores if this was a goal event
         if (wasGoalEvent)
         {
             await RecalculateMatchScoresAsync(existingEvent.MatchId);
@@ -179,9 +176,6 @@ public class MatchEventService(
         await _cacheInvalidationService.InvalidateMatchCacheAsync(existingEvent.MatchId);
     }
 
-    /// <summary>
-    /// Recalculate and update match scores based on goal events
-    /// </summary>
     private async Task RecalculateMatchScoresAsync(Guid matchId)
     {
         var match = await _matchRepository.GetByIdAsync(matchId);
@@ -193,7 +187,6 @@ public class MatchEventService(
         var homeScore = goalEvents.Count(e => e.TeamId == match.HomeTeamId);
         var awayScore = goalEvents.Count(e => e.TeamId == match.AwayTeamId);
 
-        // Only update if scores have changed
         if (match.HomeScore != homeScore || match.AwayScore != awayScore)
         {
             match.HomeScore = homeScore;
