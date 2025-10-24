@@ -14,23 +14,33 @@ public class MatchEventService(
     IMatchEventRepository matchEventRepository,
     IMatchRepository matchRepository,
     IMatchValidationService matchValidationService,
+    IMatchEventValidationService matchEventValidationService,
+    IPlayerValidationService playerValidationService,
+    ITeamValidationService teamValidationService,
     ICacheInvalidationService cacheInvalidationService,
     HybridCache cache) : IMatchEventService
 {
     private readonly IMatchEventRepository _matchEventRepository = matchEventRepository;
     private readonly IMatchRepository _matchRepository = matchRepository;
     private readonly IMatchValidationService _matchValidationService = matchValidationService;
+    private readonly IMatchEventValidationService _matchEventValidationService = matchEventValidationService;
+    private readonly IPlayerValidationService _playerValidationService = playerValidationService;
+    private readonly ITeamValidationService _teamValidationService = teamValidationService;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
     private readonly HybridCache _cache = cache;
 
     public async Task<IEnumerable<MatchEventDto>> GetMatchEventsAsync(Guid matchId)
     {
+        await _matchValidationService.ValidateMatchExistsAsync(matchId);
+
         var events = await _matchEventRepository.GetByMatchIdAsync(matchId);
         return events.Select(e => e.ToDto());
     }
 
     public async Task<IEnumerable<MatchEventDto>> GetPlayerEventsAsync(Guid playerId)
     {
+        await _playerValidationService.ValidatePlayerExistsAsync(playerId);
+
         var cacheKey = $"player_events_{playerId}";
         var options = new HybridCacheEntryOptions
         {
@@ -46,6 +56,8 @@ public class MatchEventService(
 
     public async Task<IEnumerable<MatchEventDto>> GetTeamEventsAsync(Guid teamId)
     {
+        await _teamValidationService.ValidateTeamExistsAsync(teamId);
+
         var cacheKey = $"team_events_{teamId}";
         var options = new HybridCacheEntryOptions
         {
@@ -80,8 +92,18 @@ public class MatchEventService(
     public async Task<MatchEventDto> CreateMatchEventAsync(CreateMatchEventDto createDto, Guid userId)
     {
         await _matchValidationService.ValidateCanUpdateMatchAsync(createDto.MatchId, userId);
-
         await _matchValidationService.ValidatePlayerTeamRelationshipAsync(createDto.PlayerId, createDto.TeamId, createDto.MatchId);
+        await _matchEventValidationService.ValidateEventTimeAsync(createDto.Minute, createDto.MatchId);
+        await _matchEventValidationService.ValidateEventTypeForMatchStatusAsync((int)createDto.EventType, createDto.MatchId);
+
+        if (createDto.EventType == MatchEventType.YellowCard)
+        {
+            await _matchEventValidationService.ValidateYellowCardRulesAsync(createDto.PlayerId, createDto.MatchId);
+        }
+        else if (createDto.EventType == MatchEventType.RedCard)
+        {
+            await _matchEventValidationService.ValidateRedCardRulesAsync(createDto.PlayerId, createDto.MatchId);
+        }
 
         var matchEvent = createDto.ToEntity();
         var createdEvent = await _matchEventRepository.CreateAsync(matchEvent);
@@ -104,9 +126,7 @@ public class MatchEventService(
 
     public async Task<MatchEventDto> UpdateMatchEventAsync(Guid id, UpdateMatchEventDto updateDto, Guid userId)
     {
-        var existingEvent = await _matchEventRepository.GetByIdAsync(id);
-        if (existingEvent == null)
-            throw new NotFoundException("Match event not found");
+        var existingEvent = await _matchEventValidationService.ValidateMatchEventExistsAsync(id);
 
         await _matchValidationService.ValidateCanUpdateMatchAsync(existingEvent.MatchId, userId);
 
@@ -115,6 +135,17 @@ public class MatchEventService(
 
         if (updateDto.EventType.HasValue)
         {
+            await _matchEventValidationService.ValidateEventTypeForMatchStatusAsync((int)updateDto.EventType.Value, existingEvent.MatchId);
+
+            if (updateDto.EventType.Value == MatchEventType.YellowCard)
+            {
+                await _matchEventValidationService.ValidateYellowCardRulesAsync(existingEvent.PlayerId, existingEvent.MatchId);
+            }
+            else if (updateDto.EventType.Value == MatchEventType.RedCard)
+            {
+                await _matchEventValidationService.ValidateRedCardRulesAsync(existingEvent.PlayerId, existingEvent.MatchId);
+            }
+
             existingEvent.EventType = (int)updateDto.EventType.Value;
             willBeGoalEvent = updateDto.EventType.Value == MatchEventType.Goal;
         }
@@ -124,7 +155,10 @@ public class MatchEventService(
         }
 
         if (updateDto.Minute.HasValue)
+        {
+            await _matchEventValidationService.ValidateEventTimeAsync(updateDto.Minute.Value, existingEvent.MatchId);
             existingEvent.Minute = updateDto.Minute.Value;
+        }
 
         if (updateDto.PlayerId.HasValue)
         {
@@ -152,9 +186,7 @@ public class MatchEventService(
 
     public async Task DeleteMatchEventAsync(Guid id, Guid userId)
     {
-        var existingEvent = await _matchEventRepository.GetByIdAsync(id);
-        if (existingEvent == null)
-            throw new NotFoundException("Match event not found");
+        var existingEvent = await _matchEventValidationService.ValidateMatchEventExistsAsync(id);
 
         await _matchValidationService.ValidateCanUpdateMatchAsync(existingEvent.MatchId, userId);
 

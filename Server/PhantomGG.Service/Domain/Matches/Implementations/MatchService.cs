@@ -18,6 +18,7 @@ public class MatchService(
     IMatchEventRepository matchEventRepository,
     ITournamentTeamRepository tournamentTeamRepository,
     IMatchValidationService matchValidationService,
+    ITournamentValidationService tournamentValidationService,
     ICacheInvalidationService cacheInvalidationService,
     HybridCache cache) : IMatchService
 {
@@ -25,6 +26,7 @@ public class MatchService(
     private readonly IMatchEventRepository _matchEventRepository = matchEventRepository;
     private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
     private readonly IMatchValidationService _matchValidationService = matchValidationService;
+    private readonly ITournamentValidationService _tournamentValidationService = tournamentValidationService;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
     private readonly HybridCache _cache = cache;
 
@@ -36,6 +38,8 @@ public class MatchService(
 
     public async Task<IEnumerable<MatchDto>> GetByTournamentAndStatusAsync(Guid tournamentId, MatchStatus? status)
     {
+        await _tournamentValidationService.ValidateTournamentExistsAsync(tournamentId);
+
         if (status.HasValue)
         {
             var matches = await _matchRepository.GetByTournamentAndStatusAsync(tournamentId, (int)status.Value);
@@ -69,6 +73,11 @@ public class MatchService(
 
     public async Task<PagedResult<MatchDto>> SearchAsync(MatchQuery query)
     {
+        if (query.TournamentId.HasValue)
+        {
+            await _tournamentValidationService.ValidateTournamentExistsAsync(query.TournamentId.Value);
+        }
+
         var spec = new MatchSpecification
         {
             SearchTerm = query.Q,

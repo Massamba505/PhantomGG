@@ -38,10 +38,8 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
         return await _context.Matches
             .Include(m => m.HomeTeam)
             .Include(m => m.AwayTeam)
-            .Where(m => m.TournamentId == tournamentId &&
-                       m.MatchDate > DateTime.UtcNow &&
-                       m.Status == (int)status)
             .Include(m => m.Tournament)
+            .Where(m => m.TournamentId == tournamentId && m.Status == (int)status)
             .OrderBy(m => m.MatchDate)
             .ToListAsync();
     }
