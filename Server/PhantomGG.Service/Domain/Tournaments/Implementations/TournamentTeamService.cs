@@ -35,6 +35,8 @@ public class TournamentTeamService(
 
     public async Task<IEnumerable<TournamentTeamDto>> GetTeamsAsync(Guid tournamentId, TeamRegistrationStatus? status = null)
     {
+        await _validationService.ValidateTournamentExistsAsync(tournamentId);
+
         var cacheKey = status.HasValue
             ? $"tournament_teams_{tournamentId}_{status}"
             : $"tournament_teams_{tournamentId}_all";
@@ -59,6 +61,14 @@ public class TournamentTeamService(
 
     public async Task<bool> IsTeamRegisteredAsync(Guid tournamentId, Guid teamId)
     {
+        await _validationService.ValidateTournamentExistsAsync(tournamentId);
+
+        var team = await _teamRepository.GetByIdAsync(teamId);
+        if (team == null)
+        {
+            throw new NotFoundException("Team not found");
+        }
+
         return await _tournamentTeamRepository.IsTeamRegisteredAsync(tournamentId, teamId);
     }
 
@@ -211,6 +221,16 @@ public class TournamentTeamService(
         if (registration == null)
         {
             throw new NotFoundException("Team registration not found");
+        }
+
+        var tournament = await _validationService.ValidateTournamentExistsAsync(tournamentId);
+        if (tournament.Status == (int)TournamentStatus.InProgress)
+        {
+            throw new ForbiddenException("Cannot remove teams from a tournament that is in progress");
+        }
+        if (tournament.Status == (int)TournamentStatus.Completed)
+        {
+            throw new ForbiddenException("Cannot remove teams from a completed tournament");
         }
 
         await _tournamentTeamRepository.DeleteAsync(registration);

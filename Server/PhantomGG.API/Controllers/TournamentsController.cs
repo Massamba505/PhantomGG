@@ -150,7 +150,8 @@ public class TournamentsController(
     [HttpGet("{id:guid}/standings")]
     public async Task<ActionResult<IEnumerable<TournamentStandingDto>>> GetTournamentStandings(Guid id)
     {
-        var standings = await _tournamentStandingService.GetTournamentStandingsAsync(id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var standings = await _tournamentStandingService.GetTournamentStandingsAsync(id, currentUser?.Id);
         return Ok(standings);
     }
 
@@ -160,7 +161,8 @@ public class TournamentsController(
     [HttpGet("{id:guid}/standings/goals")]
     public async Task<ActionResult<IEnumerable<PlayerGoalStandingDto>>> GetPlayerGoalStandings(Guid id)
     {
-        var standings = await _tournamentStandingService.GetPlayerGoalStandingsAsync(id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var standings = await _tournamentStandingService.GetPlayerGoalStandingsAsync(id, currentUser?.Id);
         return Ok(standings);
     }
 
@@ -170,7 +172,8 @@ public class TournamentsController(
     [HttpGet("{id:guid}/standings/assists")]
     public async Task<ActionResult<IEnumerable<PlayerAssistStandingDto>>> GetPlayerAssistStandings(Guid id)
     {
-        var standings = await _tournamentStandingService.GetPlayerAssistStandingsAsync(id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var standings = await _tournamentStandingService.GetPlayerAssistStandingsAsync(id, currentUser?.Id);
         return Ok(standings);
     }
 

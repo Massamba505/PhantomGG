@@ -4,7 +4,7 @@ namespace PhantomGG.Service.Domain.Tournaments.Interfaces;
 
 public interface ITournamentStandingService
 {
-    Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid tournamentId);
-    Task<IEnumerable<PlayerGoalStandingDto>> GetPlayerGoalStandingsAsync(Guid tournamentId);
-    Task<IEnumerable<PlayerAssistStandingDto>> GetPlayerAssistStandingsAsync(Guid tournamentId);
+    Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid tournamentId, Guid? currentUserId = null);
+    Task<IEnumerable<PlayerGoalStandingDto>> GetPlayerGoalStandingsAsync(Guid tournamentId, Guid? currentUserId = null);
+    Task<IEnumerable<PlayerAssistStandingDto>> GetPlayerAssistStandingsAsync(Guid tournamentId, Guid? currentUserId = null);
 }

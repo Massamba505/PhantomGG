@@ -15,9 +15,10 @@ public class TournamentStandingService(
     private readonly ITournamentValidationService _validationService = validationService;
     private readonly HybridCache _cache = cache;
 
-    public async Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid tournamentId)
+    public async Task<IEnumerable<TournamentStandingDto>> GetTournamentStandingsAsync(Guid tournamentId, Guid? currentUserId = null)
     {
         var tournament = await _validationService.ValidateTournamentExistsAsync(tournamentId);
+        await _validationService.ValidateDraftAccessAsync(tournamentId, currentUserId);
 
         var cacheKey = $"tournament_standings_{tournamentId}";
         var options = new HybridCacheEntryOptions
@@ -31,9 +32,10 @@ public class TournamentStandingService(
         }, options);
     }
 
-    public async Task<IEnumerable<PlayerGoalStandingDto>> GetPlayerGoalStandingsAsync(Guid tournamentId)
+    public async Task<IEnumerable<PlayerGoalStandingDto>> GetPlayerGoalStandingsAsync(Guid tournamentId, Guid? currentUserId = null)
     {
         await _validationService.ValidateTournamentExistsAsync(tournamentId);
+        await _validationService.ValidateDraftAccessAsync(tournamentId, currentUserId);
 
         var cacheKey = $"player_goal_standings_{tournamentId}";
         var options = new HybridCacheEntryOptions
@@ -47,9 +49,10 @@ public class TournamentStandingService(
         }, options);
     }
 
-    public async Task<IEnumerable<PlayerAssistStandingDto>> GetPlayerAssistStandingsAsync(Guid tournamentId)
+    public async Task<IEnumerable<PlayerAssistStandingDto>> GetPlayerAssistStandingsAsync(Guid tournamentId, Guid? currentUserId = null)
     {
         await _validationService.ValidateTournamentExistsAsync(tournamentId);
+        await _validationService.ValidateDraftAccessAsync(tournamentId, currentUserId);
 
         var cacheKey = $"player_assist_standings_{tournamentId}";
         var options = new HybridCacheEntryOptions

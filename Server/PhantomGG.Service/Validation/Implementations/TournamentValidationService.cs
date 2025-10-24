@@ -164,4 +164,17 @@ public class TournamentValidationService(
         if (!shouldBeOpen && isOpen)
             throw new ValidationException("Tournament registration is still open");
     }
+
+    public async Task ValidateDraftAccessAsync(Guid tournamentId, Guid? currentUserId)
+    {
+        var tournament = await ValidateTournamentExistsAsync(tournamentId);
+
+        if (tournament.Status == (int)TournamentStatus.Draft)
+        {
+            if (!currentUserId.HasValue || tournament.OrganizerId != currentUserId.Value)
+            {
+                throw new ForbiddenException("Draft tournaments can only be accessed by the tournament organizer");
+            }
+        }
+    }
 }

@@ -18,5 +18,6 @@ public interface ITournamentValidationService
     Task ValidateTournamentDatesAsync(DateTime startDate, DateTime endDate);
     Task ValidateCanStartTournamentAsync(Guid tournamentId);
     Task ValidateRegistrationStatusAsync(Guid tournamentId, bool shouldBeOpen);
+    Task ValidateDraftAccessAsync(Guid tournamentId, Guid? currentUserId);
 }
 
