@@ -12,4 +12,5 @@ public interface IPlayerValidationService
     Task ValidatePlayerBelongsToTeamAsync(Guid playerId, Guid teamId);
     Task ValidatePlayerNotInMatchAsync(Guid playerId);
     Task ValidatePlayerPositionDistributionAsync(Guid teamId, int position);
+    Task ValidateEmailUniquenessWithinTeamAsync(string email, Guid teamId, Guid? excludePlayerId = null);
 }

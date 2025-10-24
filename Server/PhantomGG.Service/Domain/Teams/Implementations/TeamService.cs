@@ -21,6 +21,7 @@ public class TeamService(
     IImageService imageService,
     IPlayerService playerService,
     ITeamValidationService teamValidationService,
+    ITournamentValidationService tournamentValidationService,
     IPlayerRepository playerRepository,
     ICacheInvalidationService cacheInvalidationService,
     HybridCache cache) : ITeamService
@@ -31,11 +32,17 @@ public class TeamService(
     private readonly IPlayerService _playerService = playerService;
     private readonly IPlayerRepository _playerRepository = playerRepository;
     private readonly ITeamValidationService _teamValidationService = teamValidationService;
+    private readonly ITournamentValidationService _tournamentValidationService = tournamentValidationService;
     private readonly HybridCache _cache = cache;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
 
     public async Task<PagedResult<TeamDto>> SearchAsync(TeamQuery query, Guid? userId = null)
     {
+        if (query.TournamentId.HasValue)
+        {
+            await _tournamentValidationService.ValidateTournamentExistsAsync(query.TournamentId.Value);
+        }
+
         var spec = new TeamSpecification
         {
             SearchTerm = query.Q,
@@ -157,9 +164,9 @@ public class TeamService(
         var team = await _teamValidationService.ValidateCanManageTeamAsync(userId, teamId);
 
         var currentPlayerCount = await _playerRepository.GetPlayerCountByTeamAsync(team.Id);
-        if (currentPlayerCount >= 11)
+        if (currentPlayerCount >= 15)
         {
-            throw new ValidationException("Team already has the maximum number of players (11)");
+            throw new ValidationException("Team already has the maximum number of players (15)");
         }
 
         if (teamId != playerDto.TeamId)
@@ -191,9 +198,9 @@ public class TeamService(
     private async Task ValidateMaxTeamsPerUserAsync(Guid managerId)
     {
         var existingTeams = await _teamRepository.GetByUserAsync(managerId);
-        if (existingTeams.Count() >= 100)
+        if (existingTeams.Count() >= 5)
         {
-            throw new ForbiddenException("You cannot create more than 3 teams. Please delete an existing team first.");
+            throw new ForbiddenException("You cannot create more than 5 teams. Please delete an existing team first.");
         }
     }
 

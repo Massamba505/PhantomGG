@@ -7,26 +7,40 @@ using PhantomGG.Service.Domain.Teams.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Infrastructure.Storage.Interfaces;
 using PhantomGG.Service.Mappings;
+using PhantomGG.Service.Validation.Interfaces;
 
 namespace PhantomGG.Service.Domain.Teams.Implementations;
 
 public class PlayerService(
     IPlayerRepository playerRepository,
-    IImageService imageService) : IPlayerService
+    IImageService imageService,
+    IPlayerValidationService playerValidationService,
+    ITeamValidationService teamValidationService,
+    ITeamRepository teamRepository) : IPlayerService
 {
     private readonly IPlayerRepository _playerRepository = playerRepository;
     private readonly IImageService _imageService = imageService;
+    private readonly IPlayerValidationService _playerValidationService = playerValidationService;
+    private readonly ITeamValidationService _teamValidationService = teamValidationService;
+    private readonly ITeamRepository _teamRepository = teamRepository;
 
     public async Task<PlayerDto> GetByIdAsync(Guid playerId)
     {
-        var player = await ValidatePlayerExistsAsync(playerId);
+        var player = await _playerValidationService.ValidatePlayerExistsAsync(playerId);
 
         return player.ToDto();
     }
 
     public async Task<PlayerDto> CreateAsync(CreatePlayerDto createDto)
     {
-        await ValidateMaxPlayersPerTeamAsync(createDto.TeamId);
+        await _teamValidationService.ValidateTeamExistsAsync(createDto.TeamId);
+        await _playerValidationService.ValidateMaxPlayersPerTeamAsync(createDto.TeamId, 15);
+        await _playerValidationService.ValidatePlayerPositionDistributionAsync(createDto.TeamId, (int)createDto.Position);
+
+        if (!string.IsNullOrEmpty(createDto.Email))
+        {
+            await _playerValidationService.ValidateEmailUniquenessWithinTeamAsync(createDto.Email, createDto.TeamId);
+        }
 
         var player = createDto.ToEntity();
         if (createDto.PhotoUrl != null)
@@ -40,7 +54,16 @@ public class PlayerService(
 
     public async Task<PlayerDto> UpdateAsync(UpdatePlayerDto updateDto, Guid playerId)
     {
-        var existingPlayer = await ValidatePlayerExistsAsync(playerId);
+        var existingPlayer = await _playerValidationService.ValidatePlayerExistsAsync(playerId);
+        if (!string.IsNullOrEmpty(updateDto.Email) && updateDto.Email != existingPlayer.Email)
+        {
+            await _playerValidationService.ValidateEmailUniquenessWithinTeamAsync(updateDto.Email, existingPlayer.TeamId, playerId);
+        }
+
+        if (updateDto.Position.HasValue && (int)updateDto.Position.Value != existingPlayer.Position)
+        {
+            await _playerValidationService.ValidatePlayerPositionDistributionAsync(existingPlayer.TeamId, (int)updateDto.Position.Value);
+        }
 
         updateDto.UpdateEntity(existingPlayer);
 
@@ -56,9 +79,11 @@ public class PlayerService(
 
     public async Task DeleteAsync(Guid teamId, Guid playerId)
     {
-        var player = await ValidatePlayerExistsAsync(playerId);
+        var player = await _playerValidationService.ValidatePlayerExistsAsync(playerId);
 
-        await ValidatePlayerBelongsToTeamAsync(player, teamId);
+        await _playerValidationService.ValidatePlayerBelongsToTeamAsync(playerId, teamId);
+        await _playerValidationService.ValidatePlayerNotInMatchAsync(playerId);
+        await _playerValidationService.ValidateMinPlayersPerTeamAsync(teamId, 1);
 
         if (!string.IsNullOrEmpty(player.PhotoUrl))
         {
@@ -70,6 +95,7 @@ public class PlayerService(
 
     public async Task<IEnumerable<PlayerDto>> GetByTeamAsync(Guid teamId)
     {
+        await _teamValidationService.ValidateTeamExistsAsync(teamId);
         var players = await _playerRepository.GetByTeamAsync(teamId);
 
         return players.Select(p => p.ToDto());
@@ -85,34 +111,5 @@ public class PlayerService(
         var photoUrl = await _imageService.SaveImageAsync(photo, ImageType.PlayerPhoto, player.Id);
 
         return photoUrl;
-    }
-
-    private async Task<Player> ValidatePlayerExistsAsync(Guid playerId)
-    {
-        var player = await _playerRepository.GetByIdAsync(playerId);
-        if (player == null)
-        {
-            throw new NotFoundException("Player not found");
-        }
-
-        return player;
-    }
-
-    private async Task ValidateMaxPlayersPerTeamAsync(Guid teamId)
-    {
-        var existingPlayers = await _playerRepository.GetByTeamAsync(teamId);
-        if (existingPlayers.Count() >= 15)
-        {
-            throw new ForbiddenException("A team cannot have more than 13 players. Please remove a player first");
-        }
-    }
-
-    private Task ValidatePlayerBelongsToTeamAsync(Player player, Guid teamId)
-    {
-        if (player.TeamId != teamId)
-        {
-            throw new ForbiddenException("Player does not belong to this team");
-        }
-        return Task.CompletedTask;
     }
 }

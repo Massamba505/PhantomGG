@@ -111,4 +111,19 @@ public class PlayerValidationService(
                 break;
         }
     }
+
+    public async Task ValidateEmailUniquenessWithinTeamAsync(string email, Guid teamId, Guid? excludePlayerId = null)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return;
+
+        var players = await _playerRepository.GetByTeamAsync(teamId);
+        var existingPlayer = players.FirstOrDefault(p =>
+            !string.IsNullOrEmpty(p.Email) &&
+            p.Email.Equals(email, StringComparison.OrdinalIgnoreCase) &&
+            (!excludePlayerId.HasValue || p.Id != excludePlayerId.Value));
+
+        if (existingPlayer != null)
+            throw new ConflictException("A player with this email already exists in this team");
+    }
 }
