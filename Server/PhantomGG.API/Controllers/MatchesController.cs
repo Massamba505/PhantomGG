@@ -4,7 +4,8 @@ using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Models.DTOs.MatchEvent;
-using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Auth.Interfaces;
+using PhantomGG.Service.Domain.Matches.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 

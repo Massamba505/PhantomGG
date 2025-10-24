@@ -5,7 +5,9 @@ using Microsoft.Extensions.Options;
 using PhantomGG.Common.Config;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Models.DTOs.User;
-using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Auth.Interfaces;
+using PhantomGG.Service.Domain.Users.Interfaces;
+using PhantomGG.Service.Infrastructure.Security.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 

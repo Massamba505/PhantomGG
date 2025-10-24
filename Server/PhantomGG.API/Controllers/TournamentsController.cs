@@ -6,7 +6,9 @@ using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Models.DTOs.TournamentStanding;
-using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Domain.Tournaments.Interfaces;
+using PhantomGG.Service.Domain.Matches.Interfaces;
+using PhantomGG.Service.Auth.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 

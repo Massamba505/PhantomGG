@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using PhantomGG.Models.DTOs.Auth;
-using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Auth.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 

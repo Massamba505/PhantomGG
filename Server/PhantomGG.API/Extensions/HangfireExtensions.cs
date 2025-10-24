@@ -1,7 +1,7 @@
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.SqlServer;
-using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Domain.Tournaments.Interfaces;
 
 namespace PhantomGG.API.Extensions;
 

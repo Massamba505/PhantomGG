@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Domain.Tournaments.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 
