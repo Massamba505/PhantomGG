@@ -9,6 +9,7 @@ using PhantomGG.Repository.Entities;
 using PhantomGG.Service.Infrastructure.Security.Interfaces;
 using PhantomGG.Service.Infrastructure.Storage.Interfaces;
 using PhantomGG.Service.Domain.Users.Interfaces;
+using PhantomGG.Service.Validation.Interfaces;
 
 namespace PhantomGG.Service.Domain.Users.Implementations;
 
@@ -16,11 +17,13 @@ public class UserService(
     IUserRepository userRepository,
     IPasswordHasher passwordHasher,
     IImageService imageService,
+    IUserValidationService userValidationService,
     HybridCache cache) : IUserService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IImageService _imageService = imageService;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
+    private readonly IUserValidationService _userValidationService = userValidationService;
     private readonly HybridCache _cache = cache;
 
     public async Task<UserDto> GetByIdAsync(Guid id)
@@ -33,55 +36,51 @@ public class UserService(
 
         return await _cache.GetOrCreateAsync(cacheKey, async _ =>
         {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null)
-            {
-                throw new NotFoundException("User not found");
-            }
-
+            var user = await _userValidationService.ValidateUserExistsAsync(id);
             return user.ToDto();
         }, options);
     }
 
     public async Task<UserDto> UpdateProfileAsync(Guid userId, UpdateUserProfileRequest request)
     {
-        var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null)
-        {
-            throw new NotFoundException("User not found");
-        }
+        // Validate user exists and is active
+        var user = await _userValidationService.ValidateUserIsActiveAsync(userId);
 
-        await ValidateEmailUniquenessForUserAsync(request.Email, userId);
+        // Validate email uniqueness if email is being changed
+        if (user.Email != request.Email)
+        {
+            var emailExists = await _userRepository.EmailExistsAsync(request.Email);
+            if (emailExists)
+            {
+                throw new ConflictException("Email address is already in use");
+            }
+        }
 
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
         user.Email = request.Email;
 
         await _userRepository.UpdateAsync(user);
+
+        // Invalidate cache
+        await _cache.RemoveAsync($"user_{userId}");
+
         return user.ToDto();
     }
 
     public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request)
     {
-        var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null)
-        {
-            throw new NotFoundException("User not found");
-        }
-
+        var user = await _userValidationService.ValidateUserIsActiveAsync(userId);
         await ValidateCurrentPasswordAsync(user, request.CurrentPassword);
 
         user.PasswordHash = _passwordHasher.HashPassword(request.NewPassword);
         await _userRepository.UpdateAsync(user);
+        await _cache.RemoveAsync($"user_{userId}");
     }
 
     public async Task<ProfilePictureUploadDto> UploadProfilePictureAsync(Guid userId, IFormFile file)
     {
-        var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null)
-        {
-            throw new NotFoundException("User not found");
-        }
+        var user = await _userValidationService.ValidateUserIsActiveAsync(userId);
 
         if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
         {
@@ -93,23 +92,12 @@ public class UserService(
         user.ProfilePictureUrl = imageUrl;
         await _userRepository.UpdateAsync(user);
 
+        await _cache.RemoveAsync($"user_{userId}");
+
         return new ProfilePictureUploadDto
         {
             ProfilePictureUrl = imageUrl
         };
-    }
-
-    private async Task ValidateEmailUniquenessForUserAsync(string email, Guid userId)
-    {
-        var user = await _userRepository.GetByIdAsync(userId);
-        if (user!.Email != email)
-        {
-            var emailExists = await _userRepository.EmailExistsAsync(email);
-            if (emailExists)
-            {
-                throw new ConflictException("Email address is already in use");
-            }
-        }
     }
 
     private Task ValidateCurrentPasswordAsync(User user, string currentPassword)
