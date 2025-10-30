@@ -28,7 +28,11 @@ public class Program
 
         // Configure the HTTP request pipeline
         app.UseSwaggerDocumentation(app.Environment);
-        app.UseHttpsRedirection();
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHttpsRedirection();
+        }
+
         app.UseStaticFiles();
         app.UseCors("CorsPolicy");
         app.UseSerilogRequestLogging();

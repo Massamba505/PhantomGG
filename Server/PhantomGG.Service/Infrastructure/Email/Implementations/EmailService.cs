@@ -1,5 +1,6 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using PhantomGG.Common.Config;
@@ -9,10 +10,12 @@ namespace PhantomGG.Service.Infrastructure.Email.Implementations;
 
 public class EmailService(
     IOptions<EmailSettings> emailSettings,
-    IEmailTemplateService templateService) : IEmailService
+    IEmailTemplateService templateService,
+    ILogger<EmailService> logger) : IEmailService
 {
     private readonly EmailSettings _emailSettings = emailSettings.Value;
     private readonly IEmailTemplateService _templateService = templateService;
+    private readonly ILogger<EmailService> _logger = logger;
 
     public async Task SendEmailVerificationAsync(string email, string firstName, string verificationToken)
     {
@@ -92,6 +95,8 @@ public class EmailService(
         await client.AuthenticateAsync(_emailSettings.Username, _emailSettings.Password);
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
+
+        _logger.LogDebug("Email sent to {ToEmail} with subject: {Subject}", toEmail, subject);
     }
 
     private string GetHost()
