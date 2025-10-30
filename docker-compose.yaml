@@ -54,25 +54,26 @@ services:
     image: datalust/seq:2024.3
     environment:
       - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_ADMINPASSWORDHASH=${SEQ_ADMIN_PASSWORD_HASH}
     ports:
       - "5341:80"
-      - "5342:5341"
     volumes:
       - seq_data:/data
+    restart: unless-stopped
     networks:
       - phantomgg-network
 
   api:
     build:
-      context: ./Server/PhantomGG.API
+      context: ./Server
       dockerfile: Dockerfile
     ports:
       - "${API_PORT}:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_URLS=http://+:${API_PORT}
       - ConnectionStrings__PhantomDb=Server=sqlserver;Database=PhantomGG;User=sa;Password=${SQL_PASSWORD};TrustServerCertificate=true
       - ConnectionStrings__SeqServerUrl=${SEQ_SERVER_URL}
+      - SERILOG__WRITE_TO__1__ARGS__SERVERURL=${SEQ_SERVER_URL}
       - JwtSettings__Issuer=${JWT_ISSUER}
       - JwtSettings__Audience=${JWT_AUDIENCE}
       - JwtSettings__SecretKey=${JWT_SECRET_KEY}
@@ -91,15 +92,12 @@ services:
       - EmailSettings__FromEmail=${EMAIL_FROM_EMAIL}
       - EmailSettings__FromName=${EMAIL_FROM_NAME}
       - EmailSettings__FrontendBaseUrl=${FRONTEND_BASE_URL}
+      - SEQ_SERVER_URL=${SEQ_SERVER_URL}
     depends_on:
       flyway:
         condition: service_completed_successfully
       seq:
         condition: service_started
-    volumes:
-      - ./Server/PhantomGG.API:/app
-      - /app/bin
-      - /app/obj
     networks:
       - phantomgg-network
 

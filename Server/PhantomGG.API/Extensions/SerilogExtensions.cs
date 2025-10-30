@@ -12,11 +12,22 @@ public static class SerilogExtensions
             .ReadFrom.Services(services)
             .Enrich.FromLogContext()
             .WriteTo.Console()
-            .WriteTo.Seq(serverUrl: builder.Configuration.GetConnectionString("SeqServerUrl") ?? "http://localhost:5341"));
+            .WriteTo.Seq(serverUrl: builder.Configuration.GetConnectionString("SeqServerUrl") ?? "http://seq:80"));
     }
 
     public static IApplicationBuilder UseSerilogRequestLogging(this IApplicationBuilder app)
     {
+        app.Use(async (context, next) =>
+        {
+            var correlationId = context.TraceIdentifier;
+            if (!context.Response.HasStarted)
+            {
+                context.Response.Headers["X-Correlation-ID"] = correlationId;
+            }
+
+            await next();
+        });
+
         app.UseSerilogRequestLogging(options =>
         {
             options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
@@ -32,10 +43,7 @@ public static class SerilogExtensions
                 diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
                 diagnosticContext.Set("UserAgent", httpContext.Request.Headers.UserAgent.FirstOrDefault() ?? "unknown");
                 diagnosticContext.Set("RemoteIP", httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown");
-
-                var correlationId = httpContext.TraceIdentifier;
-                diagnosticContext.Set("CorrelationId", correlationId);
-                httpContext.Response.Headers.Append("X-Correlation-ID", correlationId);
+                diagnosticContext.Set("CorrelationId", httpContext.TraceIdentifier);
             };
         });
 
