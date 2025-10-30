@@ -4,7 +4,8 @@ using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Player;
 using PhantomGG.Models.DTOs.Team;
-using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Auth.Interfaces;
+using PhantomGG.Service.Domain.Teams.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 

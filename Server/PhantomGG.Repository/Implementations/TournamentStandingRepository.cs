@@ -16,7 +16,13 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
             .Where(m => m.TournamentId == tournamentId && (MatchStatus)m.Status == MatchStatus.Completed)
             .ToListAsync();
 
+        var registeredTeamIds = await _context.TournamentTeams
+            .Where(tt => tt.TournamentId == tournamentId && tt.Status == (int)TeamRegistrationStatus.Approved)
+            .Select(tt => tt.TeamId)
+            .ToListAsync();
+
         var teams = await _context.Teams
+            .Where(t => registeredTeamIds.Contains(t.Id))
             .Select(t => new
             {
                 t.Id,

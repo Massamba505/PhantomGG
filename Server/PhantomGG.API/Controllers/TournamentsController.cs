@@ -6,7 +6,9 @@ using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Models.DTOs.Team;
 using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Models.DTOs.TournamentStanding;
-using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Domain.Tournaments.Interfaces;
+using PhantomGG.Service.Domain.Matches.Interfaces;
+using PhantomGG.Service.Auth.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 
@@ -44,7 +46,8 @@ public class TournamentsController(
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<TournamentDto>> GetTournament(Guid id)
     {
-        var tournament = await _tournamentService.GetByIdAsync(id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var tournament = await _tournamentService.GetByIdAsync(id, currentUser?.Id);
         return Ok(tournament);
     }
 
@@ -147,7 +150,8 @@ public class TournamentsController(
     [HttpGet("{id:guid}/standings")]
     public async Task<ActionResult<IEnumerable<TournamentStandingDto>>> GetTournamentStandings(Guid id)
     {
-        var standings = await _tournamentStandingService.GetTournamentStandingsAsync(id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var standings = await _tournamentStandingService.GetTournamentStandingsAsync(id, currentUser?.Id);
         return Ok(standings);
     }
 
@@ -157,7 +161,8 @@ public class TournamentsController(
     [HttpGet("{id:guid}/standings/goals")]
     public async Task<ActionResult<IEnumerable<PlayerGoalStandingDto>>> GetPlayerGoalStandings(Guid id)
     {
-        var standings = await _tournamentStandingService.GetPlayerGoalStandingsAsync(id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var standings = await _tournamentStandingService.GetPlayerGoalStandingsAsync(id, currentUser?.Id);
         return Ok(standings);
     }
 
@@ -167,7 +172,8 @@ public class TournamentsController(
     [HttpGet("{id:guid}/standings/assists")]
     public async Task<ActionResult<IEnumerable<PlayerAssistStandingDto>>> GetPlayerAssistStandings(Guid id)
     {
-        var standings = await _tournamentStandingService.GetPlayerAssistStandingsAsync(id);
+        var currentUser = _currentUserService.GetCurrentUser();
+        var standings = await _tournamentStandingService.GetPlayerAssistStandingsAsync(id, currentUser?.Id);
         return Ok(standings);
     }
 

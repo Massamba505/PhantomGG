@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PhantomGG.Models.DTOs.User;
-using PhantomGG.Service.Interfaces;
+using PhantomGG.Service.Auth.Interfaces;
+using PhantomGG.Service.Domain.Users.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 
