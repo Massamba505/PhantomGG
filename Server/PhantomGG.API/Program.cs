@@ -10,6 +10,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.AddSerilog();
         // Add services to the container
         builder.Services.AddControllers();
         builder.Services.AddHttpContextAccessor();
@@ -30,6 +31,7 @@ public class Program
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseCors("CorsPolicy");
+        app.UseSerilogRequestLogging();
         app.UseMiddleware<ValidationMiddleware>();
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseAuthentication();

@@ -1,14 +1,16 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 
 namespace PhantomGG.Validation.Middleware;
 
-public class ValidationMiddleware(RequestDelegate next)
+public class ValidationMiddleware(RequestDelegate next, ILogger<ValidationMiddleware> logger)
 {
     private readonly RequestDelegate _next = next;
+    private readonly ILogger<ValidationMiddleware> _logger = logger;
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -22,7 +24,7 @@ public class ValidationMiddleware(RequestDelegate next)
         }
     }
 
-    private static async Task HandleValidationExceptionAsync(HttpContext context, ValidationException ex)
+    private async Task HandleValidationExceptionAsync(HttpContext context, ValidationException ex)
     {
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -33,6 +35,11 @@ public class ValidationMiddleware(RequestDelegate next)
                 g => g.Key,
                 g => g.Select(e => e.ErrorMessage).ToArray()
             );
+
+        _logger.LogWarning("Validation failed for {RequestMethod} {RequestPath}: {ValidationErrors}",
+            context.Request.Method,
+            context.Request.Path.Value,
+            string.Join(", ", errors.SelectMany(kv => kv.Value.Select(v => $"{kv.Key}: {v}"))));
 
         var problemDetails = new ValidationProblemDetails
         {
