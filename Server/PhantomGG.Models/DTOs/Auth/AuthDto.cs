@@ -7,3 +7,5 @@ public class AuthDto
     public string AccessToken { get; set; } = string.Empty;
     public UserDto User { get; set; } = null!;
 }
+
+public record RefreshTokenResponse(string AccessToken);

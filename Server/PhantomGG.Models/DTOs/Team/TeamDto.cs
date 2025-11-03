@@ -1,3 +1,5 @@
+using PhantomGG.Models.DTOs.Player;
+
 namespace PhantomGG.Models.DTOs.Team;
 
 public class TeamDto
@@ -9,4 +11,6 @@ public class TeamDto
     public Guid UserId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
+    public int CountPlayers { get; set; } = 0;
+    public IEnumerable<PlayerDto> players { get; set; } = new List<PlayerDto>();
 }

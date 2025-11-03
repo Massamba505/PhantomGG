@@ -2,9 +2,10 @@
   [formGroup]="tournamentForm"
   (ngSubmit)="onSubmit()"
   class="space-y-4 card"
+  data-cy="tournament-form"
 >
-  <div>
-    <label class="input-label"
+  <div data-cy="tournament-name-field">
+    <label class="input-label" data-cy="tournament-name-label"
       >Tournament Name <span class="required">*</span></label
     >
     <input
@@ -13,16 +14,17 @@
       placeholder="Enter tournament name"
       class="input-field w-full"
       [class.error]="submitted() && tournamentForm.controls['name'].invalid"
+      data-cy="tournament-name-input"
     />
     @if (submitted() && tournamentForm.controls['name'].invalid) {
-    <div class="error-message text-sm mt-1">
+    <div class="error-message text-sm mt-1" data-cy="tournament-name-error">
       Tournament name is required (min 3 chars)
     </div>
     }
   </div>
 
-  <div>
-    <label class="input-label"
+  <div data-cy="tournament-description-field">
+    <label class="input-label" data-cy="tournament-description-label"
       >Description <span class="required">*</span></label
     >
     <textarea
@@ -33,23 +35,25 @@
       [class.error]="
         submitted() && tournamentForm.controls['description'].invalid
       "
+      data-cy="tournament-description-input"
     ></textarea>
     @if (submitted() && tournamentForm.controls['description'].invalid) {
-    <div class="error-message text-sm mt-1">
+    <div class="error-message text-sm mt-1" data-cy="tournament-description-error">
       Description is required (min 10 chars)
     </div>
     }
   </div>
 
-  <div>
-    <label class="input-label">Tournament Banner</label>
+  <div data-cy="tournament-banner-field">
+    <label class="input-label" data-cy="tournament-banner-label">Tournament Banner</label>
 
     @if (bannerPreview()) {
-    <div class="mb-4">
+    <div class="mb-4" data-cy="banner-preview-container">
       <img
         [src]="bannerPreview()"
         alt="Tournament Banner"
         class="h-48 w-full object-cover rounded-lg shadow"
+        data-cy="banner-preview-image"
       />
     </div>
     }
@@ -59,18 +63,20 @@
       accept="image/*"
       (change)="onBannerChange($event)"
       class="input-field w-full"
+      data-cy="tournament-banner-input"
     />
   </div>
 
-  <div>
-    <label class="input-label">Tournament Logo</label>
+  <div data-cy="tournament-logo-field">
+    <label class="input-label" data-cy="tournament-logo-label">Tournament Logo</label>
 
     @if (logoPreview()) {
-    <div class="mb-4">
+    <div class="mb-4" data-cy="logo-preview-container">
       <img
         [src]="logoPreview()"
         alt="Tournament Logo"
         class="h-32 w-32 object-contain rounded-lg shadow mx-auto"
+        data-cy="logo-preview-image"
       />
     </div>
     }
@@ -80,24 +86,26 @@
       accept="image/*"
       (change)="onLogoChange($event)"
       class="input-field w-full"
+      data-cy="tournament-logo-input"
     />
   </div>
 
-  <div>
-    <label class="input-label">Location <span class="required">*</span></label>
+  <div data-cy="tournament-location-field">
+    <label class="input-label" data-cy="tournament-location-label">Location <span class="required">*</span></label>
     <input
       type="text"
       formControlName="location"
       placeholder="Tournament location"
       class="input-field w-full"
+      data-cy="tournament-location-input"
     />@if (isFieldInvalid('location')) {
-    <div class="error-message text-xs mt-1">Location is required</div>
+    <div class="error-message text-xs mt-1" data-cy="tournament-location-error">Location is required</div>
     }
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div>
-      <label class="input-label"
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-cy="tournament-dates-grid">
+    <div data-cy="registration-start-field">
+      <label class="input-label" data-cy="registration-start-label"
         >Registration Start <span class="required">*</span></label
       >
       <input
@@ -106,21 +114,22 @@
         [min]="todayDateTime"
         class="input-field w-full"
         [class.error]="isFieldInvalid('registrationStartDate')"
+        data-cy="registration-start-input"
       />
       @if (isFieldInvalid('registrationStartDate')) {
-      <div class="error-message text-xs mt-1">
+      <div class="error-message text-xs mt-1" data-cy="registration-start-error">
         Registration start is required
       </div>
       } @if (submitted() && tournamentForm.errors?.['registrationStartInPast'])
       {
-      <div class="error-message text-xs mt-1">
+      <div class="error-message text-xs mt-1" data-cy="registration-start-past-error">
         Registration start cannot be in the past.
       </div>
       }
     </div>
 
-    <div>
-      <label class="input-label"
+    <div data-cy="registration-deadline-field">
+      <label class="input-label" data-cy="registration-deadline-label"
         >Registration Deadline <span class="required">*</span></label
       >
       <input
@@ -131,21 +140,22 @@
         "
         class="input-field w-full"
         [class.error]="isFieldInvalid('registrationDeadline')"
+        data-cy="registration-deadline-input"
       />
       @if (isFieldInvalid('registrationDeadline')) {
-      <div class="error-message text-xs mt-1">
+      <div class="error-message text-xs mt-1" data-cy="registration-deadline-error">
         Registration deadline is required
       </div>
       } @if (submitted() &&
       tournamentForm.errors?.['registrationDeadlineBeforeStart']) {
-      <div class="error-message text-xs mt-1">
+      <div class="error-message text-xs mt-1" data-cy="registration-deadline-before-start-error">
         Registration deadline cannot be before registration start.
       </div>
       }
     </div>
 
-    <div>
-      <label class="input-label"
+    <div data-cy="start-date-field">
+      <label class="input-label" data-cy="start-date-label"
         >Start Date <span class="required">*</span></label
       >
       <input
@@ -156,19 +166,20 @@
         "
         class="input-field w-full"
         [class.error]="isFieldInvalid('startDate')"
+        data-cy="start-date-input"
       />
       @if (isFieldInvalid('startDate')) {
-      <div class="error-message text-xs mt-1">Start date is required</div>
+      <div class="error-message text-xs mt-1" data-cy="start-date-error">Start date is required</div>
       } @if (submitted() &&
       tournamentForm.errors?.['startBeforeRegistrationDeadline']) {
-      <div class="error-message text-xs mt-1">
+      <div class="error-message text-xs mt-1" data-cy="start-date-before-deadline-error">
         Start date must be after registration deadline.
       </div>
       }
     </div>
 
-    <div>
-      <label class="input-label"
+    <div data-cy="end-date-field">
+      <label class="input-label" data-cy="end-date-label"
         >End Date <span class="required">*</span></label
       >
       <input
@@ -177,20 +188,21 @@
         [min]="tournamentForm.get('startDate')?.value || todayDateTime"
         class="input-field w-full"
         [class.error]="isFieldInvalid('endDate')"
+        data-cy="end-date-input"
       />
       @if (isFieldInvalid('endDate')) {
-      <div class="error-message text-xs mt-1">End date is required</div>
+      <div class="error-message text-xs mt-1" data-cy="end-date-error">End date is required</div>
       } @if (submitted() && tournamentForm.errors?.['endBeforeStart']) {
-      <div class="error-message text-xs mt-1">
+      <div class="error-message text-xs mt-1" data-cy="end-date-before-start-error">
         End date must be after start date.
       </div>
       }
     </div>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <div>
-      <label class="input-label"
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-cy="team-limits-grid">
+    <div data-cy="min-teams-field">
+      <label class="input-label" data-cy="min-teams-label"
         >Min Teams <span class="required">*</span></label
       >
       <input
@@ -202,14 +214,15 @@
         [class.error]="
           submitted() && tournamentForm.controls['minTeams'].invalid
         "
+        data-cy="min-teams-input"
       />
       @if (submitted() && tournamentForm.controls['minTeams'].invalid) {
-      <div class="error-message text-xs mt-1">Min teams is required</div>
+      <div class="error-message text-xs mt-1" data-cy="min-teams-error">Min teams is required</div>
       }
     </div>
 
-    <div>
-      <label class="input-label"
+    <div data-cy="max-teams-field">
+      <label class="input-label" data-cy="max-teams-label"
         >Max Teams <span class="required">*</span></label
       >
       <input
@@ -221,30 +234,32 @@
         [class.error]="
           submitted() && tournamentForm.controls['maxTeams'].invalid
         "
+        data-cy="max-teams-input"
       />
       @if (submitted() && tournamentForm.controls['maxTeams'].invalid) {
-      <div class="error-message text-xs mt-1">Max teams is required</div>
+      <div class="error-message text-xs mt-1" data-cy="max-teams-error">Max teams is required</div>
       }
     </div>
   </div>
 
-  <div>
+  <div data-cy="public-tournament-field">
     <div class="flex items-center gap-2">
-      <input type="checkbox" formControlName="isPublic" class="checkbox" />
-      <label for="checkbox" class="input-label mb-0"
+      <input type="checkbox" data-cy="is-public-checkbox" formControlName="isPublic" class="checkbox" data-cy="public-tournament-checkbox" />
+      <label for="checkbox" class="input-label mb-0" data-cy="public-tournament-label"
         >Make tournament public</label
       >
     </div>
   </div>
 
-  <div class="flex space-x-3 pt-4">
-    <button type="button" (click)="onCancel()" class="btn btn-secondary flex-1">
+  <div class="flex space-x-3 pt-4" data-cy="form-actions">
+    <button type="button" (click)="onCancel()" class="btn btn-secondary flex-1" data-cy="cancel-button">
       Cancel
     </button>
     <button
       type="submit"
       class="btn btn-primary flex-1"
       [disabled]="submitted() && tournamentForm.invalid"
+      data-cy="submit-button"
     >
       {{ isEditMode() ? "Update Tournament" : "Create Tournament" }}
     </button>

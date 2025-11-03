@@ -10,6 +10,10 @@
       <lucide-angular [img]="icons.Edit" [size]="16"></lucide-angular>
       Edit Team
     </button>
+    <button class="btn btn-destructive" data-cy="delete-team-button" (click)="onDeleteTeam()">
+      <lucide-angular [img]="icons.Trash2" [size]="16"></lucide-angular>
+      Delete Team
+    </button>
   </div>
   }
 </div>
@@ -34,13 +38,13 @@
 } @else if (!loading() && team()) {
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-2 space-y-6">
-    <div class="card">
+    <div data-cy="team-details-section" class="card">
       <div class="flex items-center gap-4 mb-4">
         @if (team()!.logoUrl) {
         <img
           [src]="team()!.logoUrl"
           [alt]="team()!.name + ' logo'"
-          class="w-32 h-32 rounded-lg object-contain"
+          class="w-32 h-32 rounded-lg object-cover"
         />
         } @else {
         <div
@@ -59,13 +63,13 @@
     </div>
 
     <div class="card">
-      <div class="flex justify-between items-center mb-6">
+      <div data-cy="team-players-section" class="flex justify-between items-center mb-6">
         <h2 class="font-bold text-xl flex items-center gap-2">
           <lucide-angular [img]="icons.Users" [size]="24"></lucide-angular>
           Team Players
         </h2>
         @if (isManager()) {
-        <button class="btn btn-primary" (click)="onShowAddPlayer()">
+        <button class="btn btn-primary" data-cy="add-player-button" (click)="onShowAddPlayer()">
           <lucide-angular [img]="icons.Plus" [size]="16"></lucide-angular>
           Add Player
         </button>
@@ -73,7 +77,9 @@
       </div>
 
       @if (players().length > 0) {
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
+        data-cy="players-list">
         @for (player of players(); track player.id) {
         <app-player-card
           [player]="player"
@@ -144,12 +150,21 @@
           <lucide-angular [img]="icons.UserPlus" [size]="16"></lucide-angular>
           Add New Player
         </button>
+        <button
+          class="btn btn-destructive w-full justify-start"
+          data-cy="delete-team-button-quick-action"
+          (click)="onDeleteTeam()"
+        >
+          <lucide-angular [img]="icons.Trash2" [size]="16"></lucide-angular>
+          Delete Team
+        </button>
       </div>
     </div>
     }
   </div>
 </div>
 }
+
 <app-modal
   [isOpen]="showPlayerModal()"
   [title]="editingPlayer() ? 'Edit Player' : 'Add New Player'"
@@ -157,8 +172,17 @@
 >
   <app-player-form
     [player]="editingPlayer()"
-    [teamId]="team()!.id"
+    [teamId]="team()?.id || ''"
     (save)="onPlayerSave($event)"
     (cancel)="onClosePlayerModal()"
   ></app-player-form>
 </app-modal>
+
+<app-confirm-delete-modal
+  [isOpen]="showDeleteModal()"
+  [title]="'Delete Team'"
+  [entityName]="team()?.name || 'Team'"
+  [isLoading]="isDeleting()"
+  (close)="closeDeleteModal()"
+  (confirm)="confirmDelete()"
+></app-confirm-delete-modal>

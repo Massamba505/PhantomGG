@@ -1,16 +1,15 @@
-import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
-import { PaginatedResponse } from '@/app/api/models/api.models';
+import { PagedResult } from '@/app/api/models/api.models';
 import { TournamentCard } from '@/app/shared/components/cards';
-import { TournamentSearchComponent } from './components/tournament-search/tournament-search';
+import { TournamentSearchComponent } from '@/app/shared/components/search';
 import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
 import { ToastService } from '@/app/shared/services/toast.service';
-import { TournamentService } from '@/app/api/services';
+import { TournamentService, UserRoles } from '@/app/api/services';
 import { AuthStateService } from '@/app/store/AuthStateService';
-import { Roles } from '@/app/shared/constants/roles';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
@@ -43,27 +42,27 @@ export class TournamentListComponent implements OnInit {
     if(!this.authStateStore.isAuthenticated()){
       return false;
     }
-    return this.authStateStore.user()!.role == Roles.Organizer;
+    return this.authStateStore.user()!.role == UserRoles.Organizer;
   })
   
   searchCriteria = signal<TournamentSearch>({
     searchTerm: undefined,
     status: undefined,
     location: undefined,
-    startDateFrom: undefined,
-    startDateTo: undefined,
+    startFrom: undefined,
+    startTo: undefined,
     isPublic: undefined,
-    pageNumber: 1,
+    page: 1,
     pageSize: 6
   });
 
-  paginationData = signal<PaginatedResponse<Tournament> | null>(null);
+  paginationData = signal<PagedResult<Tournament> | null>(null);
   
-  totalRecords = computed(() => this.paginationData()?.totalRecords ?? 0);
-  totalPages = computed(() => this.paginationData()?.totalPages ?? 0);
-  currentPage = computed(() => this.paginationData()?.pageNumber ?? 1);
-  hasNextPage = computed(() => this.paginationData()?.hasNextPage ?? false);
-  hasPreviousPage = computed(() => this.paginationData()?.hasPreviousPage ?? false);
+  totalRecords = computed(() => this.paginationData()?.meta.totalRecords ?? 0);
+  totalPages = computed(() => this.paginationData()?.meta.totalPages ?? 0);
+  currentPage = computed(() => this.paginationData()?.meta.page ?? 1);
+  hasNextPage = computed(() => this.paginationData()?.meta.hasNextPage ?? false);
+  hasPreviousPage = computed(() => this.paginationData()?.meta.hasPreviousPage ?? false);
 
   ngOnInit() {
     this.loadTournaments();
@@ -72,7 +71,7 @@ export class TournamentListComponent implements OnInit {
   loadTournaments() {
     this.isLoading.set(true);
 
-    this.tournamentService.getTournaments({ ...this.searchCriteria(), scope: 'my' }).subscribe({
+    this.tournamentService.getTournaments(this.searchCriteria()).subscribe({
       next: (response: any) => {
         this.tournaments.set(response.data);
         this.paginationData.set(response);
@@ -97,10 +96,10 @@ export class TournamentListComponent implements OnInit {
       searchTerm: undefined,
       status: undefined,
       location: undefined,
-      startDateFrom: undefined,
-      startDateTo: undefined,
+      startFrom: undefined,
+      startTo: undefined,
       isPublic: undefined,
-      pageNumber: 1,
+      page: 1,
       pageSize: 6
     });
     this.loadTournaments();
@@ -109,7 +108,7 @@ export class TournamentListComponent implements OnInit {
   onPageChange(pageNumber: number) {
     this.searchCriteria.update(current => ({
       ...current,
-      pageNumber
+      page: pageNumber
     }));
 
     this.loadTournaments();

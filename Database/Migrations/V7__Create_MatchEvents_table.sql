@@ -1,7 +1,7 @@
 CREATE TABLE MatchEvents (
     Id UNIQUEIDENTIFIER NOT NULL DEFAULT (NEWID()),
     MatchId UNIQUEIDENTIFIER NOT NULL,
-    EventType VARCHAR(20) NOT NULL,
+    EventType INT NOT NULL,
     Minute INT NOT NULL,
     TeamId UNIQUEIDENTIFIER NOT NULL,
     PlayerId UNIQUEIDENTIFIER NOT NULL,
@@ -16,3 +16,4 @@ CREATE TABLE MatchEvents (
 );
 
 CREATE INDEX IX_MatchEvents_MatchId ON MatchEvents (MatchId);
+CREATE INDEX IX_MatchEvents_EventType ON MatchEvents (EventType);

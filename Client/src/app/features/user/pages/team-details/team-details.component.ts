@@ -10,17 +10,18 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { PlayerCard, PlayerRole } from '@/app/shared/components/cards/player-card/player-card';
 import { PlayerForm } from '@/app/shared/components/forms/player-form/player-form';
+import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 
 @Component({
   selector: 'app-team-details',
-  standalone: true,
   imports: [
     CommonModule,
     RouterModule,
     LucideAngularModule,
     Modal,
     PlayerCard,
-    PlayerForm
+    PlayerForm,
+    ConfirmDeleteModal
   ],
   templateUrl: './team-details.component.html',
   styleUrl: './team-details.component.css'
@@ -40,6 +41,8 @@ export class TeamDetailsComponent implements OnInit {
   error = signal<string | null>(null);
   showPlayerModal = signal(false);
   editingPlayer = signal<Player | null>(null);
+  showDeleteModal = signal(false);
+  isDeleting = signal(false);
 
   ngOnInit() {
     const teamId = this.route.snapshot.params['id'];
@@ -57,7 +60,6 @@ export class TeamDetailsComponent implements OnInit {
         this.error.set(null);
       },
       error: (error) => {
-        console.error('Failed to load team:', error);
         this.error.set('Failed to load team details');
         this.toastService.error('Failed to load team details');
       },
@@ -73,7 +75,6 @@ export class TeamDetailsComponent implements OnInit {
         this.players.set(players);
       },
       error: (error) => {
-        console.error('Failed to load players:', error);
         this.toastService.error('Failed to load team players');
       }
     });
@@ -90,8 +91,11 @@ export class TeamDetailsComponent implements OnInit {
     }
   }
 
-  // Player management methods
   onShowAddPlayer() {
+    if (!this.team()) {
+      this.toastService.error('Please wait for team details to load');
+      return;
+    }
     this.editingPlayer.set(null);
     this.showPlayerModal.set(true);
   }
@@ -123,7 +127,6 @@ export class TeamDetailsComponent implements OnInit {
           this.onClosePlayerModal();
         },
         error: (error) => {
-          console.error('Failed to update player:', error);
           this.toastService.error('Failed to update player');
         }
       });
@@ -135,7 +138,6 @@ export class TeamDetailsComponent implements OnInit {
           this.onClosePlayerModal();
         },
         error: (error) => {
-          console.error('Failed to add player:', error);
           this.toastService.error('Failed to add player');
         }
       });
@@ -145,22 +147,17 @@ export class TeamDetailsComponent implements OnInit {
   onRemovePlayer(playerId: string) {
     const player = this.players().find(p => p.id === playerId);
     if (!player || !this.team()) return;
-    
-    if (confirm(`Are you sure you want to remove ${player.firstName} ${player.lastName} from the team?`)) {
-      this.teamService.removePlayerFromTeam(this.team()!.id, player.id).subscribe({
-        next: () => {
-          this.players.update(players => players.filter(p => p.id !== player.id));
-          this.toastService.success('Player removed successfully');
-        },
-        error: (error) => {
-          console.error('Failed to remove player:', error);
-          this.toastService.error('Failed to remove player');
-        }
-      });
-    }
+    this.teamService.removePlayerFromTeam(this.team()!.id, player.id).subscribe({
+      next: () => {
+        this.players.update(players => players.filter(p => p.id !== player.id));
+        this.toastService.success('Player removed successfully');
+      },
+      error: (error) => {
+        this.toastService.error('Failed to remove player');
+      }
+    });
   }
 
-  // Utility methods
   isManager(): boolean {
     const user = this.authStateService.user();
     const team = this.team();
@@ -185,5 +182,30 @@ export class TeamDetailsComponent implements OnInit {
 
   getPlayerInitials(player: Player): string {
     return `${player.firstName.charAt(0)}${player.lastName.charAt(0)}`.toUpperCase();
+  }
+
+  onDeleteTeam() {
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal() {
+    this.showDeleteModal.set(false);
+  }
+
+  confirmDelete() {
+    const team = this.team();
+    if (!team) return;
+
+    this.isDeleting.set(true);
+    this.teamService.deleteTeam(team.id).subscribe({
+      next: () => {
+        this.toastService.success('Team deleted successfully');
+        this.router.navigate(['/user/teams']);
+      },
+      error: (error) => {
+        this.toastService.error('Failed to delete team');
+        this.isDeleting.set(false);
+      }
+    });
   }
 }

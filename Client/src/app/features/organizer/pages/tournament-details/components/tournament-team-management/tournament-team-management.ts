@@ -2,11 +2,11 @@ import { Component, input, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { TournamentTeam } from '@/app/api/models/team.models';
+import { TeamRegistrationStatus, UserRoles } from '@/app/api/models/common.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamCard, TeamRole, TeamCardType } from '@/app/shared/components/cards/team-card/team-card';
-import { AuthStateService } from '@/app/store/AuthStateService';
 
 type TeamTab = 'approved' | 'pending';
 
@@ -21,14 +21,12 @@ export class TournamentTeamManagementComponent implements OnInit {
   
   private tournamentService = inject(TournamentService);
   private toastService = inject(ToastService);
-  private authStateStore = inject(AuthStateService);
   
   readonly icons = LucideIcons;
   
   activeTab = signal<TeamTab>('approved');
   approvedTeams = signal<TournamentTeam[]>([]);
   pendingTeams = signal<TournamentTeam[]>([]);
-  rejectedTeams = signal<TournamentTeam[]>([]);
   
   isLoading = signal(false);
   isActionLoading = signal<{ [key: string]: boolean }>({});
@@ -40,7 +38,7 @@ export class TournamentTeamManagementComponent implements OnInit {
   loadTeams() {
     this.isLoading.set(true);
     
-    this.tournamentService.getTournamentTeams(this.tournamentId(), "Approved").subscribe({
+    this.tournamentService.getTournamentTeams(this.tournamentId(), TeamRegistrationStatus.Approved).subscribe({
       next: (teams) => {
         this.approvedTeams.set(teams);
       },
@@ -49,7 +47,7 @@ export class TournamentTeamManagementComponent implements OnInit {
       }
     });
 
-    this.tournamentService.getTournamentTeams(this.tournamentId(), "pending").subscribe({
+    this.tournamentService.getTournamentTeams(this.tournamentId(), TeamRegistrationStatus.Pending).subscribe({
       next: (teams) => {
         this.pendingTeams.set(teams);
       }
@@ -95,7 +93,6 @@ export class TournamentTeamManagementComponent implements OnInit {
     this.tournamentService.rejectTeam(this.tournamentId(), team.id).subscribe({
       next: () => {
         this.toastService.success(`${team.name} has been rejected`);
-        this.loadTeams(); // Reload to get updated data
       },
       error: (error) => {
         this.setActionLoading(team.id, false);
@@ -109,7 +106,7 @@ export class TournamentTeamManagementComponent implements OnInit {
   removeTeam(team: TournamentTeam) {
     this.setActionLoading(team.id, true);
     
-    this.tournamentService.rejectTeam(this.tournamentId(), team.id).subscribe({
+    this.tournamentService.removeTeam(this.tournamentId(), team.id).subscribe({
       next: () => {
         this.toastService.success(`${team.name} has been removed from the tournament`);
         this.loadTeams();
@@ -140,21 +137,31 @@ export class TournamentTeamManagementComponent implements OnInit {
         return 0;
     }
   }
+  
+  getTabClass(tab: TeamTab): string {
+    const baseClass = 'px-2 py-1 font-semibold border-b-2 cursor-pointer sm:text-md text-xs ';
+    const activeClass = 'border-primary text-primary';
+    const inactiveClass = 'border-transparent text-muted';
+    
+    return baseClass + (this.activeTab() === tab ? activeClass : inactiveClass);
+  }
 
   convertToTeam(tournamentTeam: TournamentTeam) {
     return {
       id: tournamentTeam.id,
       name: tournamentTeam.name,
-      shortName: tournamentTeam.shortName,
+      shortName: tournamentTeam.shortName || '',
       logoUrl: tournamentTeam.logoUrl,
       userId: tournamentTeam.managerId || '',
       createdAt: tournamentTeam.registeredAt,
-      updatedAt: undefined
+      updatedAt: undefined,
+      countPlayers: tournamentTeam.players.length,
+      players: tournamentTeam.players
     };
   }
 
   getTeamRole(): TeamRole {
-    return 'Organizer'; // Organizer can approve/reject/remove teams
+    return 'Organizer';
   }
 
   getTeamCardType(): TeamCardType {

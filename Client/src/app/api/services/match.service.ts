@@ -2,12 +2,17 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../base/api-client.service';
 import { API_ENDPOINTS } from '../base/api-endpoints';
+import { PagedResult } from '../models/api.models';
 import { 
-  CreateMatch,
-  UpdateMatch,
-  Match 
+  CreateMatchDto,
+  UpdateMatchDto,
+  MatchDto,
+  MatchQuery,
+  MatchResultDto,
+  MatchEventDto,
+  CreateMatchEventDto,
+  UpdateMatchEventDto
 } from '../models/match.models';
-import { ApiResponse, PaginatedResponse } from '../models/api.models';
 
 @Injectable({
   providedIn: 'root'
@@ -15,72 +20,77 @@ import { ApiResponse, PaginatedResponse } from '../models/api.models';
 export class MatchService {
   private apiClient = inject(ApiClient);
 
-  // Note: Match-specific endpoints are not yet implemented in the backend controllers
-  // This service is prepared for future match management features
+  getMatches(params?: Partial<MatchQuery>): Observable<PagedResult<MatchDto>> {
+    const query: MatchQuery = {
+      page: 1,
+      pageSize: 20,
+      ...params
+    };
+    return this.apiClient.getPaged<MatchDto>(API_ENDPOINTS.MATCHES.LIST, query);
+  }
+
+  getMatch(matchId: string): Observable<MatchDto> {
+    return this.apiClient.get<MatchDto>(API_ENDPOINTS.MATCHES.GET(matchId));
+  }
   
-  // Tournament-related operations using available endpoints
-  getTournamentTeams(tournamentId: string): Observable<any[]> {
-    return this.apiClient.get<any[]>(API_ENDPOINTS.TOURNAMENTS.TEAMS(tournamentId));
+  createMatch(matchData: CreateMatchDto): Observable<MatchDto> {
+    return this.apiClient.post<MatchDto>(API_ENDPOINTS.MATCHES.CREATE, matchData);
   }
-
-  // Placeholder methods for future match functionality
-  // These will need to be implemented when match endpoints are added to the backend
-
-  /*
-  // Future match endpoints when implemented:
   
-  getTournamentMatches(tournamentId: string): Observable<Match[]> {
-    return this.apiClient.get<Match[]>(`tournaments/${tournamentId}/matches`);
+  updateMatch(matchId: string, updates: UpdateMatchDto): Observable<MatchDto> {
+    return this.apiClient.patch<MatchDto>(API_ENDPOINTS.MATCHES.UPDATE(matchId), updates);
   }
-
-  getMatch(tournamentId: string, matchId: string): Observable<Match> {
-    return this.apiClient.get<Match>(`tournaments/${tournamentId}/matches/${matchId}`);
+  
+  updateMatchResult(matchId: string, result: MatchResultDto): Observable<MatchDto> {
+    return this.apiClient.patch<MatchDto>(API_ENDPOINTS.MATCHES.UPDATE_RESULT(matchId), result);
   }
-
-  createMatch(tournamentId: string, matchData: CreateMatch): Observable<Match> {
-    return this.apiClient.post<Match>(`tournaments/${tournamentId}/matches`, matchData);
+  
+  deleteMatch(matchId: string): Observable<void> {
+    return this.apiClient.delete<void>(API_ENDPOINTS.MATCHES.DELETE(matchId));
   }
-
-  updateMatch(tournamentId: string, matchId: string, updates: UpdateMatch): Observable<Match> {
-    return this.apiClient.put<Match>(`tournaments/${tournamentId}/matches/${matchId}`, updates);
+  
+  getMatchEvents(matchId: string, type?: string): Observable<MatchEventDto[]> {
+    const url = type ? `${API_ENDPOINTS.MATCHES.EVENTS.LIST_BY_MATCH(matchId)}?type=${type}` : API_ENDPOINTS.MATCHES.EVENTS.LIST_BY_MATCH(matchId);
+    return this.apiClient.get<MatchEventDto[]>(url);
   }
-
-  deleteMatch(tournamentId: string, matchId: string): Observable<void> {
-    return this.apiClient.delete<void>(`tournaments/${tournamentId}/matches/${matchId}`);
+  
+  getMatchEvent(matchId: string, eventId: string): Observable<MatchEventDto> {
+    return this.apiClient.get<MatchEventDto>(API_ENDPOINTS.MATCHES.EVENTS.GET(matchId, eventId));
   }
-
-  updateMatchResult(tournamentId: string, matchId: string, result: any): Observable<Match> {
-    return this.apiClient.put<Match>(`tournaments/${tournamentId}/matches/${matchId}/result`, result);
+  
+  createMatchEvent(matchId: string, eventData: CreateMatchEventDto): Observable<MatchEventDto> {
+    const eventDataWithMatch = { ...eventData, matchId };
+    return this.apiClient.post<MatchEventDto>(API_ENDPOINTS.MATCHES.EVENTS.CREATE(matchId), eventDataWithMatch);
   }
-  */
-
-  // Legacy methods that return empty data until match endpoints are implemented
-  getTournamentMatches(tournamentId: string): Observable<Match[]> {
-    // Return empty array until match endpoints are implemented
+  
+  updateMatchEvent(matchId: string, eventId: string, updates: UpdateMatchEventDto): Observable<MatchEventDto> {
+    return this.apiClient.patch<MatchEventDto>(API_ENDPOINTS.MATCHES.EVENTS.UPDATE(matchId, eventId), updates);
+  }
+  
+  deleteMatchEvent(matchId: string, eventId: string): Observable<void> {
+    return this.apiClient.delete<void>(API_ENDPOINTS.MATCHES.EVENTS.DELETE(matchId, eventId));
+  }
+  
+  getPlayerEvents(playerId: string): Observable<MatchEventDto[]> {
+    return this.apiClient.get<MatchEventDto[]>(API_ENDPOINTS.MATCHES.EVENTS.PLAYER_EVENTS(playerId));
+  }
+  
+  getTeamEvents(teamId: string): Observable<MatchEventDto[]> {
+    return this.apiClient.get<MatchEventDto[]>(API_ENDPOINTS.MATCHES.EVENTS.TEAM_EVENTS(teamId));
+  }
+  
+  getTournamentMatches(tournamentId: string): Observable<MatchDto[]> {
     return new Observable(observer => {
-      observer.next([]);
-      observer.complete();
+      this.getMatches({ tournamentId }).subscribe({
+        next: (pagedResult) => observer.next(pagedResult.data),
+        error: (error) => observer.error(error),
+        complete: () => observer.complete()
+      });
     });
   }
 
-  getLiveMatches(tournamentId: string): Observable<Match[]> {
-    return new Observable(observer => {
-      observer.next([]);
-      observer.complete();
-    });
-  }
-
-  getUpcomingMatches(tournamentId: string): Observable<Match[]> {
-    return new Observable(observer => {
-      observer.next([]);
-      observer.complete();
-    });
-  }
-
-  getCompletedMatches(tournamentId: string): Observable<Match[]> {
-    return new Observable(observer => {
-      observer.next([]);
-      observer.complete();
-    });
+  generateFixtures(fixtureData: any): Observable<MatchDto[]> {
+    const tournamentId = fixtureData.tournamentId;
+    return this.apiClient.post<MatchDto[]>(API_ENDPOINTS.TOURNAMENTS.GENERATE_FIXTURES(tournamentId), {});
   }
 }

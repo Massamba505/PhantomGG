@@ -29,17 +29,15 @@ export class CreateTeamComponent {
   onSubmit(teamData: CreateTeam | UpdateTeam) {
     this.saving.set(true);
     
-    // For create team component, we expect CreateTeam data
     const createTeamData = teamData as CreateTeam;
     
     this.teamService.createTeam(createTeamData).subscribe({
       next: (team) => {
         this.toastService.success('Team created successfully!');
-        this.router.navigate(['/user/teams']);
+        this.router.navigate(['/user/teams',team.id]);
         this.saving.set(false);
       },
       error: (error) => {
-        console.error('Failed to create team:', error);
         this.toastService.error('Failed to create team. Please try again.');
         this.saving.set(false);
       }

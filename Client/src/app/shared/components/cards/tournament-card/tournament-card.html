@@ -1,46 +1,50 @@
-<div (click)="onView()" class="card flex flex-col gap-3 p-3">
-  <div class="flex gap-2">
+<div (click)="onView()" class="card flex flex-col gap-3 p-3" data-cy="tournament-card">
+  <div class="flex gap-2" data-cy="tournament-header">
     <img
       [src]="tournament().logoUrl"
       [alt]="tournament().name"
       class="w-12 h-12 object-contain rounded-md"
+      data-cy="tournament-logo"
     />
-    <div class="flex-1">
-      <span class="font-semibold text-md line-clamp-1">
+    <div class="flex-1" data-cy="tournament-info">
+      <span class="font-semibold text-md line-clamp-2" data-cy="tournament-name">
         {{ tournament().name }}
       </span>
     </div>
-    <div class="flex flex-col">
-      <span class="font-semibold text-xs py-1 btn btn-outline px-2">
-        {{ tournament().status }}
+    <div class="flex flex-col" data-cy="tournament-status-container">
+      <span class="font-semibold text-xs py-1 btn btn-outline px-2" data-cy="tournament-status">
+        {{ getStatus() }}
       </span>
     </div>
   </div>
 
   <div
     class="border p-2 rounded-md text-xs text-muted h-[48px] btn-outline cursor-pointer"
+    data-cy="tournament-description"
   >
     <span class="line-clamp-2">{{ tournament().description }}</span>
   </div>
 
-  <div class="grid grid-cols-3 gap-2">
+  <div class="grid grid-cols-3 gap-2" data-cy="tournament-details-grid">
     <div
       class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+      data-cy="tournament-location-info"
     >
-      <lucide-angular size="14" [img]="icons.Users" />
+      <lucide-angular size="14" [img]="icons.Users" data-cy="location-icon" />
       <div class="flex flex-col gap-1 text-center text-xs font-semibold">
-        <span class="line-clamp-1">Location</span>
-        <span class="line-clamp-1">{{ tournament().location }}</span>
+        <span class="line-clamp-1" data-cy="location-label">Location</span>
+        <span class="line-clamp-1" data-cy="location-value">{{ tournament().location }}</span>
       </div>
     </div>
 
     <div
       class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+      data-cy="tournament-teams-info"
     >
-      <lucide-angular size="14" [img]="icons.Users" />
+      <lucide-angular size="14" [img]="icons.Users" data-cy="teams-icon" />
       <div class="flex flex-col gap-1 text-center text-xs font-semibold">
-        <span class="line-clamp-1">Teams</span>
-        <span class="line-clamp-1">
+        <span class="line-clamp-1" data-cy="teams-label">Teams</span>
+        <span class="line-clamp-1" data-cy="teams-count">
           {{ tournament().teamCount }} / {{ tournament().maxTeams }}
         </span>
       </div>
@@ -48,56 +52,61 @@
 
     <div
       class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
+      data-cy="tournament-format-info"
     >
-      <lucide-angular size="14" [img]="icons.Trophy" />
+      <lucide-angular size="14" [img]="icons.Trophy" data-cy="format-icon" />
       <div class="flex flex-col gap-1 text-center text-xs font-semibold">
-        <span class="line-clamp-1">Format</span>
-        <span class="line-clamp-1">RB</span>
+        <span class="line-clamp-1" data-cy="format-label">Format</span>
+        <span class="line-clamp-1" data-cy="format-value">RB</span>
       </div>
     </div>
   </div>
 
   <div
     class="border p-2 rounded-md text-xs line-clamp-2 text-muted btn-outline cursor-pointer"
+    data-cy="tournament-dates"
   >
-    <div class="flex items-center gap-1">
-      <lucide-angular size="12" [img]="icons.Calendar" />
+    <div class="flex items-center gap-1" data-cy="registration-deadline">
+      <lucide-angular size="12" [img]="icons.Calendar" data-cy="calendar-icon" />
       <span>Registration Deadline:</span>
-      <span class="font-semibold">
+      <span class="font-semibold" data-cy="registration-deadline-date">
         {{ tournament().registrationDeadline | date : "mediumDate" }}
       </span>
     </div>
-    <div class="flex items-center gap-1">
-      <lucide-angular size="12" [img]="icons.Calendar" />
-      <span>Start:</span>
-      <span class="font-semibold">
+    <div class="flex items-center gap-1" data-cy="start-date">
+      <lucide-angular size="12" [img]="icons.Calendar" data-cy="calendar-icon" />
+      <span>Tournament StartDate:</span>
+      <span class="font-semibold" data-cy="start-date-value">
         {{ tournament().startDate | date : "mediumDate" }}
       </span>
     </div>
   </div>
 
-  <div class="flex gap-1 mt-auto">
+  <div class="flex gap-1 mt-auto" data-cy="tournament-actions">
     @if (isOrganizer()) {
     <button
       (click)="onEdit($event)"
       class="btn btn-outline flex justify-center items-center flex-1"
+      data-cy="edit-tournament-button"
     >
-      <lucide-angular size="15" [img]="icons.Edit" />
+      <lucide-angular size="15" [img]="icons.Edit" data-cy="edit-icon" />
       <span>Edit</span>
     </button>
-    <button (click)="onDelete($event)" class="btn btn-destructive">
-      <lucide-angular size="15" [img]="icons.Trash2" />
+    <button (click)="onDelete($event)" class="btn btn-destructive" data-cy="delete-tournament-button">
+      <lucide-angular size="15" [img]="icons.Trash2" data-cy="delete-icon" />
     </button>
     } @if (isUser()) {
     <button
       (click)="onView($event)"
       class="btn btn-secondary flex justify-center items-center flex-1"
+      data-cy="view-tournament-button"
     >
       <span>View</span>
     </button>
     <button
       (click)="onJoin($event)"
       class="btn btn-primary flex justify-center items-center"
+      data-cy="join-tournament-button"
     >
       <span>Join</span>
     </button>
@@ -105,6 +114,7 @@
     <button
       (click)="onView($event)"
       class="btn btn-secondary flex justify-center items-center flex-1"
+      data-cy="view-public-tournament-button"
     >
       <span>View</span>
     </button>

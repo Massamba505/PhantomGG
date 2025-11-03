@@ -1,12 +1,8 @@
-using System.ComponentModel.DataAnnotations;
+using PhantomGG.Common.Enums;
 
 namespace PhantomGG.Models.DTOs.Match;
 
 public class MatchResultDto
 {
-    [Required]
-    public int HomeScore { get; set; }
-
-    [Required]
-    public int AwayScore { get; set; }
+    public MatchStatus Status { get; set; }
 }

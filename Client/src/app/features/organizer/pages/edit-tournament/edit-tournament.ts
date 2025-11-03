@@ -52,7 +52,6 @@ export class EditTournamentPage implements OnInit {
     this.tournamentService.updateTournament(this.tournamentId(), updateData).subscribe({
       next: (updatedTournament) => {
         this.saving.set(false);
-        // Navigate to tournament details page
         this.router.navigate(['..'], { relativeTo: this.route });
       },
       complete:()=>{

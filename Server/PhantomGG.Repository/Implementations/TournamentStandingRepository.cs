@@ -13,10 +13,16 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
     public async Task<IEnumerable<TournamentStandingDto>> GetByTournamentAsync(Guid tournamentId)
     {
         var completedMatches = await _context.Matches
-            .Where(m => m.TournamentId == tournamentId && m.Status == MatchStatus.Completed.ToString())
+            .Where(m => m.TournamentId == tournamentId && (MatchStatus)m.Status == MatchStatus.Completed)
+            .ToListAsync();
+
+        var registeredTeamIds = await _context.TournamentTeams
+            .Where(tt => tt.TournamentId == tournamentId && tt.Status == (int)TeamRegistrationStatus.Approved)
+            .Select(tt => tt.TeamId)
             .ToListAsync();
 
         var teams = await _context.Teams
+            .Where(t => registeredTeamIds.Contains(t.Id))
             .Select(t => new
             {
                 t.Id,
@@ -85,105 +91,101 @@ public class TournamentStandingRepository(PhantomContext context) : ITournamentS
 
     public async Task<IEnumerable<PlayerGoalStandingDto>> GetPlayerGoalStandingsAsync(Guid tournamentId)
     {
-        var completedMatches = await _context.Matches
-            .Where(m => m.TournamentId == tournamentId && m.Status == MatchStatus.Completed.ToString())
-            .ToListAsync();
-
-        var matchesPlayedByTeam = completedMatches
-            .SelectMany(m => new[] { m.HomeTeamId, m.AwayTeamId })
-            .GroupBy(teamId => teamId)
-            .ToDictionary(g => g.Key, g => g.Count());
-
-        var goalGroups = await _context.MatchEvents
+        var goalEvents = await _context.MatchEvents
+            .Include(me => me.Match)
+            .Include(me => me.Player)
+            .Include(me => me.Team)
             .Where(me => me.Match.TournamentId == tournamentId &&
-                         me.EventType == "Goal")
-            .GroupBy(me => new { me.TeamId })
-            .Select(g => new
-            {
-                PlayerId = Guid.Empty,
-                TeamId = g.Key.TeamId,
-                Goals = g.Count()
-            })
+                         (MatchEventType)me.EventType == MatchEventType.Goal)
             .ToListAsync();
 
-        var teamLookup = await _context.Teams
-            .Where(t => goalGroups.Select(g => g.TeamId).Distinct().Contains(t.Id))
-            .ToDictionaryAsync(t => t.Id);
-
-        var playerLookup = await _context.Players
-            .Where(p => goalGroups.Select(g => g.PlayerId).Distinct().Contains(p.Id))
-            .ToDictionaryAsync(p => p.Id);
-
-        var standings = goalGroups.Select(g =>
-        {
-            var team = teamLookup[g.TeamId];
-            var player = playerLookup.ContainsKey(g.PlayerId) ? playerLookup[g.PlayerId] : null;
-
-            return new PlayerGoalStandingDto
+        var completedMatches = await _context.Matches
+            .Where(m => m.TournamentId == tournamentId && (MatchStatus)m.Status == MatchStatus.Completed)
+            .ToListAsync();
+        var playerGoalGroups = goalEvents
+            .GroupBy(ge => ge.PlayerId)
+            .Select(g =>
             {
-                PlayerId = g.PlayerId,
-                PlayerName = string.Empty,
-                PlayerPhoto = player?.PhotoUrl,
-                TeamId = g.TeamId,
-                TeamName = team.Name,
-                TeamLogo = team.LogoUrl,
-                Goals = g.Goals,
-                MatchesPlayed = matchesPlayedByTeam.ContainsKey(g.TeamId) ? matchesPlayedByTeam[g.TeamId] : 0
-            };
-        })
-        .OrderByDescending(p => p.Goals)
-        .ThenBy(p => p.PlayerName)
-        .ToList();
+                var firstEvent = g.First();
+                var player = firstEvent.Player;
+                var team = firstEvent.Team;
 
-        for (int i = 0; i < standings.Count; i++)
+                var teamMatches = completedMatches
+                    .Where(m => m.HomeTeamId == team.Id || m.AwayTeamId == team.Id)
+                    .Count();
+
+                return new PlayerGoalStandingDto
+                {
+                    PlayerId = g.Key,
+                    PlayerName = player != null ? $"{player.FirstName} {player.LastName}" : "Unknown Player",
+                    PlayerPhoto = player?.PhotoUrl,
+                    TeamId = team.Id,
+                    TeamName = team.Name,
+                    TeamLogo = team.LogoUrl,
+                    Goals = g.Count(),
+                    MatchesPlayed = teamMatches
+                };
+            })
+            .OrderByDescending(p => p.Goals)
+            .ThenBy(p => p.PlayerName)
+            .ToList();
+
+        for (int i = 0; i < playerGoalGroups.Count; i++)
         {
-            standings[i].Position = i + 1;
+            playerGoalGroups[i].Position = i + 1;
         }
 
-        return standings;
+        return playerGoalGroups;
     }
 
 
     public async Task<IEnumerable<PlayerAssistStandingDto>> GetPlayerAssistStandingsAsync(Guid tournamentId)
     {
-        // Get assist providers from match events
-        var assistStandings = await _context.MatchEvents
+        var assistEvents = await _context.MatchEvents
+            .Include(me => me.Match)
+            .Include(me => me.Player)
+            .Include(me => me.Team)
             .Where(me => me.Match.TournamentId == tournamentId &&
-                        me.EventType == "Assist")
-            .GroupBy(me => new { me.TeamId })
-            .Select(g => new
-            {
-                TeamId = g.Key.TeamId,
-                Assists = g.Count()
-            })
-            .Join(_context.Teams,
-                assists => assists.TeamId,
-                team => team.Id,
-                (assists, team) => new PlayerAssistStandingDto
-                {
-                    PlayerId = Guid.Empty, // We don't have player IDs in events, using player name
-                    PlayerName = string.Empty,
-                    TeamId = assists.TeamId,
-                    TeamName = team.Name,
-                    TeamLogo = team.LogoUrl,
-                    Assists = assists.Assists,
-                    MatchesPlayed = _context.Matches
-                        .Where(m => m.TournamentId == tournamentId &&
-                                   (m.HomeTeamId == assists.TeamId || m.AwayTeamId == assists.TeamId) &&
-                                   m.Status == MatchStatus.Completed.ToString())
-                        .Count()
-                })
-            .Where(p => p.Assists > 0)
-            .OrderByDescending(p => p.Assists)
-            .ThenByDescending(p => p.AssistsPerMatch)
+                         (MatchEventType)me.EventType == MatchEventType.Assist)
             .ToListAsync();
 
-        // Assign positions
-        for (int i = 0; i < assistStandings.Count; i++)
+        var completedMatches = await _context.Matches
+            .Where(m => m.TournamentId == tournamentId && (MatchStatus)m.Status == MatchStatus.Completed)
+            .ToListAsync();
+
+        var playerAssistGroups = assistEvents
+            .GroupBy(ae => ae.PlayerId)
+            .Select(g =>
+            {
+                var firstEvent = g.First();
+                var player = firstEvent.Player;
+                var team = firstEvent.Team;
+
+                var teamMatches = completedMatches
+                    .Where(m => m.HomeTeamId == team.Id || m.AwayTeamId == team.Id)
+                    .Count();
+
+                return new PlayerAssistStandingDto
+                {
+                    PlayerId = g.Key,
+                    PlayerName = player != null ? $"{player.FirstName} {player.LastName}" : "Unknown Player",
+                    PlayerPhoto = player?.PhotoUrl,
+                    TeamId = team.Id,
+                    TeamName = team.Name,
+                    TeamLogo = team.LogoUrl,
+                    Assists = g.Count(),
+                    MatchesPlayed = teamMatches
+                };
+            })
+            .OrderByDescending(p => p.Assists)
+            .ThenByDescending(p => p.AssistsPerMatch)
+            .ToList();
+
+        for (int i = 0; i < playerAssistGroups.Count; i++)
         {
-            assistStandings[i].Position = i + 1;
+            playerAssistGroups[i].Position = i + 1;
         }
 
-        return assistStandings;
+        return playerAssistGroups;
     }
 }

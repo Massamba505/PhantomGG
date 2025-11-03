@@ -1,16 +1,17 @@
-<div class="max-w-md mx-auto">
-  <div class="card">
-    <div class="text-center mb-6">
-      <h1 class="text-2xl font-bold mb-2">Welcome Back</h1>
+<div class="max-w-md mx-auto" data-cy="login-container">
+  <div class="card" data-cy="login-card">
+    <div class="text-center mb-6" data-cy="login-header">
+      <h1 class="text-2xl font-bold mb-2" data-cy="login-title">Welcome Back</h1>
     </div>
 
     <form
       [formGroup]="userForm"
       (ngSubmit)="onSubmit($event)"
       class="space-y-5"
+      data-cy="login-form"
     >
-      <div class="mb-4">
-        <label for="email" class="input-label">
+      <div class="mb-4" data-cy="email-field">
+        <label for="email" class="input-label" data-cy="email-label">
           Email<span class="required ml-1">*</span>
         </label>
         <input
@@ -20,25 +21,26 @@
           type="email"
           placeholder="massamba.maphalala@gmail.com"
           formControlName="email"
+          data-cy="email-input"
         />
         @if (checkFieldError('email')) {
-        <p class="text-sm error-message mt-1">
+        <p class="text-sm error-message mt-1" data-cy="email-error">
           Please enter a valid email address
         </p>
         }
       </div>
 
-      <div class="mb-4">
-        <div class="flex justify-between items-center">
-          <label for="password" class="input-label">
+      <div class="mb-4" data-cy="password-field">
+        <div class="flex justify-between items-center" data-cy="password-header">
+          <label for="password" class="input-label" data-cy="password-label">
             Password<span class="required ml-1">*</span>
           </label>
-          <a routerLink="/auth/forgot-password" class="text-xs hover:underline">
+          <a routerLink="/auth/forgot-password" class="text-xs hover:underline" data-cy="forgot-password-link">
             Forgot Password?
           </a>
         </div>
 
-        <div class="relative">
+        <div class="relative" data-cy="password-input-container">
           <input
             id="password"
             class="input-field pr-10"
@@ -46,34 +48,37 @@
             [type]="showPassword() ? 'text' : 'password'"
             placeholder="Enter your password"
             formControlName="password"
+            data-cy="password-input"
           />
           <button
             type="button"
             (click)="togglePassword()"
             class="absolute right-3 top-1/2 transform -translate-y-1/2"
             aria-label="Toggle password visibility"
+            data-cy="password-toggle"
           >
             @if (!showPassword()) {
-            <lucide-angular [img]="icons.EyeOff" size="18"></lucide-angular>
+            <lucide-angular [img]="icons.EyeOff" size="18" data-cy="eye-off-icon"></lucide-angular>
             } @else {
-            <lucide-angular [img]="icons.Eye" size="18"></lucide-angular>
+            <lucide-angular [img]="icons.Eye" size="18" data-cy="eye-icon"></lucide-angular>
             }
           </button>
         </div>
 
         @if (checkFieldError('password')) {
-        <p class="text-sm error-message mt-1">Password is required</p>
+        <p class="text-sm error-message mt-1" data-cy="password-error">Password is required</p>
         }
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2" data-cy="remember-me-field">
         <input
           type="checkbox"
           id="rememberMe"
           formControlName="rememberMe"
           class="checkbox"
+          data-cy="remember-me-checkbox"
         />
-        <label for="rememberMe" class="text-sm input-label text-muted m-0"
+        <label for="rememberMe" class="text-sm input-label text-muted m-0" data-cy="remember-me-label"
           >Remember me</label
         >
       </div>
@@ -82,26 +87,28 @@
         type="submit"
         class="btn btn-primary py-2.5 w-full"
         [disabled]="loading()"
+        data-cy="login-button"
       >
         @if (loading()) {
-        <span>Logging in...</span>
+        <span data-cy="loading-text">Logging in...</span>
         } @else {
-        <span>Log in</span>
+        <span data-cy="submit-text">Log in</span>
         }
       </button>
     </form>
 
     @if (showResendVerification()) {
-    <div class="card mt-4">
-      <div class="flex items-center gap-3">
+    <div class="card mt-4" data-cy="resend-verification-card">
+      <div class="flex items-center gap-3" data-cy="verification-alert">
         <lucide-angular
           [img]="icons.AlertTriangle"
           [size]="20"
           class="text-orange-600"
+          data-cy="alert-icon"
         ></lucide-angular>
-        <div class="flex-1">
-          <p class="text-sm font-medium">Email verification required</p>
-          <p class="text-xs text-orange-600 mt-1">
+        <div class="flex-1" data-cy="verification-message">
+          <p class="text-sm font-medium" data-cy="verification-title">Email verification required</p>
+          <p class="text-xs text-orange-600 mt-1" data-cy="verification-description">
             Please verify your email before logging in
           </p>
         </div>
@@ -109,13 +116,14 @@
       <button
         (click)="resendVerification()"
         class="btn btn-outline btn-sm mt-3 w-full"
+        data-cy="resend-verification-button"
       >
         Resend Verification Email
       </button>
     </div>
     }
 
-    <div class="flex items-center my-6">
+    <div class="flex items-center my-6" data-cy="divider">
       <div class="border-t border-border flex-1"></div>
       <span class="px-4 text-sm">OR</span>
       <div class="border-t border-border flex-1"></div>
@@ -123,6 +131,7 @@
 
     <button
       class="btn btn-secondary mb-4 flex items-center justify-center gap-2 w-full"
+      data-cy="google-login-button"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -130,6 +139,7 @@
         height="16"
         viewBox="0 0 24 24"
         fill="currentColor"
+        data-cy="google-icon"
       >
         <path
           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -148,14 +158,15 @@
           fill="#EA4335"
         />
       </svg>
-      Continue with Google
+      <span data-cy="google-button-text">Continue with Google</span>
     </button>
 
-    <div class="text-center mt-6">
-      <span class="text-sm font-semibold">Don't have an account? </span>
+    <div class="text-center mt-6" data-cy="signup-link-section">
+      <span class="text-sm font-semibold" data-cy="signup-prompt">Don't have an account? </span>
       <a
         routerLink="/auth/signup"
         class="hover:underline font-medium text-sm text-muted"
+        data-cy="signup-link"
       >
         Sign up
       </a>

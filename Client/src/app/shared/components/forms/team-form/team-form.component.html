@@ -1,7 +1,7 @@
 <form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="space-y-4 card">
   <div>
     <label class="block text-sm font-medium mb-2"
-      >Team Logo @if (!isEditMode()) {*}</label
+      >Team Logo <span class="required">*</span></label
     >
 
     @if (logoPreview()) {
@@ -9,7 +9,7 @@
       <img
         [src]="logoPreview()"
         alt="Team Logo"
-        class="h-32 w-32 object-contain rounded-lg shadow mx-auto"
+        class="h-32 w-32 object-cover rounded-lg shadow mx-auto"
       />
     </div>
     }
@@ -19,6 +19,7 @@
       accept="image/*"
       (change)="onLogoChange($event)"
       class="input-field w-full"
+      data-cy="team-image-input"
       [class.error]="isFieldInvalid('logo')"
     />
 
@@ -28,11 +29,14 @@
   </div>
 
   <div>
-    <label class="block text-sm font-medium mb-2">Team Name *</label>
+    <label class="block text-sm font-medium mb-2"
+      >Team Name <span class="required">*</span></label
+    >
     <input
       type="text"
       formControlName="name"
       class="input-field w-full"
+      data-cy = "team-name-input"
       [class.error]="submitted() && teamForm.controls['name'].invalid"
     />
     @if (submitted() && teamForm.controls['name'].invalid) {
@@ -43,12 +47,13 @@
   </div>
 
   <div>
-    <label class="block text-sm font-medium mb-2">Short Name (Optional)</label>
+    <label class="block text-sm font-medium mb-2">Short Name</label>
     <input
       type="text"
       formControlName="shortName"
       placeholder="Auto-generated if not provided"
       class="input-field w-full"
+      data-cy = "team-short-name-input"
       [class.error]="submitted() && teamForm.controls['shortName'].invalid"
     />
     @if (submitted() && teamForm.controls['shortName'].invalid) {
@@ -65,6 +70,7 @@
     <button
       type="submit"
       class="btn btn-primary flex-1"
+      data-cy = "team-submit-button"
       [disabled]="submitted() && teamForm.invalid"
     >
       {{ isEditMode() ? "Update Team" : "Create Team" }}

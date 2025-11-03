@@ -2,16 +2,17 @@
   <div
     class="flex md:justify-between justify-center flex-col md:flex-row items-center flex-wrap mb-4"
   >
-    <h1 class="text-lg md:text-2xl font-bold text-gray-900 dark:text-gray-100">
+    <h1 class="text-lg md:text-2xl font-bold text-muted">
       Available Tournaments
     </h1>
-    <div class="text-sm text-gray-600 dark:text-gray-400">
+    <div class="text-sm text-mutes">
       {{ myTeams().length }} team{{ myTeams().length !== 1 ? "s" : "" }}
       available
     </div>
   </div>
 
   <app-tournament-search
+    [withDraft]="false"
     (clearFiltersSearch)="onClearSearch()"
     (searchChange)="onSearchChange($event)"
   />
@@ -21,7 +22,7 @@
     <div
       class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"
     ></div>
-    <p class="text-gray-600 dark:text-gray-400">Loading tournaments...</p>
+    <p class="text-mutes">Loading tournaments...</p>
   </div>
   } @if (!isLoading() && tournaments().length === 0) {
   <div class="text-center py-12">
@@ -32,18 +33,14 @@
         class="mx-auto"
       ></lucide-angular>
     </div>
-    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-      No tournaments found
-    </h3>
+    <h3 class="text-xl font-semibold text-muted mb-2">No tournaments found</h3>
     @if (searchCriteria().searchTerm || searchCriteria().status) {
-    <p class="text-gray-600 dark:text-gray-400 mb-4">
-      No tournaments match your search criteria.
-    </p>
+    <p class="text-mutes mb-4">No tournaments match your search criteria.</p>
     <button class="btn btn-secondary" (click)="onClearSearch()">
       Clear Filters
     </button>
     } @else {
-    <p class="text-gray-600 dark:text-gray-400">
+    <p class="text-mutes">
       There are currently no tournaments available to join.
     </p>
     }
@@ -51,15 +48,14 @@
   } @if (!isLoading() && tournaments().length > 0) {
   <div class="flex items-center mb-4">
     @if (totalRecords() > 0) {
-    <span class="text-sm text-gray-600 dark:text-gray-400">
-      {{ totalRecords() }} Tournaments
-    </span>
+    <span class="text-sm text-mutes"> {{ totalRecords() }} Tournaments </span>
     }
   </div>
 
   <div class="flex-1">
     <div
-      class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
+    data-cy="tournaments-list"
+      class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
     >
       @for (tournament of tournaments(); track tournament.id) {
       <app-tournament-card
@@ -90,25 +86,27 @@
       </select>
     </div>
 
-    <div class="text-sm text-gray-600 dark:text-gray-400 mx-auto">
+    @if (totalPages() > 1) {
+    <div class="text-sm text-mutes mx-auto">
       Page {{ currentPage() }} of {{ totalPages() }} ({{ totalRecords() }}
       total)
     </div>
-
-    <div class="flex items-center gap-2 mx-auto">
+    <div class="flex items-center gap-1 mx-auto">
       <button
         class="btn btn-secondary btn-sm"
         [disabled]="!hasPreviousPage()"
         (click)="onPageChange(1)"
+        title="First page"
       >
-        First
+        <lucide-angular [img]="icons.ChevronsLeft" size="16" />
       </button>
       <button
         class="btn btn-secondary btn-sm"
         [disabled]="!hasPreviousPage()"
         (click)="onPageChange(currentPage() - 1)"
+        title="Previous page"
       >
-        Previous
+        <lucide-angular [img]="icons.ChevronLeft" size="16" />
       </button>
 
       @for (pageNum of getPageNumbers(); track pageNum) {
@@ -126,17 +124,20 @@
         class="btn btn-secondary btn-sm"
         [disabled]="!hasNextPage()"
         (click)="onPageChange(currentPage() + 1)"
+        title="Next page"
       >
-        Next
+        <lucide-angular [img]="icons.ChevronRight" size="16" />
       </button>
       <button
         class="btn btn-secondary btn-sm"
         [disabled]="!hasNextPage()"
         (click)="onPageChange(totalPages())"
+        title="Last page"
       >
-        Last
+        <lucide-angular [img]="icons.ChevronsRight" size="16" />
       </button>
     </div>
+    }
   </div>
   }
 </div>

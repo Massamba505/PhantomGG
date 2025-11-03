@@ -1,3 +1,4 @@
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Player;
 using PhantomGG.Repository.Entities;
 
@@ -12,11 +13,10 @@ public static class PlayerMappings
             Id = player.Id,
             FirstName = player.FirstName,
             LastName = player.LastName,
-            Position = player.Position,
-            Email = player.Email,
+            Position = (PlayerPosition)player.Position,
             PhotoUrl = player.PhotoUrl,
             TeamId = player.TeamId,
-            TeamName = player.Team?.Name ?? "Unknown",
+            TeamName = player.Team.Name,
             JoinedAt = player.CreatedAt
         };
     }
@@ -28,7 +28,8 @@ public static class PlayerMappings
             Id = Guid.NewGuid(),
             FirstName = createDto.FirstName,
             LastName = createDto.LastName,
-            Position = createDto.Position,
+            Position = (int)createDto.Position,
+            PhotoUrl = $"https://placehold.co/1200x400?text={createDto.FirstName[0]}+{createDto.LastName[0]}",
             Email = createDto.Email,
             TeamId = createDto.TeamId,
             CreatedAt = DateTime.UtcNow
@@ -42,7 +43,7 @@ public static class PlayerMappings
         if (!string.IsNullOrEmpty(updateDto.LastName))
             player.LastName = updateDto.LastName;
         if (updateDto.Position != null)
-            player.Position = updateDto.Position;
+            player.Position = (int)updateDto.Position;
         if (updateDto.Email != null)
             player.Email = updateDto.Email;
     }

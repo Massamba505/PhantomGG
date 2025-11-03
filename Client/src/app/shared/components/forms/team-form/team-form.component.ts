@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, inject, signal, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
 import { CreateTeam, UpdateTeam, Team } from '@/app/api/models/team.models';
@@ -10,10 +10,10 @@ import { CreateTeam, UpdateTeam, Team } from '@/app/api/models/team.models';
   styleUrl: './team-form.component.css'
 })
 export class TeamFormComponent implements OnInit, OnChanges {
-  @Input() team: Team | null = null;
-  @Input() tournamentId: string | null = null;
-  @Output() formSubmit = new EventEmitter<CreateTeam | UpdateTeam>();
-  @Output() formCancel = new EventEmitter<void>();
+  team = input<Team | null>(null);
+  tournamentId = input<string | null>(null);
+  formSubmit = output<CreateTeam | UpdateTeam>();
+  formCancel = output<void>();
   
   private fb = inject(FormBuilder);
   
@@ -21,24 +21,20 @@ export class TeamFormComponent implements OnInit, OnChanges {
   submitted = signal(false);
   logoPreview = signal<string | null>(null);
 
-  isEditMode = computed(() => this.team !== null);
+  isEditMode = computed(() => this.team() !== null);
 
   ngOnInit() {
-    console.log('TeamForm ngOnInit - team:', this.team);
     this.initializeForm();
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log('TeamForm ngOnChanges - changes:', changes);
     if (changes['team'] && this.teamForm) {
-      console.log('Team changed, reinitializing form with:', changes['team'].currentValue);
       this.initializeForm();
     }
   }
 
   private initializeForm() {
-    const team = this.team;
-    console.log('Initializing form with team:', team);
+    const team = this.team();
     
     this.teamForm = this.fb.group({
       name: [
@@ -49,20 +45,19 @@ export class TeamFormComponent implements OnInit, OnChanges {
         team?.shortName || '',
         [Validators.maxLength(10)],
       ],
-      logo: [null], // Optional for both create and edit
+      logo: [team?.logoUrl || null,[this.isEditMode()? Validators.required: Validators.nullValidator]],
     });
 
-    // Set logo preview if team has logoUrl
+  
     if (team?.logoUrl) {
       this.logoPreview.set(team.logoUrl);
     } else {
       this.logoPreview.set(null);
     }
 
-    console.log('Form initialized with values:', this.teamForm.value);
   }
 
-  // Handle file select
+
   onLogoChange(event: Event) {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
@@ -70,7 +65,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
       this.teamForm.patchValue({ logo: file });
       this.teamForm.get('logo')?.updateValueAndValidity();
 
-      // Show preview
+    
       const reader = new FileReader();
       reader.onload = () => this.logoPreview.set(reader.result as string);
       reader.readAsDataURL(file);
@@ -86,7 +81,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
     const formValue = this.teamForm.value;
 
     if (this.isEditMode()) {
-      // For edit mode
+    
       const updateData: UpdateTeam = {
         name: formValue.name,
         shortName: formValue.shortName || undefined,
@@ -96,7 +91,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
 
       this.formSubmit.emit(updateData);
     } else {
-      // For create mode
+    
       const createData: CreateTeam = {
         name: formValue.name,
         shortName: formValue.shortName || undefined,

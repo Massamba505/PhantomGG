@@ -29,7 +29,7 @@ public partial class Tournament
 
     public int MaxTeams { get; set; }
 
-    public string Status { get; set; } = null!;
+    public int Status { get; set; }
 
     public Guid OrganizerId { get; set; }
 

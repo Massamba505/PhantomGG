@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Player } from '@/app/api/models/team.models';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
+import { PlayerPosition } from '@/app/api/models';
 
 export type PlayerRole = 'Manager' | 'TeamMember' | 'Public';
 
@@ -24,6 +26,11 @@ export class PlayerCard {
 
   isManager(): boolean {
     return this.role() === 'Manager';
+  }
+  
+  getPosition(){
+    if(this.player().position === undefined) return 'none';
+    return getEnumLabel(PlayerPosition, this.player().position!)
   }
 
   isTeamMember(): boolean {

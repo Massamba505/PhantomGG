@@ -1,15 +1,11 @@
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 using PhantomGG.Models.DTOs.Auth;
-using PhantomGG.Models.DTOs.User;
 using PhantomGG.Repository.Entities;
-using System.Data;
 
 namespace PhantomGG.Service.Mappings;
 
 public static class AuthMappings
 {
-    public static User ToEntity(this RegisterRequestDto registerDto, string hashedPassword, string token)
+    public static User ToEntity(this RegisterRequestDto registerDto, string hashedPassword)
     {
         return new User
         {
@@ -19,12 +15,12 @@ public static class AuthMappings
             Email = registerDto.Email.ToLower(),
             PasswordHash = hashedPassword,
             ProfilePictureUrl = registerDto.ProfilePictureUrl ?? $"https://eu.ui-avatars.com/api/?name={registerDto.FirstName}+{registerDto.LastName}&size=250",
-            Role = !string.IsNullOrEmpty(registerDto.Role) ? registerDto.Role : "User",
+            Role = (int)registerDto.Role,
             CreatedAt = DateTime.UtcNow,
             IsActive = true,
             EmailVerified = false,
-            EmailVerificationToken = token,
-            EmailVerificationTokenExpiry = DateTime.UtcNow.AddDays(1),
+            EmailVerificationToken = null,
+            EmailVerificationTokenExpiry = null,
             FailedLoginAttempts = 0
         };
     }

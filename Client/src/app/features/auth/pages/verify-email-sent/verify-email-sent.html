@@ -1,55 +1,61 @@
-<div class="max-w-md mx-auto">
-  <div class="card text-center">
+<div class="max-w-md mx-auto" data-cy="verify-email-sent-container">
+  <div class="card text-center" data-cy="verify-email-card">
     <div class="flex flex-col items-center space-y-4">
       <div
         class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center"
+        data-cy="email-icon-container"
       >
         <lucide-angular
           [img]="icons.Mail"
           [size]="32"
           class="text-blue-600"
+          data-cy="email-icon"
         ></lucide-angular>
       </div>
 
-      <h1 class="text-2xl font-bold">Check Your Email</h1>
+      <h1 class="text-2xl font-bold" data-cy="verify-email-title">Check Your Email</h1>
 
-      <div class="space-y-2">
-        <p class="text-muted">We've sent a verification email to:</p>
-        <p class="font-semibold text-primary">{{ email() }}</p>
+      <div class="space-y-2" data-cy="email-info">
+        <p class="text-muted" data-cy="email-sent-message">We've sent a verification email to:</p>
+        <p class="font-semibold text-primary" data-cy="user-email">{{ email() }}</p>
       </div>
 
-      <div class="space-y-3 text-sm text-muted">
-        <p>
+      <div class="space-y-3 text-sm text-muted" data-cy="verification-instructions">
+        <p data-cy="inbox-instruction">
           Please check your inbox and click the verification link to activate
           your account.
         </p>
-        <p>You must verify your email before you can log in.</p>
+        <p data-cy="verify-requirement">You must verify your email before you can log in.</p>
       </div>
 
-      <div class="flex flex-col gap-3 w-full">
+      <div class="flex flex-col gap-3 w-full" data-cy="action-buttons">
         <button
           (click)="resendVerification()"
           [disabled]="resending()"
           class="btn btn-primary"
+          data-cy="resend-verification-button"
         >
           @if (resending()) {
-          <div class="flex items-center justify-center gap-2">
+          <div class="flex items-center justify-center gap-2" data-cy="resending-state">
             <div
               class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
+              data-cy="loading-spinner"
             ></div>
-            <span>Sending...</span>
+            <span data-cy="sending-text">Sending...</span>
           </div>
-          } @else { Resend Verification Email }
+          } @else { 
+          <span data-cy="resend-text">Resend Verification Email</span>
+          }
         </button>
 
-        <button (click)="goToLogin()" class="btn btn-outline">
+        <button (click)="goToLogin()" class="btn btn-outline" data-cy="back-to-login-button">
           Back to Login
         </button>
       </div>
 
-      <div class="text-xs text-muted space-y-1">
-        <p>Didn't receive the email?</p>
-        <p>Check your spam folder or try resending the verification email.</p>
+      <div class="text-xs text-muted space-y-1" data-cy="help-text">
+        <p data-cy="no-email-message">Didn't receive the email?</p>
+        <p data-cy="spam-instruction">Check your spam folder or try resending the verification email.</p>
       </div>
     </div>
   </div>

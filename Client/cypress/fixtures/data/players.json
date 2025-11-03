@@ -1,0 +1,33 @@
+{
+  "valid": [
+    {
+      "firstName": "Alex",
+      "lastName": "Johnson",
+      "position": "1",
+      "email": "alex.johnson@example.com"
+    },
+    {
+      "firstName": "Marcus",
+      "lastName": "Chen",
+      "position": "2",
+      "email": "marcus.chen@example.com"
+    },
+    {
+      "firstName": "Sarah",
+      "lastName": "Williams",
+      "position": "3",
+      "email": "sarah.williams@example.com"
+    },
+    {
+      "firstName": "David",
+      "lastName": "Martinez",
+      "position": "4",
+      "email": "david.martinez@example.com"
+    }
+  ],
+  "update": {
+    "firstName": "Alexander",
+    "lastName": "Johnson-Updated",
+    "position": "2"
+  }
+}

@@ -1,16 +1,16 @@
 using PhantomGG.Common.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace PhantomGG.Models.DTOs.Tournament;
 
-public class TournamentSearchDto
+public class TournamentQuery
 {
-    public string? SearchTerm { get; set; }
-    public string? Status { get; set; }
+    public string? Q { get; set; }
+    public TournamentStatus? Status { get; set; }
     public string? Location { get; set; }
-    public DateTime? StartDateFrom { get; set; }
-    public DateTime? StartDateTo { get; set; }
-    public bool? IsPublic { get; set; }
-    public TournamentScope? Scope { get; set; } = TournamentScope.All;
-    public int PageNumber { get; set; } = 1;
+    public DateTime? StartFrom { get; set; }
+    public DateTime? StartTo { get; set; }
+    public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 10;
+    public bool IsPublic { get; set; } = true;
 }

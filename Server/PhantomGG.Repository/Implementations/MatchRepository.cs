@@ -2,24 +2,16 @@ using Microsoft.EntityFrameworkCore;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Match;
+using PhantomGG.Models.DTOs;
 using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Data;
+using PhantomGG.Repository.Specifications;
 
 namespace PhantomGG.Repository.Implementations;
 
 public class MatchRepository(PhantomContext context) : IMatchRepository
 {
     private readonly PhantomContext _context = context;
-
-    public async Task<IEnumerable<Match>> GetAllAsync()
-    {
-        return await _context.Matches
-            .Include(m => m.Tournament)
-            .Include(m => m.HomeTeam)
-            .Include(m => m.AwayTeam)
-            .OrderByDescending(m => m.MatchDate)
-            .ToListAsync();
-    }
 
     public async Task<Match?> GetByIdAsync(Guid id)
     {
@@ -36,84 +28,39 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
             .Include(m => m.HomeTeam)
             .Include(m => m.AwayTeam)
             .Where(m => m.TournamentId == tournamentId)
-            .OrderBy(m => m.MatchDate)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Match>> GetByTeamAsync(Guid teamId)
-    {
-        return await _context.Matches
             .Include(m => m.Tournament)
-            .Include(m => m.HomeTeam)
-            .Include(m => m.AwayTeam)
-            .Where(m => m.HomeTeamId == teamId || m.AwayTeamId == teamId)
             .OrderBy(m => m.MatchDate)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Match>> GetUpcomingMatchesAsync(Guid tournamentId)
+    public async Task<IEnumerable<Match>> GetByTournamentAndStatusAsync(Guid tournamentId, int status)
     {
         return await _context.Matches
             .Include(m => m.HomeTeam)
             .Include(m => m.AwayTeam)
-            .Where(m => m.TournamentId == tournamentId &&
-                       m.MatchDate > DateTime.UtcNow &&
-                       m.Status == MatchStatus.Scheduled.ToString())
+            .Include(m => m.Tournament)
+            .Where(m => m.TournamentId == tournamentId && m.Status == (int)status)
             .OrderBy(m => m.MatchDate)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Match>> GetCompletedMatchesAsync(Guid tournamentId)
-    {
-        return await _context.Matches
-            .Include(m => m.HomeTeam)
-            .Include(m => m.AwayTeam)
-            .Where(m => m.TournamentId == tournamentId && m.Status == MatchStatus.Completed.ToString())
-            .OrderByDescending(m => m.MatchDate)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Match>> SearchAsync(MatchSearchDto searchDto)
+    public async Task<PagedResult<Match>> SearchAsync(MatchSpecification specification)
     {
         var query = _context.Matches
             .Include(m => m.Tournament)
             .Include(m => m.HomeTeam)
             .Include(m => m.AwayTeam)
-            .AsQueryable();
+            .Where(specification.ToExpression());
 
-        if (!string.IsNullOrEmpty(searchDto.SearchTerm))
-        {
-            query = query.Where(m =>
-                m.HomeTeam.Name.Contains(searchDto.SearchTerm) ||
-                m.AwayTeam.Name.Contains(searchDto.SearchTerm) ||
-                m.Tournament.Name.Contains(searchDto.SearchTerm));
-        }
+        var totalCount = await query.CountAsync();
 
-        if (searchDto.TournamentId.HasValue)
-        {
-            query = query.Where(m => m.TournamentId == searchDto.TournamentId);
-        }
-
-        if (!string.IsNullOrEmpty(searchDto.Status))
-        {
-            query = query.Where(m => m.Status == searchDto.Status);
-        }
-
-        if (searchDto.DateFrom.HasValue)
-        {
-            query = query.Where(m => m.MatchDate >= searchDto.DateFrom);
-        }
-
-        if (searchDto.DateTo.HasValue)
-        {
-            query = query.Where(m => m.MatchDate <= searchDto.DateTo);
-        }
-
-        return await query
+        var matches = await query
             .OrderBy(m => m.MatchDate)
-            .Skip((searchDto.PageNumber - 1) * searchDto.PageSize)
-            .Take(searchDto.PageSize)
+            .Skip((specification.Page - 1) * specification.PageSize)
+            .Take(specification.PageSize)
             .ToListAsync();
+
+        return new PagedResult<Match>(matches, specification.Page, specification.PageSize, totalCount);
     }
 
     public async Task<Match> CreateAsync(Match match)
@@ -140,11 +87,6 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
         }
     }
 
-    public async Task<bool> ExistsAsync(Guid id)
-    {
-        return await _context.Matches.AnyAsync(m => m.Id == id);
-    }
-
     public async Task<bool> TeamsHaveMatchOnDateAsync(Guid homeTeamId, Guid awayTeamId, DateTime matchDate, Guid? excludeMatchId = null)
     {
         var query = _context.Matches
@@ -158,18 +100,5 @@ public class MatchRepository(PhantomContext context) : IMatchRepository
         }
 
         return await query.AnyAsync();
-    }
-
-    public async Task<int> GetCompletedMatchCountAsync(Guid tournamentId)
-    {
-        return await _context.Matches
-            .CountAsync(m => m.TournamentId == tournamentId &&
-                m.Status == MatchStatus.Completed.ToString());
-    }
-
-    public async Task<int> GetTotalMatchCountAsync(Guid tournamentId)
-    {
-        return await _context.Matches
-            .CountAsync(m => m.TournamentId == tournamentId);
     }
 }

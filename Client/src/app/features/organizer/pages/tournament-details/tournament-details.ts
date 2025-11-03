@@ -5,14 +5,16 @@ import { Tournament } from '@/app/api/models/tournament.models';
 import { LucideAngularModule } from "lucide-angular";
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
-import { TournamentService } from '@/app/api/services';
+import { TournamentService, TournamentStatus } from '@/app/api/services';
 import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentTeamManagementComponent } from './components/tournament-team-management/tournament-team-management';
+import { TournamentMatchManagementComponent } from './components/tournament-match-management/tournament-match-management';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-tournament-details',
-  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, ConfirmDeleteModal, TournamentTeamManagementComponent],
+  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, ConfirmDeleteModal, TournamentTeamManagementComponent, TournamentMatchManagementComponent],
   templateUrl: './tournament-details.html',
   styleUrl: './tournament-details.css'
 })
@@ -36,6 +38,32 @@ export class TournamentDetailsComponent implements OnInit {
       this.loadTournament();
     });
   }
+  
+
+  readonly DESCRIPTION_LIMIT = 300;
+
+  showFullDescription = signal(false);
+  isLongDescription = signal(false);
+  displayedDescription = signal<string>('');
+
+  toggleDescription() {
+    this.showFullDescription.update(prev => !prev);
+    this.updateDisplayedDescription();
+  }
+
+  private updateDisplayedDescription() {
+    const fullDesc = this.tournament()?.description || '';
+    const plainText = fullDesc.replace(/<[^>]*>/g, '');
+    
+    this.isLongDescription.set(plainText.length > this.DESCRIPTION_LIMIT);
+
+    if (this.showFullDescription()) {
+      this.displayedDescription.set(fullDesc);
+    } else {
+      const shortText = plainText.slice(0, this.DESCRIPTION_LIMIT) + '...';
+      this.displayedDescription.set(shortText);
+    }
+  }
 
   loadTournament() {
     if (!this.tournamentId()) return;
@@ -52,6 +80,7 @@ export class TournamentDetailsComponent implements OnInit {
           bannerUrl: banner,
           logoUrl: logo
         }));
+      this.updateDisplayedDescription();
       },
       complete:()=>{
         this.loading.set(false);
@@ -67,6 +96,12 @@ export class TournamentDetailsComponent implements OnInit {
     this.router.navigate(['/organizer/tournaments']);
   }
 
+  onViewStatistics() {
+    if (this.tournamentId()) {
+      this.router.navigate(['/organizer/tournaments', this.tournamentId(), 'statistics']);
+    }
+  }
+
   deleteTournament() {
     if (!this.tournament()) return;
     this.showDeleteModal.set(true);
@@ -74,6 +109,9 @@ export class TournamentDetailsComponent implements OnInit {
 
   closeDeleteModal() {
     this.showDeleteModal.set(false);
+  }
+  getStatus(){
+    return getEnumLabel(TournamentStatus, this.tournament()!.status);
   }
 
   confirmDelete() {

@@ -3,7 +3,7 @@
   (ngSubmit)="onSubmit()"
   class="flex flex-col space-y-3"
 >
-  @if (previewData()!.photoUrl) {
+  @if (previewData()?.photoUrl) {
   <img
     [src]="previewData()!.photoUrl"
     [alt]="getFullName()"
@@ -13,12 +13,16 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
     <div>
-      <label class="input-label" for="firstName">First Name *</label>
+      <label class="input-label" for="firstName"
+        >First Name
+        <span class="required"><span class="required">*</span></span></label
+      >
       <input
         id="firstName"
         type="text"
         formControlName="firstName"
         class="input-field"
+        data-cy="player-first-name-input"
         [class.error]="getFieldError('firstName')"
         placeholder="Enter first name"
       />
@@ -28,12 +32,15 @@
     </div>
 
     <div>
-      <label class="input-label" for="lastName">Last Name *</label>
+      <label class="input-label" for="lastName"
+        >Last Name <span class="required">*</span></label
+      >
       <input
         id="lastName"
         type="text"
         formControlName="lastName"
         class="input-field"
+        data-cy="player-last-name-input"
         [class.error]="getFieldError('lastName')"
         placeholder="Enter last name"
       />
@@ -44,15 +51,21 @@
   </div>
 
   <div>
-    <label class="input-label" for="position">Position</label>
-    <input
+    <label class="input-label" for="position"
+      >Position <span class="required">*</span></label
+    >
+    <select
       id="position"
-      type="text"
       formControlName="position"
       class="input-field"
+      data-cy="player-position-select"
       [class.error]="getFieldError('position')"
-      placeholder="e.g., Forward, Midfielder, Defender, Goalkeeper"
-    />
+    >
+      <option value="">Select a position</option>
+      @for (option of positionOptions; track option.value) {
+      <option [attr.data-cy]='"position-option-" + option.value' [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
     @if (getFieldError('position')) {
     <span class="error-message">{{ getFieldError("position") }}</span>
     }
@@ -65,6 +78,7 @@
       type="email"
       formControlName="email"
       class="input-field"
+      data-cy="player-email-input"
       [class.error]="getFieldError('email')"
       placeholder="player@example.com"
     />
@@ -81,6 +95,7 @@
         type="file"
         accept="image/*"
         class="input-field"
+        data-cy="player-image-input"
         (change)="onFileSelect($event)"
       />
     </div>
@@ -90,7 +105,7 @@
     <button type="button" class="btn btn-outline" (click)="onCancel()">
       Cancel
     </button>
-    <button type="submit" class="btn btn-primary" [disabled]="!form.valid">
+    <button type="submit" data-cy="submit-button" class="btn btn-primary" [disabled]="!form.valid">
       <lucide-angular
         [img]="isEditMode ? icons.Save : icons.Plus"
         [size]="16"

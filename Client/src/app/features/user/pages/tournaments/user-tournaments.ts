@@ -8,11 +8,12 @@ import { TeamService } from '@/app/api/services/team.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
 import { Team } from '@/app/api/models/team.models';
-import { PaginatedResponse } from '@/app/api/models/api.models';
+import { PagedResult } from '@/app/api/models/api.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TeamSelectionModalComponent } from './components/team-selection-modal/team-selection-modal.component';
 import { TournamentCard } from '@/app/shared/components/cards/tournament-card/tournament-card';
-import { TournamentSearchComponent } from './components/tournament-search/tournament-search.component';
+import { TournamentSearchComponent } from '@/app/shared/components/search';
+import { TournamentStatus } from '@/app/api/models';
 
 @Component({
   selector: 'app-user-tournaments',
@@ -45,21 +46,21 @@ export class UserTournaments implements OnInit {
     searchTerm: undefined,
     status: undefined,
     location: undefined,
-    startDateFrom: undefined,
-    startDateTo: undefined,
+    startFrom: undefined,
+    startTo: undefined,
     isPublic: undefined,
-    pageNumber: 1,
+    page: 1,
     pageSize: 6
   });
 
-  paginationData = signal<PaginatedResponse<Tournament> | null>(null);
+  paginationData = signal<PagedResult<Tournament> | null>(null);
   
-  // Computed properties for pagination
-  totalRecords = computed(() => this.paginationData()?.totalRecords ?? 0);
-  totalPages = computed(() => this.paginationData()?.totalPages ?? 0);
-  currentPage = computed(() => this.paginationData()?.pageNumber ?? 1);
-  hasNextPage = computed(() => this.paginationData()?.hasNextPage ?? false);
-  hasPreviousPage = computed(() => this.paginationData()?.hasPreviousPage ?? false);
+
+  totalRecords = computed(() => this.paginationData()?.meta.totalRecords ?? 0);
+  totalPages = computed(() => this.paginationData()?.meta.totalPages ?? 0);
+  currentPage = computed(() => this.paginationData()?.meta.page ?? 1);
+  hasNextPage = computed(() => this.paginationData()?.meta.hasNextPage ?? false);
+  hasPreviousPage = computed(() => this.paginationData()?.meta.hasPreviousPage ?? false);
   
   showTeamSelectionModal = signal(false);
   selectedTournament = signal<Tournament | null>(null);
@@ -78,7 +79,6 @@ export class UserTournaments implements OnInit {
         this.paginationData.set(response);
       },
       error: (error) => {
-        console.error('Failed to load tournaments:', error);
         this.toastService.error('Failed to load tournaments');
       },
       complete: () => {
@@ -88,12 +88,9 @@ export class UserTournaments implements OnInit {
   }
 
   loadMyTeams() {
-    this.teamService.getTeams({ scope: 'my' }).subscribe({
+    this.teamService.getTeams().subscribe({
       next: (response: any) => {
         this.myTeams.set(response.data);
-      },
-      error: (error: any) => {
-        console.error('Failed to load teams:', error);
       }
     });
   }
@@ -102,7 +99,7 @@ export class UserTournaments implements OnInit {
     this.searchCriteria.update(current => ({
       ...current,
       ...searchCriteria,
-      pageNumber: 1  // Reset to first page on new search
+      pageNumber: 1
     }));
     this.loadTournaments();
   }
@@ -112,10 +109,10 @@ export class UserTournaments implements OnInit {
       searchTerm: undefined,
       status: undefined,
       location: undefined,
-      startDateFrom: undefined,
-      startDateTo: undefined,
+      startFrom: undefined,
+      startTo: undefined,
       isPublic: undefined,
-      pageNumber: 1,
+      page: 1,
       pageSize: 6
     });
     this.loadTournaments();
@@ -124,7 +121,7 @@ export class UserTournaments implements OnInit {
   onPageChange(pageNumber: number) {
     this.searchCriteria.update(current => ({
       ...current,
-      pageNumber
+      page: pageNumber
     }));
     this.loadTournaments();
   }
@@ -133,7 +130,7 @@ export class UserTournaments implements OnInit {
     this.searchCriteria.update(current => ({
       ...current,
       pageSize,
-      pageNumber: 1  // Reset to first page
+      pageNumber: 1
     }));
     this.loadTournaments();
   }
@@ -161,6 +158,7 @@ export class UserTournaments implements OnInit {
 
   joinTournament(tournament: Tournament) {
     const teams = this.myTeams();
+    
     if (teams.length === 0) {
       this.toastService.error('You need to create a team first before joining tournaments');
       return;
@@ -207,17 +205,12 @@ export class UserTournaments implements OnInit {
 
   canJoinTournament(tournament: Tournament): boolean {
     return (
-      tournament.status === 'RegistrationOpen' &&
+      tournament.status === TournamentStatus.RegistrationOpen &&
       tournament.teamCount < tournament.maxTeams &&
       this.myTeams().length > 0
     );
   }
 
-  getRegistrationStatus(tournament: Tournament): string {
-    return tournament.status;
-  }
-
-  // Tournament card event handlers
   onTournamentJoin(tournament: Tournament) {
     this.joinTournament(tournament);
   }
@@ -227,7 +220,7 @@ export class UserTournaments implements OnInit {
   }
 
   onTournamentLeave(tournament: Tournament) {
-    // Implementation for leaving tournament if needed
+
     console.log('Leave tournament:', tournament);
   }
 }

@@ -24,7 +24,6 @@ export class ThemeService {
   }
   
   private getInitialTheme(): ThemeMode {
-    // Try to get saved preference
     const savedTheme = localStorage.getItem(this.THEME_KEY) as ThemeMode;
     if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
       return savedTheme;

@@ -3,25 +3,26 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Tournament } from '@/app/api/models/tournament.models';
-import { Roles } from '@/app/shared/constants/roles';
+import { TournamentStatus } from '@/app/api/models';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
-export type UserRole = 'Organizer' | 'User' | 'Public';
+export type CardRoles = 'Organizer' | 'User' | 'Public';
 
 @Component({
   selector: 'app-tournament-card',
-  standalone: true,
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './tournament-card.html',
   styleUrls: ['./tournament-card.css'],
 })
 export class TournamentCard {
   tournament = input.required<Tournament>();
-  role = input<UserRole>('Public');
+  role = input<CardRoles>('Public');
   edit = output<Tournament>();
   delete = output<string>();
   join = output<Tournament>();
   leave = output<Tournament>();
   view = output<Tournament>();
+
 
   readonly icons = LucideIcons;
 
@@ -58,23 +59,26 @@ export class TournamentCard {
     const regDeadline = t.registrationDeadline
       ? new Date(t.registrationDeadline)
       : new Date(t.startDate);
-
     return (
-      this.role() === Roles.User.toString() &&
-      t.status === 'RegistrationOpen' &&
+      this.role() === 'User' &&
+      t.status === TournamentStatus.RegistrationOpen &&
       now < regDeadline &&
       t.teamCount < t.maxTeams
     );
   }
 
   isOrganizer(): boolean {
-    return this.role() === Roles.Organizer.toString();
+    return this.role() === 'Organizer';
   }
 
   isUser(): boolean {
-    return this.role() === Roles.User.toString();
+    return this.role() === 'User';
   }
   isPublic(): boolean {
     return this.role() === 'Public';
+  }
+
+  getStatus(){
+    return getEnumLabel(TournamentStatus, this.tournament().status);
   }
 }

@@ -1,72 +1,84 @@
-<div class="space-y-4">
-  <div class="flex space-x-1 card p-1 rounded-lg">
-    <button
-      class="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-      [ngClass]="{
-        'btn-primary': activeTab() === 'approved',
-        'btn-outline': activeTab() !== 'approved'
-      }"
-      (click)="setActiveTab('approved')"
-    >
-      <lucide-angular [img]="icons.CheckCircle" [size]="16"></lucide-angular>
-      Approved Teams
-      <span class="btn btn-secondary px-2 py-0.5 rounded-full text-xs">
-        {{ getTeamCount("approved") }}
-      </span>
-    </button>
-
-    <button
-      class="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-      [ngClass]="{
-        'btn-primary': activeTab() === 'pending',
-        'btn-outline': activeTab() !== 'pending'
-      }"
-      (click)="setActiveTab('pending')"
-    >
-      <lucide-angular [img]="icons.Clock" [size]="16"></lucide-angular>
-      Pending Teams
-      <span class="btn btn-secondary px-2 py-0.5 rounded-full text-xs">
-        {{ getTeamCount("pending") }}
-      </span>
-    </button>
-  </div>
-
-  @if (isLoading()) {
-  <div class="p-8 text-center">
-    <div
-      class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"
-    ></div>
-    <p class="text-muted">Loading teams...</p>
-  </div>
-  } @else if (getCurrentTeams().length === 0) {
-  <div class="p-8 text-center">
-    <div class="text-muted mb-3">
-      <lucide-angular
-        [img]="icons.Users"
-        [size]="48"
-        class="mx-auto"
-      ></lucide-angular>
-    </div>
-    <h3 class="text-lg font-medium mb-2">No {{ activeTab() }} teams</h3>
-    <p class="text-muted">
-      @if (activeTab() === 'approved') { No teams have been approved yet. }
-      @else if (activeTab() === 'pending') { No teams are waiting for approval.
-      }
+<div
+  data-cy="tournament-teams"
+  class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6"
+>
+  <div>
+    <h2 class="text-xl font-semibold mb-2">Team Management</h2>
+    <p class="text-muted text-sm">
+      Manage team registrations and approvals for this tournament
     </p>
   </div>
-  } @else {
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-    @for (team of getCurrentTeams(); track team.id) {
-    <app-team-card
-      [team]="convertToTeam(team)"
-      [role]="getTeamRole()"
-      [cardType]="getTeamCardType()"
-      (view)="onTeamView($event)"
-      (delete)="onTeamDelete($event)"
-      (approve)="onTeamApprove($event)"
-      (reject)="onTeamReject($event)"
-    />
-    }
+
+  <div class="flex gap-2">
+    <button class="btn btn-outline" disabled>
+      <lucide-angular size="16" [img]="icons.Users" />
+      {{ approvedTeams().length + pendingTeams().length }} Teams
+    </button>
   </div>
+</div>
+
+<div class="flex border-b mb-6">
+  <button (click)="setActiveTab('approved')" [class]="getTabClass('approved')">
+    Approved
+    <span class="btn btn-outline px-2 py-0.5 rounded-full">
+      {{ getTeamCount("approved") }}
+    </span>
+  </button>
+
+  <button (click)="setActiveTab('pending')" [class]="getTabClass('pending')">
+    Pending
+    <span class="btn btn-outline px-2 py-0.5 rounded-full">
+      {{ getTeamCount("pending") }}
+    </span>
+  </button>
+</div>
+
+@if (isLoading()) {
+<div class="text-center py-12">
+  <lucide-angular
+    size="32"
+    [img]="icons.Loader2"
+    class="animate-spin mx-auto mb-4"
+  />
+  <p class="text-muted">Loading teams...</p>
+</div>
+} @if (!isLoading() && getCurrentTeams().length === 0) {
+<div class="text-center py-12">
+  <lucide-angular
+    size="48"
+    [img]="icons.Users"
+    class="mx-auto mb-4 text-muted"
+  />
+  <h3 class="text-lg font-medium mb-2">No {{ activeTab() }} teams</h3>
+  <p class="text-muted mb-4">
+    @if (activeTab() === 'approved') { No teams have been approved for this
+    tournament yet. } @else { No teams are currently waiting for approval. }
+  </p>
+  @if (activeTab() === 'approved') {
+  <p class="text-sm text-muted">
+    Teams will appear here once you approve their registration requests.
+  </p>
+  } @else {
+  <p class="text-sm text-muted">
+    Check back later for new team registration requests.
+  </p>
   }
 </div>
+} @if (!isLoading() && getCurrentTeams().length > 0) {
+
+<div
+  class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
+>
+  @for(team of getCurrentTeams(); track team.id){
+  <app-team-card
+    [team]="convertToTeam(team)"
+    [role]="getTeamRole()"
+    [cardType]="getTeamCardType()"
+    (view)="onTeamView(team)"
+    (delete)="onTeamDelete(team.id)"
+    (approve)="onTeamApprove(team.id)"
+    (reject)="onTeamReject(team.id)"
+  />
+  }
+</div>
+}

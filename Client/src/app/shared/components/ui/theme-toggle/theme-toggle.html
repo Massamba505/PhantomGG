@@ -3,10 +3,11 @@
   (click)="toggleTheme()"
   [attr.aria-label]="buttonLabel()"
   [title]="buttonLabel()"
+  data-cy="theme-toggle-button"
 >
   @if (currentIcon() === 'light') {
-  <lucide-angular [img]="icons.Sun" size="20"></lucide-angular>
+  <lucide-angular [img]="icons.Sun" size="20" data-cy="sun-icon"></lucide-angular>
   } @else {
-  <lucide-angular [img]="icons.Moon" size="20"></lucide-angular>
+  <lucide-angular [img]="icons.Moon" size="20" data-cy="moon-icon"></lucide-angular>
   }
 </button>

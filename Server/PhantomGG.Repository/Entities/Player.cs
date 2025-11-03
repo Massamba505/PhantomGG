@@ -13,7 +13,7 @@ public partial class Player
 
     public string? PhotoUrl { get; set; }
 
-    public string? Position { get; set; }
+    public int Position { get; set; }
 
     public string? Email { get; set; }
 

@@ -17,7 +17,7 @@ public partial class User
 
     public string ProfilePictureUrl { get; set; } = null!;
 
-    public string Role { get; set; } = null!;
+    public int Role { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

@@ -10,6 +10,7 @@
   <app-tournament-search
     (clearFiltersSearch)="onClearSearh()"
     (searchChange)="onSearchChange($event)"
+    [withDraft]="true"
   />
 
   @if (isLoading()) {
@@ -42,8 +43,8 @@
   </div>
 
   <div
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-6"
-  >
+    class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
+    data-cy="tournaments-list">
     @for (tournament of tournaments(); track tournament.id) {
     <app-tournament-card
       [tournament]="tournament"
@@ -72,14 +73,11 @@
       </select>
     </div>
 
-    @if (totalPages() > 0) {
+    @if (totalPages() > 1) {
     <div class="text-sm opacity-75 mx-auto">
-      Page {{ currentPage() }} of {{ totalPages() }} ({{
-        totalRecords()
-      }}
+      Page {{ currentPage() }} of {{ totalPages() }} ({{ totalRecords() }}
       total)
     </div>
-    } @if (totalPages() > 1) {
     <div class="flex items-center gap-1 mx-auto">
       <button
         class="btn btn-secondary btn-sm"

@@ -78,6 +78,10 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-destructive: var(--destructive);
+  --color-primary: var(--primary);
+  --color-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondar-foreground: var(--secondar-foreground);
 }
 
 @layer components {

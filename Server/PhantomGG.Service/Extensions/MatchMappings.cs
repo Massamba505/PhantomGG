@@ -1,5 +1,9 @@
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Match;
 using PhantomGG.Repository.Entities;
+using PhantomGG.Repository.Specifications;
+using System.Text;
+using System.Text.Json;
 
 namespace PhantomGG.Service.Mappings;
 
@@ -19,8 +23,8 @@ public static class MatchMappings
             AwayTeamName = match.AwayTeam?.Name ?? "Unknown",
             AwayTeamLogo = match.AwayTeam?.LogoUrl,
             MatchDate = match.MatchDate,
-            Venue = "",
-            Status = match.Status,
+            Venue = match.Tournament?.Location ?? "TBD",
+            Status = (MatchStatus)match.Status,
             HomeScore = match.HomeScore,
             AwayScore = match.AwayScore
         };
@@ -35,7 +39,7 @@ public static class MatchMappings
             HomeTeamId = createDto.HomeTeamId,
             AwayTeamId = createDto.AwayTeamId,
             MatchDate = createDto.MatchDate,
-            Status = "Scheduled",
+            Status = (int)MatchStatus.Scheduled,
             HomeScore = null,
             AwayScore = null
         };
@@ -44,7 +48,13 @@ public static class MatchMappings
     public static void UpdateEntity(this UpdateMatchDto updateDto, Match match)
     {
         match.MatchDate = updateDto.MatchDate;
-        if (!string.IsNullOrEmpty(updateDto.Status))
-            match.Status = updateDto.Status;
+        match.Status = (int)updateDto.Status;
+    }
+
+    public static string GetDeterministicKey(this MatchSpecification dto)
+    {
+        return Convert.ToBase64String(
+            Encoding.UTF8.GetBytes(JsonSerializer.Serialize(dto))
+        );
     }
 }

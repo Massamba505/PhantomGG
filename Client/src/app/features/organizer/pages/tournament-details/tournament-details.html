@@ -6,10 +6,14 @@
 
   @if (tournament()) {
   <div class="flex gap-2">
+    <button class="btn btn-outline" (click)="onViewStatistics()">
+      <lucide-angular [img]="icons.BarChart3" [size]="20"></lucide-angular>
+      Statistics
+    </button>
     <button class="btn btn-primary" (click)="editTournament()">
       Edit Tournament
     </button>
-    <button class="btn btn-destructive" (click)="deleteTournament()">
+    <button class="btn btn-destructive" data-cy="delete-tournament-button" (click)="deleteTournament()">
       Delete
     </button>
   </div>
@@ -21,7 +25,7 @@
   <p>Loading tournament details...</p>
 </div>
 } @if (!loading() && tournament()) {
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div data-cy="tournament-details" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-2 space-y-6">
     <div class="card">
       <div
@@ -57,18 +61,15 @@
         class="leading-relaxed"
         [innerHTML]="tournament()!.description | appLineBreaks"
       ></p>
-    </div>
 
-    <div class="card">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="font-semibold text-lg">Team Management</h2>
-        <span class="status-badge">
-          {{ tournament()!.teamCount }}/{{ tournament()!.maxTeams }} Teams
-        </span>
-      </div>
-
-      <app-tournament-team-management [tournamentId]="tournament()!.id">
-      </app-tournament-team-management>
+      @if (isLongDescription()) {
+      <a
+        class="text-primary font-semibold underline cursor-pointer mt-2 inline-block"
+        (click)="toggleDescription()"
+      >
+        {{ showFullDescription() ? "View Less" : "View More" }}
+      </a>
+      }
     </div>
   </div>
 
@@ -81,7 +82,7 @@
             <lucide-angular [img]="icons.Activity" [size]="16"></lucide-angular>
             Status:
           </span>
-          <span class="status-badge">{{ tournament()!.status }}</span>
+          <span class="status-badge">{{ getStatus() }}</span>
         </div>
 
         <div class="flex justify-between">
@@ -161,7 +162,7 @@
             <lucide-angular [img]="icons.UserPlus" [size]="16"></lucide-angular>
             Players/Team:
           </span>
-          <span> 11 (Standard team size) </span>
+          <span> 11 </span>
         </div>
       </div>
     </div>
@@ -202,6 +203,18 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-8 mt-8">
+  <div class="card" data-cy="manage-teams-section">
+    <app-tournament-team-management [tournamentId]="tournament()!.id">
+    </app-tournament-team-management>
+  </div>
+
+  <div class="card" data-cy="matches-section">
+    <app-tournament-match-management [tournamentId]="tournament()!.id">
+    </app-tournament-match-management>
   </div>
 </div>
 }

@@ -1,9 +1,11 @@
-import { Component, input, output, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, input, output, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Player, CreatePlayer, UpdatePlayer } from '@/app/api/models/team.models';
+import { PlayerPosition } from '@/app/api/models/common.models';
+import { getEnumOptions, getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-player-form',
@@ -26,6 +28,41 @@ export class PlayerForm implements OnInit {
   isEditMode = false;
   selectedFile = signal<File | null>(null);
   previewUrl = signal<string | null>(null);
+  
+  positionOptions = getEnumOptions(PlayerPosition);
+
+  constructor() {
+    effect(() => {
+      const currentPlayer = this.player();
+      this.isEditMode = !!currentPlayer;
+      
+      if (this.form && this.form.controls) {
+        if (currentPlayer) {
+          this.form.patchValue({
+            firstName: currentPlayer.firstName || '',
+            lastName: currentPlayer.lastName || '',
+            position: currentPlayer.position?.toString() || '',
+            email: currentPlayer.email || ''
+          });
+          
+          if (currentPlayer.photoUrl) {
+            this.previewUrl.set(currentPlayer.photoUrl);
+          }
+        } else {
+          this.form.patchValue({
+            firstName: '',
+            lastName: '',
+            position: '',
+            email: ''
+          });
+          this.previewUrl.set(null);
+        }
+        
+        this.selectedFile.set(null);
+        this.form.patchValue({ photoUrl: null });
+      }
+    });
+  }
 
   previewData = computed(() => {
     if (!this.form) return null;
@@ -36,7 +73,7 @@ export class PlayerForm implements OnInit {
     return {
       firstName: formValue.firstName || 'First',
       lastName: formValue.lastName || 'Last',
-      position: formValue.position || undefined,
+      position: this.getPositionLabel(formValue.position),
       email: formValue.email || undefined,
       photoUrl: this.previewUrl() || currentPlayer?.photoUrl,
       joinedAt: currentPlayer?.joinedAt || new Date().toISOString()
@@ -44,13 +81,7 @@ export class PlayerForm implements OnInit {
   });
 
   ngOnInit() {
-    this.isEditMode = !!this.player();
     this.initializeForm();
-    
-    const currentPlayer = this.player();
-    if (currentPlayer?.photoUrl) {
-      this.previewUrl.set(currentPlayer.photoUrl);
-    }
   }
 
   initializeForm() {
@@ -59,10 +90,32 @@ export class PlayerForm implements OnInit {
     this.form = this.fb.group({
       firstName: [player?.firstName || '', [Validators.required, Validators.maxLength(100)]],
       lastName: [player?.lastName || '', [Validators.required, Validators.maxLength(100)]],
-      position: [player?.position || '', [Validators.maxLength(30)]],
+      position: [player?.position?.toString() || '', [Validators.required]],
       email: [player?.email || '', [Validators.email, Validators.maxLength(100)]],
       photoUrl: [null]
     });
+  }
+
+  resetForm() {
+    if (this.form) {
+      this.form.reset();
+    }
+    this.selectedFile.set(null);
+    this.previewUrl.set(null);
+  }
+
+  clearFormData() {
+    if (this.form) {
+      this.form.reset();
+    }
+    this.selectedFile.set(null);
+    this.previewUrl.set(null);
+  }
+
+  getPositionLabel(position: number | string): string | undefined {
+    if (!position) return undefined;
+    const positionValue = typeof position === 'string' ? parseInt(position) : position;
+    return getEnumLabel(PlayerPosition, positionValue);
   }
 
   onSubmit() {
@@ -73,7 +126,7 @@ export class PlayerForm implements OnInit {
         const updateData: UpdatePlayer = {
           firstName: formValue.firstName,
           lastName: formValue.lastName,
-          position: formValue.position || undefined,
+          position: formValue.position ? parseInt(formValue.position) : undefined,
           email: formValue.email || undefined,
           photoUrl: formValue.photoUrl || undefined
         };
@@ -89,10 +142,12 @@ export class PlayerForm implements OnInit {
         };
         this.save.emit(createData);
       }
+      this.clearFormData();
     }
   }
 
   onCancel() {
+    this.clearFormData();
     this.cancel.emit();
   }
 
@@ -103,7 +158,6 @@ export class PlayerForm implements OnInit {
       this.selectedFile.set(file);
       this.form.patchValue({ photoUrl: file });
       
-      // Create preview URL
       const reader = new FileReader();
       reader.onload = (e) => {
         this.previewUrl.set(e.target?.result as string);

@@ -1,372 +1,186 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Match;
-using PhantomGG.Service.Interfaces;
-using PhantomGG.Service.Exceptions;
+using PhantomGG.Models.DTOs.MatchEvent;
+using PhantomGG.Service.Auth.Interfaces;
+using PhantomGG.Service.Domain.Matches.Interfaces;
 
 namespace PhantomGG.API.Controllers;
 
-/// <summary>
-/// Controller for managing matches and fixtures in tournaments
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class MatchesController : ControllerBase
+public class MatchesController(
+    IMatchService matchService,
+    IMatchEventService matchEventService,
+    ICurrentUserService currentUserService) : ControllerBase
 {
-    private readonly IMatchService _matchService;
-    private readonly ICurrentUserService _currentUserService;
-
-    public MatchesController(IMatchService matchService, ICurrentUserService currentUserService)
-    {
-        _matchService = matchService;
-        _currentUserService = currentUserService;
-    }
+    private readonly IMatchService _matchService = matchService;
+    private readonly IMatchEventService _matchEventService = matchEventService;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
 
     /// <summary>
-    /// Get all matches in the system
+    /// Search or list matches
     /// </summary>
-    /// <returns>A list of all matches</returns>
-    /// <response code="200">Returns the list of matches</response>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<MatchDto>), 200)]
-    public ActionResult<ApiResponse> GetAllMatches()
+    public async Task<ActionResult<PagedResult<MatchDto>>> GetMatches([FromQuery] MatchQuery query)
     {
-        // Matches are accessed through tournaments
-        return Ok(new ApiResponse
-        {
-            Success = false,
-            Data = null,
-            Message = "Matches are accessed through tournaments. Use /api/tournaments/{tournamentId}/matches instead."
-        });
+        var result = await _matchService.SearchAsync(query);
+        return Ok(result);
     }
 
     /// <summary>
-    /// Get a specific match by ID
+    /// Get match details
     /// </summary>
-    /// <param name="id">The match ID</param>
-    /// <returns>The match details</returns>
-    /// <response code="200">Returns the match</response>
-    /// <response code="404">If the match is not found</response>
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(MatchDto), 200)]
-    [ProducesResponseType(404)]
-    public ActionResult<ApiResponse> GetMatch(Guid id)
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<MatchDto>> GetMatch(Guid id)
     {
-        // Individual match access will be implemented in future phases
-        return Ok(new ApiResponse
-        {
-            Success = false,
-            Data = null,
-            Message = "Individual match access will be implemented in future phases. Use tournament matches endpoint instead."
-        });
+        var match = await _matchService.GetByIdAsync(id);
+        return Ok(match);
     }
 
     /// <summary>
-    /// Get all matches for a specific tournament
+    /// Create a match
     /// </summary>
-    /// <param name="tournamentId">The tournament ID</param>
-    /// <returns>A list of matches for the tournament</returns>
-    /// <response code="200">Returns the list of matches</response>
-    [HttpGet("tournament/{tournamentId}")]
-    [ProducesResponseType(typeof(IEnumerable<MatchDto>), 200)]
-    public async Task<ActionResult<IEnumerable<MatchDto>>> GetMatchesByTournament(Guid tournamentId)
-    {
-        var matches = await _matchService.GetByTournamentAsync(tournamentId);
-        return Ok(matches);
-    }
-
-    /// <summary>
-    /// Get all matches for a specific team
-    /// </summary>
-    /// <param name="teamId">The team ID</param>
-    /// <returns>A list of matches for the team</returns>
-    /// <response code="200">Returns the list of matches</response>
-    [HttpGet("team/{teamId}")]
-    [ProducesResponseType(typeof(IEnumerable<MatchDto>), 200)]
-    public ActionResult<ApiResponse> GetMatchesByTeam(Guid teamId)
-    {
-        // Team matches are accessed through tournaments
-        return Ok(new ApiResponse
-        {
-            Success = false,
-            Data = null,
-            Message = "Team matches are accessed through tournaments. Use /api/tournaments/{tournamentId}/matches and filter by team."
-        });
-    }
-
-    /// <summary>
-    /// Search matches with various filters
-    /// </summary>
-    /// <param name="searchDto">Search criteria</param>
-    /// <returns>A list of matches matching the search criteria</returns>
-    /// <response code="200">Returns the filtered list of matches</response>
-    [HttpGet("search")]
-    [ProducesResponseType(typeof(IEnumerable<MatchDto>), 200)]
-    public ActionResult<ApiResponse> SearchMatches([FromQuery] MatchSearchDto searchDto)
-    {
-        // Match search will be implemented in future phases
-        return Ok(new ApiResponse
-        {
-            Success = false,
-            Data = null,
-            Message = "Match search will be implemented in future phases"
-        });
-    }
-
-    /// <summary>
-    /// Create a new match
-    /// </summary>
-    /// <param name="createDto">Match creation data</param>
-    /// <returns>The created match</returns>
-    /// <response code="201">Returns the newly created match</response>
-    /// <response code="400">If the match data is invalid</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="403">If the user is not authorized to create matches</response>
     [HttpPost]
     [Authorize]
-    [ProducesResponseType(typeof(MatchDto), 201)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
     public async Task<ActionResult<MatchDto>> CreateMatch([FromBody] CreateMatchDto createDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        var match = await _matchService.CreateAsync(createDto, currentUser.Id);
 
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var match = await _matchService.CreateAsync(createDto, userId);
-            return CreatedAtAction(nameof(GetMatch), new { id = match.Id }, match);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (UnauthorizedException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        return CreatedAtAction(nameof(GetMatch), new { id = match.Id }, match);
     }
 
     /// <summary>
-    /// Update an existing match
+    /// Update match info
     /// </summary>
-    /// <param name="id">The match ID</param>
-    /// <param name="updateDto">Match update data</param>
-    /// <returns>The updated match</returns>
-    /// <response code="200">Returns the updated match</response>
-    /// <response code="400">If the match data is invalid</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="403">If the user is not authorized to update this match</response>
-    /// <response code="404">If the match is not found</response>
-    [HttpPut("{id}")]
+    [HttpPatch("{id:guid}")]
     [Authorize]
-    [ProducesResponseType(typeof(MatchDto), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(404)]
     public async Task<ActionResult<MatchDto>> UpdateMatch(Guid id, [FromBody] UpdateMatchDto updateDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var match = await _matchService.UpdateAsync(id, updateDto, userId);
-            return Ok(match);
-        }
-        catch (ArgumentException)
-        {
-            return NotFound();
-        }
-        catch (UnauthorizedException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        var match = await _matchService.UpdateAsync(id, updateDto, currentUser.Id);
+        return Ok(match);
     }
 
     /// <summary>
-    /// Update match result and score
+    /// Delete match
     /// </summary>
-    /// <param name="id">The match ID</param>
-    /// <param name="resultDto">Match result data</param>
-    /// <returns>The updated match with results</returns>
-    /// <response code="200">Returns the updated match with results</response>
-    /// <response code="400">If the result data is invalid</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="403">If the user is not authorized to update this match result</response>
-    /// <response code="404">If the match is not found</response>
-    [HttpPut("{id}/result")]
+    [HttpDelete("{id:guid}")]
     [Authorize]
-    [ProducesResponseType(typeof(MatchDto), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(404)]
-    public async Task<ActionResult<MatchDto>> UpdateMatchResult(Guid id, [FromBody] MatchResultDto resultDto)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var match = await _matchService.UpdateResultAsync(id, resultDto, userId);
-            return Ok(match);
-        }
-        catch (ArgumentException)
-        {
-            return NotFound();
-        }
-        catch (UnauthorizedException ex)
-        {
-            return Forbid(ex.Message);
-        }
-    }
-
-    /// <summary>
-    /// Delete a match
-    /// </summary>
-    /// <param name="id">The match ID</param>
-    /// <returns>No content</returns>
-    /// <response code="204">Match deleted successfully</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="403">If the user is not authorized to delete this match</response>
-    /// <response code="404">If the match is not found</response>
-    [HttpDelete("{id}")]
-    [Authorize]
-    [ProducesResponseType(204)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    [ProducesResponseType(404)]
     public async Task<ActionResult> DeleteMatch(Guid id)
     {
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            await _matchService.DeleteAsync(id, userId);
-            return NoContent();
-        }
-        catch (ArgumentException)
-        {
-            return NotFound();
-        }
-        catch (UnauthorizedException ex)
-        {
-            return Forbid(ex.Message);
-        }
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        await _matchService.DeleteAsync(id, currentUser.Id);
+        return NoContent();
     }
 
     /// <summary>
-    /// Generate round-robin fixtures for a tournament
+    /// Submit or update match result
     /// </summary>
-    /// <param name="generateDto">Fixture generation parameters</param>
-    /// <returns>The generated matches</returns>
-    /// <response code="200">Returns the generated fixtures</response>
-    /// <response code="400">If the generation parameters are invalid or conditions not met</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="403">If the user is not authorized to generate fixtures</response>
-    [HttpPost("generate-fixtures")]
+    [HttpPatch("{id:guid}/result")]
     [Authorize]
-    [ProducesResponseType(typeof(IEnumerable<MatchDto>), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    public async Task<ActionResult<IEnumerable<MatchDto>>> GenerateFixtures([FromBody] GenerateFixturesDto generateDto)
+    public async Task<ActionResult<MatchDto>> UpdateMatchResult(Guid id, [FromBody] MatchResultDto resultDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var matches = await _matchService.GenerateRoundRobinFixturesAsync(generateDto, userId);
-            return Ok(matches);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (UnauthorizedException ex)
-        {
-            return Forbid(ex.Message);
-        }
-        catch (ForbiddenException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        var match = await _matchService.UpdateResultAsync(id, resultDto, currentUser.Id);
+        return Ok(match);
     }
 
     /// <summary>
-    /// Automatically generate fixtures based on tournament format (Round Robin or Single Elimination)
+    /// List events for a match
     /// </summary>
-    /// <param name="generateDto">Auto-generation parameters including tournament format</param>
-    /// <returns>The generated matches with success information</returns>
-    /// <response code="200">Returns the generated fixtures with success details</response>
-    /// <response code="400">If the generation parameters are invalid or conditions not met</response>
-    /// <response code="401">If the user is not authenticated</response>
-    /// <response code="403">If the user is not authorized to generate fixtures</response>
-    [HttpPost("auto-generate-fixtures")]
+    [HttpGet("{id:guid}/events")]
+    public async Task<ActionResult<IEnumerable<MatchEventDto>>> GetMatchEvents(
+        Guid id,
+        [FromQuery] MatchEventType? type)
+    {
+        var events = await _matchEventService.GetMatchEventsAsync(id);
+
+        if (type.HasValue)
+        {
+            events = events.Where(e => e.EventType == type);
+        }
+
+        return Ok(events);
+    }
+
+    /// <summary>
+    /// Add an event to a match
+    /// </summary>
+    [HttpPost("{id:guid}/events")]
     [Authorize]
-    [ProducesResponseType(typeof(object), 200)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(401)]
-    [ProducesResponseType(403)]
-    public async Task<ActionResult<IEnumerable<MatchDto>>> AutoGenerateFixtures([FromBody] AutoGenerateFixturesDto generateDto)
+    public async Task<ActionResult<MatchEventDto>> CreateMatchEvent(Guid id, [FromBody] CreateMatchEventDto createDto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var currentUser = _currentUserService.GetCurrentUser()!;
 
-        try
-        {
-            var userId = _currentUserService.GetCurrentUser().Id;
-            var matches = await _matchService.AutoGenerateFixturesAsync(generateDto, userId);
-            return Ok(new
-            {
-                success = true,
-                message = "Fixtures generated successfully",
-                matchCount = matches.Count(),
-                matches = matches
-            });
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { success = false, message = ex.Message });
-        }
-        catch (UnauthorizedException ex)
-        {
-            return StatusCode(403, new { success = false, message = ex.Message });
-        }
-        catch (ForbiddenException ex)
-        {
-            return BadRequest(new { success = false, message = ex.Message });
-        }
+        // Ensure match ID consistency
+        createDto.MatchId = id;
+
+        var createdEvent = await _matchEventService.CreateMatchEventAsync(createDto, currentUser.Id);
+
+        return CreatedAtAction(
+            nameof(GetMatchEvent),
+            new { matchId = id, eventId = createdEvent.Id },
+            createdEvent);
     }
 
     /// <summary>
-    /// Get fixture generation status for a tournament
+    /// Get an event
     /// </summary>
-    /// <param name="tournamentId">The tournament ID</param>
-    /// <returns>Fixture generation status information</returns>
-    /// <response code="200">Returns the fixture generation status</response>
-    /// <response code="404">If the tournament is not found</response>
-    [HttpGet("fixture-status/{tournamentId}")]
-    [ProducesResponseType(typeof(FixtureGenerationStatusDto), 200)]
-    [ProducesResponseType(404)]
-    public async Task<ActionResult<FixtureGenerationStatusDto>> GetFixtureGenerationStatus(Guid tournamentId)
+    [HttpGet("{matchId:guid}/events/{eventId:guid}")]
+    public async Task<ActionResult<MatchEventDto>> GetMatchEvent(Guid matchId, Guid eventId)
     {
-        try
-        {
-            var status = await _matchService.GetFixtureGenerationStatusAsync(tournamentId);
-            return Ok(status);
-        }
-        catch (ArgumentException ex)
-        {
-            return NotFound(new { success = false, message = ex.Message });
-        }
+        var matchEvent = await _matchEventService.GetMatchEventByIdAsync(eventId);
+        return Ok(matchEvent);
+    }
+
+    /// <summary>
+    /// Update an event
+    /// </summary>
+    [HttpPatch("{matchId:guid}/events/{eventId:guid}")]
+    [Authorize]
+    public async Task<ActionResult<MatchEventDto>> UpdateMatchEvent(
+        Guid matchId,
+        Guid eventId,
+        [FromBody] UpdateMatchEventDto updateDto)
+    {
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        var updatedEvent = await _matchEventService.UpdateMatchEventAsync(eventId, updateDto, currentUser.Id);
+        return Ok(updatedEvent);
+    }
+
+    /// <summary>
+    /// Delete an event
+    /// </summary>
+    [HttpDelete("{matchId:guid}/events/{eventId:guid}")]
+    [Authorize]
+    public async Task<ActionResult> DeleteMatchEvent(Guid matchId, Guid eventId)
+    {
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        await _matchEventService.DeleteMatchEventAsync(eventId, currentUser.Id);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Get all events for a specific player
+    /// </summary>
+    [HttpGet("player/{playerId:guid}/events")]
+    public async Task<ActionResult<IEnumerable<MatchEventDto>>> GetPlayerEvents(Guid playerId)
+    {
+        var events = await _matchEventService.GetPlayerEventsAsync(playerId);
+        return Ok(events);
+    }
+
+    /// <summary>
+    /// Get all events for a specific team
+    /// </summary>
+    [HttpGet("team/{teamId:guid}/events")]
+    public async Task<ActionResult<IEnumerable<MatchEventDto>>> GetTeamEvents(Guid teamId)
+    {
+        var events = await _matchEventService.GetTeamEventsAsync(teamId);
+        return Ok(events);
     }
 }

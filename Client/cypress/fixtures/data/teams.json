@@ -1,0 +1,21 @@
+{
+  "valid": {
+    "image": "Data/team_logo.jpg",
+    "name": "Phoenix Legends",
+    "shortName": "PHX"
+  },
+  "withPlayers": {
+    "image": "Data/team_logo.jpg",
+    "name": "Dragon Warriors",
+    "shortName": "DRG"
+  },
+  "update": {
+    "image": "Data/team_logo.jpg",
+    "name": "Updated Team Name",
+    "shortName": "UTN"
+  },
+  "invalid": {
+    "name": "",
+    "shortName": "ABC"
+  }
+}

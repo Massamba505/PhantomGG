@@ -1,0 +1,183 @@
+<app-modal [isOpen]="isOpen()" [title]="'Match Details'" (close)="onClose()">
+  @if (loading()) {
+  <div class="flex justify-center items-center py-8">
+    <lucide-angular
+      [img]="icons.Loader2"
+      size="24"
+      class="animate-spin text-primary"
+    ></lucide-angular>
+    <span class="ml-2">Loading match details...</span>
+  </div>
+  } @else if (match()) {
+  <div class="space-y-2">
+    <div class="py-4">
+      <div class="grid grid-cols-3 p-2">
+        <div class="flex items-center gap-3 flex-1">
+          <img
+            [src]="match()!.homeTeamLogo"
+            [alt]="match()!.homeTeamName"
+            class="w-10 h-10 object-cover rounded-md"
+          />
+          <div class="flex flex-col">
+            <span class="font-semibold text-sm line-clamp-1">{{
+              match()!.homeTeamName
+            }}</span>
+            <span class="text-xs text-muted">Home</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center px-4">
+          <span class="text-lg font-bold text-center min-w-[60px]">
+            {{ getScoreDisplay() }}
+          </span>
+        </div>
+
+        <div class="flex items-center gap-3 flex-1 justify-end">
+          <div class="flex flex-col text-right">
+            <span class="font-semibold text-sm line-clamp-1">{{
+              match()!.awayTeamName
+            }}</span>
+            <span class="text-xs text-muted">Away</span>
+          </div>
+          <img
+            [src]="match()!.awayTeamLogo"
+            [alt]="match()!.awayTeamName"
+            class="w-10 h-10 object-cover rounded-md"
+          />
+        </div>
+      </div>
+
+      <div class="text-sm space-y-1 text-muted mt-2">
+        <div class="flex items-center justify-center space-x-2">
+          <lucide-angular size="16" [img]="icons.Calendar" />
+          <span class="text-sm font-medium">
+            {{ match()!.matchDate | date : "mediumDate" }}</span
+          >
+          <span class="text-xs text-muted">
+            {{ match()!.matchDate | date : "shortTime" }}</span
+          >
+        </div>
+        @if (match()!.venue) {
+        <div class="flex items-center justify-center space-x-2">
+          <lucide-angular [img]="icons.MapPin" size="16"></lucide-angular>
+          <span>{{ match()!.venue }}</span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="font-semibold mb-3">Match Events</h3>
+      @if (matchEvents().length > 0) {
+
+      <div class="space-y-2 max-h-60 overflow-y-auto">
+        @for(event of matchEvents(); track event.id){
+        <div class="flex items-center justify-between p-3 border rounded-lg">
+          <div class="flex items-center gap-3">
+            <lucide-angular
+              size="16"
+              [img]="getEventIcon(event.eventType)"
+              [class]="getEventIconClass(event.eventType)"
+            />
+            <div>
+              <div class="text-sm font-medium">
+                {{ formatEventType(event.eventType) }} - {{ event.playerName }}
+              </div>
+              <div class="text-xs text-muted">
+                {{ event.minute }}' - {{ event.teamName }}
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="text-center text-muted py-8">
+        <lucide-angular
+          [img]="icons.Activity"
+          size="24"
+          class="mx-auto mb-2"
+        ></lucide-angular>
+        <p class="text-sm">No match events recorded</p>
+      </div>
+      }
+    </div>
+
+    <div class="card grid grid-cols-2 gap-3">
+      <div>
+        <h3 class="font-semibold mb-3 text-center line-clamp-1">
+          {{ match()!.homeTeamName }}
+        </h3>
+        <div class="space-y-2">
+          @for (player of homeTeamPlayers(); track player.id) {
+          <div class="flex items-center space-x-2 p-2 rounded">
+            <img
+              [src]="player.photoUrl"
+              [alt]="formatPlayerName(player)"
+              class="w-6 h-6 rounded-full object-cover"
+            />
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium truncate">
+                {{ formatPlayerName(player) }}
+              </div>
+              @if (player.position) {
+              <div class="text-xs text-muted">
+                {{ getPosition(player.position) }}
+              </div>
+              }
+            </div>
+          </div>
+          } @if (homeTeamPlayers().length === 0) {
+          <div class="text-center text-muted py-4">
+            <lucide-angular
+              [img]="icons.Users"
+              size="24"
+              class="mx-auto mb-2"
+            ></lucide-angular>
+            <p class="text-sm">No players available</p>
+          </div>
+          }
+        </div>
+      </div>
+
+      <div>
+        <h3 class="font-semibold mb-3 text-center line-clamp-1">
+          {{ match()!.awayTeamName }}
+        </h3>
+        <div class="space-y-2">
+          @for (player of awayTeamPlayers(); track player.id) {
+          <div
+            class="flex items-center space-x-2 p-2 btn-outline border cursor-pointer rounded"
+          >
+            <img
+              [src]="player.photoUrl"
+              [alt]="formatPlayerName(player)"
+              class="w-6 h-6 rounded-full object-cover"
+            />
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium truncate">
+                {{ formatPlayerName(player) }}
+              </div>
+              @if (player.position) {
+              <div class="text-xs text-muted">
+                {{ getPosition(player.position) }}
+              </div>
+              }
+            </div>
+          </div>
+          } @if (awayTeamPlayers().length === 0) {
+          <div class="text-center text-muted py-4">
+            <lucide-angular
+              [img]="icons.Users"
+              size="24"
+              class="mx-auto mb-2"
+            ></lucide-angular>
+            <p class="text-sm">No players available</p>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</app-modal>

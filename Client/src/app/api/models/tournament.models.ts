@@ -1,6 +1,7 @@
-import { User } from './auth.models';
+import { UserDto } from './auth.models';
+import { TournamentFormats, TournamentStatus, TeamAction } from './common.models';
 
-export interface Tournament {
+export interface TournamentDto {
   id: string;
   name: string;
   description: string;
@@ -13,9 +14,9 @@ export interface Tournament {
   maxTeams: number;
   bannerUrl?: string;
   logoUrl?: string;
-  status: string;
+  status: TournamentStatus;
   organizerId: string;
-  organizer?: User;
+  organizer?: UserDto;
   createdAt: string;
   updatedAt?: string;
   isPublic: boolean;
@@ -24,12 +25,25 @@ export interface Tournament {
   matchCount: number;
 }
 
-export interface CreateTournament {
+export interface TournamentQuery {
+  q?: string;
+  searchTerm?: string;
+  status?: TournamentStatus;
+  location?: string;
+  startFrom?: string;
+  startTo?: string;
+  page: number;
+  pageNumber?: number;
+  pageSize: number;
+  isPublic?: boolean;
+}
+
+export interface CreateTournamentDto {
   name: string;
   description: string;
   location?: string;
-  registrationStartDate?: string;
-  registrationDeadline?: string;
+  registrationStartDate: string;
+  registrationDeadline: string;
   startDate: string;
   endDate: string;
   minTeams: number;
@@ -39,7 +53,7 @@ export interface CreateTournament {
   isPublic: boolean;
 }
 
-export interface UpdateTournament {
+export interface UpdateTournamentDto {
   name?: string;
   description?: string;
   location?: string;
@@ -54,22 +68,69 @@ export interface UpdateTournament {
   isPublic?: boolean;
 }
 
-export interface TournamentSearch {
-  searchTerm?: string;
-  status?: string;
-  location?: string;
-  startDateFrom?: string;
-  startDateTo?: string;
-  isPublic?: boolean;
-  scope?: 'public' | 'my' | 'all';
-  pageNumber?: number;
-  pageSize?: number;
-}
-
-export interface JoinTournament {
-  tournamentId: string;
+export interface TeamRegistrationRequest {
   teamId: string;
 }
+
+export interface TournamentGenerateFixturesRequest {
+  format: TournamentFormats;
+}
+
+export interface FixtureStatusResponse {
+  status: string;
+}
+
+export interface TeamManagementRequest {
+  action: TeamAction;
+}
+
+export interface TournamentStandingDto {
+  id: string;
+  tournamentId: string;
+  tournamentName: string;
+  teamId: string;
+  teamName: string;
+  teamLogo?: string;
+  matchesPlayed: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+  points: number;
+  position?: number;
+}
+
+export interface PlayerGoalStandingDto {
+  playerId: string;
+  playerName: string;
+  teamId: string;
+  teamName: string;
+  teamLogo?: string;
+  playerPhoto?: string;
+  goals: number;
+  matchesPlayed: number;
+  position?: number;
+}
+
+export interface PlayerAssistStandingDto {
+  playerId: string;
+  playerName: string;
+  teamId: string;
+  teamName: string;
+  teamLogo?: string;
+  playerPhoto?: string;
+  assists: number;
+  matchesPlayed: number;
+  assistsPerMatch: number;
+  position?: number;
+}
+
+export type Tournament = TournamentDto;
+export type CreateTournament = CreateTournamentDto;
+export type UpdateTournament = UpdateTournamentDto;
+export type TournamentSearch = TournamentQuery;
 
 export interface TournamentFormat {
   id: string;
@@ -77,34 +138,15 @@ export interface TournamentFormat {
   description: string;
 }
 
-export interface TournamentStatistics {
-  tournamentId: string;
-  totalTeams: number;
-  totalMatches: number;
-  completedMatches: number;
-  totalGoals: number;
-  averageGoalsPerMatch: number;
-  topScorer?: {
-    playerId: string;
-    playerName: string;
-    goals: number;
-  };
-  mostAssists?: {
-    playerId: string;
-    playerName: string;
-    assists: number;
-  };
-}
-
 export function getTournamentFormats(): TournamentFormat[] {
   return [
     {
-      id: '1',
+      id: TournamentFormats.RoundRobin.toString(),
       name: 'Round Robin',
       description: 'Every team plays every other team once'
     },
     {
-      id: '2', 
+      id: TournamentFormats.SingleElimination.toString(), 
       name: 'Single Elimination',
       description: 'Teams are eliminated after losing one match'
     }

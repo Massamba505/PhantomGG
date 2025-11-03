@@ -1,6 +1,9 @@
 using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Repository.Entities;
+using PhantomGG.Repository.Specifications;
+using System.Text;
+using System.Text.Json;
 
 namespace PhantomGG.Service.Mappings;
 
@@ -22,14 +25,14 @@ public static class TournamentMappings
             MaxTeams = tournament.MaxTeams,
             BannerUrl = tournament.BannerUrl,
             LogoUrl = tournament.LogoUrl,
-            Status = tournament.Status,
+            Status = (TournamentStatus)tournament.Status,
             OrganizerId = tournament.OrganizerId,
             Organizer = tournament.Organizer?.ToOrganizerDto(),
             CreatedAt = tournament.CreatedAt,
             UpdatedAt = tournament.UpdatedAt,
             IsPublic = tournament.IsPublic,
-            TeamCount = tournament.TournamentTeams?.Where(t => t.Status == TeamRegistrationStatus.Approved.ToString()).Count() ?? 0,
-            PendingTeamCount = tournament.TournamentTeams?.Where(t => t.Status == TeamRegistrationStatus.Pending.ToString()).Count() ?? 0,
+            TeamCount = tournament.TournamentTeams?.Where(t => t.Status == (int)TeamRegistrationStatus.Approved).Count() ?? 0,
+            PendingTeamCount = tournament.TournamentTeams?.Where(t => t.Status == (int)TeamRegistrationStatus.Pending).Count() ?? 0,
             MatchCount = tournament.Matches?.Count ?? 0
         };
     }
@@ -41,7 +44,7 @@ public static class TournamentMappings
             Id = Guid.NewGuid(),
             Name = createDto.Name,
             Description = createDto.Description,
-            Location = createDto.Location,
+            Location = createDto.Location ?? "TBA",
             RegistrationStartDate = createDto.RegistrationStartDate,
             RegistrationDeadline = createDto.RegistrationDeadline,
             StartDate = createDto.StartDate,
@@ -50,7 +53,7 @@ public static class TournamentMappings
             MaxTeams = createDto.MaxTeams,
             BannerUrl = $"https://placehold.co/1200x400?text={createDto.Name}",
             LogoUrl = "https://placehold.co/200x200",
-            Status = TournamentStatus.Draft.ToString(),
+            Status = (int)TournamentStatus.Draft,
             OrganizerId = organizerId,
             IsPublic = createDto.IsPublic,
             CreatedAt = DateTime.UtcNow
@@ -71,13 +74,16 @@ public static class TournamentMappings
             tournament.StartDate = updateDto.StartDate.Value;
         if (updateDto.MaxTeams.HasValue)
             tournament.MaxTeams = updateDto.MaxTeams.Value;
-        //if (updateDto.BannerUrl != null)
-        //    tournament.BannerUrl = updateDto.BannerUrl;
-        //if (updateDto.LogoUrl != null)
-        //    tournament.LogoUrl = updateDto.LogoUrl;
         if (updateDto.IsPublic.HasValue)
             tournament.IsPublic = updateDto.IsPublic.Value;
 
         tournament.UpdatedAt = DateTime.UtcNow;
+    }
+
+    public static string GetDeterministicKey(this TournamentSpecification spec)
+    {
+        return Convert.ToBase64String(
+            Encoding.UTF8.GetBytes(JsonSerializer.Serialize(spec))
+        );
     }
 }

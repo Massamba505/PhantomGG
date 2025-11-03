@@ -1,22 +1,24 @@
 @if (isOpen()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6">
-  <div class="absolute inset-0 backdrop-blur-sm" (click)="close.emit()"></div>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6" data-cy="modal-overlay">
+  <div class="absolute inset-0 backdrop-blur-sm" (click)="close.emit()" data-cy="modal-backdrop"></div>
 
   <div
     class="modal relative border border-border rounded-lg shadow-lg w-full animate-fade-in max-w-md"
+    data-cy="modal-container"
   >
-    <div class="flex items-center justify-between p-4 md:p-6 border-b">
-      <h2 class="text-xl font-semibold">{{ title() }}</h2>
+    <div class="flex items-center justify-between p-4 md:p-6 border-b" data-cy="modal-header">
+      <h2 class="text-xl font-semibold" data-cy="modal-title">{{ title() }}</h2>
       <button
         (click)="close.emit()"
         class="transition-colors flex justify-center items-center p-1 cursor-pointer rounded-full border"
         aria-label="Close"
+        data-cy="modal-close-button"
       >
-        <lucide-angular size="20" [img]="icons.X"></lucide-angular>
+        <lucide-angular size="20" [img]="icons.X" data-cy="close-icon"></lucide-angular>
       </button>
     </div>
 
-    <div class="p-6">
+    <div class="p-6" data-cy="modal-content">
       <ng-content></ng-content>
     </div>
   </div>
