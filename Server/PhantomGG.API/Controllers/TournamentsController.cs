@@ -33,7 +33,7 @@ public class TournamentsController(
     [HttpGet]
     public async Task<ActionResult<PagedResult<TournamentDto>>> GetTournaments([FromQuery] TournamentQuery query)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         Guid? userId = currentUser?.Role == UserRoles.Organizer ? currentUser?.Id : null;
 
         var tournaments = await _tournamentService.SearchAsync(query, userId);
@@ -46,7 +46,7 @@ public class TournamentsController(
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<TournamentDto>> GetTournament(Guid id)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var tournament = await _tournamentService.GetByIdAsync(id, currentUser?.Id);
         return Ok(tournament);
     }
@@ -58,7 +58,7 @@ public class TournamentsController(
     [Authorize(Roles = "Organizer")]
     public async Task<ActionResult<TournamentDto>> CreateTournament([FromForm] CreateTournamentDto createDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var tournament = await _tournamentService.CreateAsync(createDto, currentUser.Id);
 
         return CreatedAtAction(
@@ -74,7 +74,7 @@ public class TournamentsController(
     [Authorize(Roles = "Organizer")]
     public async Task<ActionResult<TournamentDto>> UpdateTournament(Guid id, [FromForm] UpdateTournamentDto updateDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var tournament = await _tournamentService.UpdateAsync(id, updateDto, currentUser.Id);
         return Ok(tournament);
     }
@@ -86,7 +86,7 @@ public class TournamentsController(
     [Authorize(Roles = "Organizer")]
     public async Task<ActionResult> DeleteTournament(Guid id)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         await _tournamentService.DeleteAsync(id, currentUser.Id);
         return NoContent();
     }
@@ -110,7 +110,7 @@ public class TournamentsController(
     [Authorize(Roles = "User")]
     public async Task<ActionResult> RegisterTeam(Guid tournamentId, Guid teamId)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         await _tournamentTeamService.RegisterTeamAsync(tournamentId, teamId, currentUser.Id);
 
         return Created($"/tournaments/{tournamentId}/teams", null);
@@ -126,7 +126,7 @@ public class TournamentsController(
         Guid teamId,
         [FromBody] TeamManagementRequest request)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         await _tournamentTeamService.ManageTeamAsync(tournamentId, teamId, request.Action, currentUser.Id);
 
         return Ok();
@@ -150,7 +150,7 @@ public class TournamentsController(
     [HttpGet("{id:guid}/standings")]
     public async Task<ActionResult<IEnumerable<TournamentStandingDto>>> GetTournamentStandings(Guid id)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var standings = await _tournamentStandingService.GetTournamentStandingsAsync(id, currentUser?.Id);
         return Ok(standings);
     }
@@ -161,7 +161,7 @@ public class TournamentsController(
     [HttpGet("{id:guid}/standings/goals")]
     public async Task<ActionResult<IEnumerable<PlayerGoalStandingDto>>> GetPlayerGoalStandings(Guid id)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var standings = await _tournamentStandingService.GetPlayerGoalStandingsAsync(id, currentUser?.Id);
         return Ok(standings);
     }
@@ -172,7 +172,7 @@ public class TournamentsController(
     [HttpGet("{id:guid}/standings/assists")]
     public async Task<ActionResult<IEnumerable<PlayerAssistStandingDto>>> GetPlayerAssistStandings(Guid id)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var standings = await _tournamentStandingService.GetPlayerAssistStandingsAsync(id, currentUser?.Id);
         return Ok(standings);
     }
@@ -184,7 +184,7 @@ public class TournamentsController(
     [Authorize(Roles = "Organizer")]
     public async Task<ActionResult> GenerateFixtures(Guid id, [FromBody] GenerateFixturesRequest request)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         await _matchService.CreateTournamentBracketAsync(id, currentUser!.Id);
 
         return Accepted();
