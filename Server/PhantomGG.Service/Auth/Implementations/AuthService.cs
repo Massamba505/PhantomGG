@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
@@ -18,7 +19,8 @@ public class AuthService(
     ICookieService cookieService,
     IEmailService emailService,
     IAuthVerificationService authVerificationService,
-    IHttpContextAccessor httpContextAccessor) : IAuthService
+    IHttpContextAccessor httpContextAccessor,
+    ILogger<AuthService> logger) : IAuthService
 {
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IPasswordHasher _passwordHasher = passwordHasher;
@@ -28,6 +30,7 @@ public class AuthService(
     private readonly ICookieService _cookieService = cookieService;
     private readonly IEmailService _emailService = emailService;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly ILogger<AuthService> _logger = logger;
 
     public async Task RegisterAsync(RegisterRequestDto request)
     {
@@ -38,6 +41,8 @@ public class AuthService(
 
         await _userRepository.CreateAsync(user);
         await _authVerificationService.ResendEmailVerificationAsync(user.Email);
+
+        _logger.LogInformation("User registered successfully: {Email}", request.Email);
     }
 
     public async Task<AuthDto> LoginAsync(LoginRequestDto request)
@@ -45,7 +50,12 @@ public class AuthService(
         var user = await ValidateUserLoginAsync(request.Email, request.Password);
 
         await HandleSuccessfulLoginAsync(user);
-        return await GenerateTokensAsync(user, rememberMe: request.RememberMe);
+        var result = await GenerateTokensAsync(user, rememberMe: request.RememberMe);
+
+        _logger.LogInformation("User logged in successfully: {Email} from {RemoteIP}",
+            request.Email, GetClientIpAddress());
+
+        return result;
     }
 
     private async Task<User> ValidateUserLoginAsync(string email, string password)
@@ -55,16 +65,21 @@ public class AuthService(
         if (user == null || !user.IsActive)
         {
             await HandleFailedLoginAsync(email.ToLower());
+            _logger.LogWarning("Login attempt failed - invalid credentials: {Email} from {RemoteIP}",
+                email, GetClientIpAddress());
             throw new UnauthorizedException("Invalid email or password");
         }
 
         if (user.AccountLockedUntil.HasValue && user.AccountLockedUntil > DateTime.UtcNow)
         {
+            _logger.LogWarning("Login attempt failed - account locked: {Email} until {LockUntil}",
+                email, user.AccountLockedUntil);
             throw new UnauthorizedException($"Account is locked until {user.AccountLockedUntil:yyyy-MM-dd HH:mm} UTC");
         }
 
         if (!user.EmailVerified)
         {
+            _logger.LogWarning("Login attempt failed - email not verified: {Email}", email);
             throw new UnauthorizedException("Please verify your email address");
         }
 
@@ -72,6 +87,8 @@ public class AuthService(
         if (!validPassword)
         {
             await HandleFailedLoginAsync(user);
+            _logger.LogWarning("Login attempt failed - invalid password: {Email} from {RemoteIP}",
+                email, GetClientIpAddress());
             throw new UnauthorizedException("Invalid email or password");
         }
 
@@ -143,5 +160,10 @@ public class AuthService(
         user.AccountLockedUntil = null;
         user.LastLoginAt = DateTime.UtcNow;
         await _userRepository.UpdateAsync(user);
+    }
+
+    private string GetClientIpAddress()
+    {
+        return _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "unknown";
     }
 }

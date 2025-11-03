@@ -4,6 +4,7 @@ using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
 using PhantomGG.Models.DTOs.Image;
 using PhantomGG.Models.DTOs.Tournament;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Repository.Specifications;
 using PhantomGG.Service.Exceptions;
@@ -239,7 +240,8 @@ public class TournamentService(
                     }
                     catch (Exception emailEx)
                     {
-                        _logger.LogWarning(emailEx, "Failed to send status change email for tournament {TournamentId}", tournament.Id);
+                        _logger.LogWarning(emailEx, "Failed to send status change email for tournament {TournamentId}: {EmailError}",
+                            tournament.Id, emailEx.Message);
                     }
 
                     updatedCount++;
@@ -255,32 +257,20 @@ public class TournamentService(
         }
     }
 
-    private static TournamentStatus DetermineNewStatus(PhantomGG.Repository.Entities.Tournament tournament, DateTime now)
+    private static TournamentStatus DetermineNewStatus(Tournament tournament, DateTime now)
     {
-        var currentStatus = (TournamentStatus)tournament.Status;
+        if (now < tournament.RegistrationStartDate)
+            return TournamentStatus.Draft;
 
-        if (currentStatus == TournamentStatus.Draft && now >= tournament.RegistrationStartDate)
-        {
+        if (now < tournament.RegistrationDeadline)
             return TournamentStatus.RegistrationOpen;
-        }
 
-        if (currentStatus == TournamentStatus.RegistrationOpen && now >= tournament.RegistrationDeadline)
-        {
+        if (now < tournament.StartDate)
             return TournamentStatus.RegistrationClosed;
-        }
 
-        if (currentStatus == TournamentStatus.RegistrationClosed && now >= tournament.StartDate)
-        {
+        if (tournament.EndDate.HasValue && now < tournament.EndDate.Value)
             return TournamentStatus.InProgress;
-        }
 
-        if (currentStatus == TournamentStatus.InProgress &&
-             tournament.EndDate.HasValue &&
-             now >= tournament.EndDate.Value)
-        {
-            return TournamentStatus.Completed;
-        }
-
-        return currentStatus;
+        return TournamentStatus.Completed;
     }
 }

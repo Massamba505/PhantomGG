@@ -18,13 +18,15 @@ public class AuthController(
     ICookieService cookieService,
     IOptions<CookieSettings> cookieSettings,
     ICurrentUserService currentUserService,
-    IUserService userService) : ControllerBase
+    IUserService userService,
+    ILogger<AuthController> logger) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
     private readonly ICookieService _cookieService = cookieService;
     private readonly CookieSettings _cookieSettings = cookieSettings.Value;
     private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly IUserService _userService = userService;
+    private readonly ILogger<AuthController> _logger = logger;
 
     /// <summary>
     /// Register a new user account
@@ -61,6 +63,13 @@ public class AuthController(
     public async Task<ActionResult<RefreshTokenResponse>> Refresh()
     {
         var refreshToken = Request.Cookies[_cookieSettings.RefreshTokenCookieName] ?? string.Empty;
+
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            _logger.LogWarning("Token refresh attempted without refresh token from {RemoteIP}",
+                HttpContext.Connection.RemoteIpAddress);
+        }
+
         var result = await _authService.RefreshAsync(refreshToken);
         return Ok(new RefreshTokenResponse(result.AccessToken));
     }

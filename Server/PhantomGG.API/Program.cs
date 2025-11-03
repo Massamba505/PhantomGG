@@ -10,6 +10,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.AddSerilog();
         // Add services to the container
         builder.Services.AddControllers();
         builder.Services.AddHttpContextAccessor();
@@ -27,9 +28,14 @@ public class Program
 
         // Configure the HTTP request pipeline
         app.UseSwaggerDocumentation(app.Environment);
-        app.UseHttpsRedirection();
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHttpsRedirection();
+        }
+
         app.UseStaticFiles();
         app.UseCors("CorsPolicy");
+        app.UseSerilogRequestLogging();
         app.UseMiddleware<ValidationMiddleware>();
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseAuthentication();

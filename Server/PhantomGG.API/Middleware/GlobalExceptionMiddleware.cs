@@ -18,7 +18,6 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unhandled exception occurred");
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -37,6 +36,21 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
             ConflictException => (HttpStatusCode.Conflict, "Conflict occurred"),
             _ => (HttpStatusCode.InternalServerError, "An internal server error occurred")
         };
+
+        var logLevel = statusCode switch
+        {
+            >= HttpStatusCode.InternalServerError => LogLevel.Error,
+            >= HttpStatusCode.BadRequest => LogLevel.Warning,
+            _ => LogLevel.Information
+        };
+
+
+        _logger.Log(logLevel, exception,
+            "HTTP {RequestMethod} {RequestPath} failed with {StatusCode}: {ExceptionMessage}",
+            context.Request.Method,
+            context.Request.Path.Value,
+            (int)statusCode,
+            exception.Message);
 
         var problemDetails = new ProblemDetails
         {
