@@ -26,7 +26,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Shallow clones disabled for better analysis
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -67,19 +67,12 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner begin `
             /k:"Massamba505_PhantomGG" `
             /o:"massamba505" `
-            /n:"PhantomGG - Soccer Tournament Management API" `
-            /v:"1.0" `
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
             /d:sonar.host.url="https://sonarcloud.io" `
-            /d:sonar.projectBaseDir="Server" `
-            /d:sonar.sources="." `
-            /d:sonar.tests="PhantomGG.UnitTests" `
-            /d:sonar.test.inclusions="**/*Tests.cs" `
-            /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" `
-            /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs,**/*Tests.cs,**/obj/**,**/bin/**" `
-            /d:sonar.exclusions="**/wwwroot/**,**/Migrations/**,**/obj/**,**/bin/**" `
-            /d:sonar.sourceEncoding="UTF-8" `
-            /d:sonar.qualitygate.wait=true
+            /d:sonar.cs.opencover.reportsPaths="**/TestResults/coverage.opencover.xml" `
+            /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs,**/*Tests.cs" `
+            /d:sonar.exclusions="**/wwwroot/**,**/Migrations/**,**/obj/**,**/bin/**,**/node_modules/**" `
+            /d:sonar.sourceEncoding="UTF-8"
 
       - name: Build Solution
         run: dotnet build Server/PhantomGG.sln --configuration Release --no-restore
@@ -92,7 +85,7 @@ jobs:
             --verbosity normal `
             /p:CollectCoverage=true `
             /p:CoverletOutputFormat=opencover `
-            /p:CoverletOutput=./TestResults/coverage.opencover.xml `
+            /p:CoverletOutput=./TestResults/ `
             /p:Exclude="[*]PhantomGG.Repository.Data.Migrations.*"
 
       - name: End SonarCloud Analysis
