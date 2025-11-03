@@ -1,2 +1,8 @@
 .env
 
+
+# SonarCloud
+.sonar/
+.scannerwork/
+**/TestResults/
+**/coverage.opencover.xml
