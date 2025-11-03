@@ -24,7 +24,7 @@ public class TeamsController(
     [HttpGet]
     public async Task<ActionResult<PagedResult<TeamDto>>> GetTeams([FromQuery] TeamQuery query)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         Guid? userId = currentUser?.Role == UserRoles.User ? currentUser?.Id : null;
 
         var teams = await _teamService.SearchAsync(query, userId);
@@ -48,7 +48,7 @@ public class TeamsController(
     [Authorize]
     public async Task<ActionResult<TeamDto>> CreateTeam([FromForm] CreateTeamDto createDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var team = await _teamService.CreateAsync(createDto, currentUser.Id);
 
         return CreatedAtAction(nameof(GetTeam), new { id = team.Id }, team);
@@ -61,7 +61,7 @@ public class TeamsController(
     [Authorize]
     public async Task<ActionResult<TeamDto>> UpdateTeam(Guid id, [FromForm] UpdateTeamDto updateDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var team = await _teamService.UpdateAsync(id, updateDto, currentUser.Id);
         return Ok(team);
     }
@@ -73,7 +73,7 @@ public class TeamsController(
     [Authorize]
     public async Task<ActionResult> DeleteTeam(Guid id)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         await _teamService.DeleteAsync(id, currentUser.Id);
         return NoContent();
     }
@@ -95,7 +95,7 @@ public class TeamsController(
     [Authorize]
     public async Task<ActionResult<PlayerDto>> AddPlayerToTeam(Guid id, [FromForm] CreatePlayerDto playerDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var player = await _teamService.AddPlayerToTeamAsync(id, playerDto, currentUser.Id);
 
         return CreatedAtAction(nameof(GetTeamPlayers), new { id }, player);
@@ -111,7 +111,7 @@ public class TeamsController(
         Guid playerId,
         [FromForm] UpdatePlayerDto updateDto)
     {
-        var currentUser = _currentUserService.GetCurrentUser();
+        var currentUser = _currentUserService.GetCurrentUser()!;
         var player = await _teamService.UpdateTeamPlayerAsync(teamId, playerId, updateDto, currentUser.Id);
         return Ok(player);
     }
