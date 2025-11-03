@@ -6,11 +6,16 @@ on:
       - main
       - develop
       - "testing/**"
+      - "feature/**"
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
       - main
       - develop
+  workflow_dispatch:
+
+permissions:
+  pull-requests: read # allows SonarCloud to decorate PRs with analysis results
 
 jobs:
   sonarcloud:
@@ -29,7 +34,7 @@ jobs:
           dotnet-version: "9.0.x"
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
@@ -37,7 +42,7 @@ jobs:
 
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
@@ -91,8 +96,9 @@ jobs:
         run: .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: Upload Coverage Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: code-coverage
           path: Server/PhantomGG.UnitTests/TestResults/coverage.opencover.xml
+          retention-days: 7
