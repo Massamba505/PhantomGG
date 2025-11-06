@@ -5,24 +5,24 @@ import { LucideAngularModule } from 'lucide-angular';
 import { Team } from '@/app/api/models/team.models';
 import { Tournament } from '@/app/api/models/tournament.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { Modal } from "@/app/shared/components/ui/modal/modal";
+import { Modal } from '@/app/shared/components/ui/modal/modal';
 
 @Component({
   selector: 'app-team-selection-modal',
   imports: [CommonModule, RouterModule, LucideAngularModule, Modal],
-  templateUrl: "./team-selection-modal.component.html",
-  styleUrl: './team-selection-modal.component.css'
+  templateUrl: './team-selection-modal.component.html',
+  styleUrl: './team-selection-modal.component.css',
 })
 export class TeamSelectionModalComponent {
   isOpen = input(false);
   teams = input<Team[]>([]);
   tournament = input<Tournament | null>(null);
   isJoining = input(false);
-  
+
   teamSelected = output<Team>();
   modalClosed = output<void>();
   createTeamClicked = output<void>();
-  
+
   readonly icons = LucideIcons;
   selectedTeam = signal<Team | null>(null);
 
@@ -53,5 +53,4 @@ export class TeamSelectionModalComponent {
     this.createTeamClicked.emit();
     this.closeModal();
   }
-
 }

@@ -2,14 +2,17 @@ import { Component, signal, computed, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TournamentSearch } from '@/app/api/models/tournament.models';
-import { TournamentStatus, TournamentFormats } from '@/app/api/models/common.models';
+import {
+  TournamentStatus,
+  TournamentFormats,
+} from '@/app/api/models/common.models';
 import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-tournament-search',
   imports: [CommonModule, FormsModule],
   templateUrl: './tournament-search.component.html',
-  styleUrl: './tournament-search.component.css'
+  styleUrl: './tournament-search.component.css',
 })
 export class TournamentSearchComponent {
   searchChange = output<Partial<TournamentSearch>>();
@@ -26,18 +29,17 @@ export class TournamentSearchComponent {
   statusOptions = getEnumOptions(TournamentStatus);
   formatOptions = getEnumOptions(TournamentFormats);
 
-    searchCriteria = computed<Partial<TournamentSearch>>(() => {
+  searchCriteria = computed<Partial<TournamentSearch>>(() => {
     return {
-        searchTerm: this.searchTerm()?.trim() || undefined,
-        status: this.selectedStatus() || undefined,
-        location: this.location()?.trim() || undefined,
-        format: this.format() || undefined,
-        startFrom: this.startDateFrom() || undefined,
-        startTo: this.startDateTo() || undefined,
-        isPublic: this.isPublic() || undefined,
-      };
-    });
-
+      searchTerm: this.searchTerm()?.trim() || undefined,
+      status: this.selectedStatus() || undefined,
+      location: this.location()?.trim() || undefined,
+      format: this.format() || undefined,
+      startFrom: this.startDateFrom() || undefined,
+      startTo: this.startDateTo() || undefined,
+      isPublic: this.isPublic() || undefined,
+    };
+  });
 
   onSearchInput(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -46,7 +48,7 @@ export class TournamentSearchComponent {
 
   onStatusChange(event: Event) {
     const target = event.target as HTMLSelectElement;
-    const value = target.value? parseInt(target.value): undefined;
+    const value = target.value ? parseInt(target.value) : undefined;
 
     this.selectedStatus.set(value);
   }
@@ -83,9 +85,11 @@ export class TournamentSearchComponent {
     this.isPublic.set(value);
   }
 
-  search(){
+  search() {
     const cleanedCriteria = Object.fromEntries(
-      Object.entries(this.searchCriteria()).filter(([_, value]) => value !== undefined)
+      Object.entries(this.searchCriteria()).filter(
+        ([_, value]) => value !== undefined
+      )
     ) as Partial<TournamentSearch>;
     this.searchChange.emit(cleanedCriteria);
   }
@@ -102,12 +106,14 @@ export class TournamentSearchComponent {
   }
 
   hasFilters(): boolean {
-    return this.searchTerm() !== '' || 
-           this.selectedStatus() !== undefined || 
-           this.location() !== '' ||
-           this.format() !== undefined ||
-           this.startDateFrom() !== undefined ||
-           this.startDateTo() !== undefined ||
-           this.isPublic() !== undefined;
+    return (
+      this.searchTerm() !== '' ||
+      this.selectedStatus() !== undefined ||
+      this.location() !== '' ||
+      this.format() !== undefined ||
+      this.startDateFrom() !== undefined ||
+      this.startDateTo() !== undefined ||
+      this.isPublic() !== undefined
+    );
   }
 }
