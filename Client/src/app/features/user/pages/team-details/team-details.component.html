@@ -19,6 +19,10 @@
 </div>
 
 @if (loading()) {
+<div class="flex items-center justify-center gap-2" data-cy="resending-state">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" data-cy="loading-spinner"></div>
+  <span data-cy="sending-text">Sending...</span>
+</div>
 <div class="text-center py-12">
   <p>Loading team details...</p>
 </div>

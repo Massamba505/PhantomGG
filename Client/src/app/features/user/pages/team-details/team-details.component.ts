@@ -56,7 +56,6 @@ export class TeamDetailsComponent implements OnInit {
     const teamId = this.route.snapshot.params['id'];
     if (teamId) {
       this.loadTeamDetails(teamId);
-      this.loadTeamPlayers(teamId);
     }
   }
 
@@ -72,6 +71,7 @@ export class TeamDetailsComponent implements OnInit {
       },
       complete: () => {
         this.loading.set(false);
+        this.loadTeamPlayers(teamId);
       },
     });
   }

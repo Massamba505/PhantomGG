@@ -1,10 +1,21 @@
-import { Component, OnInit, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from "lucide-angular";
+import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { MatchService } from '@/app/api/services/match.service';
-import { Match, MatchEvent, MatchEventType } from '@/app/api/models/match.models';
+import {
+  Match,
+  MatchEvent,
+  MatchEventType,
+} from '@/app/api/models/match.models';
 import { Player } from '@/app/api/models/team.models';
 import { TeamService } from '@/app/api/services/team.service';
 import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
@@ -14,7 +25,7 @@ import { MatchStatus, PlayerPosition } from '@/app/api/models';
   selector: 'app-match-details-modal',
   imports: [CommonModule, LucideAngularModule, Modal],
   templateUrl: './match-details-modal.html',
-  styleUrl: './match-details-modal.css'
+  styleUrl: './match-details-modal.css',
 })
 export class MatchDetailsModalComponent implements OnInit {
   private matchService = inject(MatchService);
@@ -32,8 +43,8 @@ export class MatchDetailsModalComponent implements OnInit {
 
   icons = LucideIcons;
 
-  getPosition(position: number){
-    return getEnumLabel(PlayerPosition, position)
+  getPosition(position: number) {
+    return getEnumLabel(PlayerPosition, position);
   }
 
   ngOnInit() {
@@ -60,7 +71,7 @@ export class MatchDetailsModalComponent implements OnInit {
       error: (error) => {
         console.error('Error loading match:', error);
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -72,14 +83,16 @@ export class MatchDetailsModalComponent implements OnInit {
       next: (players) => {
         this.homeTeamPlayers.set(players);
       },
-      error: (error) => console.error('Error loading home team players:', error)
+      error: (error) =>
+        console.error('Error loading home team players:', error),
     });
 
     this.teamService.getTeamPlayers(match.awayTeamId).subscribe({
       next: (players) => {
         this.awayTeamPlayers.set(players);
       },
-      error: (error) => console.error('Error loading away team players:', error)
+      error: (error) =>
+        console.error('Error loading away team players:', error),
     });
   }
 
@@ -94,10 +107,10 @@ export class MatchDetailsModalComponent implements OnInit {
       error: (error) => {
         console.error('Error loading match events:', error);
         this.loading.set(false);
-      }
+      },
     });
   }
-  
+
   isInProgress(): boolean {
     const matchStatus = this.match()!.status;
     return matchStatus === MatchStatus.InProgress;
@@ -126,7 +139,8 @@ export class MatchDetailsModalComponent implements OnInit {
   }
 
   getEventIcon(eventType: string | any): any {
-    const eventTypeString = typeof eventType === 'string' ? eventType : eventType.toString();
+    const eventTypeString =
+      typeof eventType === 'string' ? eventType : eventType.toString();
     switch (eventTypeString.toLowerCase()) {
       case 'goal':
         return this.icons.Target;
@@ -156,7 +170,7 @@ export class MatchDetailsModalComponent implements OnInit {
       case MatchEventType.Substitution:
         return 'text-gray-600';
       default:
-        return 'text-blue-600';
+        return 'text-primary';
     }
   }
 
@@ -164,9 +178,9 @@ export class MatchDetailsModalComponent implements OnInit {
     return getEnumLabel(MatchEventType, eventType) || eventType.toString();
   }
 
-  
   getEventColor(eventType: string | any): string {
-    const eventTypeString = typeof eventType === 'string' ? eventType : eventType.toString();
+    const eventTypeString =
+      typeof eventType === 'string' ? eventType : eventType.toString();
     switch (eventTypeString.toLowerCase()) {
       case 'goal':
         return 'text-green-600';
@@ -175,7 +189,7 @@ export class MatchDetailsModalComponent implements OnInit {
       case 'redcard':
         return 'text-red-600';
       case 'substitution':
-        return 'text-blue-600';
+        return 'text-primary';
       case 'foul':
         return 'text-orange-600';
       default:
