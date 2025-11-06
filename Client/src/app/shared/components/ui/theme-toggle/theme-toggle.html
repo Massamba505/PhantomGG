@@ -1,10 +1,5 @@
-<button
-  class="p-2 rounded-full cursor-pointer hover:bg-[hsl(var(--muted))] transition-colors"
-  (click)="toggleTheme()"
-  [attr.aria-label]="buttonLabel()"
-  [title]="buttonLabel()"
-  data-cy="theme-toggle-button"
->
+<button class="p-2 rounded-full cursor-pointer hover:bg-[hsl(var(--muted))] transition-colors" (click)="toggleTheme()"
+  [attr.aria-label]="buttonLabel()" [title]="buttonLabel()" data-cy="theme-toggle-button">
   @if (currentIcon() === 'light') {
   <lucide-angular [img]="icons.Sun" size="20" data-cy="sun-icon"></lucide-angular>
   } @else {

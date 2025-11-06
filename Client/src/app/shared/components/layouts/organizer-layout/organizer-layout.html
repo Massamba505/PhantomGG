@@ -1,15 +1,9 @@
 <div class="flex h-screen" data-cy="organizer-layout">
-  <app-sidebar
-    [userRole]="userRole()"
-    (stateChange)="onSidebarStateChange($event)"
-    data-cy="organizer-sidebar"
-  ></app-sidebar>
+  <app-sidebar [userRole]="userRole()" (stateChange)="onSidebarStateChange($event)"
+    data-cy="organizer-sidebar"></app-sidebar>
 
-  <div
-    class="flex flex-col flex-1 h-full transition-all duration-300"
-    [ngClass]="sidebarOpen() ? 'ml-64' : 'ml-16'"
-    data-cy="organizer-main-content"
-  >
+  <div class="flex flex-col flex-1 h-full transition-all duration-300" [ngClass]="sidebarOpen() ? 'ml-64' : 'ml-16'"
+    data-cy="organizer-main-content">
     <header class="h-16 flex items-center justify-between px-6 shadow-sm" data-cy="organizer-header">
       <h1 class="text-xl font-semibold" data-cy="organizer-page-title">{{ pageTitle() }}</h1>
 

@@ -1,6 +1,11 @@
 import { Component, input, output, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { Team } from '@/app/api/models/team.models';
 import { Match, MatchStatus } from '@/app/api/models';
@@ -11,11 +16,7 @@ import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
   selector: 'app-edit-match-modal',
   imports: [CommonModule, ReactiveFormsModule, Modal],
   template: `
-    <app-modal
-      [isOpen]="isOpen()"
-      title="Edit Match"
-      (close)="close.emit()"
-    >
+    <app-modal [isOpen]="isOpen()" title="Edit Match" (close)="close.emit()">
       <form
         [formGroup]="editMatchForm"
         (ngSubmit)="onSubmit()"
@@ -24,29 +25,35 @@ import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium mb-2">Home Team</label>
-            <select [value]="" formControlName="homeTeamId" class="input-select">
-                @for(team of teams(); track team.id){
-                <option [value]="team.id">
-                    {{ team.name }}
-                </option>
-                }
+            <select
+              [value]=""
+              formControlName="homeTeamId"
+              class="input-select"
+            >
+              @for(team of teams(); track team.id){
+              <option [value]="team.id">
+                {{ team.name }}
+              </option>
+              }
             </select>
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2">Away Team</label>
             <select formControlName="awayTeamId" class="input-select">
-                @for(team of teams(); track team.id){
-                <option [value]="team.id">
-                    {{ team.name }}
-                </option>
-                }
+              @for(team of teams(); track team.id){
+              <option [value]="team.id">
+                {{ team.name }}
+              </option>
+              }
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-2">Match Date & Time</label>
+          <label class="block text-sm font-medium mb-2"
+            >Match Date & Time</label
+          >
           <input
             type="datetime-local"
             [min]="startDate()"
@@ -54,16 +61,16 @@ import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
             class="input-field"
           />
         </div>
-          <div>
-            <label class="block text-sm font-medium mb-2">Match Status</label>
-            <select formControlName="status" class="input-select">
-                @for(matchStatus of matchStatuses; track matchStatus.value){
-                <option [value]="matchStatus.value">
-                    {{ matchStatus.label }}
-                </option>
-                }
-            </select>
-          </div>
+        <div>
+          <label class="block text-sm font-medium mb-2">Match Status</label>
+          <select formControlName="status" class="input-select">
+            @for(matchStatus of matchStatuses; track matchStatus.value){
+            <option [value]="matchStatus.value">
+              {{ matchStatus.label }}
+            </option>
+            }
+          </select>
+        </div>
         <div>
           <label class="block text-sm font-medium mb-2">Venue</label>
           <input
@@ -92,7 +99,7 @@ import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
         </div>
       </form>
     </app-modal>
-  `
+  `,
 })
 export class EditMatchModalComponent {
   isOpen = input.required<boolean>();
@@ -103,15 +110,15 @@ export class EditMatchModalComponent {
 
   close = output<void>();
   update = output<{ matchId: string; updateData: UpdateMatch }>();
-  
+
   private fb = inject(FormBuilder);
-  
+
   editMatchForm: FormGroup = this.fb.group({
     homeTeamId: ['', Validators.required],
     awayTeamId: ['', Validators.required],
     matchDate: ['', Validators.required],
     venue: [''],
-    status:['']
+    status: [''],
   });
 
   constructor() {
@@ -123,7 +130,7 @@ export class EditMatchModalComponent {
           awayTeamId: match.awayTeamId,
           matchDate: new Date(match.matchDate).toISOString().slice(0, 16),
           venue: match.venue || '',
-          status: match.status
+          status: match.status,
         });
       }
     });
@@ -131,19 +138,19 @@ export class EditMatchModalComponent {
 
   onSubmit() {
     if (this.editMatchForm.invalid || !this.selectedMatch()) return;
-    
+
     const formValue = this.editMatchForm.value;
     const updateData: UpdateMatch = {
       homeTeamId: formValue.homeTeamId,
       awayTeamId: formValue.awayTeamId,
       matchDate: formValue.matchDate,
       venue: formValue.venue,
-      status: parseInt(formValue.status) 
+      status: parseInt(formValue.status),
     };
 
     this.update.emit({
       matchId: this.selectedMatch()!.id,
-      updateData
+      updateData,
     });
   }
 }

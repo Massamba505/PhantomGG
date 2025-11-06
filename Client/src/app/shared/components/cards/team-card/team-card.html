@@ -1,11 +1,7 @@
 <div (click)="onView()" class="card flex flex-col gap-3 p-3" data-cy="team-card">
   <div class="flex gap-2" data-cy="team-header">
-    <img
-      [src]="team().logoUrl || 'assets/PhantomGG_LOGO.png'"
-      [alt]="team().name"
-      class="w-12 h-12 object-cover rounded-md"
-      data-cy="team-logo"
-    />
+    <img [src]="team().logoUrl || 'assets/PhantomGG_LOGO.png'" [alt]="team().name"
+      class="w-12 h-12 object-cover rounded-md" data-cy="team-logo" />
     <div class="flex-1" data-cy="team-info">
       <span class="font-semibold text-md line-clamp-1" data-cy="team-name">
         {{ team().name }}
@@ -21,8 +17,7 @@
   <div class="grid grid-cols-2 gap-2" data-cy="team-stats">
     <div
       class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
-      data-cy="team-members-info"
-    >
+      data-cy="team-members-info">
       <lucide-angular size="14" [img]="icons.Users" data-cy="members-icon" />
       <div class="flex flex-col gap-1 text-center text-xs font-semibold">
         <span class="line-clamp-1" data-cy="members-label">Members</span>
@@ -32,8 +27,7 @@
 
     <div
       class="border flex flex-col px-4 py-2 btn-outline cursor-pointer rounded-md text-muted justify-center items-center"
-      data-cy="team-date-info"
-    >
+      data-cy="team-date-info">
       <lucide-angular size="14" [img]="icons.Clock" data-cy="date-icon" />
       <div class="flex flex-col gap-1 text-center text-xs font-semibold">
         @if (isManager()) {
@@ -50,11 +44,8 @@
 
   <div class="flex gap-1 mt-auto" data-cy="team-actions">
     @if (isManager()) {
-    <button
-      (click)="onEdit($event)"
-      class="btn btn-outline flex justify-center items-center flex-1"
-      data-cy="edit-team-button"
-    >
+    <button (click)="onEdit($event)" class="btn btn-outline flex justify-center items-center flex-1"
+      data-cy="edit-team-button">
       <lucide-angular size="15" [img]="icons.Edit" data-cy="edit-icon" />
       <span>Edit</span>
     </button>
@@ -62,11 +53,8 @@
       <lucide-angular size="15" [img]="icons.Trash2" data-cy="delete-icon" />
     </button>
     } @if (isOrganizer()) { @if (isPendingCard()) {
-    <button
-      (click)="onApproveTeam($event)"
-      class="btn btn-primary flex justify-center items-center py-3 flex-1"
-      data-cy="approve-team-button"
-    >
+    <button (click)="onApproveTeam($event)" class="btn btn-primary flex justify-center items-center py-3 flex-1"
+      data-cy="approve-team-button">
       <lucide-angular size="15" [img]="icons.Check" data-cy="approve-icon" />
       <span>Approve</span>
     </button>
@@ -74,20 +62,14 @@
       <lucide-angular size="15" [img]="icons.X" data-cy="reject-icon" />
     </button>
     } @else if (isApprovedCard()) {
-    <button
-      (click)="onRemoveTeam($event)"
-      class="btn btn-destructive flex justify-center items-center flex-1"
-      data-cy="remove-team-button"
-    >
+    <button (click)="onRemoveTeam($event)" class="btn btn-destructive flex justify-center items-center flex-1"
+      data-cy="remove-team-button">
       <lucide-angular size="15" [img]="icons.Trash2" data-cy="remove-icon" />
       <span>Remove</span>
     </button>
     } @else {
-    <button
-      (click)="onApproveTeam($event)"
-      class="btn btn-primary flex justify-center items-center py-3 flex-1"
-      data-cy="approve-team-button-default"
-    >
+    <button (click)="onApproveTeam($event)" class="btn btn-primary flex justify-center items-center py-3 flex-1"
+      data-cy="approve-team-button-default">
       <lucide-angular size="15" [img]="icons.Check" data-cy="approve-icon-default" />
       <span>Approve</span>
     </button>
@@ -95,11 +77,8 @@
       <lucide-angular size="15" [img]="icons.X" data-cy="reject-icon-default" />
     </button>
     } } @if (isPublic()) {
-    <button
-      (click)="onView($event)"
-      class="btn btn-secondary flex justify-center items-center flex-1"
-      data-cy="view-team-button"
-    >
+    <button (click)="onView($event)" class="btn btn-secondary flex justify-center items-center flex-1"
+      data-cy="view-team-button">
       <span>View</span>
     </button>
     }

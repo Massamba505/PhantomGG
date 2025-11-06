@@ -55,12 +55,12 @@ export type MatchTab = 'all' | 'scheduled' | 'inprogress' | 'completed';
         </span>
       </button>
     </div>
-  `
+  `,
 })
 export class MatchTabsComponent {
   matches = input.required<Match[]>();
   activeTab = input.required<MatchTab>();
-  
+
   tabChange = output<MatchTab>();
 
   setActiveTab(tab: MatchTab) {
@@ -68,17 +68,18 @@ export class MatchTabsComponent {
   }
 
   getTabClass(tab: MatchTab): string {
-    const baseClass = 'px-2 py-1 font-semibold border-b-2 cursor-pointer sm:text-md text-xs ';
+    const baseClass =
+      'px-2 py-1 font-semibold border-b-2 cursor-pointer sm:text-md text-xs ';
     const activeClass = 'border-primary text-primary';
     const inactiveClass = 'border-transparent text-muted';
-    
+
     return baseClass + (this.activeTab() === tab ? activeClass : inactiveClass);
   }
 
   getTabCount(tab: MatchTab): number {
     if (tab === 'all') return this.matches().length;
-    
-    return this.matches().filter(match => {
+
+    return this.matches().filter((match) => {
       const status = match.status;
       switch (tab) {
         case 'scheduled':

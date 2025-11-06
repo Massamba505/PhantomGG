@@ -1,20 +1,30 @@
-import { Component, signal, computed, output, input, OnInit } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  output,
+  input,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TournamentSearch } from '@/app/api/models/tournament.models';
-import { TournamentStatus, TournamentFormats } from '@/app/api/models/common.models';
+import {
+  TournamentStatus,
+  TournamentFormats,
+} from '@/app/api/models/common.models';
 import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-tournament-search',
   imports: [CommonModule, FormsModule],
   templateUrl: './tournament-search.html',
-  styleUrl: './tournament-search.css'
+  styleUrl: './tournament-search.css',
 })
 export class TournamentSearchComponent implements OnInit {
   searchChange = output<Partial<TournamentSearch>>();
   clearFiltersSearch = output<void>();
-  withDraft = input.required<boolean>()
+  withDraft = input.required<boolean>();
   searchTerm = signal('');
   selectedStatus = signal<TournamentStatus | undefined>(undefined);
   location = signal('');
@@ -27,7 +37,7 @@ export class TournamentSearchComponent implements OnInit {
   formatOptions = getEnumOptions(TournamentFormats);
 
   ngOnInit(): void {
-    this.statusOptions = getEnumOptions(TournamentStatus).filter(status => {
+    this.statusOptions = getEnumOptions(TournamentStatus).filter((status) => {
       const isDraft = status.value === TournamentStatus.Draft;
       return this.withDraft() || !isDraft;
     });
@@ -90,7 +100,9 @@ export class TournamentSearchComponent implements OnInit {
 
   search() {
     const cleanedCriteria = Object.fromEntries(
-      Object.entries(this.searchCriteria()).filter(([_, value]) => value !== undefined)
+      Object.entries(this.searchCriteria()).filter(
+        ([_, value]) => value !== undefined
+      )
     ) as Partial<TournamentSearch>;
     this.searchChange.emit(cleanedCriteria);
   }
@@ -107,12 +119,14 @@ export class TournamentSearchComponent implements OnInit {
   }
 
   hasFilters(): boolean {
-    return this.searchTerm() !== '' || 
-           this.selectedStatus() !== undefined || 
-           this.location() !== '' ||
-           this.format() !== undefined ||
-           this.startDateFrom() !== undefined ||
-           this.startDateTo() !== undefined ||
-           this.isPublic() !== undefined;
+    return (
+      this.searchTerm() !== '' ||
+      this.selectedStatus() !== undefined ||
+      this.location() !== '' ||
+      this.format() !== undefined ||
+      this.startDateFrom() !== undefined ||
+      this.startDateTo() !== undefined ||
+      this.isPublic() !== undefined
+    );
   }
 }

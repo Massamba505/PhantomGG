@@ -28,16 +28,11 @@
 <div data-cy="tournament-details" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-2 space-y-6">
     <div class="card">
-      <div
-        class="tournament-banner h-48 rounded-md"
-        [style.background-image]="
+      <div class="tournament-banner h-48 rounded-md" [style.background-image]="
           tournament()!.bannerUrl
             ? 'url(' + tournament()!.bannerUrl + ')'
             : 'none'
-        "
-        [style.background-size]="'cover'"
-        [style.background-position]="'center'"
-      >
+        " [style.background-size]="'cover'" [style.background-position]="'center'">
         @if (!tournament()!.bannerUrl) {
         <div class="h-full flex items-center justify-center">
           <span class="opacity-50">No banner uploaded</span>
@@ -48,25 +43,15 @@
 
     <div class="card">
       <div class="flex items-center gap-3 mb-3">
-        <img
-          [src]="tournament()!.logoUrl"
-          alt="tournament logo"
-          class="h-16 w-16 object-contain rounded-lg"
-        />
+        <img [src]="tournament()!.logoUrl" alt="tournament logo" class="h-16 w-16 object-contain rounded-lg" />
         <p class="font-semibold text-3xl underline mb-3">
           {{ tournament()!.name }}
         </p>
       </div>
-      <p
-        class="leading-relaxed"
-        [innerHTML]="tournament()!.description | appLineBreaks"
-      ></p>
+      <p class="leading-relaxed" [innerHTML]="tournament()!.description | appLineBreaks"></p>
 
       @if (isLongDescription()) {
-      <a
-        class="text-primary font-semibold underline cursor-pointer mt-2 inline-block"
-        (click)="toggleDescription()"
-      >
+      <a class="text-primary font-semibold underline cursor-pointer mt-2 inline-block" (click)="toggleDescription()">
         {{ showFullDescription() ? "View Less" : "View More" }}
       </a>
       }
@@ -87,10 +72,7 @@
 
         <div class="flex justify-between">
           <span class="opacity-75 flex items-center gap-2">
-            <lucide-angular
-              [img]="icons.LayoutGrid"
-              [size]="16"
-            ></lucide-angular>
+            <lucide-angular [img]="icons.LayoutGrid" [size]="16"></lucide-angular>
             Format:
           </span>
           <span>Standard Tournament</span>
@@ -181,11 +163,8 @@
               {{ tournament()!.organizer?.firstName }}
               {{ tournament()!.organizer?.lastName }}
             </span>
-            <img
-              [src]="tournament()!.organizer?.profilePictureUrl"
-              alt="Organizer's Profile Picture"
-              class="w-8 h-8 rounded-full object-contain"
-            />
+            <img [src]="tournament()!.organizer?.profilePictureUrl" alt="Organizer's Profile Picture"
+              class="w-8 h-8 rounded-full object-contain" />
           </div>
         </div>
 
@@ -194,10 +173,7 @@
             <lucide-angular [img]="icons.Mail" [size]="16"></lucide-angular>
             Email:
           </span>
-          <a
-            href="mailto:{{ tournament()!.organizer?.email }}"
-            class="text-blue-500 hover:underline"
-          >
+          <a href="mailto:{{ tournament()!.organizer?.email }}" class="text-blue-500 hover:underline">
             {{ tournament()!.organizer?.email }}
           </a>
         </div>
@@ -219,11 +195,5 @@
 </div>
 }
 
-<app-confirm-delete-modal
-  [isOpen]="showDeleteModal()"
-  [title]="'Delete Tournament'"
-  [entityName]="'Tournament'"
-  [isLoading]="isDeleting()"
-  (close)="closeDeleteModal()"
-  (confirm)="confirmDelete()"
-></app-confirm-delete-modal>
+<app-confirm-delete-modal [isOpen]="showDeleteModal()" [title]="'Delete Tournament'" [entityName]="'Tournament'"
+  [isLoading]="isDeleting()" (close)="closeDeleteModal()" (confirm)="confirmDelete()"></app-confirm-delete-modal>

@@ -30,7 +30,7 @@ export class Sidebar implements OnInit, OnDestroy {
   userRole = input.required<UserRoles>();
   toggle = output<void>();
   stateChange = output<boolean>();
-  
+
   readonly icons = LucideIcons;
 
   isOpen = signal(window.innerWidth > 1400);
@@ -97,9 +97,9 @@ export class Sidebar implements OnInit, OnDestroy {
       url: '/user/teams/create',
       icon: this.icons.UserPlus,
       roles: [UserRoles.User],
-    }
+    },
   ];
-  
+
   ngOnInit() {
     window.addEventListener('resize', this.handleResize);
   }
@@ -113,7 +113,7 @@ export class Sidebar implements OnInit, OnDestroy {
   };
 
   onToggle() {
-    this.isOpen.update(prev => !prev);
+    this.isOpen.update((prev) => !prev);
     this.toggle.emit();
   }
 }

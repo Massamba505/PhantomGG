@@ -1,4 +1,4 @@
-import { Tournament } from "@/app/api/models";
+import { Tournament } from '@/app/api/models';
 
 export class TournamentUtils {
   static getDisplayName(tournament: Tournament | null | undefined): string {
@@ -7,10 +7,14 @@ export class TournamentUtils {
 
   static getStatusDisplay(status: string | undefined): string {
     switch (status?.toLowerCase()) {
-      case 'registrationopen': return 'Registration Open';
-      case 'registrationclosed': return 'Registration Closed';
-      case 'inprogress': return 'In Progress';
-      default: return status || 'Unknown';
+      case 'registrationopen':
+        return 'Registration Open';
+      case 'registrationclosed':
+        return 'Registration Closed';
+      case 'inprogress':
+        return 'In Progress';
+      default:
+        return status || 'Unknown';
     }
   }
 

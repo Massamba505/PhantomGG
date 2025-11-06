@@ -10,7 +10,10 @@ export class ValidationUtils {
     return input.trim().replace(/[<>]/g, '');
   }
 
-  static truncateString(input: string | null | undefined, maxLength: number): string {
+  static truncateString(
+    input: string | null | undefined,
+    maxLength: number
+  ): string {
     if (!input) return '';
     if (input.length <= maxLength) return input;
     return `${input.substring(0, maxLength - 3)}...`;
@@ -25,26 +28,29 @@ export class ValidationUtils {
     return file.size <= maxSizeInBytes;
   }
 
-  static isValidImageFile(file: File, maxSizeInMB: number = 5): {
+  static isValidImageFile(
+    file: File,
+    maxSizeInMB: number = 5
+  ): {
     isValid: boolean;
     error?: string;
   } {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    
+
     if (!this.isValidFileType(file, allowedTypes)) {
       return {
         isValid: false,
-        error: 'Please select a valid image file (JPEG, PNG, or GIF)'
+        error: 'Please select a valid image file (JPEG, PNG, or GIF)',
       };
     }
-    
+
     if (!this.isValidFileSize(file, maxSizeInMB)) {
       return {
         isValid: false,
-        error: `Image size must be less than ${maxSizeInMB}MB`
+        error: `Image size must be less than ${maxSizeInMB}MB`,
       };
     }
-    
+
     return { isValid: true };
   }
 }

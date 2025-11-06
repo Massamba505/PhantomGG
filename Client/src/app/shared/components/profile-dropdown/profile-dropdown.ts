@@ -8,9 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
-import {
-  LucideAngularModule,
-} from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
 
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { LucideIcons } from '../ui/icons/lucide-icons';
@@ -45,7 +43,7 @@ export class ProfileDropdown {
       },
       error: (error) => {
         this.router.navigate(['/']);
-      }
+      },
     });
   }
 

@@ -1,26 +1,14 @@
-<app-modal
-  [isOpen]="isOpen()"
-  [title]="team()?.name || 'Team Details'"
-  (close)="onClose()"
->
+<app-modal [isOpen]="isOpen()" [title]="team()?.name || 'Team Details'" (close)="onClose()">
   @if (loading()) {
   <div class="flex justify-center items-center py-8">
-    <lucide-angular
-      [img]="icons.Loader2"
-      size="24"
-      class="animate-spin text-primary"
-    ></lucide-angular>
+    <lucide-angular [img]="icons.Loader2" size="24" class="animate-spin text-primary"></lucide-angular>
     <span class="ml-2">Loading team details...</span>
   </div>
   } @else if (team()) {
   <div class="space-y-6">
     <div class="card text-center">
       <div class="flex flex-col items-center space-y-4">
-        <img
-          [src]="team()!.logoUrl"
-          [alt]="team()!.name"
-          class="w-20 h-20 rounded-full object-cover border-4"
-        />
+        <img [src]="team()!.logoUrl" [alt]="team()!.name" class="w-20 h-20 rounded-full object-cover border-4" />
 
         <div>
           <h2 class="text-2xl font-bold">{{ team()!.name }}</h2>
@@ -49,14 +37,8 @@
       @if (team()!.players && team()!.players.length > 0) {
       <div class="grid gap-3">
         @for (player of team()!.players; track player.id) {
-        <div
-          class="flex items-center space-x-3 p-3 btn-outline cursor-pointer rounded border"
-        >
-          <img
-            [src]="player.photoUrl"
-            [alt]="formatPlayerName(player)"
-            class="w-12 h-12 rounded-full object-cover"
-          />
+        <div class="flex items-center space-x-3 p-3 btn-outline cursor-pointer rounded border">
+          <img [src]="player.photoUrl" [alt]="formatPlayerName(player)" class="w-12 h-12 rounded-full object-cover" />
 
           <div class="flex-1 min-w-0">
             <div class="flex items-center space-x-2">
@@ -87,11 +69,7 @@
       </div>
       } @else {
       <div class="text-center text-muted py-8">
-        <lucide-angular
-          [img]="icons.Users"
-          size="32"
-          class="mx-auto mb-3 opacity-50"
-        ></lucide-angular>
+        <lucide-angular [img]="icons.Users" size="32" class="mx-auto mb-3 opacity-50"></lucide-angular>
         <p class="text-lg font-medium mb-2">No Players</p>
         <p class="text-sm">This team hasn't added any players yet.</p>
       </div>

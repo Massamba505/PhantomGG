@@ -2,11 +2,14 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { Tournament, TournamentSearch } from '@/app/api/models/tournament.models';
+import {
+  Tournament,
+  TournamentSearch,
+} from '@/app/api/models/tournament.models';
 import { PagedResult } from '@/app/api/models/api.models';
 import { TournamentCard } from '@/app/shared/components/cards';
 import { TournamentSearchComponent } from '@/app/shared/components/search';
-import { ConfirmDeleteModal } from "@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal";
+import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { TournamentService, UserRoles } from '@/app/api/services';
 import { AuthStateService } from '@/app/store/AuthStateService';
@@ -19,10 +22,10 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
     LucideAngularModule,
     TournamentCard,
     TournamentSearchComponent,
-    ConfirmDeleteModal
-],
+    ConfirmDeleteModal,
+  ],
   templateUrl: './tournament-list.html',
-  styleUrl: './tournament-list.css'
+  styleUrl: './tournament-list.css',
 })
 export class TournamentListComponent implements OnInit {
   private tournamentService = inject(TournamentService);
@@ -38,13 +41,13 @@ export class TournamentListComponent implements OnInit {
   tournamentToDelete = signal<Tournament | null>(null);
   isDeleting = signal(false);
 
-  isOrganizer = computed(()=>{
-    if(!this.authStateStore.isAuthenticated()){
+  isOrganizer = computed(() => {
+    if (!this.authStateStore.isAuthenticated()) {
       return false;
     }
     return this.authStateStore.user()!.role == UserRoles.Organizer;
-  })
-  
+  });
+
   searchCriteria = signal<TournamentSearch>({
     searchTerm: undefined,
     status: undefined,
@@ -53,16 +56,20 @@ export class TournamentListComponent implements OnInit {
     startTo: undefined,
     isPublic: undefined,
     page: 1,
-    pageSize: 6
+    pageSize: 6,
   });
 
   paginationData = signal<PagedResult<Tournament> | null>(null);
-  
+
   totalRecords = computed(() => this.paginationData()?.meta.totalRecords ?? 0);
   totalPages = computed(() => this.paginationData()?.meta.totalPages ?? 0);
   currentPage = computed(() => this.paginationData()?.meta.page ?? 1);
-  hasNextPage = computed(() => this.paginationData()?.meta.hasNextPage ?? false);
-  hasPreviousPage = computed(() => this.paginationData()?.meta.hasPreviousPage ?? false);
+  hasNextPage = computed(
+    () => this.paginationData()?.meta.hasNextPage ?? false
+  );
+  hasPreviousPage = computed(
+    () => this.paginationData()?.meta.hasPreviousPage ?? false
+  );
 
   ngOnInit() {
     this.loadTournaments();
@@ -76,22 +83,22 @@ export class TournamentListComponent implements OnInit {
         this.tournaments.set(response.data);
         this.paginationData.set(response);
       },
-      complete:()=>{
+      complete: () => {
         this.isLoading.set(false);
       },
     });
   }
 
   onSearchChange(searchCriteria: Partial<TournamentSearch>) {
-    this.searchCriteria.update(current => ({
+    this.searchCriteria.update((current) => ({
       ...current,
-      ...searchCriteria
+      ...searchCriteria,
     }));
 
     this.loadTournaments();
   }
 
-  onClearSearh(){
+  onClearSearh() {
     this.searchCriteria.set({
       searchTerm: undefined,
       status: undefined,
@@ -100,24 +107,24 @@ export class TournamentListComponent implements OnInit {
       startTo: undefined,
       isPublic: undefined,
       page: 1,
-      pageSize: 6
+      pageSize: 6,
     });
     this.loadTournaments();
   }
 
   onPageChange(pageNumber: number) {
-    this.searchCriteria.update(current => ({
+    this.searchCriteria.update((current) => ({
       ...current,
-      page: pageNumber
+      page: pageNumber,
     }));
 
     this.loadTournaments();
   }
 
   onPageSizeChange(pageSize: number) {
-    this.searchCriteria.update(current => ({
+    this.searchCriteria.update((current) => ({
       ...current,
-      pageSize
+      pageSize,
     }));
 
     this.loadTournaments();
@@ -130,10 +137,13 @@ export class TournamentListComponent implements OnInit {
     this.loadTournaments();
   }
 
-  onTournamentAction(action: { type: string, tournament: Tournament }) {
+  onTournamentAction(action: { type: string; tournament: Tournament }) {
     switch (action.type) {
       case 'edit':
-        this.router.navigate(['/organizer/tournaments/edit', action.tournament.id]);
+        this.router.navigate([
+          '/organizer/tournaments/edit',
+          action.tournament.id,
+        ]);
         break;
       case 'view':
         this.router.navigate(['/organizer/tournaments', action.tournament.id]);
@@ -145,9 +155,9 @@ export class TournamentListComponent implements OnInit {
   }
 
   deleteTournament(tournamentId: string) {
-    const tournament = this.tournaments().find(t => t.id === tournamentId);
+    const tournament = this.tournaments().find((t) => t.id === tournamentId);
     if (!tournament) return;
-    
+
     this.tournamentToDelete.set(tournament);
     this.isDeleteModalOpen.set(true);
   }
@@ -164,10 +174,9 @@ export class TournamentListComponent implements OnInit {
         this.closeDeleteModal();
       },
       error: (error) => {
-        
-        this.closeDeleteModal()
+        this.closeDeleteModal();
         this.isDeleting.set(false);
-      }
+      },
     });
   }
 
@@ -181,15 +190,15 @@ export class TournamentListComponent implements OnInit {
     const current = this.currentPage();
     const total = this.totalPages();
     const delta = 2;
-    
+
     const range: number[] = [];
     const start = Math.max(1, current - delta);
     const end = Math.min(total, current + delta);
-    
+
     for (let i = start; i <= end; i++) {
       range.push(i);
     }
-    
+
     return range;
   }
 

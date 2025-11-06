@@ -20,9 +20,9 @@ export interface RoleOption {
 export class RoleSelection {
   selectedRole = input<UserRoles | null>(UserRoles.User);
   roleChange = output<UserRoles>();
-  
+
   readonly icons = LucideIcons;
-  
+
   roleOptions: RoleOption[] = [
     {
       value: UserRoles.User,
@@ -31,10 +31,10 @@ export class RoleSelection {
       icon: this.icons.Users,
       features: [
         'Create and manage teams',
-        'Register for tournaments', 
+        'Register for tournaments',
         'Add players to your team',
-        'Track team performance'
-      ]
+        'Track team performance',
+      ],
     },
     {
       value: UserRoles.Organizer,
@@ -44,9 +44,9 @@ export class RoleSelection {
       features: [
         'Create tournaments',
         'Manage registrations',
-        'Track match results'
-      ]
-    }
+        'Track match results',
+      ],
+    },
   ];
 
   onRoleSelect(role: UserRoles) {

@@ -5,20 +5,20 @@ export function playerCountValidator(min: number, max: number): ValidatorFn {
     if (!control.value && control.value !== 0) {
       return null;
     }
-    
+
     const count = Number(control.value);
     if (isNaN(count)) {
       return { notANumber: true };
     }
-    
+
     if (count < min) {
       return { minPlayers: { min, actual: count } };
     }
-    
+
     if (count > max) {
       return { maxPlayers: { max, actual: count } };
     }
-    
+
     return null;
   };
 }

@@ -5,7 +5,6 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   name: 'appLineBreaks',
 })
 export class LineBreaksPipe implements PipeTransform {
-
   constructor(private sanitizer: DomSanitizer) {}
 
   transform(value: string): SafeHtml {
@@ -13,5 +12,4 @@ export class LineBreaksPipe implements PipeTransform {
     const formatted = value.replace(/\n/g, '<br>');
     return this.sanitizer.bypassSecurityTrustHtml(formatted);
   }
-
 }

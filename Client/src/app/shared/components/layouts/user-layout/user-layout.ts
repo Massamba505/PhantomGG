@@ -1,10 +1,4 @@
-import {
-  Component,
-  signal,
-  computed,
-  OnInit,
-  inject,
-} from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 

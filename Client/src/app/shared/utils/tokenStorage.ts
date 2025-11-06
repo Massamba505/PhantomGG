@@ -13,7 +13,7 @@ export class TokenStorage {
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
   }
 
-  private static decodePayload(token: string){
+  private static decodePayload(token: string) {
     try {
       const payload = token.split('.')[1];
       return JSON.parse(atob(payload));
@@ -21,14 +21,14 @@ export class TokenStorage {
       return null;
     }
   }
-  
+
   static getTokenExpiry(): Date | null {
     const token = this.getAccessToken();
     if (!token) return null;
 
     const payload = this.decodePayload(token);
     if (!payload?.exp) return null;
-    
+
     return new Date(payload.exp * 1000);
   }
 
