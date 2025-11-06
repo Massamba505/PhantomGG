@@ -13,7 +13,7 @@
   <div data-cy="tournament-description-field">
     <label class="input-label" data-cy="tournament-description-label">Description <span
         class="required">*</span></label>
-    <textarea formControlName="description" placeholder="Describe your tournament..." rows="4" class="textarea w-full"
+    <textarea formControlName="description" placeholder="Describe your tournament..." rows="8" class="textarea w-full"
       [class.error]="
         submitted() && tournamentForm.controls['description'].invalid
       " data-cy="tournament-description-input"></textarea>
