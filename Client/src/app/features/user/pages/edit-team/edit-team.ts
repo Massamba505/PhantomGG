@@ -67,6 +67,6 @@ export class EditTeamComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/user/teams']);
+    this.router.navigate(['..'], { relativeTo: this.route });
   }
 }
