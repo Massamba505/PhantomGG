@@ -16,15 +16,15 @@ import { TournamentStatus } from '@/app/api/models';
 })
 export class TournamentFilter {
   filtersChanged = output<TournamentSearch>();
-  
+
   searchTerm = signal('');
   status = signal(null);
   location = signal('');
   startDateFrom = signal('');
   startDateTo = signal('');
-  
+
   readonly icons = LucideIcons;
-  
+
   readonly statusOptions = getEnumOptions(TournamentStatus);
 
   onSearch() {
@@ -36,9 +36,9 @@ export class TournamentFilter {
       startTo: this.startDateTo() || undefined,
       isPublic: true,
       page: 1,
-      pageSize: 12
+      pageSize: 12,
     };
-    
+
     this.filtersChanged.emit(filters);
   }
 
