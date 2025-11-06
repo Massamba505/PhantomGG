@@ -162,7 +162,7 @@ export class TournamentStatsComponent implements OnInit {
       case 3:
         return 'text-orange-600 font-bold';
       default:
-        return 'text-gray-700';
+        return 'text-muted';
     }
   }
 
