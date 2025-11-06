@@ -95,7 +95,7 @@ public class TournamentService(
         {
             var uploadImage = new UploadImageRequest
             {
-                OldFileUrl = tournament.BannerUrl,
+                OldFileUrl = null,
                 File = createDto.BannerUrl,
                 ImageType = ImageType.TournamentBanner,
                 Id = tournament.Id
@@ -108,7 +108,7 @@ public class TournamentService(
         {
             var uploadImage = new UploadImageRequest
             {
-                OldFileUrl = tournament.BannerUrl,
+                OldFileUrl = null,
                 File = createDto.LogoUrl,
                 ImageType = ImageType.TournamentBanner,
                 Id = tournament.Id

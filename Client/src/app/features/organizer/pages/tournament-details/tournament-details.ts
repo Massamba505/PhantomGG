@@ -46,29 +46,29 @@ export class TournamentDetailsComponent implements OnInit {
     });
   }
 
-  readonly DESCRIPTION_LIMIT = 300;
+  readonly DESCRIPTION_LIMIT_LINES = 7;
+  readonly DESCRIPTION_LIMIT_CHAR = 300;
+  displayedDescription = signal<string>('');
 
   showFullDescription = signal(false);
   isLongDescription = signal(false);
-  displayedDescription = signal<string>('');
 
   toggleDescription() {
     this.showFullDescription.update((prev) => !prev);
-    this.updateDisplayedDescription();
   }
 
   private updateDisplayedDescription() {
-    const fullDesc = this.tournament()?.description || '';
-    const plainText = fullDesc.replace(/<[^>]*>/g, '');
+    const desc = this.tournament()?.description || '';
+    const plainText = desc
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<[^>]*>/g, '');
 
-    this.isLongDescription.set(plainText.length > this.DESCRIPTION_LIMIT);
+    const lines = plainText.split(/\r?\n/).filter((line) => line.trim() !== '');
+    const isLong =
+      lines.length > this.DESCRIPTION_LIMIT_LINES ||
+      plainText.length > this.DESCRIPTION_LIMIT_CHAR;
 
-    if (this.showFullDescription()) {
-      this.displayedDescription.set(fullDesc);
-    } else {
-      const shortText = plainText.slice(0, this.DESCRIPTION_LIMIT) + '...';
-      this.displayedDescription.set(shortText);
-    }
+    this.isLongDescription.set(isLong);
   }
 
   loadTournament() {
@@ -79,8 +79,8 @@ export class TournamentDetailsComponent implements OnInit {
     this.tournamentService.getTournament(this.tournamentId()).subscribe({
       next: (tournament: any) => {
         this.tournament.set(tournament);
-        const banner = this.tournament()!.bannerUrl?.split(' ').join('+');
-        const logo = this.tournament()!.logoUrl?.split(' ').join('+');
+        const banner = this.tournament()!.bannerUrl;
+        const logo = this.tournament()!.logoUrl;
         this.tournament.update((current) => ({
           ...current!,
           bannerUrl: banner,
@@ -92,6 +92,11 @@ export class TournamentDetailsComponent implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  onImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
   }
 
   editTournament() {
