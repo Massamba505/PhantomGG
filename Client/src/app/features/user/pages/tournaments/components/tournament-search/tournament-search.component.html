@@ -3,22 +3,13 @@
     <div class="flex flex-col md:flex-row flex-wrap gap-4">
       <div class="flex-1 min-w-[12em]">
         <label class="input-label">Search Tournaments</label>
-        <input
-          type="text"
-          class="input-field"
-          placeholder="Search by name or description..."
-          [value]="searchTerm()"
-          (input)="onSearchInput($event)"
-        />
+        <input type="text" class="input-field" placeholder="Search by name or description..." [value]="searchTerm()"
+          (input)="onSearchInput($event)" />
       </div>
 
       <div class="flex-1 min-w-[12em]">
         <label class="input-label">Status</label>
-        <select
-          class="input-select"
-          [value]="selectedStatus() || ''"
-          (change)="onStatusChange($event)"
-        >
+        <select class="input-select" [value]="selectedStatus() || ''" (change)="onStatusChange($event)">
           <option value="">All Status</option>
           @for (option of statusOptions; track option.value) {
           <option [value]="option.value">{{ option.label }}</option>
@@ -27,19 +18,11 @@
       </div>
 
       <div class="flex items-end gap-2">
-        <button
-          class="btn btn-outline"
-          (click)="clearFilters()"
-          [disabled]="!hasFilters()"
-        >
+        <button class="btn btn-outline" (click)="clearFilters()" [disabled]="!hasFilters()">
           Clear
         </button>
         <div class="flex items-end">
-          <button
-            class="btn btn-primary"
-            (click)="search()"
-            [disabled]="!hasFilters()"
-          >
+          <button class="btn btn-primary" (click)="search()" [disabled]="!hasFilters()">
             Search
           </button>
         </div>
@@ -48,31 +31,20 @@
 
     <details class="group">
       <summary class="cursor-pointer text-sm font-medium">
-        <span class="group-close:hidden group-open:hidden position"
-          >Show Advanced Filters</span
-        >
+        <span class="group-close:hidden group-open:hidden position">Show Advanced Filters</span>
         <span class="hidden group-open:inline">Hide Advanced Filters</span>
       </summary>
 
       <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <label class="input-label">Location</label>
-          <input
-            type="text"
-            class="input-field"
-            placeholder="location..."
-            [value]="location()"
-            (input)="onLocationInput($event)"
-          />
+          <input type="text" class="input-field" placeholder="location..." [value]="location()"
+            (input)="onLocationInput($event)" />
         </div>
 
         <div>
           <label class="input-label">Tournament Format</label>
-          <select
-            class="input-select"
-            [value]="format() || ''"
-            (change)="onFormatChange($event)"
-          >
+          <select class="input-select" [value]="format() || ''" (change)="onFormatChange($event)">
             <option value="">All Formats</option>
             @for (option of formatOptions; track option.value) {
             <option [value]="option.value">{{ option.label }}</option>
@@ -82,13 +54,9 @@
 
         <div>
           <label class="input-label">Visibility</label>
-          <select
-            class="input-select"
-            [value]="
+          <select class="input-select" [value]="
               isPublic() === undefined ? 'All' : isPublic() ? 'true' : 'false'
-            "
-            (change)="onIsPublicChange($event)"
-          >
+            " (change)="onIsPublicChange($event)">
             <option value="All">All Tournaments</option>
             <option value="true">Public Only</option>
             <option value="false">Private Only</option>
@@ -96,28 +64,19 @@
         </div>
         <div>
           <label class="input-label">Start Date From</label>
-          <input
-            type="date"
-            class="input-field"
-            [value]="startDateFrom() || ''"
-            (change)="onStartDateFromChange($event)"
-          />
+          <input type="date" class="input-field" [value]="startDateFrom() || ''"
+            (change)="onStartDateFromChange($event)" />
         </div>
 
         <div>
           <label class="input-label">Start Date To</label>
-          <input
-            type="date"
-            class="input-field"
-            [value]="startDateTo() || ''"
-            (change)="onStartDateToChange($event)"
-          />
+          <input type="date" class="input-field" [value]="startDateTo() || ''" (change)="onStartDateToChange($event)" />
         </div>
       </div>
     </details>
 
     @if (hasFilters()) {
-    <div class="text-sm text-gray-600 rounded-lg p-3">
+    <div class="text-sm text-muted rounded-lg p-3">
       <span class="font-medium">Active filters:</span>
       @if (searchTerm()) {
       <span class="ml-2 inline-block btn btn-outline text-xs">

@@ -168,7 +168,7 @@ export class MatchDetailsModalComponent implements OnInit {
       case MatchEventType.Foul:
         return 'text-red-600';
       case MatchEventType.Substitution:
-        return 'text-gray-600';
+        return 'text-muted';
       default:
         return 'text-primary';
     }
@@ -193,7 +193,7 @@ export class MatchDetailsModalComponent implements OnInit {
       case 'foul':
         return 'text-orange-600';
       default:
-        return 'text-gray-600';
+        return 'text-muted';
     }
   }
 

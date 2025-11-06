@@ -19,12 +19,9 @@
 </div>
 
 @if (loading()) {
-<div class="flex items-center justify-center gap-2" data-cy="resending-state">
+<div class="flex items-center flex-col justify-center gap-2">
   <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" data-cy="loading-spinner"></div>
-  <span data-cy="sending-text">Sending...</span>
-</div>
-<div class="text-center py-12">
-  <p>Loading team details...</p>
+  <span data-cy="loading-text">Loading team details...</span>
 </div>
 } @else if (error()) {
 <div class="text-center py-12">
@@ -81,8 +78,8 @@
       } @else {
       <div class="text-center py-12 rounded-lg">
         <lucide-angular [img]="icons.Users" [size]="48" class="mx-auto mb-4 text-gray-400"></lucide-angular>
-        <h3 class="text-lg font-semibold text-gray-600 mb-2">No Players Yet</h3>
-        <p class="text-gray-500 mb-4">
+        <h3 class="text-lg font-semibold text-muted mb-2">No Players Yet</h3>
+        <p class="text-muted mb-4">
           @if (isManager()) { Start building your team by adding your first
           player } @else { No players have been added to this team yet }
         </p>
@@ -116,27 +113,6 @@
         </div>
       </div>
     </div>
-
-    @if (isManager()) {
-    <div class="card">
-      <h3 class="font-semibold text-lg mb-4">Quick Actions</h3>
-      <div class="space-y-3">
-        <button class="btn btn-outline w-full justify-start" (click)="onEditTeam()">
-          <lucide-angular [img]="icons.Edit" [size]="16"></lucide-angular>
-          Edit Team Details
-        </button>
-        <button class="btn btn-outline w-full justify-start" (click)="onShowAddPlayer()">
-          <lucide-angular [img]="icons.UserPlus" [size]="16"></lucide-angular>
-          Add New Player
-        </button>
-        <button class="btn btn-destructive w-full justify-start" data-cy="delete-team-button-quick-action"
-          (click)="onDeleteTeam()">
-          <lucide-angular [img]="icons.Trash2" [size]="16"></lucide-angular>
-          Delete Team
-        </button>
-      </div>
-    </div>
-    }
   </div>
 </div>
 }

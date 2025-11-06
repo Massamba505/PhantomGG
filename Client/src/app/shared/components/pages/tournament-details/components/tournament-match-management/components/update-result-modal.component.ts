@@ -183,7 +183,7 @@ export class UpdateResultModalComponent implements OnInit {
       case MatchEventType.Foul:
         return 'text-red-600';
       case MatchEventType.Substitution:
-        return 'text-gray-600';
+        return 'text-muted';
       default:
         return 'text-primary';
     }
