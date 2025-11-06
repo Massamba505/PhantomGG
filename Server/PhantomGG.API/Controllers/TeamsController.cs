@@ -11,6 +11,7 @@ namespace PhantomGG.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "User")]
 public class TeamsController(
     ITeamService teamService,
     ICurrentUserService currentUserService) : ControllerBase
@@ -35,6 +36,7 @@ public class TeamsController(
     /// Get team details by ID
     /// </summary>
     [HttpGet("{id:guid}")]
+    [AllowAnonymous]
     public async Task<ActionResult<TeamDto>> GetTeam(Guid id)
     {
         var team = await _teamService.GetByIdAsync(id);
@@ -45,7 +47,6 @@ public class TeamsController(
     /// Create new team
     /// </summary>
     [HttpPost]
-    [Authorize]
     public async Task<ActionResult<TeamDto>> CreateTeam([FromForm] CreateTeamDto createDto)
     {
         var currentUser = _currentUserService.GetCurrentUser()!;
@@ -58,7 +59,6 @@ public class TeamsController(
     /// Update team details
     /// </summary>
     [HttpPatch("{id:guid}")]
-    [Authorize]
     public async Task<ActionResult<TeamDto>> UpdateTeam(Guid id, [FromForm] UpdateTeamDto updateDto)
     {
         var currentUser = _currentUserService.GetCurrentUser()!;
@@ -70,7 +70,6 @@ public class TeamsController(
     /// Delete team
     /// </summary>
     [HttpDelete("{id:guid}")]
-    [Authorize]
     public async Task<ActionResult> DeleteTeam(Guid id)
     {
         var currentUser = _currentUserService.GetCurrentUser()!;
@@ -82,6 +81,7 @@ public class TeamsController(
     /// Get team players
     /// </summary>
     [HttpGet("{id:guid}/players")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<PlayerDto>>> GetTeamPlayers(Guid id)
     {
         var players = await _teamService.GetTeamPlayersAsync(id);
@@ -92,7 +92,6 @@ public class TeamsController(
     /// Add player to team
     /// </summary>
     [HttpPost("{id:guid}/players")]
-    [Authorize]
     public async Task<ActionResult<PlayerDto>> AddPlayerToTeam(Guid id, [FromForm] CreatePlayerDto playerDto)
     {
         var currentUser = _currentUserService.GetCurrentUser()!;
@@ -105,7 +104,6 @@ public class TeamsController(
     /// Update player in team
     /// </summary>
     [HttpPatch("{teamId:guid}/players/{playerId:guid}")]
-    [Authorize]
     public async Task<ActionResult<PlayerDto>> UpdateTeamPlayer(
         Guid teamId,
         Guid playerId,
@@ -120,7 +118,6 @@ public class TeamsController(
     /// Remove player from team
     /// </summary>
     [HttpDelete("{teamId:guid}/players/{playerId:guid}")]
-    [Authorize]
     public async Task<ActionResult> RemovePlayerFromTeam(Guid teamId, Guid playerId)
     {
         var currentUser = _currentUserService.GetCurrentUser()!;

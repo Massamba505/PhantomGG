@@ -24,11 +24,7 @@
 </div>
 } @else if (error()) {
 <div class="text-center py-12">
-  <lucide-angular
-    [img]="icons.AlertCircle"
-    [size]="48"
-    class="mx-auto mb-4 text-red-500"
-  ></lucide-angular>
+  <lucide-angular [img]="icons.AlertCircle" [size]="48" class="mx-auto mb-4 text-red-500"></lucide-angular>
   <p class="text-destructive mb-4">{{ error() }}</p>
   <button class="btn btn-primary" (click)="retryLoad()">
     <lucide-angular [img]="icons.RefreshCw" [size]="16"></lucide-angular>
@@ -41,15 +37,9 @@
     <div data-cy="team-details-section" class="card">
       <div class="flex items-center gap-4 mb-4">
         @if (team()!.logoUrl) {
-        <img
-          [src]="team()!.logoUrl"
-          [alt]="team()!.name + ' logo'"
-          class="w-32 h-32 rounded-lg object-cover"
-        />
+        <img [src]="team()!.logoUrl" [alt]="team()!.name + ' logo'" class="w-32 h-32 rounded-lg object-cover" />
         } @else {
-        <div
-          class="w-20 h-20 rounded-lg flex items-center justify-center text-xl font-semibold"
-        >
+        <div class="w-20 h-20 rounded-lg flex items-center justify-center text-xl font-semibold">
           {{ team()!.name.charAt(0).toUpperCase() }}
         </div>
         }
@@ -77,25 +67,16 @@
       </div>
 
       @if (players().length > 0) {
-      <div
-        class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
+      <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-center gap-6"
         data-cy="players-list">
         @for (player of players(); track player.id) {
-        <app-player-card
-          [player]="player"
-          [role]="getPlayerRole()"
-          (edit)="onEditPlayer($event)"
-          (delete)="onRemovePlayer($event)"
-        ></app-player-card>
+        <app-player-card [player]="player" [role]="getPlayerRole()" (edit)="onEditPlayer($event)"
+          (delete)="onRemovePlayer($event)"></app-player-card>
         }
       </div>
       } @else {
       <div class="text-center py-12 rounded-lg">
-        <lucide-angular
-          [img]="icons.Users"
-          [size]="48"
-          class="mx-auto mb-4 text-gray-400"
-        ></lucide-angular>
+        <lucide-angular [img]="icons.Users" [size]="48" class="mx-auto mb-4 text-gray-400"></lucide-angular>
         <h3 class="text-lg font-semibold text-gray-600 mb-2">No Players Yet</h3>
         <p class="text-gray-500 mb-4">
           @if (isManager()) { Start building your team by adding your first
@@ -136,25 +117,16 @@
     <div class="card">
       <h3 class="font-semibold text-lg mb-4">Quick Actions</h3>
       <div class="space-y-3">
-        <button
-          class="btn btn-outline w-full justify-start"
-          (click)="onEditTeam()"
-        >
+        <button class="btn btn-outline w-full justify-start" (click)="onEditTeam()">
           <lucide-angular [img]="icons.Edit" [size]="16"></lucide-angular>
           Edit Team Details
         </button>
-        <button
-          class="btn btn-outline w-full justify-start"
-          (click)="onShowAddPlayer()"
-        >
+        <button class="btn btn-outline w-full justify-start" (click)="onShowAddPlayer()">
           <lucide-angular [img]="icons.UserPlus" [size]="16"></lucide-angular>
           Add New Player
         </button>
-        <button
-          class="btn btn-destructive w-full justify-start"
-          data-cy="delete-team-button-quick-action"
-          (click)="onDeleteTeam()"
-        >
+        <button class="btn btn-destructive w-full justify-start" data-cy="delete-team-button-quick-action"
+          (click)="onDeleteTeam()">
           <lucide-angular [img]="icons.Trash2" [size]="16"></lucide-angular>
           Delete Team
         </button>
@@ -165,24 +137,11 @@
 </div>
 }
 
-<app-modal
-  [isOpen]="showPlayerModal()"
-  [title]="editingPlayer() ? 'Edit Player' : 'Add New Player'"
-  (close)="onClosePlayerModal()"
->
-  <app-player-form
-    [player]="editingPlayer()"
-    [teamId]="team()?.id || ''"
-    (save)="onPlayerSave($event)"
-    (cancel)="onClosePlayerModal()"
-  ></app-player-form>
+<app-modal [isOpen]="showPlayerModal()" [title]="editingPlayer() ? 'Edit Player' : 'Add New Player'"
+  (close)="onClosePlayerModal()">
+  <app-player-form [player]="editingPlayer()" [teamId]="team()?.id || ''" (save)="onPlayerSave($event)"
+    (cancel)="onClosePlayerModal()"></app-player-form>
 </app-modal>
 
-<app-confirm-delete-modal
-  [isOpen]="showDeleteModal()"
-  [title]="'Delete Team'"
-  [entityName]="team()?.name || 'Team'"
-  [isLoading]="isDeleting()"
-  (close)="closeDeleteModal()"
-  (confirm)="confirmDelete()"
-></app-confirm-delete-modal>
+<app-confirm-delete-modal [isOpen]="showDeleteModal()" [title]="'Delete Team'" [entityName]="team()?.name || 'Team'"
+  [isLoading]="isDeleting()" (close)="closeDeleteModal()" (confirm)="confirmDelete()"></app-confirm-delete-modal>

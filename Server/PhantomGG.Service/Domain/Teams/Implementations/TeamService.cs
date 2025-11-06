@@ -91,7 +91,7 @@ public class TeamService(
         {
             var uploadImage = new UploadImageRequest
             {
-                OldFileUrl = team.LogoUrl,
+                OldFileUrl = null,
                 File = createDto.LogoUrl,
                 ImageType = ImageType.TournamentBanner,
                 Id = team.Id

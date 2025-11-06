@@ -41,9 +41,6 @@ export class VerifyEmailSent {
       },
       error: (err) => {
         this.resending.set(false);
-        this.toastService.error(
-          err.error?.message || 'Failed to resend verification email'
-        );
       },
     });
   }

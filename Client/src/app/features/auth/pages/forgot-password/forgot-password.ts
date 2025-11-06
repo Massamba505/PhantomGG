@@ -56,9 +56,6 @@ export class ForgotPassword {
       },
       error: (err) => {
         this.loading.set(false);
-        this.toastService.error(
-          err.error?.message || 'Failed to send reset email'
-        );
       },
     });
   }

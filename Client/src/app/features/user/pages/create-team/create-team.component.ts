@@ -10,13 +10,9 @@ import { TeamFormComponent } from '../../../../shared/components/forms/team-form
 
 @Component({
   selector: 'app-create-team',
-  imports: [
-    CommonModule,
-    TeamFormComponent,
-    LucideAngularModule
-  ],
+  imports: [CommonModule, TeamFormComponent, LucideAngularModule],
   templateUrl: './create-team.component.html',
-  styleUrl: './create-team.component.css'
+  styleUrl: './create-team.component.css',
 })
 export class CreateTeamComponent {
   private teamService = inject(TeamService);
@@ -28,19 +24,18 @@ export class CreateTeamComponent {
 
   onSubmit(teamData: CreateTeam | UpdateTeam) {
     this.saving.set(true);
-    
+
     const createTeamData = teamData as CreateTeam;
-    
+
     this.teamService.createTeam(createTeamData).subscribe({
       next: (team) => {
         this.toastService.success('Team created successfully!');
-        this.router.navigate(['/user/teams',team.id]);
+        this.router.navigate(['/user/teams', team.id]);
         this.saving.set(false);
       },
       error: (error) => {
-        this.toastService.error('Failed to create team. Please try again.');
         this.saving.set(false);
-      }
+      },
     });
   }
 

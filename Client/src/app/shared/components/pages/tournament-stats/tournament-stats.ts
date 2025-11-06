@@ -1,15 +1,22 @@
-import { Component, input, signal, OnInit, inject, computed } from '@angular/core';
+import {
+  Component,
+  input,
+  signal,
+  OnInit,
+  inject,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { ToastService } from '@/app/shared/services/toast.service';
-import { 
-  Tournament, 
-  TournamentStandingDto, 
-  PlayerGoalStandingDto, 
-  PlayerAssistStandingDto 
+import {
+  Tournament,
+  TournamentStandingDto,
+  PlayerGoalStandingDto,
+  PlayerAssistStandingDto,
 } from '@/app/api/models/tournament.models';
 
 export type StatsTab = 'table' | 'goals' | 'assists';
@@ -18,10 +25,9 @@ export type StatsTab = 'table' | 'goals' | 'assists';
   selector: 'app-tournament-stats',
   imports: [CommonModule, RouterModule, LucideAngularModule],
   templateUrl: './tournament-stats.html',
-  styleUrl: './tournament-stats.css'
+  styleUrl: './tournament-stats.css',
 })
 export class TournamentStatsComponent implements OnInit {
-
   tournamentId = input<string>('');
   tournament = input<Tournament | null>(null);
   showBackButton = input<boolean>(true);
@@ -31,7 +37,6 @@ export class TournamentStatsComponent implements OnInit {
   getTournamentId = computed(() => {
     return this.tournamentId() || this._tournamentId();
   });
-
 
   private tournamentService = inject(TournamentService);
   private toastService = inject(ToastService);
@@ -45,7 +50,6 @@ export class TournamentStatsComponent implements OnInit {
   standings = signal<TournamentStandingDto[]>([]);
   goalStandings = signal<PlayerGoalStandingDto[]>([]);
   assistStandings = signal<PlayerAssistStandingDto[]>([]);
-
 
   tournamentName = computed(() => {
     return this.tournament()?.name || 'Tournament Statistics';
@@ -70,11 +74,17 @@ export class TournamentStatsComponent implements OnInit {
   });
 
   totalGoals = computed(() => {
-    return this.goalStandings().reduce((total, player) => total + player.goals, 0);
+    return this.goalStandings().reduce(
+      (total, player) => total + player.goals,
+      0
+    );
   });
 
   totalMatches = computed(() => {
-    return this.standings().reduce((total, team) => total + team.matchesPlayed, 0) / 2;
+    return (
+      this.standings().reduce((total, team) => total + team.matchesPlayed, 0) /
+      2
+    );
   });
 
   ngOnInit() {
@@ -82,7 +92,7 @@ export class TournamentStatsComponent implements OnInit {
     if (routeTournamentId) {
       this._tournamentId.set(routeTournamentId);
     }
-    
+
     this.loadAllStatistics();
   }
 
@@ -91,7 +101,7 @@ export class TournamentStatsComponent implements OnInit {
     Promise.all([
       this.loadStandings(),
       this.loadGoalStandings(),
-      this.loadAssistStandings()
+      this.loadAssistStandings(),
     ]).finally(() => {
       this.isLoading.set(false);
     });
@@ -99,46 +109,49 @@ export class TournamentStatsComponent implements OnInit {
 
   private loadStandings(): Promise<void> {
     return new Promise((resolve) => {
-      this.tournamentService.getTournamentStandings(this.getTournamentId()).subscribe({
-        next: (data) => {
-          this.standings.set(data);
-          resolve();
-        },
-        error: (error) => {
-          this.toastService.error('Failed to load standings');
-          resolve();
-        }
-      });
+      this.tournamentService
+        .getTournamentStandings(this.getTournamentId())
+        .subscribe({
+          next: (data) => {
+            this.standings.set(data);
+            resolve();
+          },
+          error: (error) => {
+            resolve();
+          },
+        });
     });
   }
 
   private loadGoalStandings(): Promise<void> {
     return new Promise((resolve) => {
-      this.tournamentService.getPlayerGoalStandings(this.getTournamentId()).subscribe({
-        next: (data) => {
-          this.goalStandings.set(data);
-          resolve();
-        },
-        error: (error) => {
-          this.toastService.error('Failed to load goal standings');
-          resolve();
-        }
-      });
+      this.tournamentService
+        .getPlayerGoalStandings(this.getTournamentId())
+        .subscribe({
+          next: (data) => {
+            this.goalStandings.set(data);
+            resolve();
+          },
+          error: (error) => {
+            resolve();
+          },
+        });
     });
   }
 
   private loadAssistStandings(): Promise<void> {
     return new Promise((resolve) => {
-      this.tournamentService.getPlayerAssistStandings(this.getTournamentId()).subscribe({
-        next: (data) => {
-          this.assistStandings.set(data);
-          resolve();
-        },
-        error: (error) => {
-          this.toastService.error('Failed to load assist standings');
-          resolve();
-        }
-      });
+      this.tournamentService
+        .getPlayerAssistStandings(this.getTournamentId())
+        .subscribe({
+          next: (data) => {
+            this.assistStandings.set(data);
+            resolve();
+          },
+          error: (error) => {
+            resolve();
+          },
+        });
     });
   }
 
@@ -147,17 +160,18 @@ export class TournamentStatsComponent implements OnInit {
   }
 
   getTabClass(tab: StatsTab): string {
-    const baseClass = 'px-2 py-1 font-semibold border-b-2 cursor-pointer sm:text-md text-xs ';
+    const baseClass =
+      'px-2 py-1 font-semibold border-b-2 cursor-pointer sm:text-md text-xs ';
     const activeClass = 'border-primary text-primary';
     const inactiveClass = 'border-transparent text-muted';
-    
+
     return baseClass + (this.activeTab() === tab ? activeClass : inactiveClass);
   }
 
   getTeamInitials(teamName: string): string {
     return teamName
       .split(' ')
-      .map(word => word.charAt(0))
+      .map((word) => word.charAt(0))
       .join('')
       .toUpperCase()
       .slice(0, 3);
@@ -166,7 +180,9 @@ export class TournamentStatsComponent implements OnInit {
   getPlayerInitials(playerName: string): string {
     const names = playerName.split(' ');
     if (names.length >= 2) {
-      return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
+      return `${names[0].charAt(0)}${names[names.length - 1].charAt(
+        0
+      )}`.toUpperCase();
     }
     return playerName.slice(0, 2).toUpperCase();
   }

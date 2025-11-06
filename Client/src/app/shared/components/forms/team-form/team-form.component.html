@@ -1,27 +1,17 @@
 <form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="space-y-4 card">
   <div>
-    <label class="block text-sm font-medium mb-2"
-      >Team Logo <span class="required">*</span></label
-    >
-
+    <div class="flex justify-between pr-2">
+      <label class="block text-sm font-medium mb-2">Team Logo <span class="required">*</span></label>
+      <span class="text-xs text-muted">128x128 px</span>
+    </div>
     @if (logoPreview()) {
     <div class="mb-4">
-      <img
-        [src]="logoPreview()"
-        alt="Team Logo"
-        class="h-32 w-32 object-cover rounded-lg shadow mx-auto"
-      />
+      <img [src]="logoPreview()" alt="Team Logo" class="h-32 w-32 object-cover rounded-lg shadow mx-auto" />
     </div>
     }
 
-    <input
-      type="file"
-      accept="image/*"
-      (change)="onLogoChange($event)"
-      class="input-field w-full"
-      data-cy="team-image-input"
-      [class.error]="isFieldInvalid('logo')"
-    />
+    <input type="file" accept="image/*" (change)="onLogoChange($event)" class="input-field w-full"
+      data-cy="team-image-input" [class.error]="isFieldInvalid('logo')" />
 
     @if (submitted() && teamForm.controls['logo'].invalid) {
     <div class="error-message text-sm mt-1">Logo is required</div>
@@ -29,16 +19,9 @@
   </div>
 
   <div>
-    <label class="block text-sm font-medium mb-2"
-      >Team Name <span class="required">*</span></label
-    >
-    <input
-      type="text"
-      formControlName="name"
-      class="input-field w-full"
-      data-cy = "team-name-input"
-      [class.error]="submitted() && teamForm.controls['name'].invalid"
-    />
+    <label class="block text-sm font-medium mb-2">Team Name <span class="required">*</span></label>
+    <input type="text" formControlName="name" class="input-field w-full" data-cy="team-name-input"
+      placeholder="Liverpool FC" [class.error]="submitted() && teamForm.controls['name'].invalid" />
     @if (submitted() && teamForm.controls['name'].invalid) {
     <div class="error-message text-sm mt-1">
       Team name is required (min 2 chars)
@@ -48,14 +31,9 @@
 
   <div>
     <label class="block text-sm font-medium mb-2">Short Name</label>
-    <input
-      type="text"
-      formControlName="shortName"
-      placeholder="Auto-generated if not provided"
-      class="input-field w-full"
-      data-cy = "team-short-name-input"
-      [class.error]="submitted() && teamForm.controls['shortName'].invalid"
-    />
+    <input type="text" formControlName="shortName" placeholder="Auto-generated if not provided"
+      class="input-field w-full" data-cy="team-short-name-input"
+      [class.error]="submitted() && teamForm.controls['shortName'].invalid" />
     @if (submitted() && teamForm.controls['shortName'].invalid) {
     <div class="error-message text-sm mt-1">
       Short name must be 10 characters or less
@@ -67,13 +45,17 @@
     <button type="button" (click)="onCancel()" class="btn btn-secondary flex-1">
       Cancel
     </button>
-    <button
-      type="submit"
-      class="btn btn-primary flex-1"
-      data-cy = "team-submit-button"
-      [disabled]="submitted() && teamForm.invalid"
-    >
+    <button type="submit" class="btn btn-primary flex-1" data-cy="team-submit-button"
+      [disabled]="submitted() && teamForm.invalid">
+      @if(submitted()){
+      <div class="flex items-center justify-center gap-2" data-cy="resending-state">
+        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white" data-cy="loading-spinner"></div>
+        <span data-cy="loading-text">{{ isEditMode() ? "Updating Team" : "Creating Team" }}...</span>
+      </div>
+      }
+      @else{
       {{ isEditMode() ? "Update Team" : "Create Team" }}
+      }
     </button>
   </div>
 </form>

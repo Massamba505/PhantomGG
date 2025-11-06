@@ -73,9 +73,6 @@ export class TournamentBrowse implements OnInit {
         this.tournaments.set(response.data);
         this.paginationData.set(response);
       },
-      error: (error) => {
-        this.toastService.error('Failed to load tournaments');
-      },
       complete: () => {
         this.isLoading.set(false);
       },

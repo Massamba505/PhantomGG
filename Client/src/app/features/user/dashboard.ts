@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { UserLayout } from "../../shared/components/layouts/user-layout/user-layout";
+import { UserLayout } from '../../shared/components/layouts/user-layout/user-layout';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -8,6 +8,4 @@ import { RouterOutlet } from '@angular/router';
   styleUrls: ['./dashboard.css'],
   imports: [UserLayout, RouterOutlet],
 })
-export class Dashboard {
-  
-}
+export class Dashboard {}
