@@ -1,18 +1,14 @@
 <div class="max-w-lg mx-auto">
   <div class="card">
-    <app-role-selection
-      [selectedRole]="selectedRole()"
-      (roleChange)="onRoleSelected($event)"
-    >
+    <app-role-selection [selectedRole]="selectedRole()" (roleChange)="onRoleSelected($event)">
     </app-role-selection>
 
-    <button
-      (click)="onContinue()"
-      [disabled]="!selectedRole() || loading()"
-      class="btn btn-primary mt-6 py-2.5 w-full"
-    >
+    <button (click)="onContinue()" [disabled]="!selectedRole() || loading()" class="btn btn-primary mt-6 py-2.5 w-full">
       @if (loading()) {
-      <span>Creating account...</span>
+      <div class="flex items-center justify-center gap-2" data-cy="resending-state">
+        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white" data-cy="loading-spinner"></div>
+        <span data-cy="loading-text">Creating account...</span>
+      </div>
       } @else {
       <span>Create Account</span>
       }

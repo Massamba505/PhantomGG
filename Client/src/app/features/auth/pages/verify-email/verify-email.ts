@@ -18,14 +18,14 @@ export class VerifyEmail implements OnInit {
   private toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
-  
+
   verifying = signal(true);
   success = signal(false);
   error = signal('');
 
   ngOnInit() {
     const token = this.route.snapshot.queryParams['token'];
-    
+
     if (!token) {
       this.error.set('Verification token is missing');
       this.verifying.set(false);
@@ -40,15 +40,20 @@ export class VerifyEmail implements OnInit {
       next: () => {
         this.success.set(true);
         this.verifying.set(false);
-        this.toastService.success('Email verified successfully! You can now log in.');
+        this.toastService.success(
+          'Email verified successfully! You can now log in.'
+        );
         setTimeout(() => {
           this.router.navigate(['/auth/login']);
         }, 3000);
       },
       error: (err) => {
-        this.error.set(err.error?.message || 'Verification failed. The token may be invalid or expired.');
+        this.error.set(
+          err.error?.message ||
+            'Verification failed. The token may be invalid or expired.'
+        );
         this.verifying.set(false);
-      }
+      },
     });
   }
 

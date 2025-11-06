@@ -1,9 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@/app/store/AuthStateService';
@@ -36,7 +32,7 @@ export class Signup {
   constructor() {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state?.['signupData']) {
-      this.signupForm.setValue({...navigation.extras.state['signupData']});
+      this.signupForm.setValue({ ...navigation.extras.state['signupData'] });
     }
   }
 
@@ -59,8 +55,7 @@ export class Signup {
     const value = this.signupForm.controls['password'].value || '';
     const score = getPasswordScore(value);
     if (!value) return { label: '', color: '' };
-    if (score >= 5)
-      return { label: 'Strong Password', color: 'text-success' };
+    if (score >= 5) return { label: 'Strong Password', color: 'text-success' };
     if (score >= 3) {
       return { label: 'Medium Strength', color: 'text-warning' };
     }
@@ -77,7 +72,7 @@ export class Signup {
     }
 
     this.router.navigate(['/auth/role-selection'], {
-      state: { signupData: this.signupForm.value }
+      state: { signupData: this.signupForm.value },
     });
   }
 
@@ -88,7 +83,7 @@ export class Signup {
   toggleConfirmPassword() {
     this.showConfirmPassword.update((x) => !x);
   }
-  
+
   checkFieldError(name: string) {
     const control = this.signupForm.get(name);
     return (this.submitted() || control?.touched) && control?.errors;

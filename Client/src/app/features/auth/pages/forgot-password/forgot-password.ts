@@ -20,12 +20,12 @@ export class ForgotPassword {
   private toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
-  
+
   loading = signal(false);
   emailSent = signal(false);
 
   forgotPasswordForm = this.fb.group({
-    email: ['', [Validators.required, strictEmailValidator]]
+    email: ['', [Validators.required, strictEmailValidator]],
   });
 
   get email() {
@@ -50,12 +50,16 @@ export class ForgotPassword {
       next: () => {
         this.loading.set(false);
         this.emailSent.set(true);
-        this.toastService.success('Password reset instructions sent to your email');
+        this.toastService.success(
+          'Password reset instructions sent to your email'
+        );
       },
       error: (err) => {
         this.loading.set(false);
-        this.toastService.error(err.error?.message || 'Failed to send reset email');
-      }
+        this.toastService.error(
+          err.error?.message || 'Failed to send reset email'
+        );
+      },
     });
   }
 

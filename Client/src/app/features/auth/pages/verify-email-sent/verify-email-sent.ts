@@ -17,7 +17,7 @@ export class VerifyEmailSent {
   private toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
-  
+
   email = signal('');
   resending = signal(false);
 
@@ -32,7 +32,7 @@ export class VerifyEmailSent {
 
   resendVerification() {
     if (!this.email()) return;
-    
+
     this.resending.set(true);
     this.authService.resendVerification({ email: this.email() }).subscribe({
       next: () => {
@@ -41,8 +41,10 @@ export class VerifyEmailSent {
       },
       error: (err) => {
         this.resending.set(false);
-        this.toastService.error(err.error?.message || 'Failed to resend verification email');
-      }
+        this.toastService.error(
+          err.error?.message || 'Failed to resend verification email'
+        );
+      },
     });
   }
 

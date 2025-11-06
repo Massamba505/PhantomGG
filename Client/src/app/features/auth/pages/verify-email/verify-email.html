@@ -2,9 +2,7 @@
   <div class="card text-center">
     @if (verifying()) {
     <div class="flex flex-col items-center space-y-4">
-      <div
-        class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"
-      ></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       <h1 class="text-xl font-bold">Verifying Your Email</h1>
       <p class="text-muted">
         Please wait while we verify your email address...
@@ -12,14 +10,8 @@
     </div>
     } @if (success()) {
     <div class="flex flex-col items-center space-y-4">
-      <div
-        class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"
-      >
-        <lucide-angular
-          [img]="icons.CheckCircle"
-          [size]="32"
-          class="text-success"
-        ></lucide-angular>
+      <div class="w-16 h-16 rounded-full flex items-center justify-center">
+        <lucide-angular [img]="icons.CheckCircle" [size]="32" class="text-success"></lucide-angular>
       </div>
       <h1 class="text-2xl font-bold text-success">Email Verified!</h1>
       <p class="text-muted">
@@ -30,14 +22,8 @@
     </div>
     } @if (error() && !verifying()) {
     <div class="flex flex-col items-center space-y-4">
-      <div
-        class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center"
-      >
-        <lucide-angular
-          [img]="icons.XCircle"
-          [size]="32"
-          class="text-destructive"
-        ></lucide-angular>
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+        <lucide-angular [img]="icons.XCircle" [size]="32" class="text-destructive"></lucide-angular>
       </div>
       <h1 class="text-2xl font-bold text-destructive">Verification Failed</h1>
       <p class="text-muted">{{ error() }}</p>

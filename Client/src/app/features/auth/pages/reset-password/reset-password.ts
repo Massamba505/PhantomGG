@@ -23,20 +23,23 @@ export class ResetPassword implements OnInit {
   private toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
-  
+
   loading = signal(false);
   success = signal(false);
   error = signal('');
   token = signal('');
 
-  resetPasswordForm = this.fb.group({
-    password: ['', [Validators.required, passwordStrengthValidator]],
-    confirmPassword: ['', Validators.required]
-  }, { validators: matchPasswordsValidator });
+  resetPasswordForm = this.fb.group(
+    {
+      password: ['', [Validators.required, passwordStrengthValidator]],
+      confirmPassword: ['', Validators.required],
+    },
+    { validators: matchPasswordsValidator }
+  );
 
   ngOnInit() {
     const tokenParam = this.route.snapshot.queryParams['token'];
-    
+
     if (!tokenParam) {
       this.error.set('Reset token is missing');
       return;
@@ -73,22 +76,26 @@ export class ResetPassword implements OnInit {
     this.loading.set(true);
     const { password } = this.resetPasswordForm.value;
 
-    this.authService.resetPassword({
-      token: this.token(),
-      newPassword: password!
-    }).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.success.set(true);
-        this.toastService.success('Password reset successfully! You can now log in.');
-        setTimeout(() => {
-          this.router.navigate(['/auth/login']);
-        }, 3000);
-      },
-      error: (err) => {
-        this.loading.set(false);
-      }
-    });
+    this.authService
+      .resetPassword({
+        token: this.token(),
+        newPassword: password!,
+      })
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.success.set(true);
+          this.toastService.success(
+            'Password reset successfully! You can now log in.'
+          );
+          setTimeout(() => {
+            this.router.navigate(['/auth/login']);
+          }, 3000);
+        },
+        error: (err) => {
+          this.loading.set(false);
+        },
+      });
   }
 
   goToLogin() {

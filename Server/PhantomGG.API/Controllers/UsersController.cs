@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PhantomGG.Models.DTOs.User;
 using PhantomGG.Service.Auth.Interfaces;
 using PhantomGG.Service.Domain.Users.Interfaces;
+using PhantomGG.Service.Exceptions;
 
 namespace PhantomGG.API.Controllers;
 
@@ -58,7 +59,7 @@ public class UsersController(
     {
         if (profilePicture == null || profilePicture.Length == 0)
         {
-            return BadRequest("No file provided");
+            throw new ValidationException("No file provided");
         }
 
         var currentUser = _currentUserService.GetCurrentUser()!;

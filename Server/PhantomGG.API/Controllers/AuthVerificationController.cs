@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using PhantomGG.Models.DTOs.Auth;
 using PhantomGG.Service.Auth.Interfaces;
+using PhantomGG.Service.Exceptions;
 
 namespace PhantomGG.API.Controllers;
 
@@ -24,7 +25,7 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
 
         if (!success)
         {
-            return BadRequest(new { message = "Invalid or expired verification token" });
+            throw new ValidationException("Invalid or expired verification token");
         }
 
         return Ok(new { message = "Email verified successfully" });
@@ -40,7 +41,7 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
 
         if (!success)
         {
-            return BadRequest(new { message = "Invalid email" });
+            throw new ValidationException("Invalid email");
         }
 
         return Ok(new { message = "Verification email sent" });
@@ -67,7 +68,7 @@ public class AuthVerificationController(IAuthVerificationService authVerificatio
 
         if (!success)
         {
-            return BadRequest(new { message = "Invalid or expired reset token" });
+            throw new ValidationException("Invalid or expired reset token");
         }
 
         return Ok(new { message = "Password reset successfully" });
