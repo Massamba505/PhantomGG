@@ -54,7 +54,14 @@
       </button>
       <button (click)="confirmSelection()" [disabled]="!selectedTeam() || isJoining()"
         class="px-6 py-2 btn btn-primary disabled:cursor-not-allowed">
+        @if(isJoining()){
+        <div class="flex items-center justify-center gap-2">
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white" data-cy="loading-spinner"></div>
+          <span data-cy="loading-text">{{ isJoining() ? "Registering..." : "Register Team" }}</span>
+        </div>
+        }@else {
         <span>{{ isJoining() ? "Registering..." : "Register Team" }}</span>
+        }
       </button>
     </div>
   </div>
