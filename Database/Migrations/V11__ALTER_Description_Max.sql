@@ -1,0 +1,2 @@
+ALTER TABLE Tournaments
+ALTER COLUMN Description VARCHAR(MAX);
