@@ -45,20 +45,20 @@ export class RoleSelectionPage {
 
     const credentials: RegisterRequest = {
       ...this.signupData,
-      role: this.selectedRole()!
+      role: this.selectedRole()!,
     };
 
     this.authState.register(credentials).subscribe({
       next: () => {
         this.router.navigate(['/auth/verify-email-sent'], {
-          state: { email: credentials.email }
+          state: { email: credentials.email },
         });
       },
       error: (error) => {
-        this.router.navigate(['/auth/signup'],{
-          state : { signupData: this.signupData }
+        this.router.navigate(['/auth/signup'], {
+          state: { signupData: this.signupData },
         });
-      }
+      },
     });
   }
 

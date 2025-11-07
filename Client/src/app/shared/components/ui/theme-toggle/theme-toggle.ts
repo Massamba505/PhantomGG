@@ -13,7 +13,6 @@ export class ThemeToggle {
   themeService = inject(ThemeService);
   currentIcon = computed(() => this.themeService.currentTheme());
 
-
   readonly icons = LucideIcons;
 
   buttonLabel = computed(() => {

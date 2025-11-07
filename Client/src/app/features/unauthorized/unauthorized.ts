@@ -8,7 +8,7 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   selector: 'app-unauthorized',
   imports: [CommonModule, RouterLink, LucideAngularModule],
   templateUrl: './unauthorized.html',
-  styleUrl: './unauthorized.css'
+  styleUrl: './unauthorized.css',
 })
 export class Unauthorized {
   readonly icons = LucideIcons;

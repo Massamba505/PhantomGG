@@ -11,14 +11,18 @@ import { UserRoles } from './api/models';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./shared/components/layouts/public-layout/public-layout').then((m) => m.PublicLayout),
+    loadComponent: () =>
+      import('./shared/components/layouts/public-layout/public-layout').then(
+        (m) => m.PublicLayout
+      ),
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/public/landing/landing').then((m) => m.Landing),
+        loadComponent: () =>
+          import('./features/public/landing/landing').then((m) => m.Landing),
         title: 'PhantomGG - Esports Tournament Platform',
-      }
-    ]
+      },
+    ],
   },
   {
     path: 'auth',
@@ -29,8 +33,10 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     canActivate: [authGuard],
-    loadComponent: () => 
-      import('./features/dashboard-selection/dashboard-selection.component').then((m) => m.DashboardSelectionComponent),
+    loadComponent: () =>
+      import(
+        './features/dashboard-selection/dashboard-selection.component'
+      ).then((m) => m.DashboardSelectionComponent),
   },
   {
     path: 'public',
@@ -51,7 +57,9 @@ export const routes: Routes = [
   {
     path: 'unauthorized',
     loadComponent: () =>
-      import('./features/unauthorized/unauthorized').then((m) => m.Unauthorized),
+      import('./features/unauthorized/unauthorized').then(
+        (m) => m.Unauthorized
+      ),
     title: 'Unauthorized - PhantomGG',
   },
   {

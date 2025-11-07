@@ -1,8 +1,5 @@
 <div class="flex h-screen overflow-hidden" data-cy="public-layout">
-  <div
-    class="flex flex-col flex-1 h-full transition-all duration-300 overflow-hidden"
-    data-cy="public-main-content"
-  >
+  <div class="flex flex-col flex-1 h-full transition-all duration-300 overflow-hidden" data-cy="public-main-content">
     <header class="h-16 flex items-center justify-between px-6 shadow-sm" data-cy="public-header">
       <h1 class="text-xl font-semibold" data-cy="public-page-title">{{ pageTitle() }}</h1>
 
@@ -10,21 +7,11 @@
         <app-theme-toggle data-cy="public-theme-toggle"></app-theme-toggle>
         @if(!isAuthenticated()){
         <button (click)="goToAuth()" class="btn btn-outline" data-cy="sign-in-button">
-          <lucide-angular
-            [img]="icons.LogIn"
-            [size]="16"
-            class="mr-1"
-            data-cy="sign-in-icon"
-          ></lucide-angular>
+          <lucide-angular [img]="icons.LogIn" [size]="16" class="mr-1" data-cy="sign-in-icon"></lucide-angular>
           Sign In
         </button>
         <button (click)="navigateTo('/auth/signup')" class="btn btn-primary" data-cy="sign-up-button">
-          <lucide-angular
-            [img]="icons.UserPlus"
-            [size]="16"
-            class="mr-1"
-            data-cy="sign-up-icon"
-          ></lucide-angular>
+          <lucide-angular [img]="icons.UserPlus" [size]="16" class="mr-1" data-cy="sign-up-icon"></lucide-angular>
           Sign Up
         </button>
         }

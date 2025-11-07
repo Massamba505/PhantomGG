@@ -1,11 +1,7 @@
 <app-modal [isOpen]="isOpen()" [title]="getModalTitle()" (close)="closeModal()">
   @if (teams().length === 0) {
   <div class="text-center py-12">
-    <lucide-angular
-      [img]="icons.Users"
-      [size]="64"
-      class="mx-auto mb-4"
-    ></lucide-angular>
+    <lucide-angular [img]="icons.Users" [size]="64" class="mx-auto mb-4"></lucide-angular>
     <h3 class="text-lg font-semibold mb-2">No Teams Found</h3>
     <p class="mb-6">
       You need to create a team before you can register for tournaments.
@@ -22,11 +18,7 @@
       <div class="card rounded-lg cursor-pointer" (click)="selectTeam(team)">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <img
-              [src]="team.logoUrl"
-              [alt]="team.name"
-              class="w-12 h-12 rounded-lg object-contain"
-            />
+            <img [src]="team.logoUrl" [alt]="team.name" class="w-12 h-12 rounded-lg object-contain" />
             <div>
               <h4 class="font-semibold">
                 {{ team.name }}
@@ -36,10 +28,8 @@
               </p>
             </div>
           </div>
-          <div
-            class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
-            [class.bg-blue-500]="selectedTeam() === team"
-          >
+          <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+            [class.bg-blue-500]="selectedTeam() === team">
             @if (selectedTeam() === team) {
             <lucide-angular [img]="icons.Check" [size]="12"></lucide-angular>
             }
@@ -50,10 +40,7 @@
     </div>
 
     <div class="pt-4 border-t">
-      <button
-        (click)="onCreateTeam()"
-        class="w-full p-3 btn btn-secondary cursor-pointer"
-      >
+      <button (click)="onCreateTeam()" class="w-full p-3 btn btn-secondary cursor-pointer">
         <div class="flex items-center justify-center gap-2">
           <lucide-angular [img]="icons.CirclePlus" [size]="16"></lucide-angular>
           <span>Create New Team</span>
@@ -62,19 +49,19 @@
     </div>
 
     <div class="flex items-center justify-end gap-3 pt-4 border-t">
-      <button
-        (click)="closeModal()"
-        class="px-4 py-2 btn btn-outline"
-        [disabled]="isJoining()"
-      >
+      <button (click)="closeModal()" class="px-4 py-2 btn btn-outline" [disabled]="isJoining()">
         Cancel
       </button>
-      <button
-        (click)="confirmSelection()"
-        [disabled]="!selectedTeam() || isJoining()"
-        class="px-6 py-2 btn btn-primary disabled:cursor-not-allowed"
-      >
+      <button (click)="confirmSelection()" [disabled]="!selectedTeam() || isJoining()"
+        class="px-6 py-2 btn btn-primary disabled:cursor-not-allowed">
+        @if(isJoining()){
+        <div class="flex items-center justify-center gap-2">
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white" data-cy="loading-spinner"></div>
+          <span data-cy="loading-text">{{ isJoining() ? "Registering..." : "Register Team" }}</span>
+        </div>
+        }@else {
         <span>{{ isJoining() ? "Registering..." : "Register Team" }}</span>
+        }
       </button>
     </div>
   </div>

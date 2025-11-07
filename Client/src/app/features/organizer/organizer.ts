@@ -4,10 +4,7 @@ import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-organizer',
-  imports: [
-    RouterOutlet,
-    OrganizerLayout
-],
+  imports: [RouterOutlet, OrganizerLayout],
   templateUrl: './organizer.html',
 })
 export class OrganizerComponent {}

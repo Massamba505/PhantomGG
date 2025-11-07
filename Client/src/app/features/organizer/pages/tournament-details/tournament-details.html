@@ -25,19 +25,14 @@
   <p>Loading tournament details...</p>
 </div>
 } @if (!loading() && tournament()) {
-<div data-cy="tournament-details" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-  <div class="lg:col-span-2 space-y-6">
+<div data-cy="tournament-details" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+  <div class="lg:col-span-2 flex flex-col space-y-6 h-full">
     <div class="card">
-      <div
-        class="tournament-banner h-48 rounded-md"
-        [style.background-image]="
+      <div class="tournament-banner h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72  rounded-md" [style.background-image]="
           tournament()!.bannerUrl
             ? 'url(' + tournament()!.bannerUrl + ')'
             : 'none'
-        "
-        [style.background-size]="'cover'"
-        [style.background-position]="'center'"
-      >
+        " [style.background-size]="'cover'" [style.background-position]="'center'">
         @if (!tournament()!.bannerUrl) {
         <div class="h-full flex items-center justify-center">
           <span class="opacity-50">No banner uploaded</span>
@@ -46,34 +41,26 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card flex-grow flex flex-col">
       <div class="flex items-center gap-3 mb-3">
-        <img
-          [src]="tournament()!.logoUrl"
-          alt="tournament logo"
-          class="h-16 w-16 object-contain rounded-lg"
-        />
+        <img [src]="tournament()!.logoUrl" alt="tournament logo" class="h-16 w-16 object-contain rounded-lg" />
         <p class="font-semibold text-3xl underline mb-3">
           {{ tournament()!.name }}
         </p>
       </div>
-      <p
-        class="leading-relaxed"
-        [innerHTML]="tournament()!.description | appLineBreaks"
-      ></p>
+
+      <div class="leading-relaxed flex-grow description"
+        [class.collapsed]="!showFullDescription() && isLongDescription()"
+        [innerHTML]="tournament()!.description | appLineBreaks"></div>
 
       @if (isLongDescription()) {
-      <a
-        class="text-primary font-semibold underline cursor-pointer mt-2 inline-block"
-        (click)="toggleDescription()"
-      >
+      <a class="text-primary font-semibold underline cursor-pointer mt-2 inline-block" (click)="toggleDescription()">
         {{ showFullDescription() ? "View Less" : "View More" }}
       </a>
       }
     </div>
   </div>
-
-  <div class="space-y-6">
+  <div class="flex flex-col space-y-6 h-full">
     <div class="card">
       <h3 class="font-semibold mb-4">Tournament Info</h3>
       <div class="space-y-3">
@@ -87,10 +74,7 @@
 
         <div class="flex justify-between">
           <span class="opacity-75 flex items-center gap-2">
-            <lucide-angular
-              [img]="icons.LayoutGrid"
-              [size]="16"
-            ></lucide-angular>
+            <lucide-angular [img]="icons.LayoutGrid" [size]="16"></lucide-angular>
             Format:
           </span>
           <span>Standard Tournament</span>
@@ -104,7 +88,6 @@
           <span>{{ tournament()!.startDate | date : "short" }}</span>
         </div>
 
-        <!-- Entry fee and prize pool sections removed - not supported in backend -->
         @if (tournament()!.location) {
         <div class="flex justify-between">
           <span class="opacity-75 flex items-center gap-2">
@@ -116,10 +99,8 @@
         }
       </div>
     </div>
-
     <div class="card">
       <h3 class="font-semibold mb-4">Registration</h3>
-
       <div class="space-y-3">
         @if (tournament()!.registrationStartDate) {
         <div class="flex justify-between">
@@ -127,11 +108,10 @@
             <lucide-angular [img]="icons.Play" [size]="16"></lucide-angular>
             Opens:
           </span>
-          <span>{{
-            tournament()!.registrationStartDate | date : "short"
-          }}</span>
+          <span>{{ tournament()!.registrationStartDate | date : "short" }}</span>
         </div>
-        } @if (tournament()!.registrationDeadline) {
+        }
+        @if (tournament()!.registrationDeadline) {
         <div class="flex justify-between">
           <span class="opacity-75 flex items-center gap-2">
             <lucide-angular [img]="icons.Clock" [size]="16"></lucide-angular>
@@ -162,11 +142,10 @@
             <lucide-angular [img]="icons.UserPlus" [size]="16"></lucide-angular>
             Players/Team:
           </span>
-          <span> 11 </span>
+          <span>11</span>
         </div>
       </div>
     </div>
-
     <div class="card">
       <h3 class="font-semibold mb-4">Contact</h3>
       <div class="space-y-2">
@@ -181,11 +160,8 @@
               {{ tournament()!.organizer?.firstName }}
               {{ tournament()!.organizer?.lastName }}
             </span>
-            <img
-              [src]="tournament()!.organizer?.profilePictureUrl"
-              alt="Organizer's Profile Picture"
-              class="w-8 h-8 rounded-full object-contain"
-            />
+            <img [src]="tournament()!.organizer?.profilePictureUrl" alt="Organizer's Profile Picture"
+              class="w-8 h-8 rounded-full object-contain" />
           </div>
         </div>
 
@@ -194,10 +170,7 @@
             <lucide-angular [img]="icons.Mail" [size]="16"></lucide-angular>
             Email:
           </span>
-          <a
-            href="mailto:{{ tournament()!.organizer?.email }}"
-            class="text-blue-500 hover:underline"
-          >
+          <a href="mailto:{{ tournament()!.organizer?.email }}" class="text-blue-500 hover:underline">
             {{ tournament()!.organizer?.email }}
           </a>
         </div>
@@ -205,6 +178,7 @@
     </div>
   </div>
 </div>
+
 
 <div class="grid grid-cols-1 gap-8 mt-8">
   <div class="card" data-cy="manage-teams-section">
@@ -219,11 +193,5 @@
 </div>
 }
 
-<app-confirm-delete-modal
-  [isOpen]="showDeleteModal()"
-  [title]="'Delete Tournament'"
-  [entityName]="'Tournament'"
-  [isLoading]="isDeleting()"
-  (close)="closeDeleteModal()"
-  (confirm)="confirmDelete()"
-></app-confirm-delete-modal>
+<app-confirm-delete-modal [isOpen]="showDeleteModal()" [title]="'Delete Tournament'" [entityName]="'Tournament'"
+  [isLoading]="isDeleting()" (close)="closeDeleteModal()" (confirm)="confirmDelete()"></app-confirm-delete-modal>

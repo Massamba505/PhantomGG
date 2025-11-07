@@ -5,13 +5,13 @@ import { TeamFormComponent } from '../../../../shared/components/forms/team-form
 import { TeamService } from '@/app/api/services/team.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { CreateTeam, UpdateTeam, Team } from '@/app/api/models/team.models';
-import { LucideAngularModule } from "lucide-angular";
+import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 
 @Component({
   selector: 'app-edit-team',
   imports: [CommonModule, TeamFormComponent, LucideAngularModule],
-  templateUrl: "./edit-team.html"
+  templateUrl: './edit-team.html',
 })
 export class EditTeamComponent implements OnInit {
   private router = inject(Router);
@@ -43,9 +43,8 @@ export class EditTeamComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.toastService.error('Failed to load team details');
         this.isLoading.set(false);
-      }
+      },
     });
   }
 
@@ -53,22 +52,21 @@ export class EditTeamComponent implements OnInit {
     if (this.isSaving() || !this.teamId) return;
 
     this.isSaving.set(true);
-    
+
     const updateData = teamData as UpdateTeam;
-    
+
     this.teamService.updateTeam(this.teamId, updateData).subscribe({
       next: (updatedTeam) => {
         this.toastService.success('Team updated successfully!');
         this.router.navigate(['/user/teams']);
       },
       error: (error) => {
-        this.toastService.error('Failed to update team. Please try again.');
         this.isSaving.set(false);
-      }
+      },
     });
   }
 
   goBack() {
-    this.router.navigate(['/user/teams']);
+    this.router.navigate(['..'], { relativeTo: this.route });
   }
 }

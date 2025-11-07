@@ -20,11 +20,7 @@
 </div>
 } @if (!loading() && tournament()) {
 <div class="max-w-4xl">
-  <app-tournament-form
-    [tournament]="tournament()"
-    [loadingState]="saving()"
-    (formUpdate)="onUpdate($event)"
-    (formCancel)="goBack()"
-  />
+  <app-tournament-form [tournament]="tournament()" [loadingState]="saving()" (formUpdate)="onUpdate($event)"
+    (formCancel)="goBack()" />
 </div>
 }

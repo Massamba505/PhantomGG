@@ -56,7 +56,7 @@ import {
   Plus,
   BarChart3,
   Save,
-  Upload
+  Upload,
 } from 'lucide-angular';
 
 export const LucideIcons = {
@@ -117,5 +117,5 @@ export const LucideIcons = {
   Plus,
   BarChart3,
   Save,
-  Upload
+  Upload,
 };

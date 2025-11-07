@@ -1,22 +1,37 @@
-import { Component, OnInit, OnChanges, SimpleChanges, inject, signal, computed, input, output } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  inject,
+  signal,
+  computed,
+  input,
+  output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+  FormGroup,
+} from '@angular/forms';
 import { CreateTeam, UpdateTeam, Team } from '@/app/api/models/team.models';
 
 @Component({
   selector: 'app-team-form',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './team-form.component.html',
-  styleUrl: './team-form.component.css'
+  styleUrl: './team-form.component.css',
 })
 export class TeamFormComponent implements OnInit, OnChanges {
   team = input<Team | null>(null);
   tournamentId = input<string | null>(null);
   formSubmit = output<CreateTeam | UpdateTeam>();
   formCancel = output<void>();
-  
+
   private fb = inject(FormBuilder);
-  
+
   teamForm!: FormGroup;
   submitted = signal(false);
   logoPreview = signal<string | null>(null);
@@ -35,28 +50,29 @@ export class TeamFormComponent implements OnInit, OnChanges {
 
   private initializeForm() {
     const team = this.team();
-    
+
     this.teamForm = this.fb.group({
       name: [
         team?.name || '',
-        [Validators.required, Validators.minLength(2), Validators.maxLength(200)],
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(200),
+        ],
       ],
-      shortName: [
-        team?.shortName || '',
-        [Validators.maxLength(10)],
+      shortName: [team?.shortName || '', [Validators.maxLength(10)]],
+      logo: [
+        team?.logoUrl || null,
+        [this.isEditMode() ? Validators.required : Validators.nullValidator],
       ],
-      logo: [team?.logoUrl || null,[this.isEditMode()? Validators.required: Validators.nullValidator]],
     });
 
-  
     if (team?.logoUrl) {
       this.logoPreview.set(team.logoUrl);
     } else {
       this.logoPreview.set(null);
     }
-
   }
-
 
   onLogoChange(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -65,7 +81,6 @@ export class TeamFormComponent implements OnInit, OnChanges {
       this.teamForm.patchValue({ logo: file });
       this.teamForm.get('logo')?.updateValueAndValidity();
 
-    
       const reader = new FileReader();
       reader.onload = () => this.logoPreview.set(reader.result as string);
       reader.readAsDataURL(file);
@@ -81,22 +96,20 @@ export class TeamFormComponent implements OnInit, OnChanges {
     const formValue = this.teamForm.value;
 
     if (this.isEditMode()) {
-    
       const updateData: UpdateTeam = {
         name: formValue.name,
         shortName: formValue.shortName || undefined,
         logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
-        teamPhotoUrl: undefined
+        teamPhotoUrl: undefined,
       };
 
       this.formSubmit.emit(updateData);
     } else {
-    
       const createData: CreateTeam = {
         name: formValue.name,
         shortName: formValue.shortName || undefined,
         logoUrl: formValue.logo instanceof File ? formValue.logo : undefined,
-        teamPhotoUrl: undefined
+        teamPhotoUrl: undefined,
       };
 
       this.formSubmit.emit(createData);

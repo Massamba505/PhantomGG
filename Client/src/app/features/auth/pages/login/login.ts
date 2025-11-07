@@ -52,12 +52,12 @@ export class Login {
         }
       },
       error: (error) => {
-        const errorMessage = error.error?.message || 'Login failed';
-        
+        const errorMessage = error.error?.detail || 'Login failed';
+
         if (errorMessage.includes('verify your email')) {
           this.showResendVerification.set(true);
         }
-      }
+      },
     });
   }
 
@@ -70,9 +70,11 @@ export class Login {
 
     this.authService.resendVerification({ email }).subscribe({
       next: () => {
-        this.toastService.success('Verification email sent! Please check your inbox.');
+        this.toastService.success(
+          'Verification email sent! Please check your inbox.'
+        );
         this.showResendVerification.set(false);
-      }
+      },
     });
   }
 
@@ -80,7 +82,6 @@ export class Login {
     const control = this.userForm.get(name);
     return (this.submitted() || control?.touched) && control?.errors;
   }
-
 
   togglePassword() {
     this.showPassword.update((v) => !v);

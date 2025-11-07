@@ -7,16 +7,10 @@
 <div class="max-w-xl">
   @if (isLoading()) {
   <div class="flex justify-center items-center py-12">
-    <div
-      class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"
-    ></div>
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
   </div>
   } @else if (!team()) {
-  <p class="text-gray-400">The team you're looking for doesn't exist.</p>
+  <p class="text-muted">The team you're looking for doesn't exist.</p>
   } @else {
-  <app-team-form
-    [team]="team()"
-    (formSubmit)="handleFormUpdate($event)"
-    (formCancel)="goBack()"
-  />}
+  <app-team-form [team]="team()" (formSubmit)="handleFormUpdate($event)" (formCancel)="goBack()" />}
 </div>

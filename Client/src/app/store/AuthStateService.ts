@@ -54,9 +54,9 @@ export class AuthStateService {
 
   register(credentials: RegisterRequest) {
     return this.withLoading(
-      this.authService.register(credentials).pipe(
-        catchError((error) => throwError(() => error))
-      )
+      this.authService
+        .register(credentials)
+        .pipe(catchError((error) => throwError(() => error)))
     );
   }
 

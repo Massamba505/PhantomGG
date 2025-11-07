@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Tournament } from '@/app/api/models/tournament.models';
-import { LucideAngularModule } from "lucide-angular";
+import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { LineBreaksPipe } from '@/app/shared/pipe/LineBreaks.pipe';
 import { TournamentService, TournamentStatus } from '@/app/api/services';
@@ -15,9 +15,17 @@ import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-public-tournament-details',
-  imports: [CommonModule, LucideAngularModule, LineBreaksPipe, TournamentTeamManagementComponent, TournamentMatchManagementComponent, MatchDetailsModalComponent, TeamDetailsModalComponent],
+  imports: [
+    CommonModule,
+    LucideAngularModule,
+    LineBreaksPipe,
+    TournamentTeamManagementComponent,
+    TournamentMatchManagementComponent,
+    MatchDetailsModalComponent,
+    TeamDetailsModalComponent,
+  ],
   templateUrl: './tournament-details.html',
-  styleUrl: './tournament-details.css'
+  styleUrl: './tournament-details.css',
 })
 export class TournamentDetailsComponent implements OnInit {
   private router = inject(Router);
@@ -29,7 +37,7 @@ export class TournamentDetailsComponent implements OnInit {
   loading = signal(true);
   tournamentId = signal<string>('');
   icons = LucideIcons;
-  
+
   showDeleteModal = signal(false);
   isDeleting = signal(false);
 
@@ -40,56 +48,55 @@ export class TournamentDetailsComponent implements OnInit {
   selectedTeamId = signal<string>('');
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe((params) => {
       this.tournamentId.set(params['id']);
       this.loadTournament();
     });
   }
-  
 
-  readonly DESCRIPTION_LIMIT = 300;
+  readonly DESCRIPTION_LIMIT_LINES = 7;
+  readonly DESCRIPTION_LIMIT_CHAR = 300;
+  displayedDescription = signal<string>('');
 
   showFullDescription = signal(false);
   isLongDescription = signal(false);
-  displayedDescription = signal<string>('');
 
   toggleDescription() {
-    this.showFullDescription.update(prev => !prev);
-    this.updateDisplayedDescription();
+    this.showFullDescription.update((prev) => !prev);
   }
 
   private updateDisplayedDescription() {
-    const fullDesc = this.tournament()?.description || '';
-    const plainText = fullDesc.replace(/<[^>]*>/g, '');
-    
-    this.isLongDescription.set(plainText.length > this.DESCRIPTION_LIMIT);
+    const desc = this.tournament()?.description || '';
+    const plainText = desc
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<[^>]*>/g, '');
 
-    if (this.showFullDescription()) {
-      this.displayedDescription.set(fullDesc);
-    } else {
-      const shortText = plainText.slice(0, this.DESCRIPTION_LIMIT) + '...';
-      this.displayedDescription.set(shortText);
-    }
+    const lines = plainText.split(/\r?\n/).filter((line) => line.trim() !== '');
+    const isLong =
+      lines.length > this.DESCRIPTION_LIMIT_LINES ||
+      plainText.length > this.DESCRIPTION_LIMIT_CHAR;
+
+    this.isLongDescription.set(isLong);
   }
 
   loadTournament() {
     if (!this.tournamentId()) return;
-    
+
     this.loading.set(true);
-    
+
     this.tournamentService.getTournament(this.tournamentId()).subscribe({
       next: (tournament: any) => {
         this.tournament.set(tournament);
-        const banner = this.tournament()!.bannerUrl?.split(" ").join("+");
-        const logo = this.tournament()!.logoUrl?.split(" ").join("+");
-        this.tournament.update(current => ({
+        const banner = this.tournament()!.bannerUrl?.split(' ').join('+');
+        const logo = this.tournament()!.logoUrl?.split(' ').join('+');
+        this.tournament.update((current) => ({
           ...current!,
           bannerUrl: banner,
-          logoUrl: logo
+          logoUrl: logo,
         }));
-      this.updateDisplayedDescription();
+        this.updateDisplayedDescription();
       },
-      complete:()=>{
+      complete: () => {
         this.loading.set(false);
       },
     });
@@ -101,11 +108,15 @@ export class TournamentDetailsComponent implements OnInit {
 
   onViewStatistics() {
     if (this.tournamentId()) {
-      this.router.navigate(['/public/tournaments', this.tournamentId(), 'statistics']);
+      this.router.navigate([
+        '/public/tournaments',
+        this.tournamentId(),
+        'statistics',
+      ]);
     }
   }
 
-  getStatus(){
+  getStatus() {
     return getEnumLabel(TournamentStatus, this.tournament()!.status);
   }
 

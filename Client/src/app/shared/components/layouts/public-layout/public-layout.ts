@@ -1,6 +1,11 @@
 import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule, NavigationEnd } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+  RouterModule,
+  NavigationEnd,
+} from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ThemeToggle } from '../../ui/theme-toggle/theme-toggle';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
@@ -18,7 +23,7 @@ export class PublicLayout implements OnInit {
   private route = inject(ActivatedRoute);
   private readonly authState = inject(AuthStateService);
   isAuthenticated = signal(this.authState.isAuthenticated());
-  
+
   readonly icons = LucideIcons;
   pageTitle = signal('PhantomGG');
 
@@ -36,12 +41,14 @@ export class PublicLayout implements OnInit {
   ];
 
   ngOnInit() {
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
-      map(() => this.route.snapshot.firstChild?.title || 'PhantomGG')
-    ).subscribe(title => {
-      this.pageTitle.set(title);
-    });
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        map(() => this.route.snapshot.firstChild?.title || 'PhantomGG')
+      )
+      .subscribe((title) => {
+        this.pageTitle.set(title);
+      });
   }
 
   navigateTo(url: string) {

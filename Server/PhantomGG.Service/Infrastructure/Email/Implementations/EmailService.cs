@@ -80,7 +80,7 @@ public class EmailService(
     {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_emailSettings.FromName, _emailSettings.FromEmail));
-        message.To.Add(new MailboxAddress("", toEmail));
+        message.To.Add(new MailboxAddress(toEmail, toEmail));
         message.Subject = subject;
 
         var bodyBuilder = new BodyBuilder

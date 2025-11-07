@@ -17,7 +17,7 @@ export type MatchUserRole = 'Organizer' | 'User' | 'Public';
 export class MatchCard {
   match = input.required<Match>();
   role = input<MatchUserRole>('Public');
-  
+
   edit = output<Match>();
   updateResult = output<Match>();
   view = output<Match>();
@@ -55,12 +55,12 @@ export class MatchCard {
 
   canUpdateResult(): boolean {
     const matchStatus = this.match().status;
-    return this.isOrganizer() && (matchStatus === MatchStatus.InProgress);
+    return this.isOrganizer() && matchStatus === MatchStatus.InProgress;
   }
 
   canEdit(): boolean {
     const matchStatus = this.match().status;
-    return this.isOrganizer() && (matchStatus === MatchStatus.Scheduled);
+    return this.isOrganizer() && matchStatus === MatchStatus.Scheduled;
   }
 
   isInProgress(): boolean {
@@ -72,7 +72,7 @@ export class MatchCard {
     const matchStatus = this.match().status;
     return matchStatus === MatchStatus.Completed;
   }
-  getStatus(){
+  getStatus() {
     return getEnumLabel(MatchStatus, this.match().status);
   }
 

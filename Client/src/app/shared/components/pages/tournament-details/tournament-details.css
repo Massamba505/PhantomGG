@@ -1,0 +1,12 @@
+.description {
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.description.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    /* Limit to 12 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

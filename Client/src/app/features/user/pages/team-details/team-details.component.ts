@@ -5,10 +5,18 @@ import { LucideAngularModule } from 'lucide-angular';
 import { TeamService } from '@/app/api/services/team.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { AuthStateService } from '@/app/store/AuthStateService';
-import { Team, Player, CreatePlayer, UpdatePlayer } from '@/app/api/models/team.models';
+import {
+  Team,
+  Player,
+  CreatePlayer,
+  UpdatePlayer,
+} from '@/app/api/models/team.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
-import { PlayerCard, PlayerRole } from '@/app/shared/components/cards/player-card/player-card';
+import {
+  PlayerCard,
+  PlayerRole,
+} from '@/app/shared/components/cards/player-card/player-card';
 import { PlayerForm } from '@/app/shared/components/forms/player-form/player-form';
 import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
 
@@ -21,10 +29,10 @@ import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModa
     Modal,
     PlayerCard,
     PlayerForm,
-    ConfirmDeleteModal
+    ConfirmDeleteModal,
   ],
   templateUrl: './team-details.component.html',
-  styleUrl: './team-details.component.css'
+  styleUrl: './team-details.component.css',
 })
 export class TeamDetailsComponent implements OnInit {
   private teamService = inject(TeamService);
@@ -32,9 +40,9 @@ export class TeamDetailsComponent implements OnInit {
   private authStateService = inject(AuthStateService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  
+
   readonly icons = LucideIcons;
-  
+
   team = signal<Team | null>(null);
   players = signal<Player[]>([]);
   loading = signal(false);
@@ -48,7 +56,6 @@ export class TeamDetailsComponent implements OnInit {
     const teamId = this.route.snapshot.params['id'];
     if (teamId) {
       this.loadTeamDetails(teamId);
-      this.loadTeamPlayers(teamId);
     }
   }
 
@@ -61,11 +68,11 @@ export class TeamDetailsComponent implements OnInit {
       },
       error: (error) => {
         this.error.set('Failed to load team details');
-        this.toastService.error('Failed to load team details');
       },
       complete: () => {
         this.loading.set(false);
-      }
+        this.loadTeamPlayers(teamId);
+      },
     });
   }
 
@@ -74,9 +81,6 @@ export class TeamDetailsComponent implements OnInit {
       next: (players) => {
         this.players.set(players);
       },
-      error: (error) => {
-        this.toastService.error('Failed to load team players');
-      }
     });
   }
 
@@ -115,47 +119,46 @@ export class TeamDetailsComponent implements OnInit {
     if (!team) return;
 
     const isEdit = !!this.editingPlayer();
-    
+
     if (isEdit) {
       const player = this.editingPlayer()!;
-      this.teamService.updateTeamPlayer(team.id, player.id, playerData as UpdatePlayer).subscribe({
-        next: (updatedPlayer) => {
-          this.players.update(players => 
-            players.map(p => p.id === player.id ? updatedPlayer : p)
-          );
-          this.toastService.success('Player updated successfully');
-          this.onClosePlayerModal();
-        },
-        error: (error) => {
-          this.toastService.error('Failed to update player');
-        }
-      });
+      this.teamService
+        .updateTeamPlayer(team.id, player.id, playerData as UpdatePlayer)
+        .subscribe({
+          next: (updatedPlayer) => {
+            this.players.update((players) =>
+              players.map((p) => (p.id === player.id ? updatedPlayer : p))
+            );
+            this.toastService.success('Player updated successfully');
+            this.onClosePlayerModal();
+          },
+        });
     } else {
-      this.teamService.addPlayerToTeam(team.id, playerData as CreatePlayer).subscribe({
-        next: (newPlayer) => {
-          this.players.update(players => [...players, newPlayer]);
-          this.toastService.success('Player added successfully');
-          this.onClosePlayerModal();
-        },
-        error: (error) => {
-          this.toastService.error('Failed to add player');
-        }
-      });
+      this.teamService
+        .addPlayerToTeam(team.id, playerData as CreatePlayer)
+        .subscribe({
+          next: (newPlayer) => {
+            this.players.update((players) => [...players, newPlayer]);
+            this.toastService.success('Player added successfully');
+            this.onClosePlayerModal();
+          },
+        });
     }
   }
 
   onRemovePlayer(playerId: string) {
-    const player = this.players().find(p => p.id === playerId);
+    const player = this.players().find((p) => p.id === playerId);
     if (!player || !this.team()) return;
-    this.teamService.removePlayerFromTeam(this.team()!.id, player.id).subscribe({
-      next: () => {
-        this.players.update(players => players.filter(p => p.id !== player.id));
-        this.toastService.success('Player removed successfully');
-      },
-      error: (error) => {
-        this.toastService.error('Failed to remove player');
-      }
-    });
+    this.teamService
+      .removePlayerFromTeam(this.team()!.id, player.id)
+      .subscribe({
+        next: () => {
+          this.players.update((players) =>
+            players.filter((p) => p.id !== player.id)
+          );
+          this.toastService.success('Player removed successfully');
+        },
+      });
   }
 
   isManager(): boolean {
@@ -181,7 +184,9 @@ export class TeamDetailsComponent implements OnInit {
   }
 
   getPlayerInitials(player: Player): string {
-    return `${player.firstName.charAt(0)}${player.lastName.charAt(0)}`.toUpperCase();
+    return `${player.firstName.charAt(0)}${player.lastName.charAt(
+      0
+    )}`.toUpperCase();
   }
 
   onDeleteTeam() {
@@ -203,9 +208,8 @@ export class TeamDetailsComponent implements OnInit {
         this.router.navigate(['/user/teams']);
       },
       error: (error) => {
-        this.toastService.error('Failed to delete team');
         this.isDeleting.set(false);
-      }
+      },
     });
   }
 }

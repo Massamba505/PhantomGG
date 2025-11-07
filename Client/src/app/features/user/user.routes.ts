@@ -3,61 +3,83 @@ import { Routes } from '@angular/router';
 export const userRoutes: Routes = [
   {
     path: '',
-    loadComponent:()=>import("./dashboard").then(m=>m.Dashboard),
+    loadComponent: () => import('./dashboard').then((m) => m.Dashboard),
     children: [
       {
         path: '',
         redirectTo: 'dashboard',
-        pathMatch: 'full'
+        pathMatch: 'full',
       },
       {
         path: 'dashboard',
-        loadComponent: () => import('./pages/dashboard/user-dashboard').then(m => m.UserDashboard),
+        loadComponent: () =>
+          import('./pages/dashboard/user-dashboard').then(
+            (m) => m.UserDashboard
+          ),
         title: 'Dashboard - PhantomGG',
-        data:{title:"Dashboard"}
+        data: { title: 'Dashboard' },
       },
       {
         path: 'teams',
-        loadComponent: () => import('./pages/teams/user-teams').then(m => m.UserTeams),
+        loadComponent: () =>
+          import('./pages/teams/user-teams').then((m) => m.UserTeams),
         title: 'My Teams - PhantomGG',
-        data:{title:"My Teams"}
+        data: { title: 'My Teams' },
       },
       {
         path: 'teams/create',
-        loadComponent: () => import('./pages/create-team/create-team.component').then(m => m.CreateTeamComponent),
+        loadComponent: () =>
+          import('./pages/create-team/create-team.component').then(
+            (m) => m.CreateTeamComponent
+          ),
         title: 'Create Team - PhantomGG',
-        data:{title:"Create Team"}
+        data: { title: 'Create Team' },
       },
       {
         path: 'teams/:id',
-        loadComponent: () => import('./pages/team-details/team-details.component').then(m => m.TeamDetailsComponent),
+        loadComponent: () =>
+          import('./pages/team-details/team-details.component').then(
+            (m) => m.TeamDetailsComponent
+          ),
         title: 'Team Details - PhantomGG',
-        data:{title:"Team Details"}
+        data: { title: 'Team Details' },
       },
       {
         path: 'teams/:id/edit',
-        loadComponent: () => import('./pages/edit-team/edit-team').then(m => m.EditTeamComponent),
+        loadComponent: () =>
+          import('./pages/edit-team/edit-team').then(
+            (m) => m.EditTeamComponent
+          ),
         title: 'Edit Team - PhantomGG',
-        data:{title:"Edit Team"}
+        data: { title: 'Edit Team' },
       },
       {
         path: 'tournaments',
-        loadComponent: () => import('./pages/tournaments/user-tournaments').then(m => m.UserTournaments),
+        loadComponent: () =>
+          import('./pages/tournaments/user-tournaments').then(
+            (m) => m.UserTournaments
+          ),
         title: 'Tournaments - PhantomGG',
-        data:{title:"Tournaments"}
+        data: { title: 'Tournaments' },
       },
       {
         path: 'tournaments/:id',
-        loadComponent: () => import('../../shared/components/pages/tournament-details/tournament-details').then(m => m.TournamentDetailsComponent),
+        loadComponent: () =>
+          import(
+            '../../shared/components/pages/tournament-details/tournament-details'
+          ).then((m) => m.TournamentDetailsComponent),
         title: 'Tournaments - PhantomGG',
-        data:{title:"Tournaments"}
+        data: { title: 'Tournaments' },
       },
       {
         path: 'tournaments/:id/statistics',
-        loadComponent: () => import('../../shared/components/pages/tournament-stats/tournament-stats').then(m => m.TournamentStatsComponent),
+        loadComponent: () =>
+          import(
+            '../../shared/components/pages/tournament-stats/tournament-stats'
+          ).then((m) => m.TournamentStatsComponent),
         title: 'Tournament Statistics - PhantomGG',
-        data:{title:"Tournament Statistics"}
-      }
-    ]
-  }
+        data: { title: 'Tournament Statistics' },
+      },
+    ],
+  },
 ];

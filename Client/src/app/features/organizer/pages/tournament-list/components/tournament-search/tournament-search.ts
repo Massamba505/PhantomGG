@@ -1,7 +1,18 @@
-import { Component, signal, inject, OnInit, computed, output } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  OnInit,
+  computed,
+  output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Tournament, TournamentFormat, TournamentSearch } from '@/app/api/models/tournament.models';
+import {
+  Tournament,
+  TournamentFormat,
+  TournamentSearch,
+} from '@/app/api/models/tournament.models';
 import { TournamentService, TournamentStatus } from '@/app/api/services';
 import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
 
@@ -9,7 +20,7 @@ import { getEnumOptions } from '@/app/shared/utils/enumConvertor';
   selector: 'app-tournament-search',
   imports: [CommonModule, FormsModule],
   templateUrl: './tournament-search.html',
-  styleUrl: './tournament-search.css'
+  styleUrl: './tournament-search.css',
 })
 export class TournamentSearchComponent implements OnInit {
   searchChange = output<Partial<TournamentSearch>>();
@@ -29,14 +40,14 @@ export class TournamentSearchComponent implements OnInit {
 
   searchCriteria = computed<Partial<TournamentSearch>>(() => {
     return {
-        searchTerm: this.searchTerm()?.trim() || undefined,
-        status: this.selectedStatus() || undefined,
-        location: this.location()?.trim() || undefined,
-        format: this.format() || undefined,
-        startDateFrom: this.startDateFrom() || undefined,
-        startDateTo: this.startDateTo() || undefined,
-        isPublic: this.isPublic(),
-      };
+      searchTerm: this.searchTerm()?.trim() || undefined,
+      status: this.selectedStatus() || undefined,
+      location: this.location()?.trim() || undefined,
+      format: this.format() || undefined,
+      startDateFrom: this.startDateFrom() || undefined,
+      startDateTo: this.startDateTo() || undefined,
+      isPublic: this.isPublic(),
+    };
   });
 
   ngOnInit() {
@@ -48,7 +59,6 @@ export class TournamentSearchComponent implements OnInit {
     this.formats.set(formats);
   }
 
-
   onSearchInput(event: Event) {
     const target = event.target as HTMLInputElement;
     this.searchTerm.set(target.value);
@@ -56,7 +66,7 @@ export class TournamentSearchComponent implements OnInit {
 
   onStatusChange(event: Event) {
     const target = event.target as HTMLSelectElement;
-    const value = target.value? parseInt(target.value): undefined;
+    const value = target.value ? parseInt(target.value) : undefined;
     this.selectedStatus.set(value);
   }
 
@@ -68,8 +78,8 @@ export class TournamentSearchComponent implements OnInit {
   onFormatChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     let value: string | undefined = target.value;
-    if(value == "All") {
-        value = undefined;
+    if (value == 'All') {
+      value = undefined;
     }
     this.format.set(value);
   }
@@ -89,21 +99,21 @@ export class TournamentSearchComponent implements OnInit {
   onIsPublicChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     let value: boolean | undefined;
-    if (target.value == 'true'){
+    if (target.value == 'true') {
       value = true;
-    }
-    else if (target.value == 'false'){
+    } else if (target.value == 'false') {
       value = false;
-    }
-    else{
+    } else {
       value = undefined;
     }
     this.isPublic.set(value);
   }
 
-  search(){
+  search() {
     const cleanedCriteria = Object.fromEntries(
-      Object.entries(this.searchCriteria()).filter(([_, value]) => value !== undefined)
+      Object.entries(this.searchCriteria()).filter(
+        ([_, value]) => value !== undefined
+      )
     ) as Partial<TournamentSearch>;
     this.searchChange.emit(cleanedCriteria);
   }
@@ -120,12 +130,14 @@ export class TournamentSearchComponent implements OnInit {
   }
 
   hasFilters(): boolean {
-    return this.searchTerm() !== '' || 
-           this.selectedStatus() !== undefined || 
-           this.location() !== '' ||
-           this.format() !== undefined ||
-           this.startDateFrom() !== undefined ||
-           this.startDateTo() !== undefined ||
-           this.isPublic() !== undefined;
+    return (
+      this.searchTerm() !== '' ||
+      this.selectedStatus() !== undefined ||
+      this.location() !== '' ||
+      this.format() !== undefined ||
+      this.startDateFrom() !== undefined ||
+      this.startDateTo() !== undefined ||
+      this.isPublic() !== undefined
+    );
   }
 }

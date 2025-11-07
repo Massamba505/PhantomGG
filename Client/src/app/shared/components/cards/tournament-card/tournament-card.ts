@@ -23,7 +23,6 @@ export class TournamentCard {
   leave = output<Tournament>();
   view = output<Tournament>();
 
-
   readonly icons = LucideIcons;
 
   onEdit(e: Event) {
@@ -78,7 +77,7 @@ export class TournamentCard {
     return this.role() === 'Public';
   }
 
-  getStatus(){
+  getStatus() {
     return getEnumLabel(TournamentStatus, this.tournament().status);
   }
 }

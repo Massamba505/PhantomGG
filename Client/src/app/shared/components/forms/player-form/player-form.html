@@ -1,49 +1,24 @@
-<form
-  [formGroup]="form"
-  (ngSubmit)="onSubmit()"
-  class="flex flex-col space-y-3"
->
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col space-y-3">
   @if (previewData()?.photoUrl) {
-  <img
-    [src]="previewData()!.photoUrl"
-    [alt]="getFullName()"
-    class="w-32 h-32 object-cover rounded-full border-2 border-gray-100 mx-auto"
-  />
+  <img [src]="previewData()!.photoUrl" [alt]="getFullName()"
+    class="w-32 h-32 object-cover rounded-full border-2 border-gray-100 mx-auto" />
   }
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
     <div>
-      <label class="input-label" for="firstName"
-        >First Name
-        <span class="required"><span class="required">*</span></span></label
-      >
-      <input
-        id="firstName"
-        type="text"
-        formControlName="firstName"
-        class="input-field"
-        data-cy="player-first-name-input"
-        [class.error]="getFieldError('firstName')"
-        placeholder="Enter first name"
-      />
+      <label class="input-label" for="firstName">First Name
+        <span class="required"><span class="required">*</span></span></label>
+      <input id="firstName" type="text" formControlName="firstName" class="input-field"
+        data-cy="player-first-name-input" [class.error]="getFieldError('firstName')" placeholder="Enter first name" />
       @if (getFieldError('firstName')) {
       <span class="error-message">{{ getFieldError("firstName") }}</span>
       }
     </div>
 
     <div>
-      <label class="input-label" for="lastName"
-        >Last Name <span class="required">*</span></label
-      >
-      <input
-        id="lastName"
-        type="text"
-        formControlName="lastName"
-        class="input-field"
-        data-cy="player-last-name-input"
-        [class.error]="getFieldError('lastName')"
-        placeholder="Enter last name"
-      />
+      <label class="input-label" for="lastName">Last Name <span class="required">*</span></label>
+      <input id="lastName" type="text" formControlName="lastName" class="input-field" data-cy="player-last-name-input"
+        [class.error]="getFieldError('lastName')" placeholder="Enter last name" />
       @if (getFieldError('lastName')) {
       <span class="error-message">{{ getFieldError("lastName") }}</span>
       }
@@ -51,16 +26,9 @@
   </div>
 
   <div>
-    <label class="input-label" for="position"
-      >Position <span class="required">*</span></label
-    >
-    <select
-      id="position"
-      formControlName="position"
-      class="input-field"
-      data-cy="player-position-select"
-      [class.error]="getFieldError('position')"
-    >
+    <label class="input-label" for="position">Position <span class="required">*</span></label>
+    <select id="position" formControlName="position" class="input-field" data-cy="player-position-select"
+      [class.error]="getFieldError('position')">
       <option value="">Select a position</option>
       @for (option of positionOptions; track option.value) {
       <option [attr.data-cy]='"position-option-" + option.value' [value]="option.value">{{ option.label }}</option>
@@ -73,15 +41,8 @@
 
   <div>
     <label class="input-label" for="email">Email</label>
-    <input
-      id="email"
-      type="email"
-      formControlName="email"
-      class="input-field"
-      data-cy="player-email-input"
-      [class.error]="getFieldError('email')"
-      placeholder="player@example.com"
-    />
+    <input id="email" type="email" formControlName="email" class="input-field" data-cy="player-email-input"
+      [class.error]="getFieldError('email')" placeholder="player@example.com" />
     @if (getFieldError('email')) {
     <span class="error-message">{{ getFieldError("email") }}</span>
     }
@@ -90,14 +51,8 @@
   <div>
     <label class="input-label" for="photo">Player Photo</label>
     <div class="">
-      <input
-        id="photo"
-        type="file"
-        accept="image/*"
-        class="input-field"
-        data-cy="player-image-input"
-        (change)="onFileSelect($event)"
-      />
+      <input id="photo" type="file" accept="image/*" class="input-field" data-cy="player-image-input"
+        (change)="onFileSelect($event)" />
     </div>
   </div>
 
@@ -106,10 +61,6 @@
       Cancel
     </button>
     <button type="submit" data-cy="submit-button" class="btn btn-primary" [disabled]="!form.valid">
-      <lucide-angular
-        [img]="isEditMode ? icons.Save : icons.Plus"
-        [size]="16"
-      ></lucide-angular>
       {{ getSubmitText() }}
     </button>
   </div>

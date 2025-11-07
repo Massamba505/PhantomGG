@@ -1,15 +1,15 @@
 import { Component, input, output } from '@angular/core';
-import { Modal } from "../modal/modal";
-import { LucideAngularModule } from "lucide-angular";
+import { Modal } from '../modal/modal';
+import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../icons/lucide-icons';
 
 @Component({
   selector: 'app-confirm-delete-modal',
   imports: [Modal, LucideAngularModule],
-  templateUrl: "./ConfirmDeleteModal.html",
+  templateUrl: './ConfirmDeleteModal.html',
   styleUrl: './ConfirmDeleteModal.css',
 })
-export class ConfirmDeleteModal { 
+export class ConfirmDeleteModal {
   isOpen = input<boolean>(false);
   title = input<string>('Delete');
   entityName = input<string>('');
@@ -20,7 +20,7 @@ export class ConfirmDeleteModal {
   readonly icons = LucideIcons;
 
   handleClose() {
-    if (this.isLoading()) return; 
+    if (this.isLoading()) return;
     this.close.emit();
   }
 

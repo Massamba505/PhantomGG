@@ -4,18 +4,14 @@ import { Router } from '@angular/router';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { CreateTournament } from '@/app/api/models/tournament.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { LucideAngularModule } from "lucide-angular";
+import { LucideAngularModule } from 'lucide-angular';
 import { TournamentForm } from '@/app/shared/components/forms/tournament-form/tournament-form';
 
 @Component({
   selector: 'app-create-tournament',
-  imports: [
-    CommonModule,
-    TournamentForm,
-    LucideAngularModule
-  ],
+  imports: [CommonModule, TournamentForm, LucideAngularModule],
   templateUrl: './create-tournament.html',
-  styleUrl: './create-tournament.css'
+  styleUrl: './create-tournament.css',
 })
 export class CreateTournamentPage {
   private tournamentService = inject(TournamentService);
@@ -26,7 +22,7 @@ export class CreateTournamentPage {
 
   onSubmit(tournamentData: CreateTournament) {
     this.saving.set(true);
-    
+
     this.tournamentService.createTournament(tournamentData).subscribe({
       next: (tournament) => {
         this.router.navigate(['/organizer/tournaments', tournament.id]);
@@ -34,7 +30,7 @@ export class CreateTournamentPage {
       },
       error: (error) => {
         this.saving.set(false);
-      }
+      },
     });
   }
 

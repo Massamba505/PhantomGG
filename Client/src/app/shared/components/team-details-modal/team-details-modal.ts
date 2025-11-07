@@ -1,6 +1,13 @@
-import { Component, OnInit, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from "lucide-angular";
+import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
 import { TeamService } from '@/app/api/services/team.service';
@@ -12,7 +19,7 @@ import { PlayerPosition } from '@/app/api/models';
   selector: 'app-team-details-modal',
   imports: [CommonModule, LucideAngularModule, Modal],
   templateUrl: './team-details-modal.html',
-  styleUrl: './team-details-modal.css'
+  styleUrl: './team-details-modal.css',
 })
 export class TeamDetailsModalComponent implements OnInit {
   private teamService = inject(TeamService);
@@ -26,9 +33,8 @@ export class TeamDetailsModalComponent implements OnInit {
 
   icons = LucideIcons;
 
-
-  getPosition(position: number){
-    return getEnumLabel(PlayerPosition, position)
+  getPosition(position: number) {
+    return getEnumLabel(PlayerPosition, position);
   }
 
   ngOnInit() {
@@ -54,7 +60,7 @@ export class TeamDetailsModalComponent implements OnInit {
       error: (error) => {
         console.error('Error loading team:', error);
         this.loading.set(false);
-      }
+      },
     });
   }
 

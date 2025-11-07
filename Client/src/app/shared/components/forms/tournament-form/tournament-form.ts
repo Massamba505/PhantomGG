@@ -7,7 +7,7 @@ import {
   signal,
   computed,
   input,
-  output
+  output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -19,7 +19,7 @@ import {
 import {
   CreateTournament,
   UpdateTournament,
-  Tournament
+  Tournament,
 } from '@/app/api/models/tournament.models';
 import { tournamentDatesValidator } from '@/app/shared/validators/date.validator';
 
@@ -70,13 +70,20 @@ export class TournamentForm implements OnInit, OnChanges {
       {
         name: [
           t?.name || '',
-          [Validators.required, Validators.minLength(3), Validators.maxLength(200)],
+          [
+            Validators.required,
+            Validators.minLength(3),
+            Validators.maxLength(200),
+          ],
         ],
         description: [
           t?.description || '',
           [Validators.required, Validators.minLength(10)],
         ],
-        location: [t?.location || '', [Validators.maxLength(200), Validators.required]],
+        location: [
+          t?.location || '',
+          [Validators.maxLength(200), Validators.required],
+        ],
         registrationStartDate: [
           t?.registrationStartDate
             ? new Date(t.registrationStartDate).toISOString().slice(0, 16)
@@ -90,19 +97,21 @@ export class TournamentForm implements OnInit, OnChanges {
           [Validators.required],
         ],
         startDate: [
-          t?.startDate
-            ? new Date(t.startDate).toISOString().slice(0, 16)
-            : '',
+          t?.startDate ? new Date(t.startDate).toISOString().slice(0, 16) : '',
           [Validators.required],
         ],
         endDate: [
-          t?.endDate
-            ? new Date(t.endDate).toISOString().slice(0, 16)
-            : '',
+          t?.endDate ? new Date(t.endDate).toISOString().slice(0, 16) : '',
           [Validators.required],
         ],
-        minTeams: [t?.minTeams || 2, [Validators.required, Validators.min(2), Validators.max(64)]],
-        maxTeams: [t?.maxTeams || 16, [Validators.required, Validators.min(4), Validators.max(128)]],
+        minTeams: [
+          t?.minTeams || 2,
+          [Validators.required, Validators.min(2), Validators.max(64)],
+        ],
+        maxTeams: [
+          t?.maxTeams || 16,
+          [Validators.required, Validators.min(4), Validators.max(128)],
+        ],
         isPublic: [t?.isPublic ?? true],
         banner: [null],
         logo: [null],

@@ -1,15 +1,8 @@
 <div class="relative" data-cy="profile-dropdown">
-  <button
-    class="flex cursor-pointer items-center gap-2 p-1 rounded-full"
-    (click)="toggleDropdown()"
-    data-cy="profile-dropdown-button"
-  >
-    <img
-      [src]="user.profilePictureUrl"
-      alt="Profile"
-      class="w-10 h-10 rounded-full border-2 object-contain"
-      data-cy="profile-avatar"
-    />
+  <button class="flex cursor-pointer items-center gap-2 p-1 rounded-full" (click)="toggleDropdown()"
+    data-cy="profile-dropdown-button">
+    <img [src]="user.profilePictureUrl" alt="Profile" class="w-10 h-10 rounded-full border-2 object-contain"
+      data-cy="profile-avatar" />
   </button>
 
   @if (open()) {
@@ -22,23 +15,15 @@
     </div>
 
     <div class="py-1" data-cy="profile-actions">
-      <button
-        routerLink="/profile"
+      <button routerLink="/profile"
         class="w-full px-4 py-2 text-left text-sm flex items-center gap-3 cursor-pointer btn-outline rounded-md"
-        data-cy="profile-link"
-      >
-        <lucide-angular
-          [img]="icons.UserCircle2"
-          class="w-4 h-4"
-          data-cy="profile-icon"
-        ></lucide-angular>
+        data-cy="profile-link">
+        <lucide-angular [img]="icons.UserCircle2" class="w-4 h-4" data-cy="profile-icon"></lucide-angular>
         Profile
       </button>
-      <button
-        (click)="logout()"
+      <button (click)="logout()"
         class="w-full px-4 py-2 text-left text-sm flex items-center gap-3 cursor-pointer btn-outline rounded-md"
-        data-cy="logout-button"
-      >
+        data-cy="logout-button">
         <lucide-angular [img]="icons.LogOut" class="w-4 h-4" data-cy="logout-icon"></lucide-angular>
         Logout
       </button>

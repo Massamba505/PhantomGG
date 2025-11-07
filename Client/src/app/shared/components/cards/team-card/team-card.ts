@@ -1,6 +1,6 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule } from "lucide-angular";
+import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '../../ui/icons/lucide-icons';
 import { Team, TeamRegistrationStatus } from '@/app/api/models';
 
@@ -18,13 +18,13 @@ export class TeamCard {
   role = input<TeamRole>('Public');
   cardType = input<TeamCardType>('default');
   isLoading = signal(false);
-  
+
   edit = output<Team>();
   delete = output<string>();
   view = output<Team>();
   approve = output<string>();
   reject = output<string>();
-  
+
   readonly icons = LucideIcons;
 
   isManager(): boolean {

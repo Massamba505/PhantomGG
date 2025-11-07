@@ -6,10 +6,6 @@
 </div>
 
 <div class="max-w-4xl" data-cy="create-tournament-container">
-  <app-tournament-form
-    [loadingState]="saving()"
-    (formSubmit)="onSubmit($event)"
-    (formCancel)="goBack()"
-    data-cy="tournament-form-component"
-  />
+  <app-tournament-form [loadingState]="saving()" (formSubmit)="onSubmit($event)" (formCancel)="goBack()"
+    data-cy="tournament-form-component" />
 </div>

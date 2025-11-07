@@ -7,7 +7,10 @@ import { TeamService } from '@/app/api/services/team.service';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { Team, TeamSearch } from '@/app/api/models/team.models';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
-import { TeamCard, TeamRole } from '@/app/shared/components/cards/team-card/team-card';
+import {
+  TeamCard,
+  TeamRole,
+} from '@/app/shared/components/cards/team-card/team-card';
 import { AuthStateService } from '@/app/store/AuthStateService';
 import { TeamSearchComponent } from '@/app/shared/components/search';
 import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModal/ConfirmDeleteModal';
@@ -21,20 +24,20 @@ import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModa
     LucideAngularModule,
     TeamCard,
     TeamSearchComponent,
-    ConfirmDeleteModal
+    ConfirmDeleteModal,
   ],
   templateUrl: './user-teams.html',
-  styleUrl: './user-teams.css'
+  styleUrl: './user-teams.css',
 })
 export class UserTeams implements OnInit {
   private teamService = inject(TeamService);
   private toastService = inject(ToastService);
   private router = inject(Router);
   private authStateStore = inject(AuthStateService);
-  
+
   readonly icons = LucideIcons;
   readonly Math = Math;
-  
+
   teams = signal<Team[]>([]);
   totalCount = signal(0);
   currentPage = signal(1);
@@ -56,13 +59,13 @@ export class UserTeams implements OnInit {
 
   loadMyTeams() {
     this.isLoading.set(true);
-    
+
     const searchParams = {
       pageNumber: this.currentPage(),
       pageSize: this.pageSize(),
-      ...this.searchCriteria()
+      ...this.searchCriteria(),
     };
-    
+
     this.teamService.getTeams(searchParams).subscribe({
       next: (response: any) => {
         this.teams.set(response.data);
@@ -74,13 +77,13 @@ export class UserTeams implements OnInit {
       },
       complete: () => {
         this.isLoading.set(false);
-      }
+      },
     });
   }
 
   onSearchChange(searchCriteria: Partial<TeamSearch>) {
     this.searchCriteria.set(searchCriteria);
-    this.currentPage.set(1); 
+    this.currentPage.set(1);
     this.loadMyTeams();
   }
 
@@ -133,7 +136,7 @@ export class UserTeams implements OnInit {
     const total = this.totalPages();
     const current = this.currentPage();
     const pages: number[] = [];
-    
+
     if (total <= 7) {
       for (let i = 1; i <= total; i++) {
         pages.push(i);
@@ -141,12 +144,12 @@ export class UserTeams implements OnInit {
     } else {
       const start = Math.max(1, current - 2);
       const end = Math.min(total, current + 2);
-      
+
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
     }
-    
+
     return pages;
   }
 
@@ -163,9 +166,9 @@ export class UserTeams implements OnInit {
   }
 
   onTeamDelete(teamId: string) {
-    const team = this.teams().find(t => t.id === teamId);
+    const team = this.teams().find((t) => t.id === teamId);
     if (!team) return;
-    
+
     this.teamToDelete.set(team);
     this.showDeleteModal.set(true);
   }
@@ -187,9 +190,8 @@ export class UserTeams implements OnInit {
         this.loadMyTeams();
       },
       error: (error) => {
-        this.toastService.error('Failed to delete team');
         this.isDeleting.set(false);
-      }
+      },
     });
   }
 }

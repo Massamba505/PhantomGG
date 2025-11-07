@@ -7,29 +7,25 @@ import { TeamSearch } from '@/app/api/models/team.models';
 
 @Component({
   selector: 'app-team-search',
-  imports: [
-    CommonModule,
-    FormsModule,
-    LucideAngularModule
-  ],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './team-search.html',
-  styleUrl: './team-search.css'
+  styleUrl: './team-search.css',
 })
 export class TeamSearchComponent {
   readonly icons = LucideIcons;
-  
+
   searchTerm = signal('');
-  
+
   searchChange = output<Partial<TeamSearch>>();
   clearFiltersSearch = output<void>();
 
   onSearch() {
     const searchCriteria: Partial<TeamSearch> = {};
-    
+
     if (this.searchTerm().trim()) {
       searchCriteria.q = this.searchTerm().trim();
     }
-    
+
     this.searchChange.emit(searchCriteria);
   }
 

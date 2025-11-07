@@ -1,6 +1,20 @@
-import { Component, input, output, OnInit, inject, computed, effect, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  OnInit,
+  inject,
+  computed,
+  effect,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
@@ -24,18 +38,16 @@ import { GenerateFixtures } from '@/app/api/models/match.models';
       >
         <div class="card">
           <div class="flex items-center gap-2 mb-2">
-            <lucide-angular
-              size="16"
-              [img]="icons.AlertCircle"
-            />
+            <lucide-angular size="16" [img]="icons.AlertCircle" />
             <span class="text-sm font-medium">Tournament Info</span>
           </div>
           <p class="text-sm ">
             {{ teams().length }} teams registered. This will generate
-            {{ singleRoundMatches() }} matches
-            @if (generateFixturesForm.get('includeReturnMatches')?.value) {
-              ({{ doubleRoundMatches() }} with return matches)
-            }
+            {{ singleRoundMatches() }} matches @if
+            (generateFixturesForm.get('includeReturnMatches')?.value) { ({{
+              doubleRoundMatches()
+            }}
+            with return matches) }
           </p>
         </div>
 
@@ -50,7 +62,9 @@ import { GenerateFixtures } from '@/app/api/models/match.models';
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-2">Days Between Matches</label>
+          <label class="block text-sm font-medium mb-2"
+            >Days Between Matches</label
+          >
           <input
             type="number"
             formControlName="daysBetweenMatches"
@@ -61,7 +75,9 @@ import { GenerateFixtures } from '@/app/api/models/match.models';
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-2">Default Venue (Optional)</label>
+          <label class="block text-sm font-medium mb-2"
+            >Default Venue (Optional)</label
+          >
           <input
             type="text"
             formControlName="defaultVenue"
@@ -100,26 +116,26 @@ import { GenerateFixtures } from '@/app/api/models/match.models';
         </div>
       </form>
     </app-modal>
-  `
+  `,
 })
 export class GenerateFixturesModalComponent {
   isOpen = input.required<boolean>();
   teams = input.required<Team[]>();
   tournament = input.required<Tournament | null>();
   tournamentId = input.required<string>();
-  
+
   close = output<void>();
   generateFixtures = output<GenerateFixtures>();
-  
+
   private fb = inject(FormBuilder);
   readonly icons = LucideIcons;
-  
+
   generateFixturesForm: FormGroup = this.fb.group({
-      startDate: ['', Validators.required],
-      daysBetweenMatches: [3, [Validators.min(1)]],
-      defaultVenue: [''],
-      includeReturnMatches: [false]
-    });
+    startDate: ['', Validators.required],
+    daysBetweenMatches: [3, [Validators.min(1)]],
+    defaultVenue: [''],
+    includeReturnMatches: [false],
+  });
 
   singleRoundMatches = computed(() => {
     const teamCount = this.teams().length;
@@ -145,14 +161,14 @@ export class GenerateFixturesModalComponent {
 
   onSubmit() {
     if (this.generateFixturesForm.invalid) return;
-    
+
     const formValue = this.generateFixturesForm.value;
     const fixtureData: GenerateFixtures = {
       tournamentId: this.tournamentId(),
       startDate: formValue.startDate,
       daysBetweenMatches: formValue.daysBetweenMatches,
       defaultVenue: formValue.defaultVenue,
-      includeReturnMatches: formValue.includeReturnMatches
+      includeReturnMatches: formValue.includeReturnMatches,
     };
 
     this.generateFixtures.emit(fixtureData);
@@ -161,7 +177,7 @@ export class GenerateFixturesModalComponent {
   reset() {
     this.generateFixturesForm?.reset({
       daysBetweenMatches: 3,
-      includeReturnMatches: false
+      includeReturnMatches: false,
     });
   }
 

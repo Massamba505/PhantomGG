@@ -13,20 +13,11 @@
     </p>
 
     <div class="flex justify-center gap-3 mt-6">
-      <button
-        class="btn btn-outline"
-        [disabled]="isLoading()"
-        (click)="handleClose()"
-        data-cy="cancel-delete-button"
-      >
+      <button class="btn btn-outline" [disabled]="isLoading()" (click)="handleClose()" data-cy="cancel-delete-button">
         Cancel
       </button>
-      <button
-        class="btn btn-destructive"
-        [disabled]="isLoading()"
-        (click)="handleConfirm()"
-        data-cy="confirm-delete-button"
-      >
+      <button class="btn btn-destructive" [disabled]="isLoading()" (click)="handleConfirm()"
+        data-cy="confirm-delete-button">
         Delete {{ entityName() }}
       </button>
     </div>
