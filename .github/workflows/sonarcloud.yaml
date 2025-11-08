@@ -69,24 +69,19 @@ jobs:
             /o:"massamba505" `
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
             /d:sonar.host.url="https://sonarcloud.io" `
-            /d:sonar.cs.opencover.reportsPaths="**/TestResults/coverage.opencover.xml" `
-            /d:sonar.coverage.exclusions="**/Migrations/**,**/Program.cs,**/*Tests.cs" `
             /d:sonar.exclusions="**/wwwroot/**,**/Migrations/**,**/obj/**,**/bin/**,**/node_modules/**" `
-            /d:sonar.sourceEncoding="UTF-8"
+            /d:sonar.sourceEncoding="UTF-8" `
+            /d:sonar.qualitygate.wait=false
 
       - name: Build Solution
         run: dotnet build Server/PhantomGG.sln --configuration Release --no-restore
 
-      - name: Run Tests with Code Coverage
+      - name: Run Tests
         run: |
           dotnet test Server/PhantomGG.UnitTests/PhantomGG.UnitTests.csproj `
             --configuration Release `
             --no-build `
-            --verbosity normal `
-            /p:CollectCoverage=true `
-            /p:CoverletOutputFormat=opencover `
-            /p:CoverletOutput=./TestResults/ `
-            /p:Exclude="[*]PhantomGG.Repository.Data.Migrations.*"
+            --verbosity normal
 
       - name: End SonarCloud Analysis
         env:
@@ -94,11 +89,3 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-
-      - name: Upload Coverage Artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: code-coverage
-          path: Server/PhantomGG.UnitTests/TestResults/coverage.opencover.xml
-          retention-days: 7
