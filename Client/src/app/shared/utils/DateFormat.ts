@@ -3,7 +3,7 @@ export class DateValidator {
     if (!dateString) return '';
 
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString;
+    if (Number.isNaN(date.getTime())) return dateString;
 
     if (short) {
       return new Intl.DateTimeFormat('en-US', {

@@ -7,7 +7,7 @@ export function playerCountValidator(min: number, max: number): ValidatorFn {
     }
 
     const count = Number(control.value);
-    if (isNaN(count)) {
+    if (Number.isNaN(count)) {
       return { notANumber: true };
     }
 
