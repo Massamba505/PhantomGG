@@ -184,7 +184,7 @@ export class PlayerForm implements OnInit {
 
   onFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
+    if (input.files?.[0]) {
       const file = input.files[0];
       this.selectedFile.set(file);
       this.form.patchValue({ photoUrl: file });

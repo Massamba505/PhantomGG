@@ -60,8 +60,8 @@ export class TournamentDetailsComponent implements OnInit {
   private updateDisplayedDescription() {
     const desc = this.tournament()?.description || '';
     const plainText = desc
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<[^>]*>/g, '');
+      .replaceAll(/<br\s*\/?>/gi, '\n')
+      .replaceAll(/<[^>]*>/g, '');
 
     const lines = plainText.split(/\r?\n/).filter((line) => line.trim() !== '');
     const isLong =
