@@ -28,10 +28,10 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   styleUrl: './tournament-list.css',
 })
 export class TournamentListComponent implements OnInit {
-  private tournamentService = inject(TournamentService);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
-  private authStateStore = inject(AuthStateService);
+  private readonly tournamentService = inject(TournamentService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
+ private readonly authStateStore = inject(AuthStateService);
 
   readonly icons = LucideIcons;
 

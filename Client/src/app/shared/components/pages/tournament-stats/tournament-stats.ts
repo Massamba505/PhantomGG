@@ -32,16 +32,16 @@ export class TournamentStatsComponent implements OnInit {
   tournament = input<Tournament | null>(null);
   showBackButton = input<boolean>(true);
   backRoute = input<string>('');
-  private _tournamentId = signal<string>('');
+  private readonly _tournamentId = signal<string>('');
 
   getTournamentId = computed(() => {
     return this.tournamentId() || this._tournamentId();
   });
 
-  private tournamentService = inject(TournamentService);
-  private toastService = inject(ToastService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private readonly tournamentService = inject(TournamentService);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly icons = LucideIcons;
 
@@ -59,7 +59,7 @@ export class TournamentStatsComponent implements OnInit {
     if (this.backRoute()) {
       this.router.navigate([this.backRoute()]);
     } else {
-      window.history.back();
+      globalThis.history.back();
     }
   }
 

@@ -22,7 +22,7 @@ import { PlayerPosition } from '@/app/api/models';
   styleUrl: './team-details-modal.css',
 })
 export class TeamDetailsModalComponent implements OnInit {
-  private teamService = inject(TeamService);
+  private readonly teamService = inject(TeamService);
 
   isOpen = input<boolean>(false);
   teamId = input<string>('');

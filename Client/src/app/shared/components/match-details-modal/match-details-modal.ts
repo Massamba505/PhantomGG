@@ -28,8 +28,8 @@ import { MatchStatus, PlayerPosition } from '@/app/api/models';
   styleUrl: './match-details-modal.css',
 })
 export class MatchDetailsModalComponent implements OnInit {
-  private matchService = inject(MatchService);
-  private teamService = inject(TeamService);
+  private readonly matchService = inject(MatchService);
+  private readonly teamService = inject(TeamService);
 
   isOpen = input<boolean>(false);
   matchId = input<string>('');
@@ -100,8 +100,9 @@ export class MatchDetailsModalComponent implements OnInit {
     if (!this.matchId()) return;
 
     this.matchService.getMatchEvents(this.matchId()).subscribe({
-      next: (events) => {
-        this.matchEvents.set(events.sort((a, b) => a.minute - b.minute));
+      next: (events:MatchEvent[]) => {
+        events.sort((a, b) => a.minute - b.minute);
+        this.matchEvents.set(events);
         this.loading.set(false);
       },
       error: (error) => {
@@ -138,7 +139,7 @@ export class MatchDetailsModalComponent implements OnInit {
     this.awayTeamPlayers.set([]);
   }
 
-  getEventIcon(eventType: string | any): any {
+  getEventIcon(eventType: any): any {
     const eventTypeString =
       typeof eventType === 'string' ? eventType : eventType.toString();
     switch (eventTypeString.toLowerCase()) {
@@ -178,7 +179,7 @@ export class MatchDetailsModalComponent implements OnInit {
     return getEnumLabel(MatchEventType, eventType) || eventType.toString();
   }
 
-  getEventColor(eventType: string | any): string {
+  getEventColor(eventType: any): string {
     const eventTypeString =
       typeof eventType === 'string' ? eventType : eventType.toString();
     switch (eventTypeString.toLowerCase()) {

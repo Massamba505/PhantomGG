@@ -18,7 +18,7 @@ import {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiClient = inject(ApiClient);
+  private readonly apiClient = inject(ApiClient);
 
   register(request: RegisterRequestDto): Observable<AuthDto> {
     return this.apiClient.post<AuthDto>(API_ENDPOINTS.AUTH.REGISTER, request);

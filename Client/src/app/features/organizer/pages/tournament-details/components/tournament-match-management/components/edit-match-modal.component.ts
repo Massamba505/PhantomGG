@@ -111,7 +111,7 @@ export class EditMatchModalComponent {
   close = output<void>();
   update = output<{ matchId: string; updateData: UpdateMatch }>();
 
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
 
   editMatchForm: FormGroup = this.fb.group({
     homeTeamId: ['', Validators.required],

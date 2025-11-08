@@ -15,7 +15,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Modal } from '@/app/shared/components/ui/modal/modal';
-import { Team, Player } from '@/app/api/models/team.models';
+import { Team } from '@/app/api/models/team.models';
 import {
   Match,
   CreateMatchEvent,
@@ -114,7 +114,7 @@ export class AddEventModalComponent implements OnInit {
   close = output<void>();
   addEvent = output<CreateMatchEvent>();
 
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
   addEventForm!: FormGroup;
 
   selectedTeamId = signal<string | null>(null);
@@ -149,7 +149,7 @@ export class AddEventModalComponent implements OnInit {
 
   eventTypes = computed(() => {
     return Object.keys(MatchEventType)
-      .filter((key) => isNaN(Number(key)))
+      .filter((key) => Number.Number.isNaN(Number(key)))
       .map((key) => ({
         id: MatchEventType[key as keyof typeof MatchEventType] as number,
         value: key,
@@ -200,6 +200,6 @@ export class AddEventModalComponent implements OnInit {
   }
 
   formatEventType(eventType: string): string {
-    return eventType.replace(/([A-Z])/g, ' $1').trim();
+    return eventType.replaceAll(/([A-Z])/g, ' $1').trim();
   }
 }

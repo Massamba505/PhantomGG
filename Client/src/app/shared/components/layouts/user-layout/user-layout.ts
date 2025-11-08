@@ -16,9 +16,9 @@ import { UserRoles } from '@/app/api/models';
   styleUrls: ['./user-layout.css'],
 })
 export class UserLayout implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private authState = inject(AuthStateService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly authState = inject(AuthStateService);
 
   sidebarOpen = signal(true);
   pageTitle = signal('Dashboard');

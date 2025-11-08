@@ -17,7 +17,7 @@ import {
   providedIn: 'root'
 })
 export class TeamService {
-  private apiClient = inject(ApiClient);
+  private readonly apiClient = inject(ApiClient);
 
   getTeams(params?: Partial<TeamQuery>): Observable<PagedResult<TeamDto>> {
     const query: TeamQuery = {

@@ -2,11 +2,9 @@ import {
   Component,
   input,
   output,
-  OnInit,
   inject,
   computed,
-  effect,
-  SimpleChanges,
+  effect
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -127,7 +125,7 @@ export class GenerateFixturesModalComponent {
   close = output<void>();
   generateFixtures = output<GenerateFixtures>();
 
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
   readonly icons = LucideIcons;
 
   generateFixturesForm: FormGroup = this.fb.group({

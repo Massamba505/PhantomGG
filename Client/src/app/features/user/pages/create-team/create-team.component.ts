@@ -15,9 +15,9 @@ import { TeamFormComponent } from '../../../../shared/components/forms/team-form
   styleUrl: './create-team.component.css',
 })
 export class CreateTeamComponent {
-  private teamService = inject(TeamService);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
+  private readonly teamService = inject(TeamService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   saving = signal(false);
   icons = LucideIcons;

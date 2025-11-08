@@ -14,10 +14,10 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   templateUrl: './edit-team.html',
 })
 export class EditTeamComponent implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private teamService = inject(TeamService);
-  private toastService = inject(ToastService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly teamService = inject(TeamService);
+  private readonly toastService = inject(ToastService);
 
   team = signal<Team | null>(null);
   isLoading = signal(true);

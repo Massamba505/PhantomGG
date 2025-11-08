@@ -1,4 +1,4 @@
-import { Component, signal, computed, OnInit, inject } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ActivatedRoute,
@@ -20,8 +20,8 @@ import { AuthStateService } from '@/app/store/AuthStateService';
 })
 export class PublicLayout implements OnInit {
   readonly router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private readonly authState = inject(AuthStateService);
+  private readonly route = inject(ActivatedRoute);
+ private readonly authState= inject(AuthStateService);
   isAuthenticated = signal(this.authState.isAuthenticated());
 
   readonly icons = LucideIcons;

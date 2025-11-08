@@ -102,7 +102,7 @@ export class UpdateResultModalComponent implements OnInit {
   updateResult = output<{ matchId: string; result: MatchResult }>();
   addEvent = output<void>();
 
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
   readonly icons = LucideIcons;
 
   updateResultForm!: FormGroup;
@@ -175,13 +175,13 @@ export class UpdateResultModalComponent implements OnInit {
   getEventIconClass(eventType: MatchEventType): string {
     switch (eventType) {
       case MatchEventType.Goal:
-        return 'text-green-600';
+        return 'text-success';
       case MatchEventType.YellowCard:
-        return 'text-yellow-600';
+        return 'text-warning';
       case MatchEventType.RedCard:
-        return 'text-red-600';
+        return 'text-destructive';
       case MatchEventType.Foul:
-        return 'text-red-600';
+        return 'text-destructive';
       case MatchEventType.Substitution:
         return 'text-muted';
       default:

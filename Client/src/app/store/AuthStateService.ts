@@ -15,11 +15,11 @@ import { AuthService } from '../api/services';
   providedIn: 'root',
 })
 export class AuthStateService {
-  private authService = inject(AuthService);
-  private tokenService = inject(TokenRefreshService);
+  private readonly authService = inject(AuthService);
+  private readonly tokenService = inject(TokenRefreshService);
 
-  private userSignal = signal<User | null>(null);
-  private loadingSignal = signal<boolean>(false);
+  private readonly userSignal = signal<User | null>(null);
+  private readonly loadingSignal = signal<boolean>(false);
 
   readonly user = this.userSignal.asReadonly();
   readonly loading = this.loadingSignal.asReadonly();

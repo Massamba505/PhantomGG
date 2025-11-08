@@ -5,14 +5,13 @@ import {
   OnInit,
   inject,
   computed,
-  viewChild,
-  output,
+  output
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '@/app/shared/services/toast.service';
 
 import { Match, MatchEvent } from '@/app/api/models/match.models';
-import { Team, Player } from '@/app/api/models/team.models';
+import { Team } from '@/app/api/models/team.models';
 import {
   MatchStatus,
   TeamRegistrationStatus,
@@ -42,9 +41,9 @@ import {
 export class TournamentMatchManagementComponent implements OnInit {
   tournamentId = input.required<string>();
 
-  private matchService = inject(MatchService);
-  private tournamentService = inject(TournamentService);
-  private toastService = inject(ToastService);
+  private readonly matchService = inject(MatchService);
+  private readonly tournamentService = inject(TournamentService);
+  private readonly toastService = inject(ToastService);
   matchView = output<string>();
 
   matches = signal<Match[]>([]);

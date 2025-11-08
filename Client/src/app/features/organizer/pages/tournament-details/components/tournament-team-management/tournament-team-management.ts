@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { TournamentTeam } from '@/app/api/models/team.models';
 import {
-  TeamRegistrationStatus,
-  UserRoles,
+  TeamRegistrationStatus
 } from '@/app/api/models/common.models';
 import { TournamentService } from '@/app/api/services/tournament.service';
 import { ToastService } from '@/app/shared/services/toast.service';
@@ -26,8 +25,8 @@ type TeamTab = 'approved' | 'pending';
 export class TournamentTeamManagementComponent implements OnInit {
   tournamentId = input.required<string>();
 
-  private tournamentService = inject(TournamentService);
-  private toastService = inject(ToastService);
+  private readonly tournamentService = inject(TournamentService);
+  private readonly toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
 

@@ -33,10 +33,10 @@ import { TournamentStatus } from '@/app/api/models';
   styleUrl: './user-tournaments.css',
 })
 export class UserTournaments implements OnInit {
-  private tournamentService = inject(TournamentService);
-  private teamService = inject(TeamService);
-  private toastService = inject(ToastService);
-  private router = inject(Router);
+  private readonly tournamentService = inject(TournamentService);
+  private readonly teamService = inject(TeamService);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
 
   readonly icons = LucideIcons;
 

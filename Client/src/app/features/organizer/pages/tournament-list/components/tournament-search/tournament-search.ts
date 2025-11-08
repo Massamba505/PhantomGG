@@ -9,7 +9,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  Tournament,
   TournamentFormat,
   TournamentSearch,
 } from '@/app/api/models/tournament.models';
@@ -26,7 +25,7 @@ export class TournamentSearchComponent implements OnInit {
   searchChange = output<Partial<TournamentSearch>>();
   clearFiltersSearch = output<void>();
 
-  private tournamentService = inject(TournamentService);
+  private readonly tournamentService = inject(TournamentService);
 
   searchTerm = signal('');
   selectedStatus = signal<TournamentStatus | undefined>(undefined);

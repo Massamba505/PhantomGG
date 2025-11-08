@@ -24,7 +24,7 @@ import { MatchDto } from '../models/match.models';
   providedIn: 'root'
 })
 export class TournamentService {
-  private apiClient = inject(ApiClient);
+  private readonly apiClient = inject(ApiClient);
 
   getTournaments(params?: Partial<TournamentQuery>): Observable<PagedResult<TournamentDto>> {
     const query: TournamentQuery = {

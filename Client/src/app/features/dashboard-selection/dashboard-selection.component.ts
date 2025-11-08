@@ -10,8 +10,8 @@ import { UserRoles } from '@/app/api/models';
   template: '',
 })
 export class DashboardSelectionComponent implements OnInit {
-  private router = inject(Router);
-  private authState = inject(AuthStateService);
+  private readonly router = inject(Router);
+ private readonly authState = inject(AuthStateService);
   user = this.authState.user;
 
   ngOnInit() {

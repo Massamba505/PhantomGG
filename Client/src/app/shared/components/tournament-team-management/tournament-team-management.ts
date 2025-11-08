@@ -30,8 +30,8 @@ type TeamTab = 'approved';
 export class TournamentTeamManagementComponent implements OnInit {
   tournamentId = input.required<string>();
 
-  private tournamentService = inject(TournamentService);
-  private toastService = inject(ToastService);
+  private readonly tournamentService = inject(TournamentService);
+  private readonly toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
   teamView = output<string>();
@@ -67,21 +67,19 @@ export class TournamentTeamManagementComponent implements OnInit {
 
   getCurrentTeams(): TournamentTeam[] {
     const tab = this.activeTab();
-    switch (tab) {
-      case 'approved':
+    if(tab == 'approved'){
         return this.approvedTeams();
-      default:
-        return [];
     }
+    
+    return [];
   }
 
   getTeamCount(tab: TeamTab): number {
-    switch (tab) {
-      case 'approved':
-        return this.approvedTeams().length;
-      default:
-        return 0;
+    if(tab == 'approved'){
+      return this.approvedTeams().length;
     }
+    
+    return 0;
   }
 
   getTabClass(tab: TeamTab): string {
@@ -112,8 +110,7 @@ export class TournamentTeamManagementComponent implements OnInit {
   }
 
   getTeamCardType(): TeamCardType {
-    const tab = this.activeTab();
-    return tab === 'approved' ? 'approved' : 'approved';
+    return 'approved';
   }
 
   onTeamView(team: any) {

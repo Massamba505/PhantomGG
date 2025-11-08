@@ -16,10 +16,10 @@ import { AuthService } from '@/app/api/services';
   providedIn: 'root',
 })
 export class TokenRefreshService {
-  private refreshInProgress = new BehaviorSubject<boolean>(false);
-  private refreshTokenSubject = new BehaviorSubject<string | null>(null);
+  private readonly refreshInProgress = new BehaviorSubject<boolean>(false);
+  private readonly refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
-  private authService = inject(AuthService);
+  private readonly authService = inject(AuthService);
 
   getToken(): string | null {
     return TokenStorage.getAccessToken();
