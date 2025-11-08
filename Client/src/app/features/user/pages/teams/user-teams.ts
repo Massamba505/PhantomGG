@@ -30,10 +30,10 @@ import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModa
   styleUrl: './user-teams.css',
 })
 export class UserTeams implements OnInit {
-  private teamService = inject(TeamService);
-  private toastService = inject(ToastService);
-  private router = inject(Router);
-  private authStateStore = inject(AuthStateService);
+  private readonly teamService = inject(TeamService);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
+  private readonly authStateStore = inject(AuthStateService);
 
   readonly icons = LucideIcons;
   readonly Math = Math;
@@ -192,6 +192,9 @@ export class UserTeams implements OnInit {
       error: (error) => {
         this.isDeleting.set(false);
       },
+      complete: ()=>{
+        this.isDeleting.set(false);
+      }
     });
   }
 }

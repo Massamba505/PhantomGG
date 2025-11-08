@@ -17,9 +17,9 @@ import { UserRoles } from '@/app/api/models';
   templateUrl: './signup.html',
 })
 export class Signup {
-  private fb = inject(FormBuilder);
-  private authState = inject(AuthStateService);
-  private router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly authState = inject(AuthStateService);
+  private readonly router = inject(Router);
 
   readonly icons = LucideIcons;
 

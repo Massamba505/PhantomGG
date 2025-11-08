@@ -19,7 +19,7 @@ import {
   CreateMatchEvent,
   GenerateFixtures,
 } from '@/app/api/models/match.models';
-import { Team, Player } from '@/app/api/models/team.models';
+import { Team } from '@/app/api/models/team.models';
 import {
   MatchStatus,
   TeamRegistrationStatus,
@@ -59,9 +59,9 @@ import {
 export class TournamentMatchManagementComponent implements OnInit {
   tournamentId = input.required<string>();
 
-  private matchService = inject(MatchService);
-  private tournamentService = inject(TournamentService);
-  private toastService = inject(ToastService);
+  private readonly matchService = inject(MatchService);
+  private readonly tournamentService = inject(TournamentService);
+  private readonly toastService = inject(ToastService);
 
   matches = signal<Match[]>([]);
   tournament = signal<Tournament | null>(null);

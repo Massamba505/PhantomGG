@@ -37,7 +37,7 @@ export class TournamentForm implements OnInit, OnChanges {
   formUpdate = output<UpdateTournament>();
   formCancel = output<void>();
 
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
 
   tournamentForm!: FormGroup;
   submitted = signal(false);

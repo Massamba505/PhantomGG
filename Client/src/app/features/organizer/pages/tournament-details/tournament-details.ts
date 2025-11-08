@@ -26,10 +26,10 @@ import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
   styleUrl: './tournament-details.css',
 })
 export class TournamentDetailsComponent implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private tournamentService = inject(TournamentService);
-  private toastService = inject(ToastService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly tournamentService = inject(TournamentService);
+  private readonly toastService = inject(ToastService);
 
   tournament = signal<Tournament | null>(null);
   loading = signal(true);

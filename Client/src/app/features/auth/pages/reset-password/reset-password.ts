@@ -16,11 +16,11 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   templateUrl: './reset-password.html',
 })
 export class ResetPassword implements OnInit {
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
 

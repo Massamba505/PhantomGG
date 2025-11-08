@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@/app/api/services';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { LucideAngularModule } from 'lucide-angular';
@@ -12,10 +12,10 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   templateUrl: './verify-email.html',
 })
 export class VerifyEmail implements OnInit {
-  private authService = inject(AuthService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
+  private readonly authService = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
 

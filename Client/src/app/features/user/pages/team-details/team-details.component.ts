@@ -35,11 +35,11 @@ import { ConfirmDeleteModal } from '@/app/shared/components/ui/ConfirmDeleteModa
   styleUrl: './team-details.component.css',
 })
 export class TeamDetailsComponent implements OnInit {
-  private teamService = inject(TeamService);
-  private toastService = inject(ToastService);
-  private authStateService = inject(AuthStateService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private readonly teamService = inject(TeamService);
+  private readonly toastService = inject(ToastService);
+  private readonly authStateService = inject(AuthStateService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly icons = LucideIcons;
 

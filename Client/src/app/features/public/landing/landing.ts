@@ -9,6 +9,6 @@ import { AuthStateService } from '@/app/store/AuthStateService';
   styleUrl: './landing.css',
 })
 export class Landing {
-  private readonly authState = inject(AuthStateService);
+ private readonly authState= inject(AuthStateService);
   isAuthenticated = signal(this.authState.isAuthenticated());
 }

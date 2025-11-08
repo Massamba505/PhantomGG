@@ -33,7 +33,7 @@ import { strictEmailValidator } from '@/app/shared/validators/email.validator';
   imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
 })
 export class PlayerForm implements OnInit {
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
 
   player = input<Player | null>(null);
   teamId = input.required<string>();
@@ -55,7 +55,7 @@ export class PlayerForm implements OnInit {
       const currentPlayer = this.player();
       this.isEditMode = !!currentPlayer;
       debugger;
-      if (this.form && this.form.controls) {
+      if (this.form?.controls) {
         if (currentPlayer) {
           this.form.patchValue({
             firstName: currentPlayer.firstName || '',

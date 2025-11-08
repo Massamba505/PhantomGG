@@ -18,7 +18,7 @@ import {
   providedIn: 'root'
 })
 export class MatchService {
-  private apiClient = inject(ApiClient);
+  private readonly apiClient = inject(ApiClient);
 
   getMatches(params?: Partial<MatchQuery>): Observable<PagedResult<MatchDto>> {
     const query: MatchQuery = {

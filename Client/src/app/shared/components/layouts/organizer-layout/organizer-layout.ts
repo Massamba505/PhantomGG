@@ -3,8 +3,7 @@ import {
   signal,
   computed,
   OnInit,
-  inject,
-  ViewChild,
+  inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -23,9 +22,9 @@ import { UserRoles } from '@/app/api/models';
   styleUrls: ['./organizer-layout.css'],
 })
 export class OrganizerLayout implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private authState = inject(AuthStateService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly authState = inject(AuthStateService);
 
   sidebarOpen = signal(false);
   pageTitle = signal('Dashboard');

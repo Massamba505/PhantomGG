@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '@/app/api/services';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { strictEmailValidator } from '@/app/shared/validators/email.validator';
@@ -14,10 +14,10 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   templateUrl: './forgot-password.html',
 })
 export class ForgotPassword {
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
 

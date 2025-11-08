@@ -13,7 +13,7 @@ import {
   providedIn: 'root'
 })
 export class UserService {
-  private apiClient = inject(ApiClient);
+  private readonly apiClient = inject(ApiClient);
 
   getProfile(): Observable<UserDto> {
     return this.apiClient.get<UserDto>(API_ENDPOINTS.USERS.PROFILE);

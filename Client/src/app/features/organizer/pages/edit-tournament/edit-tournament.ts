@@ -17,9 +17,9 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   styleUrl: './edit-tournament.css',
 })
 export class EditTournamentPage implements OnInit {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private tournamentService = inject(TournamentService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly tournamentService = inject(TournamentService);
 
   tournament = signal<Tournament | null>(null);
   loading = signal(true);

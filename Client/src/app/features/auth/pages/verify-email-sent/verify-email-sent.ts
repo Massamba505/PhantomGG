@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '@/app/api/services';
@@ -11,17 +11,17 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './verify-email-sent.html',
 })
-export class VerifyEmailSent {
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
+export class VerifyEmailSent implements OnInit {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
 
   email = signal('');
   resending = signal(false);
 
-  constructor() {
+  ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state?.['email']) {
       this.email.set(navigation.extras.state['email']);

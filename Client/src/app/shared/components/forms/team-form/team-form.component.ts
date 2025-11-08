@@ -30,7 +30,7 @@ export class TeamFormComponent implements OnInit, OnChanges {
   formSubmit = output<CreateTeam | UpdateTeam>();
   formCancel = output<void>();
 
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
 
   teamForm!: FormGroup;
   submitted = signal(false);

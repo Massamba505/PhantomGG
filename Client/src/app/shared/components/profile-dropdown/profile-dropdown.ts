@@ -19,9 +19,9 @@ import { LucideIcons } from '../ui/icons/lucide-icons';
   templateUrl: './profile-dropdown.html',
 })
 export class ProfileDropdown {
-  private router = inject(Router);
-  private el = inject(ElementRef);
-  private authService = inject(AuthStateService);
+  private readonly router = inject(Router);
+  private readonly el = inject(ElementRef);
+  private readonly authService = inject(AuthStateService);
   readonly user = this.authService.user()!;
   open = signal(false);
 

@@ -28,8 +28,8 @@ import { MatchStatus, PlayerPosition } from '@/app/api/models';
   styleUrl: './match-details-modal.css',
 })
 export class MatchDetailsModalComponent implements OnInit {
-  private matchService = inject(MatchService);
-  private teamService = inject(TeamService);
+  private readonly matchService = inject(MatchService);
+  private readonly teamService = inject(TeamService);
 
   isOpen = input<boolean>(false);
   matchId = input<string>('');

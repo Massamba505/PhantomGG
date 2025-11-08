@@ -16,11 +16,11 @@ import { LoginRequest } from '@/app/api/models';
   templateUrl: './login.html',
 })
 export class Login {
-  private fb = inject(FormBuilder);
-  private authState = inject(AuthStateService);
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private toastService = inject(ToastService);
+  private readonly fb = inject(FormBuilder);
+  private readonly authState = inject(AuthStateService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   readonly icons = LucideIcons;
 

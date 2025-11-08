@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthStateService } from '@/app/store/AuthStateService';
@@ -13,10 +13,10 @@ import { LucideIcons } from '@/app/shared/components/ui/icons/lucide-icons';
   templateUrl: './role-selection-page.html',
   imports: [CommonModule, RoleSelection, LucideAngularModule],
 })
-export class RoleSelectionPage {
-  private router = inject(Router);
-  private authState = inject(AuthStateService);
-  private toast = inject(ToastService);
+export class RoleSelectionPage implements OnInit {
+  private readonly router = inject(Router);
+  private readonly authState = inject(AuthStateService);
+  private readonly toast = inject(ToastService);
 
   readonly icons = LucideIcons;
   readonly UserRoles = UserRoles;
@@ -24,7 +24,7 @@ export class RoleSelectionPage {
   signupData: any = null;
   loading = this.authState.loading;
 
-  constructor() {
+  ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state?.['signupData']) {
       this.signupData = navigation.extras.state['signupData'];

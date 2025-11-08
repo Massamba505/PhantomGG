@@ -91,7 +91,7 @@ export class CreateMatchModalComponent {
   close = output<void>();
   create = output<CreateMatch>();
 
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
   createMatchForm: FormGroup = this.fb.group({
     homeTeamId: ['', Validators.required],
     awayTeamId: ['', Validators.required],

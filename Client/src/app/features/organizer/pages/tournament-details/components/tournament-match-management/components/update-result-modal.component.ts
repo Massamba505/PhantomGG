@@ -140,7 +140,7 @@ export class UpdateResultModalComponent implements OnInit {
   updateResult = output<{ matchId: string; result: MatchResult }>();
   addEvent = output<void>();
 
-  private fb = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
   readonly icons = LucideIcons;
 
   updateResultForm!: FormGroup;

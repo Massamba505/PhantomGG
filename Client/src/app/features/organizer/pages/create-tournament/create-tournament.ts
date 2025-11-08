@@ -14,8 +14,8 @@ import { TournamentForm } from '@/app/shared/components/forms/tournament-form/to
   styleUrl: './create-tournament.css',
 })
 export class CreateTournamentPage {
-  private tournamentService = inject(TournamentService);
-  private router = inject(Router);
+  private readonly tournamentService = inject(TournamentService);
+  private readonly router = inject(Router);
 
   saving = signal(false);
   icons = LucideIcons;
