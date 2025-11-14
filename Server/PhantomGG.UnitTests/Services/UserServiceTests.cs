@@ -53,6 +53,7 @@ public class UserServiceTests
             LastName = "Doe",
             Email = "massamba@phantomgg.com",
             Role = (int)UserRoles.User,
+            ProfilePictureUrl = "",
             IsActive = true
         };
 
@@ -97,6 +98,8 @@ public class UserServiceTests
             FirstName = "John",
             LastName = "Doe",
             Email = "massamba@phantomgg.com",
+            Role = (int)UserRoles.User,
+            ProfilePictureUrl = "",
             IsActive = true
         };
 
@@ -133,6 +136,8 @@ public class UserServiceTests
             Id = userId,
             Email = "massamba@phantomgg.com",
             PasswordHash = "old-hashed-password",
+            Role = (int)UserRoles.User,
+            ProfilePictureUrl = "",
             IsActive = true
         };
 
@@ -181,6 +186,8 @@ public class UserServiceTests
             Id = userId,
             Email = "massamba@phantomgg.com",
             PasswordHash = "old-hashed-password",
+            Role = (int)UserRoles.User,
+            ProfilePictureUrl = "",
             IsActive = true
         };
 
@@ -216,6 +223,7 @@ public class UserServiceTests
             Id = userId,
             Email = "massamba@phantomgg.com",
             ProfilePictureUrl = string.Empty,
+            Role = (int)UserRoles.User,
             IsActive = true
         };
 
@@ -261,6 +269,7 @@ public class UserServiceTests
             Id = userId,
             Email = "massamba@phantomgg.com",
             ProfilePictureUrl = "https://phantomgg.com/old-profile.jpg",
+            Role = (int)UserRoles.User,
             IsActive = true
         };
 
