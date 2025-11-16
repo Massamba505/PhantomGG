@@ -23,11 +23,18 @@ export class VerifyEmailSent implements OnInit {
 
   ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras.state?.['email']) {
+    if (navigation?.extras?.state?.['email']) {
       this.email.set(navigation.extras.state['email']);
-    } else {
-      this.router.navigate(['/auth/signup']);
+      return;
     }
+
+    const histState = (history && (history.state as any)) || null;
+    if (histState?.email) {
+      this.email.set(histState.email);
+      return;
+    }
+
+    this.router.navigate(['/auth/signup']);
   }
 
   resendVerification() {
