@@ -34,6 +34,16 @@
               {
                 "glob": "**/*",
                 "input": "src/assets"
+              },
+              {
+                "glob": "env-config.js",
+                "input": "src",
+                "output": "/"
+              },
+              {
+                "glob": "env-config.template.js",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": ["src/styles.css"]
