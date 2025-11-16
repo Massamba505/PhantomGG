@@ -109,6 +109,7 @@ services:
       - StorageSettings__Provider=${STORAGE_PROVIDER}
       - StorageSettings__AzureStorageConnectionString=${AZURE_STORAGE_CONNECTION_STRING}
       - StorageSettings__BlobContainerName=${BLOB_CONTAINER_NAME}
+      - StorageSettings__PublicBlobUrl=${PUBLIC_BLOB_URL}
     depends_on:
       flyway:
         condition: service_completed_successfully

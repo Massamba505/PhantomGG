@@ -13,6 +13,7 @@ public class AzureBlobImageService : IImageService
 {
     private readonly BlobServiceClient _blobServiceClient;
     private readonly string _containerName;
+    private readonly string? _publicBlobBaseUrl;
 
     public AzureBlobImageService(IOptions<StorageSettings> storageSettings)
     {
@@ -25,6 +26,9 @@ public class AzureBlobImageService : IImageService
 
         _blobServiceClient = new BlobServiceClient(settings.AzureStorageConnectionString);
         _containerName = settings.BlobContainerName;
+        _publicBlobBaseUrl = string.IsNullOrWhiteSpace(settings.PublicBlobUrl)
+            ? null
+            : settings.PublicBlobUrl.TrimEnd('/');
     }
 
     public async Task<string> SaveImageAsync(IFormFile file, ImageType imageType, Guid? entityId = null)
@@ -47,6 +51,11 @@ public class AzureBlobImageService : IImageService
             HttpHeaders = blobHttpHeaders
         });
 
+        if (!string.IsNullOrEmpty(_publicBlobBaseUrl))
+        {
+            return $"{_publicBlobBaseUrl}/{_containerName}/{blobName}";
+        }
+
         return blobClient.Uri.ToString();
     }
 
@@ -55,11 +64,22 @@ public class AzureBlobImageService : IImageService
         try
         {
             var uri = new Uri(imageUrl);
-            var blobName = uri.AbsolutePath.TrimStart('/');
+            var path = uri.AbsolutePath.TrimStart('/');
 
-            if (blobName.StartsWith($"{_containerName}/"))
+            string blobName;
+            var containerSegment = $"{_containerName}/";
+            var idx = path.IndexOf(containerSegment, StringComparison.OrdinalIgnoreCase);
+            if (idx >= 0)
             {
-                blobName = blobName.Substring(_containerName.Length + 1);
+                blobName = path.Substring(idx + containerSegment.Length);
+            }
+            else if (path.StartsWith(_containerName + "/", StringComparison.OrdinalIgnoreCase))
+            {
+                blobName = path.Substring(_containerName.Length + 1);
+            }
+            else
+            {
+                blobName = path;
             }
 
             var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
