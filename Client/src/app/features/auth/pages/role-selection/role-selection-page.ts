@@ -26,11 +26,18 @@ export class RoleSelectionPage implements OnInit {
 
   ngOnInit() {
     const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras.state?.['signupData']) {
+    if (navigation?.extras?.state?.['signupData']) {
       this.signupData = navigation.extras.state['signupData'];
-    } else {
-      this.router.navigate(['/auth/signup']);
+      return;
     }
+
+    const histState = (history && (history.state as any)) || null;
+    if (histState?.signupData) {
+      this.signupData = histState.signupData;
+      return;
+    }
+
+    this.router.navigate(['/auth/signup']);
   }
 
   onRoleSelected(role: UserRoles) {

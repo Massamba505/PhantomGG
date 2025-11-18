@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { PagedResult } from '../models/api.models';
-import { environment } from '@/environments/environment.development';
+import { environment } from '@/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,15 @@ import { environment } from '@/environments/environment.development';
 export class ApiClient {
   private readonly http = inject(HttpClient);
   private readonly env = environment;
-  private readonly baseUrl = this.env.apiUrl;
+  private readonly baseUrl = this.getApiUrl();;
+
+  private getApiUrl(): string {
+    const runtimeApiUrl = (window as any)['__env']?.apiUrl;
+    if (runtimeApiUrl) {
+      return runtimeApiUrl;
+    }
+    return this.env.apiUrl;
+  }
 
   get<T>(endpoint: string): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}/${endpoint}`);

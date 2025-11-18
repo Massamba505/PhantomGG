@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using PhantomGG.Service.Auth.Implementations;
 using PhantomGG.Service.Domain.Tournaments.Implementations;
 using PhantomGG.Service.Domain.Matches.Implementations;
@@ -19,12 +20,13 @@ using PhantomGG.Service.Auth.Interfaces;
 using PhantomGG.Service.Domain.Teams.Interfaces;
 using PhantomGG.Service.Domain.Matches.Interfaces;
 using PhantomGG.Service.Infrastructure.Caching.Interfaces;
+using PhantomGG.Common.Config;
 
 namespace PhantomGG.Service.Extensions;
 
 public static class ServiceExtensions
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAuthVerificationService, AuthVerificationService>();
@@ -48,7 +50,19 @@ public static class ServiceExtensions
         services.AddScoped<ICookieService, CookieService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
-        services.AddScoped<IImageService, LocalFileImageService>();
+
+        services.Configure<StorageSettings>(configuration.GetSection("StorageSettings"));
+        var storageProvider = configuration.GetValue<string>("StorageSettings:Provider") ?? "LocalFile";
+
+        if (storageProvider.Equals("AzureBlob", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddScoped<IImageService, AzureBlobImageService>();
+        }
+        else
+        {
+            services.AddScoped<IImageService, LocalFileImageService>();
+        }
+
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IEmailTemplateService, EmailTemplateService>();
         services.AddScoped<ICacheInvalidationService, CacheInvalidationService>();

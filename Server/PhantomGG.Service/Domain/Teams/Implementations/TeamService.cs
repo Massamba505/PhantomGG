@@ -93,7 +93,7 @@ public class TeamService(
             {
                 OldFileUrl = null,
                 File = createDto.LogoUrl,
-                ImageType = ImageType.TournamentBanner,
+                ImageType = ImageType.TeamLogo,
                 Id = team.Id
             };
 
@@ -123,7 +123,7 @@ public class TeamService(
             {
                 OldFileUrl = existingTeam.LogoUrl,
                 File = updateDto.LogoUrl,
-                ImageType = ImageType.TournamentBanner,
+                ImageType = ImageType.TeamLogo,
                 Id = existingTeam.Id
             };
             existingTeam.LogoUrl = await _imageService.UploadImageAsync(uploadImage);

@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddApplicationSettings(configuration);
         services.AddApplicationDatabase(configuration);
         services.AddApplicationRepositories();
-        services.AddApplicationServices();
+        services.AddApplicationServices(configuration);
         services.AddApplicationValidation();
 
         return services;

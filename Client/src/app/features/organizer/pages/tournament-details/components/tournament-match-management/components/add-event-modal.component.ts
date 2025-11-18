@@ -149,7 +149,7 @@ export class AddEventModalComponent implements OnInit {
 
   eventTypes = computed(() => {
     return Object.keys(MatchEventType)
-      .filter((key) => Number.Number.isNaN(Number(key)))
+      .filter((key) => Number.isNaN(Number(key)))
       .map((key) => ({
         id: MatchEventType[key as keyof typeof MatchEventType] as number,
         value: key,

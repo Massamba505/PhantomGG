@@ -70,6 +70,13 @@ ng serve
 - **Live Updates**: Real-time score tracking
 - **Standings**: Automatic calculation of points, wins, losses, draws
 - **Email Notifications**: Tournament updates and notifications
+- **Image Storage**: Upload and manage images for profiles, tournaments, and teams with support for local file storage and Azure Blob Storage
+
+## Image Storage Configuration
+
+PhantomGG supports two image storage providers:
+- **LocalFile**: For local development (stores images in `wwwroot/images/`)
+- **AzureBlob**: For Docker and production (uses Azurite locally or Azure Blob Storage in production)
 
 ## Project Structure
 

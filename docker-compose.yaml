@@ -62,6 +62,19 @@ services:
     networks:
       - phantomgg-network
 
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - azurite_data:/data
+    command: azurite-blob --blobHost 0.0.0.0 --blobPort 10000 -l /data
+    restart: unless-stopped
+    networks:
+      - phantomgg-network
+
   api:
     build:
       context: ./Server
@@ -93,6 +106,10 @@ services:
       - EmailSettings__FromName=${EMAIL_FROM_NAME}
       - EmailSettings__FrontendBaseUrl=${FRONTEND_BASE_URL}
       - SEQ_SERVER_URL=${SEQ_SERVER_URL}
+      - StorageSettings__Provider=${STORAGE_PROVIDER}
+      - StorageSettings__AzureStorageConnectionString=${AZURE_STORAGE_CONNECTION_STRING}
+      - StorageSettings__BlobContainerName=${BLOB_CONTAINER_NAME}
+      - StorageSettings__PublicBlobUrl=${PUBLIC_BLOB_URL}
     depends_on:
       flyway:
         condition: service_completed_successfully
@@ -106,12 +123,9 @@ services:
       context: ./Client
       dockerfile: Dockerfile
     ports:
-      - "${CLIENT_PORT}:4200"
+      - "${CLIENT_PORT}:80"
     environment:
       - API_URL=${API_URL}
-    volumes:
-      - ./Client:/app
-      - /app/node_modules
     depends_on:
       api:
         condition: service_started
@@ -121,6 +135,7 @@ services:
 volumes:
   sqlserver_data:
   seq_data:
+  azurite_data:
 
 networks:
   phantomgg-network:

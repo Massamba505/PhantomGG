@@ -15,6 +15,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  contents: read
   pull-requests: read # allows SonarCloud to decorate PRs with analysis results
 
 jobs:
@@ -27,6 +28,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Shallow clones disabled for better analysis
+          token: ${{ secrets.GIT_TOKEN }}
+        timeout-minutes: 10
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
