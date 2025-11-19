@@ -104,7 +104,7 @@ dotnet test
 **Run E2E Tests**
 ```bash
 cd Client
-npm run cypress:open
+npx cypress open
 ```
 
 ## Troubleshooting

@@ -6,6 +6,7 @@ using PhantomGG.Models.DTOs.Tournament;
 using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Domain.Tournaments.Implementations;
+using PhantomGG.Service.Domain.Tournaments.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Infrastructure.Caching.Interfaces;
 using PhantomGG.Service.Infrastructure.Email.Interfaces;
@@ -25,7 +26,7 @@ public class TournamentServiceTests
     private Mock<IEmailService> _mockEmailService = null!;
     private Mock<HybridCache> _mockCache = null!;
     private Mock<ILogger<TournamentService>> _mockLogger = null!;
-    private TournamentService _tournamentService = null!;
+    private ITournamentService _tournamentService = null!;
 
     [SetUp]
     public void Setup()

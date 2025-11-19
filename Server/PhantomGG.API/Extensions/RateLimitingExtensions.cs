@@ -37,7 +37,7 @@ public static class RateLimitingExtensions
                     _ => new FixedWindowRateLimiterOptions
                     {
                         PermitLimit = 100,
-                        Window = TimeSpan.FromMinutes(1),
+                        Window = TimeSpan.FromMinutes(2),
                         QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                         QueueLimit = 0
                     }));

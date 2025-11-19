@@ -19,6 +19,19 @@ describe('Tournament CRUD Operations', () => {
       cy.url().should('include', '/organizer');
     });
 
+    afterEach(() => {
+      cy.wait(1000);
+      cy.url().then((url) => {
+        if (!url.includes('/create')) {
+          const match = url.match(/tournaments\/([^\/]+)/);
+          if (match) {
+            const tournamentId = match[1];
+            cy.deleteTournament(tournamentId);
+          }
+        }
+      });
+    });
+
     it('should create a tournament with valid data', () => {
       tournamentName = `${tournamentData.valid.name} ${Date.now()}`;
       const data = { ...tournamentData.valid, name: tournamentName };
@@ -82,6 +95,19 @@ describe('Tournament CRUD Operations', () => {
       cy.login(users.organizer.email, users.organizer.password);
     });
 
+    after(() => {
+      cy.wait(1000);
+      cy.url().then((url) => {
+        if (!url.includes('/create')) {
+          const match = url.match(/tournaments\/([^\/]+)/);
+          if (match) {
+            const tournamentId = match[1];
+            cy.deleteTournament(tournamentId);
+          }
+        }
+      });
+    });
+
     it('should view tournament details', () => {
       tournamentPage.visitList();
       cy.contains(tournamentName).should('be.visible');
@@ -125,6 +151,19 @@ describe('Tournament CRUD Operations', () => {
 
     beforeEach(() => {
       cy.login(users.organizer.email, users.organizer.password);
+    });
+    
+    after(() => {
+      cy.wait(1000);
+      cy.url().then((url) => {
+        if (!url.includes('/create')) {
+          const match = url.match(/tournaments\/([^\/]+)/);
+          if (match) {
+            const tournamentId = match[1];
+            cy.deleteTournament(tournamentId);
+          }
+        }
+      });
     });
 
     it('should update tournament details', () => {
