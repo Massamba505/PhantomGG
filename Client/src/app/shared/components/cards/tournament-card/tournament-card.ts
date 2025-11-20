@@ -30,6 +30,14 @@ export class TournamentCard {
     this.edit.emit(this.tournament());
   }
 
+  showEdit(){
+    if(!this.tournament()){
+      return false;
+    }
+    
+    return this.tournament().status == TournamentStatus.Draft;
+  }
+
   onDelete(e: Event) {
     e.stopPropagation();
     this.delete.emit(this.tournament().id);

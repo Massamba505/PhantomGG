@@ -4,7 +4,7 @@
     Back
   </button>
 
-  @if (tournament()) {
+  @if (tournament() && showStats()) {
   <div class="flex gap-2">
     <button class="btn btn-outline" (click)="onViewStatistics()">
       <lucide-angular [img]="icons.BarChart3" [size]="20"></lucide-angular>
@@ -177,9 +177,11 @@
   <div class="card">
     <app-tournament-team-management [tournamentId]="tournamentId()" (teamView)="openTeamModal($event)" />
   </div>
-  <div class="card">
-    <app-tournament-match-management [tournamentId]="tournamentId()" (matchView)="openMatchModal($event)" />
-  </div>
+  @if(showMatches()){
+    <div class="card">
+      <app-tournament-match-management [tournamentId]="tournamentId()" (matchView)="openMatchModal($event)" />
+    </div>
+  }
 </div>
 
 <app-match-details-modal [isOpen]="showMatchModal()" [matchId]="selectedMatchId()" (close)="closeMatchModal()" />

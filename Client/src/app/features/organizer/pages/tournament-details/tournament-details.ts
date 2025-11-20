@@ -44,7 +44,23 @@ export class TournamentDetailsComponent implements OnInit {
       return false;
     }
 
-    return this.tournament()!.status > TournamentStatus.RegistrationClosed
+    return this.tournament()!.status >= TournamentStatus.RegistrationClosed
+  }
+
+  showStats(){
+    if(!this.tournament()){
+      return false;
+    }
+
+    return this.tournament()!.status >= TournamentStatus.InProgress
+  }
+
+  showEdit(){
+    if(!this.tournament()){
+      return false;
+    }
+    
+    return this.tournament()!.status == TournamentStatus.Draft;
   }
 
   ngOnInit() {

@@ -73,12 +73,14 @@
 
   <div class="flex gap-1 mt-auto" data-cy="tournament-actions">
     @if (isOrganizer()) {
-    <button (click)="onEdit($event)" class="btn btn-outline flex justify-center items-center flex-1"
-      data-cy="edit-tournament-button">
-      <lucide-angular size="15" [img]="icons.Edit" data-cy="edit-icon" />
-      <span>Edit</span>
-    </button>
-    <button (click)="onDelete($event)" class="btn btn-destructive" data-cy="delete-tournament-button">
+      @if (showEdit()) {
+        <button (click)="onEdit($event)" class="btn btn-outline flex justify-center items-center flex-1"
+          data-cy="edit-tournament-button">
+          <lucide-angular size="15" [img]="icons.Edit" data-cy="edit-icon" />
+          <span>Edit</span>
+        </button>
+      }
+    <button (click)="onDelete($event)" class="btn btn-destructive ml-auto p-3" data-cy="delete-tournament-button">
       <lucide-angular size="15" [img]="icons.Trash2" data-cy="delete-icon" />
     </button>
     } @if (isUser()) {

@@ -6,13 +6,17 @@
 
   @if (tournament()) {
   <div class="flex gap-2">
-    <button class="btn btn-outline" (click)="onViewStatistics()">
-      <lucide-angular [img]="icons.BarChart3" [size]="20"></lucide-angular>
-      Statistics
-    </button>
-    <button class="btn btn-primary" (click)="editTournament()">
-      Edit Tournament
-    </button>
+    @if(showStats()){
+      <button class="btn btn-outline" (click)="onViewStatistics()">
+        <lucide-angular [img]="icons.BarChart3" [size]="20"></lucide-angular>
+        Statistics
+      </button>
+    }
+    @if(showEdit()){
+      <button class="btn btn-primary" (click)="editTournament()">
+        Edit Tournament
+      </button>
+    }
     <button class="btn btn-destructive" data-cy="delete-tournament-button" (click)="deleteTournament()">
       Delete
     </button>

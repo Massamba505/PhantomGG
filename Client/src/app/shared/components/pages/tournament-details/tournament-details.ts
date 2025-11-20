@@ -65,6 +65,22 @@ export class TournamentDetailsComponent implements OnInit {
     this.showFullDescription.update((prev) => !prev);
   }
 
+  showStats(){
+    if(!this.tournament()){
+      return false;
+    }
+
+    return this.tournament()!.status >= TournamentStatus.InProgress
+  }
+
+  showMatches(){
+    if(!this.tournament()){
+      return false;
+    }
+
+    return this.tournament()!.status >= TournamentStatus.RegistrationClosed
+  }
+
   private updateDisplayedDescription() {
     const desc = this.tournament()?.description || '';
     const plainText = desc
