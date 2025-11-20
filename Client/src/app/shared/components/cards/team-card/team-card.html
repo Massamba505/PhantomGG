@@ -62,11 +62,10 @@
       <lucide-angular size="15" [img]="icons.X" data-cy="reject-icon" />
     </button>
     } @else if (isApprovedCard()) {
-    <button (click)="onRemoveTeam($event)" class="btn btn-destructive flex justify-center items-center flex-1"
-      data-cy="remove-team-button">
-      <lucide-angular size="15" [img]="icons.Trash2" data-cy="remove-icon" />
-      <span>Remove</span>
-    </button>
+      <button (click)="onView($event)" class="btn btn-secondary flex justify-center items-center flex-1"
+        data-cy="view-team-button">
+        <span>View</span>
+      </button>
     } @else {
     <button (click)="onApproveTeam($event)" class="btn btn-primary flex justify-center items-center py-3 flex-1"
       data-cy="approve-team-button-default">

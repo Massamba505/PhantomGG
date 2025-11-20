@@ -185,11 +185,13 @@
     <app-tournament-team-management [tournamentId]="tournament()!.id">
     </app-tournament-team-management>
   </div>
-
-  <div class="card" data-cy="matches-section">
-    <app-tournament-match-management [tournamentId]="tournament()!.id">
-    </app-tournament-match-management>
-  </div>
+  
+  @if(showMatches()){
+    <div class="card" data-cy="matches-section">
+      <app-tournament-match-management [tournamentId]="tournament()!.id">
+      </app-tournament-match-management>
+    </div>
+  }
 </div>
 }
 
