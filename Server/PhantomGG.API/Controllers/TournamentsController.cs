@@ -41,6 +41,18 @@ public class TournamentsController(
     }
 
     /// <summary>
+    /// Get tournaments where user's teams are registered
+    /// </summary>
+    [HttpGet("my-tournaments")]
+    [Authorize(Roles = "User")]
+    public async Task<ActionResult<PagedResult<TournamentDto>>> GetMyTournaments([FromQuery] TournamentQuery query)
+    {
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        var tournaments = await _tournamentService.GetUserTournamentsAsync(query, currentUser.Id);
+        return Ok(tournaments);
+    }
+
+    /// <summary>
     /// Get tournament details
     /// </summary>
     [HttpGet("{id:guid}")]

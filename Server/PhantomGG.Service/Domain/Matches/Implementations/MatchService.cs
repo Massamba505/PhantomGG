@@ -17,6 +17,7 @@ public class MatchService(
     IMatchRepository matchRepository,
     IMatchEventRepository matchEventRepository,
     ITournamentTeamRepository tournamentTeamRepository,
+    ITeamRepository teamRepository,
     IMatchValidationService matchValidationService,
     ITournamentValidationService tournamentValidationService,
     ICacheInvalidationService cacheInvalidationService,
@@ -25,6 +26,7 @@ public class MatchService(
     private readonly IMatchRepository _matchRepository = matchRepository;
     private readonly IMatchEventRepository _matchEventRepository = matchEventRepository;
     private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
+    private readonly ITeamRepository _teamRepository = teamRepository;
     private readonly IMatchValidationService _matchValidationService = matchValidationService;
     private readonly ITournamentValidationService _tournamentValidationService = tournamentValidationService;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
@@ -83,6 +85,43 @@ public class MatchService(
             SearchTerm = query.Q,
             TournamentId = query.TournamentId,
             TeamId = query.TeamId,
+            Status = query.Status,
+            DateFrom = query.From,
+            DateTo = query.To,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
+
+        var result = await _matchRepository.SearchAsync(spec);
+
+        return new PagedResult<MatchDto>(
+            result.Data.Select(m => m.ToDto()),
+            result.Meta.Page,
+            result.Meta.PageSize,
+            result.Meta.TotalRecords
+        );
+    }
+
+    public async Task<PagedResult<MatchDto>> GetUserMatchesAsync(MatchQuery query, Guid userId)
+    {
+        var userTeams = await _teamRepository.GetByUserAsync(userId);
+        var teamIds = userTeams.Select(t => t.Id).ToList();
+
+        if (!teamIds.Any())
+        {
+            return new PagedResult<MatchDto>(
+                [],
+                query.Page,
+                query.PageSize,
+                0
+            );
+        }
+
+        var spec = new MatchSpecification
+        {
+            SearchTerm = query.Q,
+            TournamentId = query.TournamentId,
+            UserTeamIds = teamIds,
             Status = query.Status,
             DateFrom = query.From,
             DateTo = query.To,

@@ -29,6 +29,15 @@ export class MatchService {
     return this.apiClient.getPaged<MatchDto>(API_ENDPOINTS.MATCHES.LIST, query);
   }
 
+  getMyMatches(params?: Partial<MatchQuery>): Observable<PagedResult<MatchDto>> {
+    const query: MatchQuery = {
+      page: 1,
+      pageSize: 20,
+      ...params
+    };
+    return this.apiClient.getPaged<MatchDto>(API_ENDPOINTS.MATCHES.MY_MATCHES, query);
+  }
+
   getMatch(matchId: string): Observable<MatchDto> {
     return this.apiClient.get<MatchDto>(API_ENDPOINTS.MATCHES.GET(matchId));
   }

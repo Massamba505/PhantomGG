@@ -13,6 +13,7 @@ public class TournamentSpecification
     public DateTime? StartDateTo { get; set; }
     public bool? IsPublic { get; set; }
     public Guid? OrganizerId { get; set; }
+    public List<Guid>? TournamentIds { get; set; }
     public int Page { get; set; }
     public int PageSize { get; set; }
 
@@ -34,6 +35,7 @@ public class TournamentSpecification
             (!StartDateFrom.HasValue || t.StartDate >= StartDateFrom.Value) &&
             (!StartDateTo.HasValue || t.StartDate <= StartDateTo.Value) &&
             (!IsPublic.HasValue || t.IsPublic == IsPublic.Value) &&
-            (!OrganizerId.HasValue || t.OrganizerId == OrganizerId.Value);
+            (!OrganizerId.HasValue || t.OrganizerId == OrganizerId.Value) &&
+            (TournamentIds == null || TournamentIds.Count == 0 || TournamentIds.Contains(t.Id));
     }
 }

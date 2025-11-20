@@ -19,6 +19,8 @@ namespace PhantomGG.Service.Domain.Tournaments.Implementations;
 
 public class TournamentService(
     ITournamentRepository tournamentRepository,
+    ITournamentTeamRepository tournamentTeamRepository,
+    ITeamRepository teamRepository,
     IImageService imageService,
     ITournamentValidationService validationService,
     ICacheInvalidationService cacheInvalidationService,
@@ -28,6 +30,8 @@ public class TournamentService(
     ILogger<TournamentService> logger) : ITournamentService
 {
     private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
+    private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
+    private readonly ITeamRepository _teamRepository = teamRepository;
     private readonly ITournamentValidationService _validationService = validationService;
     private readonly IImageService _imageService = imageService;
     private readonly HybridCache _cache = cache;
@@ -64,6 +68,61 @@ public class TournamentService(
             result.Meta.Page,
             result.Meta.PageSize,
             filteredData.Count()
+        );
+    }
+
+    public async Task<PagedResult<TournamentDto>> GetUserTournamentsAsync(TournamentQuery query, Guid userId)
+    {
+        var userTeams = await _teamRepository.GetByUserAsync(userId);
+        var teamIds = userTeams.Select(t => t.Id).ToList();
+
+        if (!teamIds.Any())
+        {
+            return new PagedResult<TournamentDto>(
+                [],
+                query.Page,
+                query.PageSize,
+                0
+            );
+        }
+
+        var tournamentTeams = await _tournamentTeamRepository.GetByTeamIdsAsync(teamIds);
+        var tournamentIds = tournamentTeams
+            .Where(tt => tt.Status == (int)TeamRegistrationStatus.Approved)
+            .Select(tt => tt.TournamentId)
+            .Distinct()
+            .ToList();
+
+        if (!tournamentIds.Any())
+        {
+            return new PagedResult<TournamentDto>(
+                [],
+                query.Page,
+                query.PageSize,
+                0
+            );
+        }
+
+        var spec = new TournamentSpecification
+        {
+            SearchTerm = query.Q,
+            Status = query.Status,
+            Location = query.Location,
+            StartDateFrom = query.StartFrom,
+            StartDateTo = query.StartTo,
+            TournamentIds = tournamentIds,
+            IsPublic = query.IsPublic,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
+
+        var result = await _tournamentRepository.SearchAsync(spec);
+
+        return new PagedResult<TournamentDto>(
+            result.Data.Select(t => t.ToDto()),
+            result.Meta.Page,
+            result.Meta.PageSize,
+            result.Meta.TotalRecords
         );
     }
 
