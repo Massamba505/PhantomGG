@@ -26,7 +26,7 @@ public class TeamServiceTests
     private Mock<IPlayerRepository> _mockPlayerRepository = null!;
     private Mock<ICacheInvalidationService> _mockCacheInvalidationService = null!;
     private Mock<HybridCache> _mockCache = null!;
-    private TeamService _teamService = null!;
+    private ITeamService _teamService = null!;
 
     [SetUp]
     public void Setup()

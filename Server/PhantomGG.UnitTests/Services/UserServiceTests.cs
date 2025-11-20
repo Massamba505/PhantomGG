@@ -6,6 +6,7 @@ using PhantomGG.Models.DTOs.User;
 using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Service.Domain.Users.Implementations;
+using PhantomGG.Service.Domain.Users.Interfaces;
 using PhantomGG.Service.Exceptions;
 using PhantomGG.Service.Infrastructure.Security.Interfaces;
 using PhantomGG.Service.Infrastructure.Storage.Interfaces;
@@ -21,7 +22,7 @@ public class UserServiceTests
     private Mock<IImageService> _mockImageService = null!;
     private Mock<IUserValidationService> _mockUserValidationService = null!;
     private Mock<HybridCache> _mockCache = null!;
-    private UserService _userService = null!;
+    private IUserService _userService = null!;
 
     [SetUp]
     public void Setup()

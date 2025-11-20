@@ -1,3 +1,4 @@
+/// <reference types="cypress" />
 import { TeamPage } from '../../support/page-objects/TeamPage';
 
 describe('Team Operations', () => {
@@ -17,6 +18,19 @@ describe('Team Operations', () => {
     beforeEach(() => {
       cy.login(users.user.email, users.user.password);
       cy.url().should('include', '/user');
+    });
+
+    afterEach(() => {
+      cy.wait(1000);
+      cy.url().then((url) => {
+        if (!url.includes('/create')) {
+          const match = url.match(/teams\/([^\/]+)/);
+          if (match) {
+            const teamId = match[1];
+            cy.deleteTeam(teamId);
+          }
+        }
+      });
     });
 
     it('should create a team with valid data', () => {
@@ -69,6 +83,19 @@ describe('Team Operations', () => {
       });
     });
 
+    after(() => {
+      cy.wait(1000);
+      cy.url().then((url) => {
+        if (!url.includes('/create')) {
+          const match = url.match(/teams\/([^\/]+)/);
+          if (match) {
+            const teamId = match[1];
+            cy.deleteTeam(teamId);
+          }
+        }
+      });
+    });
+
     beforeEach(() => {
       cy.login(users.user.email, users.user.password);
     });
@@ -118,6 +145,19 @@ describe('Team Operations', () => {
       cy.login(users.user.email, users.user.password);
     });
 
+    after(() => {
+      cy.wait(1000);
+      cy.url().then((url) => {
+        if (!url.includes('/create')) {
+          const match = url.match(/teams\/([^\/]+)/);
+          if (match) {
+            const teamId = match[1];
+            cy.deleteTeam(teamId);
+          }
+        }
+      });
+    });
+
     it('should update team details', () => {
       if (createdTeamId) {
         const teamName = `${teamData.update.name} ${Date.now()}`;
@@ -152,6 +192,19 @@ describe('Team Operations', () => {
   describe('Delete Team', () => {
     beforeEach(() => {
       cy.login(users.user.email, users.user.password);
+    });
+
+    afterEach(() => {
+      cy.wait(1000);
+      cy.url().then((url) => {
+        if (!url.includes('/create')) {
+          const match = url.match(/teams\/([^\/]+)/);
+          if (match) {
+            const teamId = match[1];
+            cy.deleteTeam(teamId);
+          }
+        }
+      });
     });
 
     it('should delete a team', () => {
@@ -200,6 +253,19 @@ describe('Team Operations', () => {
       cy.url().should('not.include', '/create').should("not.include","/create").then((url) => {
         const match = url.match(/teams\/([^\/]+)/);
         if (match) createdTeamId = match[1];
+      });
+    });
+
+    after(() => {
+      cy.wait(1000);
+      cy.url().then((url) => {
+        if (!url.includes('/create')) {
+          const match = url.match(/teams\/([^\/]+)/);
+          if (match) {
+            const teamId = match[1];
+            cy.deleteTeam(teamId);
+          }
+        }
       });
     });
 
