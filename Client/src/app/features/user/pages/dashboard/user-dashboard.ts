@@ -9,8 +9,9 @@ import { MatchService } from '@/app/api/services/match.service';
 import { TeamDto } from '@/app/api/models/team.models';
 import { TournamentDto } from '@/app/api/models/tournament.models';
 import { MatchDto } from '@/app/api/models/match.models';
-import { MatchStatus } from '@/app/api/models';
+import { MatchStatus, TournamentStatus } from '@/app/api/models';
 import { forkJoin } from 'rxjs';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -81,22 +82,7 @@ export class UserDashboard implements OnInit {
     return new Date(date);
   }
 
-  getTournamentStatus(tournament: TournamentDto): string {
-    const now = new Date();
-    const startDate = new Date(tournament.startDate);
-    const endDate = new Date(tournament.endDate);
-    const registrationDeadline = tournament.registrationDeadline 
-      ? new Date(tournament.registrationDeadline) 
-      : null;
-
-    if (registrationDeadline && now < registrationDeadline) {
-      return 'Registration Open';
-    } else if (now >= startDate && now <= endDate) {
-      return 'In Progress';
-    } else if (now < startDate) {
-      return 'Upcoming';
-    } else {
-      return 'Completed';
-    }
+  getTournamentStatus(tournament: TournamentDto): any {
+    return getEnumLabel(TournamentStatus, tournament.status);
   }
 }

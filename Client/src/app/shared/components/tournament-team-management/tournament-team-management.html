@@ -1,8 +1,8 @@
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
   <div>
-    <h2 class="text-xl font-semibold mb-2">Team Management</h2>
+    <h2 class="text-xl font-semibold mb-2">Teams Centre</h2>
     <p class="text-muted text-sm">
-      Manage team registrations and approvals for this tournament
+      View all tournament teams and their details.
     </p>
   </div>
 
@@ -16,7 +16,7 @@
 
 <div class="flex border-b mb-6">
   <button data-cy="manage-teams-tab" (click)="setActiveTab('approved')" [class]="getTabClass('approved')">
-    Approved
+    Participants
     <span class="btn btn-outline px-2 py-0.5 rounded-full">
       {{ getTeamCount("approved") }}
     </span>

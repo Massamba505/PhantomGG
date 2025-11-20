@@ -39,6 +39,30 @@ export class TournamentDetailsComponent implements OnInit {
   showDeleteModal = signal(false);
   isDeleting = signal(false);
 
+  showMatches(){
+    if(!this.tournament()){
+      return false;
+    }
+
+    return this.tournament()!.status >= TournamentStatus.RegistrationClosed
+  }
+
+  showStats(){
+    if(!this.tournament()){
+      return false;
+    }
+
+    return this.tournament()!.status >= TournamentStatus.InProgress
+  }
+
+  showEdit(){
+    if(!this.tournament()){
+      return false;
+    }
+    
+    return this.tournament()!.status == TournamentStatus.Draft;
+  }
+
   ngOnInit() {
     this.route.params.subscribe((params) => {
       this.tournamentId.set(params['id']);

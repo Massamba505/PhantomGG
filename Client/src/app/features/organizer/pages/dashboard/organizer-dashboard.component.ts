@@ -8,9 +8,10 @@ import { MatchService } from '@/app/api/services/match.service';
 import { TournamentDto } from '@/app/api/models/tournament.models';
 import { TournamentTeamDto } from '@/app/api/models/team.models';
 import { MatchDto } from '@/app/api/models/match.models';
-import { TeamAction } from '@/app/api/models/common.models';
+import { TeamAction, TournamentStatus } from '@/app/api/models/common.models';
 import { ToastService } from '@/app/shared/services/toast.service';
 import { forkJoin } from 'rxjs';
+import { getEnumLabel } from '@/app/shared/utils/enumConvertor';
 
 @Component({
   selector: 'app-organizer-dashboard',
@@ -69,23 +70,8 @@ export class OrganizerDashboardComponent implements OnInit {
     });
   }
 
-  getTournamentStatus(tournament: TournamentDto): string {
-    const now = new Date();
-    const startDate = new Date(tournament.startDate);
-    const endDate = new Date(tournament.endDate);
-    const registrationDeadline = tournament.registrationDeadline 
-      ? new Date(tournament.registrationDeadline) 
-      : null;
-
-    if (registrationDeadline && now < registrationDeadline) {
-      return 'Registration Open';
-    } else if (now >= startDate && now <= endDate) {
-      return 'In Progress';
-    } else if (now < startDate) {
-      return 'Upcoming';
-    } else {
-      return 'Completed';
-    }
+  getTournamentStatus(tournament: TournamentDto): any {
+      return getEnumLabel(TournamentStatus, tournament.status);
   }
 
   approveTeam(approval: TournamentTeamDto, event: Event) {
