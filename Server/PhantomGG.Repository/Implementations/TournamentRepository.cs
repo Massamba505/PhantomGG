@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using PhantomGG.Common.Enums;
 using PhantomGG.Models.DTOs;
-using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Data;
+using PhantomGG.Repository.Entities;
 using PhantomGG.Repository.Interfaces;
 using PhantomGG.Repository.Specifications;
 
@@ -48,6 +49,11 @@ public class TournamentRepository(PhantomContext context) : ITournamentRepositor
             .Include(t => t.Organizer)
             .Include(t => t.TournamentTeams)
             .Where(spec.ToExpression());
+
+        if (!spec.OrganizerId.HasValue)
+        {
+            query = query.Where(t => t.Status != (int)TournamentStatus.Draft);
+        }
 
         var totalRecords = await query.CountAsync();
 

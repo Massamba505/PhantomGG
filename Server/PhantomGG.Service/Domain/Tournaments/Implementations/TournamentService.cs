@@ -49,7 +49,7 @@ public class TournamentService(
             Location = query.Location,
             StartDateFrom = query.StartFrom,
             StartDateTo = query.StartTo,
-            OrganizerId = userId,
+            OrganizerId = userId.HasValue ? userId : null,
             IsPublic = query.IsPublic,
             Page = query.Page,
             PageSize = query.PageSize
@@ -57,17 +57,12 @@ public class TournamentService(
 
         var result = await _tournamentRepository.SearchAsync(spec);
 
-        var filteredData = result.Data;
-        if (!userId.HasValue)
-        {
-            filteredData = filteredData.Where(t => t.Status != (int)TournamentStatus.Draft).ToList();
-        }
 
         return new PagedResult<TournamentDto>(
-            filteredData.Select(t => t.ToDto()),
+            result.Data.Select(t => t.ToDto()),
             result.Meta.Page,
             result.Meta.PageSize,
-            filteredData.Count()
+            result.Data.Count()
         );
     }
 
