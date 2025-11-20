@@ -34,6 +34,14 @@ public class TournamentTeamRepository(PhantomContext context) : ITournamentTeamR
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<TournamentTeam>> GetByTeamIdsAsync(List<Guid> teamIds)
+    {
+        return await _context.TournamentTeams
+            .Include(tt => tt.Tournament)
+            .Where(tt => teamIds.Contains(tt.TeamId))
+            .ToListAsync();
+    }
+
     public async Task<TournamentTeam?> GetRegistrationAsync(Guid tournamentId, Guid teamId)
     {
         return await _context.TournamentTeams

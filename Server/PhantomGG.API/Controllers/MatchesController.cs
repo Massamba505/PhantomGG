@@ -31,6 +31,18 @@ public class MatchesController(
     }
 
     /// <summary>
+    /// Get matches for the current user's teams
+    /// </summary>
+    [HttpGet("my-matches")]
+    [Authorize(Roles = "User")]
+    public async Task<ActionResult<PagedResult<MatchDto>>> GetMyMatches([FromQuery] MatchQuery query)
+    {
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        var result = await _matchService.GetUserMatchesAsync(query, currentUser.Id);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Get match details
     /// </summary>
     [HttpGet("{id:guid}")]

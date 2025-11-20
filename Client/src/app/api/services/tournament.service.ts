@@ -35,6 +35,15 @@ export class TournamentService {
     return this.apiClient.getPaged<TournamentDto>(API_ENDPOINTS.TOURNAMENTS.LIST, query);
   }
 
+  getMyTournaments(params?: Partial<TournamentQuery>): Observable<PagedResult<TournamentDto>> {
+    const query: TournamentQuery = {
+      page: 1,
+      pageSize: 10,
+      ...params
+    };
+    return this.apiClient.getPaged<TournamentDto>(API_ENDPOINTS.TOURNAMENTS.MY_TOURNAMENTS, query);
+  }
+
   getTournament(id: string): Observable<TournamentDto> {
     return this.apiClient.get<TournamentDto>(API_ENDPOINTS.TOURNAMENTS.GET(id));
   }

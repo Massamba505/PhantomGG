@@ -1,0 +1,181 @@
+<div class="h-full flex flex-col" data-cy="user-dashboard-container">
+  @if (isLoading()) {
+  <div class="text-center py-12" data-cy="loading-state">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"
+      data-cy="loading-spinner"></div>
+    <p class="text-muted" data-cy="loading-text">Loading dashboard...</p>
+  </div>
+  } @else {
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 overflow-auto" data-cy="dashboard-grid">
+    
+    <div class="card flex flex-col" data-cy="my-teams-widget">
+      <div class="flex items-center justify-between mb-4" data-cy="teams-widget-header">
+        <h2 class="text-lg font-semibold" data-cy="teams-widget-title">My Teams</h2>
+        <a routerLink="/user/teams" class="text-sm text-primary hover:underline" data-cy="view-all-teams">View All</a>
+      </div>
+
+      @if (myTeams().length === 0) {
+      <div class="flex-1 flex flex-col items-center justify-center py-8 text-center" data-cy="no-teams">
+        <p class="text-muted mb-4" data-cy="no-teams-message">You haven't created any teams yet.</p>
+        <a routerLink="/user/teams/create" class="btn btn-primary" data-cy="create-team-link">Create Your First Team</a>
+      </div>
+      } @else {
+      <div class="flex flex-col gap-3 flex-1" data-cy="teams-list">
+        @for (team of myTeams(); track team.id) {
+        <a [routerLink]="['/user/teams', team.id]" 
+           class="border rounded-md p-3 hover:border-primary transition-colors flex items-center gap-3"
+           data-cy="team-item">
+          <img [src]="team.logoUrl || 'assets/PhantomGG_LOGO.png'" 
+               [alt]="team.name" 
+               class="w-12 h-12 object-cover rounded-md" 
+               data-cy="team-logo" />
+          <div class="flex-1" data-cy="team-info">
+            <h3 class="font-semibold line-clamp-1" data-cy="team-name">{{ team.name }}</h3>
+            @if (team.shortName) {
+            <p class="text-xs text-muted font-mono" data-cy="team-short-name">{{ team.shortName }}</p>
+            }
+          </div>
+          <div class="text-right" data-cy="team-stats">
+            <p class="text-sm font-semibold" data-cy="team-members">{{ team.countPlayers }} Members</p>
+            <p class="text-xs text-muted" data-cy="team-created">{{ team.createdAt | date : 'mediumDate' }}</p>
+          </div>
+        </a>
+        }
+      </div>
+      }
+    </div>
+
+    <div class="card flex flex-col" data-cy="active-tournaments-widget">
+      <div class="flex items-center justify-between mb-4" data-cy="tournaments-widget-header">
+        <h2 class="text-lg font-semibold" data-cy="tournaments-widget-title">Active Tournaments</h2>
+        <a routerLink="/user/tournaments" class="text-sm text-primary hover:underline" data-cy="view-all-tournaments">View All</a>
+      </div>
+
+      @if (activeTournaments().length === 0) {
+      <div class="flex-1 flex flex-col items-center justify-center py-8 text-center" data-cy="no-tournaments">
+        <p class="text-muted mb-4" data-cy="no-tournaments-message">No active tournaments found.</p>
+        <a routerLink="/user/tournaments" class="btn btn-secondary" data-cy="browse-tournaments-link">Browse Tournaments</a>
+      </div>
+      } @else {
+      <div class="flex flex-col gap-3 flex-1" data-cy="tournaments-list">
+        @for (tournament of activeTournaments(); track tournament.id) {
+        <a [routerLink]="['/user/tournaments', tournament.id]" 
+           class="border rounded-md p-3 hover:border-primary transition-colors"
+           data-cy="tournament-item">
+          <div class="flex items-start gap-3 mb-2">
+            <img [src]="tournament.logoUrl" 
+                 [alt]="tournament.name" 
+                 class="w-12 h-12 object-contain rounded-md" 
+                 data-cy="tournament-logo" />
+            <div class="flex-1" data-cy="tournament-info">
+              <h3 class="font-semibold line-clamp-1 mb-1" data-cy="tournament-name">{{ tournament.name }}</h3>
+              <p class="text-xs text-muted line-clamp-2" data-cy="tournament-description">{{ tournament.description }}</p>
+            </div>
+            <span class="text-xs px-2 py-1 border rounded-md whitespace-nowrap" data-cy="tournament-status">
+              {{ getTournamentStatus(tournament) }}
+            </span>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-muted" data-cy="tournament-details">
+            <span data-cy="tournament-teams">{{ tournament.teamCount }}/{{ tournament.maxTeams }} Teams</span>
+            <span data-cy="tournament-location">{{ tournament.location }}</span>
+            <span data-cy="tournament-start-date">{{ tournament.startDate | date : 'mediumDate' }}</span>
+          </div>
+        </a>
+        }
+      </div>
+      }
+    </div>
+
+    <div class="card flex flex-col" data-cy="upcoming-matches-widget">
+      <div class="flex items-center justify-between mb-4" data-cy="matches-widget-header">
+        <h2 class="text-lg font-semibold" data-cy="matches-widget-title">Upcoming Matches</h2>
+        <a routerLink="/fixtures" class="text-sm text-primary hover:underline" data-cy="view-all-fixtures">View All</a>
+      </div>
+
+      @if (upcomingMatches().length === 0) {
+      <div class="flex-1 flex flex-col items-center justify-center py-8 text-center" data-cy="no-upcoming-matches">
+        <p class="text-muted" data-cy="no-matches-message">No upcoming matches scheduled.</p>
+      </div>
+      } @else {
+      <div class="flex flex-col gap-3 flex-1" data-cy="matches-list">
+        @for (match of upcomingMatches(); track match.id) {
+        <div class="border rounded-md p-3" data-cy="match-item">
+          <div class="flex items-center justify-between mb-3 text-xs text-muted" data-cy="match-header">
+            <span data-cy="match-date">{{ match.matchDate | date : 'mediumDate' }} at {{ match.matchDate | date : 'shortTime' }}</span>
+            <span data-cy="match-tournament">{{ match.tournamentName }}</span>
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2" data-cy="match-teams">
+            <div class="flex items-center gap-2" data-cy="home-team">
+              <img [src]="match.homeTeamLogo" 
+                   [alt]="match.homeTeamName" 
+                   class="w-8 h-8 object-cover rounded-md" 
+                   data-cy="home-team-logo" />
+              <span class="font-semibold text-sm line-clamp-1" data-cy="home-team-name">{{ match.homeTeamName }}</span>
+            </div>
+            <div class="text-center font-bold" data-cy="match-vs">vs</div>
+            <div class="flex items-center gap-2 justify-end" data-cy="away-team">
+              <span class="font-semibold text-sm line-clamp-1" data-cy="away-team-name">{{ match.awayTeamName }}</span>
+              <img [src]="match.awayTeamLogo" 
+                   [alt]="match.awayTeamName" 
+                   class="w-8 h-8 object-cover rounded-md" 
+                   data-cy="away-team-logo" />
+            </div>
+          </div>
+          @if (match.venue) {
+          <div class="mt-2 text-xs text-muted" data-cy="match-venue">Venue: {{ match.venue }}</div>
+          }
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <div class="card flex flex-col" data-cy="recent-results-widget">
+      <div class="flex items-center justify-between mb-4" data-cy="results-widget-header">
+        <h2 class="text-lg font-semibold" data-cy="results-widget-title">Recent Results</h2>
+        <a routerLink="/fixtures" class="text-sm text-primary hover:underline" data-cy="view-all-results">View All</a>
+      </div>
+
+      @if (recentMatches().length === 0) {
+      <div class="flex-1 flex flex-col items-center justify-center py-8 text-center" data-cy="no-recent-results">
+        <p class="text-muted" data-cy="no-results-message">No recent match results.</p>
+      </div>
+      } @else {
+      <div class="flex flex-col gap-3 flex-1" data-cy="results-list">
+        @for (match of recentMatches(); track match.id) {
+        <div class="border rounded-md p-3" data-cy="result-item">
+          <div class="flex items-center justify-between mb-3 text-xs text-muted" data-cy="result-header">
+            <span data-cy="result-date">{{ match.matchDate | date : 'mediumDate' }}</span>
+            <span data-cy="result-tournament">{{ match.tournamentName }}</span>
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2" data-cy="result-teams">
+            <div class="flex items-center gap-2" data-cy="result-home-team">
+              <img [src]="match.homeTeamLogo" 
+                   [alt]="match.homeTeamName" 
+                   class="w-8 h-8 object-cover rounded-md" 
+                   data-cy="result-home-logo" />
+              <span class="font-semibold text-sm line-clamp-1" data-cy="result-home-name">{{ match.homeTeamName }}</span>
+            </div>
+            <div class="text-center font-bold text-lg" data-cy="result-score">
+              {{ match.homeScore ?? 0 }} - {{ match.awayScore ?? 0 }}
+            </div>
+            <div class="flex items-center gap-2 justify-end" data-cy="result-away-team">
+              <span class="font-semibold text-sm line-clamp-1" data-cy="result-away-name">{{ match.awayTeamName }}</span>
+              <img [src]="match.awayTeamLogo" 
+                   [alt]="match.awayTeamName" 
+                   class="w-8 h-8 object-cover rounded-md" 
+                   data-cy="result-away-logo" />
+            </div>
+          </div>
+          @if (match.venue) {
+          <div class="mt-2 text-xs text-muted" data-cy="result-venue">Venue: {{ match.venue }}</div>
+          }
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+  </div>
+  }
+</div>

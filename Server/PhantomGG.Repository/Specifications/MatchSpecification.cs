@@ -9,6 +9,7 @@ public class MatchSpecification
     public string? SearchTerm { get; set; }
     public Guid? TournamentId { get; set; }
     public Guid? TeamId { get; set; }
+    public List<Guid>? UserTeamIds { get; set; }
     public MatchStatus? Status { get; set; }
     public DateTime? DateFrom { get; set; }
     public DateTime? DateTo { get; set; }
@@ -28,6 +29,10 @@ public class MatchSpecification
             (!TeamId.HasValue ||
                 m.HomeTeamId == TeamId.Value ||
                 m.AwayTeamId == TeamId.Value) &&
+
+            (UserTeamIds == null || UserTeamIds.Count == 0 ||
+                UserTeamIds.Contains(m.HomeTeamId) ||
+                UserTeamIds.Contains(m.AwayTeamId)) &&
 
             (!Status.HasValue || m.Status == (int)Status) &&
 

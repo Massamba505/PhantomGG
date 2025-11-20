@@ -43,26 +43,36 @@ public class UserService(
 
     public async Task<UserDto> UpdateProfileAsync(Guid userId, UpdateUserProfileRequest request)
     {
-        // Validate user exists and is active
         var user = await _userValidationService.ValidateUserIsActiveAsync(userId);
 
-        // Validate email uniqueness if email is being changed
-        if (user.Email != request.Email)
+        var newFirstName = request.FirstName?.Trim();
+        var newLastName = request.LastName?.Trim();
+        var newEmail = request.Email?.Trim().ToLowerInvariant();
+
+        if (!string.IsNullOrWhiteSpace(newEmail) &&
+            !string.Equals(user.Email, newEmail, StringComparison.OrdinalIgnoreCase))
         {
-            var emailExists = await _userRepository.EmailExistsAsync(request.Email);
+            var emailExists = await _userRepository.EmailExistsAsync(newEmail);
             if (emailExists)
-            {
                 throw new ConflictException("Email address is already in use");
-            }
+
+            user.Email = newEmail;
         }
 
-        user.FirstName = request.FirstName;
-        user.LastName = request.LastName;
-        user.Email = request.Email;
+        if (!string.IsNullOrWhiteSpace(newFirstName) &&
+            !string.Equals(user.FirstName, newFirstName, StringComparison.Ordinal))
+        {
+            user.FirstName = newFirstName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(newLastName) &&
+            !string.Equals(user.LastName, newLastName, StringComparison.Ordinal))
+        {
+            user.LastName = newLastName;
+        }
 
         await _userRepository.UpdateAsync(user);
 
-        // Invalidate cache
         await _cache.RemoveAsync($"user_{userId}");
 
         return user.ToDto();
