@@ -43,11 +43,15 @@ export interface TeamDto {
 
 export interface TournamentTeamDto {
   id: string;
+  teamId: string;
+  tournamentId: string;
   name: string;
   shortName?: string;
   logoUrl?: string;
+  tournamentName?: string;
   status: string;
   registeredAt: string;
+  requestedAt: string;
   acceptedAt?: string;
   managerName?: string;
   managerId?: string;

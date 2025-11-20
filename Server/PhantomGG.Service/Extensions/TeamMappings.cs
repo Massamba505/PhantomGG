@@ -56,11 +56,15 @@ public static class TeamMappings
         return new TournamentTeamDto
         {
             Id = tournamentTeam.TeamId,
+            TeamId = tournamentTeam.TeamId,
+            TournamentId = tournamentTeam.TournamentId,
             Name = tournamentTeam.Team.Name,
             ShortName = tournamentTeam.Team.ShortName,
             LogoUrl = tournamentTeam.Team.LogoUrl,
+            TournamentName = tournamentTeam.Tournament?.Name,
             Status = (TeamRegistrationStatus)tournamentTeam.Status,
             RegisteredAt = tournamentTeam.RequestedAt,
+            RequestedAt = tournamentTeam.RequestedAt,
             AcceptedAt = tournamentTeam.AcceptedAt,
             ManagerName = $"{tournamentTeam.Team.User.FirstName} {tournamentTeam.Team.User.LastName}".Trim(),
             ManagerId = tournamentTeam.Team.UserId,

@@ -44,6 +44,10 @@ export class TournamentService {
     return this.apiClient.getPaged<TournamentDto>(API_ENDPOINTS.TOURNAMENTS.MY_TOURNAMENTS, query);
   }
 
+  getPendingApprovals(): Observable<TournamentTeamDto[]> {
+    return this.apiClient.get<TournamentTeamDto[]>(API_ENDPOINTS.TOURNAMENTS.PENDING_APPROVALS);
+  }
+
   getTournament(id: string): Observable<TournamentDto> {
     return this.apiClient.get<TournamentDto>(API_ENDPOINTS.TOURNAMENTS.GET(id));
   }

@@ -8,6 +8,7 @@ public class MatchSpecification
 {
     public string? SearchTerm { get; set; }
     public Guid? TournamentId { get; set; }
+    public List<Guid>? TournamentIds { get; set; }
     public Guid? TeamId { get; set; }
     public List<Guid>? UserTeamIds { get; set; }
     public MatchStatus? Status { get; set; }
@@ -25,6 +26,9 @@ public class MatchSpecification
                 (m.Tournament.Name != null && m.Tournament.Name.Contains(SearchTerm, StringComparison.CurrentCultureIgnoreCase))) &&
 
             (!TournamentId.HasValue || m.TournamentId == TournamentId.Value) &&
+
+            (TournamentIds == null || TournamentIds.Count == 0 ||
+                TournamentIds.Contains(m.TournamentId)) &&
 
             (!TeamId.HasValue ||
                 m.HomeTeamId == TeamId.Value ||

@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
   TOURNAMENTS: {
     LIST: 'tournaments',
     MY_TOURNAMENTS: 'tournaments/my-tournaments',
+    PENDING_APPROVALS: 'tournaments/pending-approvals',
     GET: (tournamentId: string) => `tournaments/${tournamentId}`,
     CREATE: 'tournaments',
     UPDATE: (tournamentId: string) => `tournaments/${tournamentId}`,
@@ -54,6 +55,7 @@ export const API_ENDPOINTS = {
   MATCHES: {
     LIST: 'matches',
     MY_MATCHES: 'matches/my-matches',
+    ORGANIZER_MATCHES: 'matches/organizer-matches',
     GET: (matchId: string) => `matches/${matchId}`,
     CREATE: 'matches',
     UPDATE: (matchId: string) => `matches/${matchId}`,

@@ -38,6 +38,15 @@ export class MatchService {
     return this.apiClient.getPaged<MatchDto>(API_ENDPOINTS.MATCHES.MY_MATCHES, query);
   }
 
+  getOrganizerMatches(params?: Partial<MatchQuery>): Observable<PagedResult<MatchDto>> {
+    const query: MatchQuery = {
+      page: 1,
+      pageSize: 5,
+      ...params
+    };
+    return this.apiClient.getPaged<MatchDto>(API_ENDPOINTS.MATCHES.ORGANIZER_MATCHES, query);
+  }
+
   getMatch(matchId: string): Observable<MatchDto> {
     return this.apiClient.get<MatchDto>(API_ENDPOINTS.MATCHES.GET(matchId));
   }
