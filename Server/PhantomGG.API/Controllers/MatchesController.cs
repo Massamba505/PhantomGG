@@ -43,6 +43,18 @@ public class MatchesController(
     }
 
     /// <summary>
+    /// Get matches for the current organizer's tournaments
+    /// </summary>
+    [HttpGet("organizer-matches")]
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<PagedResult<MatchDto>>> GetOrganizerMatches([FromQuery] MatchQuery query)
+    {
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        var result = await _matchService.GetOrganizerMatchesAsync(query, currentUser.Id);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Get match details
     /// </summary>
     [HttpGet("{id:guid}")]

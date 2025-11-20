@@ -18,6 +18,7 @@ public class MatchService(
     IMatchEventRepository matchEventRepository,
     ITournamentTeamRepository tournamentTeamRepository,
     ITeamRepository teamRepository,
+    ITournamentRepository tournamentRepository,
     IMatchValidationService matchValidationService,
     ITournamentValidationService tournamentValidationService,
     ICacheInvalidationService cacheInvalidationService,
@@ -27,6 +28,7 @@ public class MatchService(
     private readonly IMatchEventRepository _matchEventRepository = matchEventRepository;
     private readonly ITournamentTeamRepository _tournamentTeamRepository = tournamentTeamRepository;
     private readonly ITeamRepository _teamRepository = teamRepository;
+    private readonly ITournamentRepository _tournamentRepository = tournamentRepository;
     private readonly IMatchValidationService _matchValidationService = matchValidationService;
     private readonly ITournamentValidationService _tournamentValidationService = tournamentValidationService;
     private readonly ICacheInvalidationService _cacheInvalidationService = cacheInvalidationService;
@@ -122,6 +124,42 @@ public class MatchService(
             SearchTerm = query.Q,
             TournamentId = query.TournamentId,
             UserTeamIds = teamIds,
+            Status = query.Status,
+            DateFrom = query.From,
+            DateTo = query.To,
+            Page = query.Page,
+            PageSize = query.PageSize
+        };
+
+        var result = await _matchRepository.SearchAsync(spec);
+
+        return new PagedResult<MatchDto>(
+            result.Data.Select(m => m.ToDto()),
+            result.Meta.Page,
+            result.Meta.PageSize,
+            result.Meta.TotalRecords
+        );
+    }
+
+    public async Task<PagedResult<MatchDto>> GetOrganizerMatchesAsync(MatchQuery query, Guid organizerId)
+    {
+        var organizerTournaments = await _tournamentRepository.GetByOrganizerAsync(organizerId);
+        var tournamentIds = organizerTournaments.Select(t => t.Id).ToList();
+
+        if (!tournamentIds.Any())
+        {
+            return new PagedResult<MatchDto>(
+                [],
+                query.Page,
+                query.PageSize,
+                0
+            );
+        }
+
+        var spec = new MatchSpecification
+        {
+            SearchTerm = query.Q,
+            TournamentIds = tournamentIds,
             Status = query.Status,
             DateFrom = query.From,
             DateTo = query.To,

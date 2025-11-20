@@ -53,6 +53,18 @@ public class TournamentsController(
     }
 
     /// <summary>
+    /// Get pending team approvals for organizer's tournaments
+    /// </summary>
+    [HttpGet("pending-approvals")]
+    [Authorize(Roles = "Organizer")]
+    public async Task<ActionResult<IEnumerable<TournamentTeamDto>>> GetPendingApprovals()
+    {
+        var currentUser = _currentUserService.GetCurrentUser()!;
+        var pendingApprovals = await _tournamentTeamService.GetOrganizerPendingApprovalsAsync(currentUser.Id);
+        return Ok(pendingApprovals);
+    }
+
+    /// <summary>
     /// Get tournament details
     /// </summary>
     [HttpGet("{id:guid}")]

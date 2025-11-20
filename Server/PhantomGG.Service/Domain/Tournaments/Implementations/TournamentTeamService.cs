@@ -59,6 +59,29 @@ public class TournamentTeamService(
         }, options);
     }
 
+    public async Task<IEnumerable<TournamentTeamDto>> GetOrganizerPendingApprovalsAsync(Guid organizerId)
+    {
+        var organizerTournaments = await _tournamentRepository.GetByOrganizerAsync(organizerId);
+        var tournamentIds = organizerTournaments.Select(t => t.Id).ToList();
+
+        if (!tournamentIds.Any())
+        {
+            return [];
+        }
+
+        var allPendingApprovals = new List<TournamentTeam>();
+        foreach (var tournamentId in tournamentIds)
+        {
+            var pendingTeams = await _tournamentTeamRepository.GetByTournamentAndStatusAsync(
+                tournamentId,
+                (int)TeamRegistrationStatus.Pending
+            );
+            allPendingApprovals.AddRange(pendingTeams);
+        }
+
+        return allPendingApprovals.Select(tt => tt.ToDto());
+    }
+
     public async Task<bool> IsTeamRegisteredAsync(Guid tournamentId, Guid teamId)
     {
         await _validationService.ValidateTournamentExistsAsync(tournamentId);
