@@ -27,6 +27,8 @@ public class TournamentServiceTests
     private Mock<HybridCache> _mockCache = null!;
     private Mock<ILogger<TournamentService>> _mockLogger = null!;
     private ITournamentService _tournamentService = null!;
+    private Mock<ITournamentTeamRepository> _mockTournamentTeamRepository = null!;
+    private Mock<ITeamRepository> _mockTeamRepository = null!;
 
     [SetUp]
     public void Setup()
@@ -39,9 +41,13 @@ public class TournamentServiceTests
         _mockEmailService = new Mock<IEmailService>();
         _mockCache = new Mock<HybridCache>();
         _mockLogger = new Mock<ILogger<TournamentService>>();
+        _mockTournamentTeamRepository = new Mock<ITournamentTeamRepository>();
+        _mockTeamRepository = new Mock<ITeamRepository>();
 
         _tournamentService = new TournamentService(
             _mockTournamentRepository.Object,
+            _mockTournamentTeamRepository.Object,
+            _mockTeamRepository.Object,
             _mockImageService.Object,
             _mockValidationService.Object,
             _mockCacheInvalidationService.Object,
