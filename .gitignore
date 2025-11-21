@@ -1,5 +1,5 @@
 .env
-**/images
+**/wwwroot
 
 # SonarCloud
 .sonar/
