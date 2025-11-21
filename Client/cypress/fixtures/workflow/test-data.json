@@ -1,0 +1,3105 @@
+{
+  "users": [
+    {
+      "id": "user-001",
+      "firstName": "Thabo",
+      "lastName": "Mokoena",
+      "email": "thabo.mokoena@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_1.jpg",
+      "createdAt": "2025-01-15T10:00:00Z"
+    },
+    {
+      "id": "user-002",
+      "firstName": "Naledi",
+      "lastName": "Khumalo",
+      "email": "naledi.khumalo@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_2.jpg",
+      "createdAt": "2025-01-16T10:00:00Z"
+    },
+    {
+      "id": "user-003",
+      "firstName": "Sipho",
+      "lastName": "Dlamini",
+      "email": "sipho.dlamini@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_3.jpg",
+      "createdAt": "2025-01-17T10:00:00Z"
+    },
+    {
+      "id": "user-004",
+      "firstName": "Lerato",
+      "lastName": "Ndlovu",
+      "email": "lerato.ndlovu@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_4.jpg",
+      "createdAt": "2025-01-18T10:00:00Z"
+    },
+    {
+      "id": "user-005",
+      "firstName": "Bongani",
+      "lastName": "Mthembu",
+      "email": "bongani.mthembu@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_5.jpg",
+      "createdAt": "2025-01-19T10:00:00Z"
+    },
+    {
+      "id": "user-006",
+      "firstName": "Zanele",
+      "lastName": "Mahlangu",
+      "email": "zanele.mahlangu@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_6.jpg",
+      "createdAt": "2025-01-20T10:00:00Z"
+    },
+    {
+      "id": "user-007",
+      "firstName": "Mandla",
+      "lastName": "Nkosi",
+      "email": "mandla.nkosi@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_7.jpg",
+      "createdAt": "2025-01-21T10:00:00Z"
+    },
+    {
+      "id": "user-008",
+      "firstName": "Thandiwe",
+      "lastName": "Zulu",
+      "email": "thandiwe.zulu@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_8.jpg",
+      "createdAt": "2025-01-22T10:00:00Z"
+    },
+    {
+      "id": "user-009",
+      "firstName": "Kabelo",
+      "lastName": "Molefe",
+      "email": "kabelo.molefe@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_9.jpg",
+      "createdAt": "2025-01-23T10:00:00Z"
+    },
+    {
+      "id": "user-010",
+      "firstName": "Noxolo",
+      "lastName": "Buthelezi",
+      "email": "noxolo.buthelezi@phantomgg.com",
+      "password": "Password123!",
+      "role": "User",
+      "profilePicture": "workflow/images/profilepictures/user_10.jpg",
+      "createdAt": "2025-01-24T10:00:00Z"
+    }
+  ],
+  "organizers": [
+    {
+      "id": "org-001",
+      "firstName": "Mpho",
+      "lastName": "Sithole",
+      "email": "mpho.sithole@phantomgg.com",
+      "password": "Password123!",
+      "role": "Organizer",
+      "profilePicture": "workflow/images/profilepictures/organizer_1.jpg",
+      "createdAt": "2025-01-10T10:00:00Z"
+    },
+    {
+      "id": "org-002",
+      "firstName": "Thandi",
+      "lastName": "Ntuli",
+      "email": "thandi.ntuli@phantomgg.com",
+      "password": "Password123!",
+      "role": "Organizer",
+      "profilePicture": "workflow/images/profilepictures/organizer_2.jpg",
+      "createdAt": "2025-01-11T10:00:00Z"
+    },
+    {
+      "id": "org-003",
+      "firstName": "Lungile",
+      "lastName": "Radebe",
+      "email": "lungile.radebe@phantomgg.com",
+      "password": "Password123!",
+      "role": "Organizer",
+      "profilePicture": "workflow/images/profilepictures/organizer_3.jpg",
+      "createdAt": "2025-01-12T10:00:00Z"
+    }
+  ],
+  "teams": [
+    {
+      "id": "team-001",
+      "name": "Johannesburg Lions",
+      "shortName": "JHB",
+      "logoUrl": "workflow/images/teamlogos/team_1.jpg",
+      "userId": "user-001",
+      "createdAt": "2025-02-01T10:00:00Z"
+    },
+    {
+      "id": "team-002",
+      "name": "Pretoria Panthers",
+      "shortName": "PTA",
+      "logoUrl": "workflow/images/teamlogos/team_2.jpg",
+      "userId": "user-001",
+      "createdAt": "2025-02-02T10:00:00Z"
+    },
+    {
+      "id": "team-003",
+      "name": "Cape Town Sharks",
+      "shortName": "CPT",
+      "logoUrl": "workflow/images/teamlogos/team_3.jpg",
+      "userId": "user-001",
+      "createdAt": "2025-02-03T10:00:00Z"
+    },
+    {
+      "id": "team-004",
+      "name": "Durban Warriors",
+      "shortName": "DBN",
+      "logoUrl": "workflow/images/teamlogos/team_4.jpg",
+      "userId": "user-001",
+      "createdAt": "2025-02-04T10:00:00Z"
+    },
+    {
+      "id": "team-005",
+      "name": "Soweto Strikers",
+      "shortName": "SWT",
+      "logoUrl": "workflow/images/teamlogos/team_5.jpg",
+      "userId": "user-002",
+      "createdAt": "2025-02-05T10:00:00Z"
+    },
+    {
+      "id": "team-006",
+      "name": "Port Elizabeth Eagles",
+      "shortName": "PE",
+      "logoUrl": "workflow/images/teamlogos/team_6.jpg",
+      "userId": "user-002",
+      "createdAt": "2025-02-06T10:00:00Z"
+    },
+    {
+      "id": "team-007",
+      "name": "Bloemfontein Blazers",
+      "shortName": "BFN",
+      "logoUrl": "workflow/images/teamlogos/team_7.jpg",
+      "userId": "user-002",
+      "createdAt": "2025-02-07T10:00:00Z"
+    },
+    {
+      "id": "team-008",
+      "name": "Polokwane Titans",
+      "shortName": "PLK",
+      "logoUrl": "workflow/images/teamlogos/team_8.jpg",
+      "userId": "user-002",
+      "createdAt": "2025-02-08T10:00:00Z"
+    },
+    {
+      "id": "team-009",
+      "name": "Nelspruit Thunder",
+      "shortName": "NSP",
+      "logoUrl": "workflow/images/teamlogos/team_9.jpg",
+      "userId": "user-003",
+      "createdAt": "2025-02-09T10:00:00Z"
+    },
+    {
+      "id": "team-010",
+      "name": "Kimberley Diamonds",
+      "shortName": "KIM",
+      "logoUrl": "workflow/images/teamlogos/team_10.jpg",
+      "userId": "user-003",
+      "createdAt": "2025-02-10T10:00:00Z"
+    },
+    {
+      "id": "team-011",
+      "name": "East London Legends",
+      "shortName": "EL",
+      "logoUrl": "workflow/images/teamlogos/team_11.jpg",
+      "userId": "user-003",
+      "createdAt": "2025-02-11T10:00:00Z"
+    },
+    {
+      "id": "team-012",
+      "name": "Rustenburg Rhinos",
+      "shortName": "RST",
+      "logoUrl": "workflow/images/teamlogos/team_12.jpg",
+      "userId": "user-003",
+      "createdAt": "2025-02-12T10:00:00Z"
+    },
+    {
+      "id": "team-013",
+      "name": "Pietermaritzburg Pirates",
+      "shortName": "PMB",
+      "logoUrl": "workflow/images/teamlogos/team_13.jpg",
+      "userId": "user-004",
+      "createdAt": "2025-02-13T10:00:00Z"
+    },
+    {
+      "id": "team-014",
+      "name": "Mbombela Mavericks",
+      "shortName": "MBM",
+      "logoUrl": "workflow/images/teamlogos/team_14.jpg",
+      "userId": "user-004",
+      "createdAt": "2025-02-14T10:00:00Z"
+    },
+    {
+      "id": "team-015",
+      "name": "Centurion Cyclones",
+      "shortName": "CEN",
+      "logoUrl": "workflow/images/teamlogos/team_15.jpg",
+      "userId": "user-004",
+      "createdAt": "2025-02-15T10:00:00Z"
+    },
+    {
+      "id": "team-016",
+      "name": "Midrand Meteors",
+      "shortName": "MID",
+      "logoUrl": "workflow/images/teamlogos/team_16.jpg",
+      "userId": "user-004",
+      "createdAt": "2025-02-16T10:00:00Z"
+    },
+    {
+      "id": "team-017",
+      "name": "Sandton Spartans",
+      "shortName": "SDT",
+      "logoUrl": "workflow/images/teamlogos/team_17.jpg",
+      "userId": "user-005",
+      "createdAt": "2025-02-17T10:00:00Z"
+    },
+    {
+      "id": "team-018",
+      "name": "Randburg Raiders",
+      "shortName": "RDB",
+      "logoUrl": "workflow/images/teamlogos/team_18.jpg",
+      "userId": "user-005",
+      "createdAt": "2025-02-18T10:00:00Z"
+    },
+    {
+      "id": "team-019",
+      "name": "Roodepoort Raptors",
+      "shortName": "RDP",
+      "logoUrl": "workflow/images/teamlogos/team_19.jpg",
+      "userId": "user-005",
+      "createdAt": "2025-02-19T10:00:00Z"
+    },
+    {
+      "id": "team-020",
+      "name": "Boksburg Buffaloes",
+      "shortName": "BKS",
+      "logoUrl": "workflow/images/teamlogos/team_20.jpg",
+      "userId": "user-005",
+      "createdAt": "2025-02-20T10:00:00Z"
+    },
+    {
+      "id": "team-021",
+      "name": "Benoni Bengals",
+      "shortName": "BEN",
+      "logoUrl": "workflow/images/teamlogos/team_21.jpg",
+      "userId": "user-006",
+      "createdAt": "2025-02-21T10:00:00Z"
+    },
+    {
+      "id": "team-022",
+      "name": "Germiston Giants",
+      "shortName": "GRM",
+      "logoUrl": "workflow/images/teamlogos/team_22.jpg",
+      "userId": "user-006",
+      "createdAt": "2025-02-22T10:00:00Z"
+    },
+    {
+      "id": "team-023",
+      "name": "Springs Stallions",
+      "shortName": "SPR",
+      "logoUrl": "workflow/images/teamlogos/team_23.jpg",
+      "userId": "user-006",
+      "createdAt": "2025-02-23T10:00:00Z"
+    },
+    {
+      "id": "team-024",
+      "name": "Krugersdorp Knights",
+      "shortName": "KSD",
+      "logoUrl": "workflow/images/teamlogos/team_24.jpg",
+      "userId": "user-006",
+      "createdAt": "2025-02-24T10:00:00Z"
+    },
+    {
+      "id": "team-025",
+      "name": "Vereeniging Vipers",
+      "shortName": "VRG",
+      "logoUrl": "workflow/images/teamlogos/team_25.jpg",
+      "userId": "user-007",
+      "createdAt": "2025-02-25T10:00:00Z"
+    },
+    {
+      "id": "team-026",
+      "name": "Vanderbijlpark Vultures",
+      "shortName": "VBP",
+      "logoUrl": "workflow/images/teamlogos/team_26.jpg",
+      "userId": "user-007",
+      "createdAt": "2025-02-26T10:00:00Z"
+    },
+    {
+      "id": "team-027",
+      "name": "Sasolburg Scorpions",
+      "shortName": "SSB",
+      "logoUrl": "workflow/images/teamlogos/team_27.jpg",
+      "userId": "user-007",
+      "createdAt": "2025-02-27T10:00:00Z"
+    },
+    {
+      "id": "team-028",
+      "name": "Welkom Wolves",
+      "shortName": "WLK",
+      "logoUrl": "workflow/images/teamlogos/team_28.jpg",
+      "userId": "user-007",
+      "createdAt": "2025-02-28T10:00:00Z"
+    },
+    {
+      "id": "team-029",
+      "name": "Richards Bay Rebels",
+      "shortName": "RB",
+      "logoUrl": "workflow/images/teamlogos/team_29.jpg",
+      "userId": "user-008",
+      "createdAt": "2025-03-01T10:00:00Z"
+    },
+    {
+      "id": "team-030",
+      "name": "Newcastle Ninjas",
+      "shortName": "NCL",
+      "logoUrl": "workflow/images/teamlogos/team_30.jpg",
+      "userId": "user-008",
+      "createdAt": "2025-03-02T10:00:00Z"
+    },
+    {
+      "id": "team-031",
+      "name": "Ladysmith Leopards",
+      "shortName": "LDS",
+      "logoUrl": "workflow/images/teamlogos/team_31.jpg",
+      "userId": "user-008",
+      "createdAt": "2025-03-03T10:00:00Z"
+    },
+    {
+      "id": "team-032",
+      "name": "Empangeni Express",
+      "shortName": "EMP",
+      "logoUrl": "workflow/images/teamlogos/team_32.jpg",
+      "userId": "user-008",
+      "createdAt": "2025-03-04T10:00:00Z"
+    },
+    {
+      "id": "team-033",
+      "name": "Umhlanga United",
+      "shortName": "UMH",
+      "logoUrl": "workflow/images/teamlogos/team_33.jpg",
+      "userId": "user-009",
+      "createdAt": "2025-03-05T10:00:00Z"
+    },
+    {
+      "id": "team-034",
+      "name": "Ballito Blazers",
+      "shortName": "BLT",
+      "logoUrl": "workflow/images/teamlogos/team_34.jpg",
+      "userId": "user-009",
+      "createdAt": "2025-03-06T10:00:00Z"
+    },
+    {
+      "id": "team-035",
+      "name": "Tongaat Titans",
+      "shortName": "TGT",
+      "logoUrl": "workflow/images/teamlogos/team_35.jpg",
+      "userId": "user-009",
+      "createdAt": "2025-03-07T10:00:00Z"
+    },
+    {
+      "id": "team-036",
+      "name": "Phoenix Flyers",
+      "shortName": "PHX",
+      "logoUrl": "workflow/images/teamlogos/team_36.jpg",
+      "userId": "user-009",
+      "createdAt": "2025-03-08T10:00:00Z"
+    },
+    {
+      "id": "team-037",
+      "name": "Chatsworth Champions",
+      "shortName": "CHT",
+      "logoUrl": "workflow/images/teamlogos/team_37.jpg",
+      "userId": "user-010",
+      "createdAt": "2025-03-09T10:00:00Z"
+    },
+    {
+      "id": "team-038",
+      "name": "Umlazi Ultras",
+      "shortName": "UML",
+      "logoUrl": "workflow/images/teamlogos/team_38.jpg",
+      "userId": "user-010",
+      "createdAt": "2025-03-10T10:00:00Z"
+    },
+    {
+      "id": "team-039",
+      "name": "Pinetown Predators",
+      "shortName": "PTN",
+      "logoUrl": "workflow/images/teamlogos/team_39.jpg",
+      "userId": "user-010",
+      "createdAt": "2025-03-11T10:00:00Z"
+    },
+    {
+      "id": "team-040",
+      "name": "Westville Warriors",
+      "shortName": "WTV",
+      "logoUrl": "workflow/images/teamlogos/team_40.jpg",
+      "userId": "user-010",
+      "createdAt": "2025-03-12T10:00:00Z"
+    }
+  ],
+  "players": [
+    {
+      "id": "player-001",
+      "firstName": "Prudence",
+      "lastName": "Baloyi",
+      "position": "Goalkeeper",
+      "email": "prudence.baloyi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_1.jpg",
+      "teamId": "team-001",
+      "joinedAt": "2025-11-07T06:31:46.307Z"
+    },
+    {
+      "id": "player-002",
+      "firstName": "Innocent",
+      "lastName": "Kubheka",
+      "position": "Defender",
+      "email": "innocent.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_2.jpg",
+      "teamId": "team-001",
+      "joinedAt": "2025-10-27T22:10:58.845Z"
+    },
+    {
+      "id": "player-003",
+      "firstName": "Palesa",
+      "lastName": "Radebe",
+      "position": "Defender",
+      "email": "palesa.radebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_3.jpg",
+      "teamId": "team-001",
+      "joinedAt": "2025-10-30T11:01:52.215Z"
+    },
+    {
+      "id": "player-004",
+      "firstName": "Grace",
+      "lastName": "Phiri",
+      "position": "Midfielder",
+      "email": "grace.phiri@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_4.jpg",
+      "teamId": "team-001",
+      "joinedAt": "2025-10-23T09:43:17.863Z"
+    },
+    {
+      "id": "player-005",
+      "firstName": "Bongani",
+      "lastName": "Shongwe",
+      "position": "Forward",
+      "email": "bongani.shongwe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_5.jpg",
+      "teamId": "team-001",
+      "joinedAt": "2025-10-23T20:16:34.261Z"
+    },
+    {
+      "id": "player-006",
+      "firstName": "Bongani",
+      "lastName": "Mohlala",
+      "position": "Goalkeeper",
+      "email": "bongani.mohlala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_6.jpg",
+      "teamId": "team-002",
+      "joinedAt": "2025-10-30T16:04:29.906Z"
+    },
+    {
+      "id": "player-007",
+      "firstName": "Mandla",
+      "lastName": "Shezi",
+      "position": "Defender",
+      "email": "mandla.shezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_7.jpg",
+      "teamId": "team-002",
+      "joinedAt": "2025-11-15T05:51:13.420Z"
+    },
+    {
+      "id": "player-008",
+      "firstName": "Patience",
+      "lastName": "Sithole",
+      "position": "Defender",
+      "email": "patience.sithole@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_8.jpg",
+      "teamId": "team-002",
+      "joinedAt": "2025-10-23T08:08:13.057Z"
+    },
+    {
+      "id": "player-009",
+      "firstName": "Given",
+      "lastName": "Mathebula",
+      "position": "Midfielder",
+      "email": "given.mathebula@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_9.jpg",
+      "teamId": "team-002",
+      "joinedAt": "2025-11-16T09:26:29.701Z"
+    },
+    {
+      "id": "player-010",
+      "firstName": "Lerato",
+      "lastName": "Maseko",
+      "position": "Forward",
+      "email": "lerato.maseko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_10.jpg",
+      "teamId": "team-002",
+      "joinedAt": "2025-11-17T15:54:12.418Z"
+    },
+    {
+      "id": "player-011",
+      "firstName": "Grace",
+      "lastName": "Mahlangu",
+      "position": "Midfielder",
+      "email": "grace.mahlangu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_11.jpg",
+      "teamId": "team-002",
+      "joinedAt": "2025-11-16T14:39:31.439Z"
+    },
+    {
+      "id": "player-012",
+      "firstName": "Success",
+      "lastName": "Shabalala",
+      "position": "Goalkeeper",
+      "email": "success.shabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_12.jpg",
+      "teamId": "team-003",
+      "joinedAt": "2025-10-23T17:02:02.908Z"
+    },
+    {
+      "id": "player-013",
+      "firstName": "Prudence",
+      "lastName": "Zulu",
+      "position": "Defender",
+      "email": "prudence.zulu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_13.jpg",
+      "teamId": "team-003",
+      "joinedAt": "2025-10-29T09:18:53.193Z"
+    },
+    {
+      "id": "player-014",
+      "firstName": "Lesedi",
+      "lastName": "Zulu",
+      "position": "Defender",
+      "email": "lesedi.zulu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_14.jpg",
+      "teamId": "team-003",
+      "joinedAt": "2025-11-02T21:16:35.138Z"
+    },
+    {
+      "id": "player-015",
+      "firstName": "Happy",
+      "lastName": "Tshabalala",
+      "position": "Midfielder",
+      "email": "happy.tshabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_15.jpg",
+      "teamId": "team-003",
+      "joinedAt": "2025-11-02T20:11:47.149Z"
+    },
+    {
+      "id": "player-016",
+      "firstName": "Given",
+      "lastName": "Mazibuko",
+      "position": "Forward",
+      "email": "given.mazibuko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_16.jpg",
+      "teamId": "team-003",
+      "joinedAt": "2025-11-08T03:36:04.041Z"
+    },
+    {
+      "id": "player-017",
+      "firstName": "Precious",
+      "lastName": "Radebe",
+      "position": "Midfielder",
+      "email": "precious.radebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_17.jpg",
+      "teamId": "team-003",
+      "joinedAt": "2025-10-31T09:19:59.631Z"
+    },
+    {
+      "id": "player-018",
+      "firstName": "Bongani",
+      "lastName": "Mnisi",
+      "position": "Forward",
+      "email": "bongani.mnisi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_18.jpg",
+      "teamId": "team-003",
+      "joinedAt": "2025-11-08T06:17:40.723Z"
+    },
+    {
+      "id": "player-019",
+      "firstName": "Palesa",
+      "lastName": "Khumalo",
+      "position": "Goalkeeper",
+      "email": "palesa.khumalo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_19.jpg",
+      "teamId": "team-004",
+      "joinedAt": "2025-11-11T08:53:48.891Z"
+    },
+    {
+      "id": "player-020",
+      "firstName": "Peace",
+      "lastName": "Mohlala",
+      "position": "Defender",
+      "email": "peace.mohlala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_20.jpg",
+      "teamId": "team-004",
+      "joinedAt": "2025-11-06T18:44:25.105Z"
+    },
+    {
+      "id": "player-021",
+      "firstName": "Prudence",
+      "lastName": "Mthembu",
+      "position": "Defender",
+      "email": "prudence.mthembu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_21.jpg",
+      "teamId": "team-004",
+      "joinedAt": "2025-11-04T13:58:49.591Z"
+    },
+    {
+      "id": "player-022",
+      "firstName": "Peace",
+      "lastName": "Mathebula",
+      "position": "Midfielder",
+      "email": "peace.mathebula@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_22.jpg",
+      "teamId": "team-004",
+      "joinedAt": "2025-10-28T00:21:42.872Z"
+    },
+    {
+      "id": "player-023",
+      "firstName": "Nomsa",
+      "lastName": "Shezi",
+      "position": "Forward",
+      "email": "nomsa.shezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_23.jpg",
+      "teamId": "team-004",
+      "joinedAt": "2025-11-08T06:16:50.058Z"
+    },
+    {
+      "id": "player-024",
+      "firstName": "Bongani",
+      "lastName": "Shabalala",
+      "position": "Goalkeeper",
+      "email": "bongani.shabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_24.jpg",
+      "teamId": "team-005",
+      "joinedAt": "2025-11-09T11:55:43.680Z"
+    },
+    {
+      "id": "player-025",
+      "firstName": "Success",
+      "lastName": "Mkhize",
+      "position": "Defender",
+      "email": "success.mkhize@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_25.jpg",
+      "teamId": "team-005",
+      "joinedAt": "2025-11-03T03:59:02.392Z"
+    },
+    {
+      "id": "player-026",
+      "firstName": "Sipho",
+      "lastName": "Ngcobo",
+      "position": "Defender",
+      "email": "sipho.ngcobo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_26.jpg",
+      "teamId": "team-005",
+      "joinedAt": "2025-11-09T20:59:49.668Z"
+    },
+    {
+      "id": "player-027",
+      "firstName": "Goodwill",
+      "lastName": "Ngubane",
+      "position": "Midfielder",
+      "email": "goodwill.ngubane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_27.jpg",
+      "teamId": "team-005",
+      "joinedAt": "2025-10-28T01:26:21.322Z"
+    },
+    {
+      "id": "player-028",
+      "firstName": "Goodwill",
+      "lastName": "Sibiya",
+      "position": "Forward",
+      "email": "goodwill.sibiya@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_28.jpg",
+      "teamId": "team-005",
+      "joinedAt": "2025-11-14T20:09:16.666Z"
+    },
+    {
+      "id": "player-029",
+      "firstName": "Gift",
+      "lastName": "Tshabalala",
+      "position": "Midfielder",
+      "email": "gift.tshabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_29.jpg",
+      "teamId": "team-005",
+      "joinedAt": "2025-10-28T21:22:34.446Z"
+    },
+    {
+      "id": "player-030",
+      "firstName": "Champion",
+      "lastName": "Mabena",
+      "position": "Goalkeeper",
+      "email": "champion.mabena@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_30.jpg",
+      "teamId": "team-006",
+      "joinedAt": "2025-11-17T23:42:55.117Z"
+    },
+    {
+      "id": "player-031",
+      "firstName": "Lesedi",
+      "lastName": "Hadebe",
+      "position": "Defender",
+      "email": "lesedi.hadebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_31.jpg",
+      "teamId": "team-006",
+      "joinedAt": "2025-11-14T10:15:52.895Z"
+    },
+    {
+      "id": "player-032",
+      "firstName": "Tshepo",
+      "lastName": "Nxumalo",
+      "position": "Defender",
+      "email": "tshepo.nxumalo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_32.jpg",
+      "teamId": "team-006",
+      "joinedAt": "2025-10-29T06:57:49.575Z"
+    },
+    {
+      "id": "player-033",
+      "firstName": "Sello",
+      "lastName": "Shabalala",
+      "position": "Midfielder",
+      "email": "sello.shabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_33.jpg",
+      "teamId": "team-006",
+      "joinedAt": "2025-11-11T03:56:28.482Z"
+    },
+    {
+      "id": "player-034",
+      "firstName": "Wisdom",
+      "lastName": "Baloyi",
+      "position": "Forward",
+      "email": "wisdom.baloyi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_34.jpg",
+      "teamId": "team-006",
+      "joinedAt": "2025-11-04T03:02:00.064Z"
+    },
+    {
+      "id": "player-035",
+      "firstName": "Jabu",
+      "lastName": "Nkomo",
+      "position": "Midfielder",
+      "email": "jabu.nkomo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_35.jpg",
+      "teamId": "team-006",
+      "joinedAt": "2025-11-13T22:54:53.388Z"
+    },
+    {
+      "id": "player-036",
+      "firstName": "Faith",
+      "lastName": "Seema",
+      "position": "Forward",
+      "email": "faith.seema@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_36.jpg",
+      "teamId": "team-006",
+      "joinedAt": "2025-10-28T02:37:39.177Z"
+    },
+    {
+      "id": "player-037",
+      "firstName": "Sipho",
+      "lastName": "Kubheka",
+      "position": "Goalkeeper",
+      "email": "sipho.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_37.jpg",
+      "teamId": "team-007",
+      "joinedAt": "2025-10-26T10:39:55.702Z"
+    },
+    {
+      "id": "player-038",
+      "firstName": "Champion",
+      "lastName": "Mthembu",
+      "position": "Defender",
+      "email": "champion.mthembu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_38.jpg",
+      "teamId": "team-007",
+      "joinedAt": "2025-11-13T03:38:29.624Z"
+    },
+    {
+      "id": "player-039",
+      "firstName": "Dineo",
+      "lastName": "Gumede",
+      "position": "Defender",
+      "email": "dineo.gumede@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_39.jpg",
+      "teamId": "team-007",
+      "joinedAt": "2025-11-11T05:16:51.516Z"
+    },
+    {
+      "id": "player-040",
+      "firstName": "Champion",
+      "lastName": "Zungu",
+      "position": "Midfielder",
+      "email": "champion.zungu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_40.jpg",
+      "teamId": "team-007",
+      "joinedAt": "2025-11-16T03:23:31.055Z"
+    },
+    {
+      "id": "player-041",
+      "firstName": "Lucky",
+      "lastName": "Mahlangu",
+      "position": "Forward",
+      "email": "lucky.mahlangu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_41.jpg",
+      "teamId": "team-007",
+      "joinedAt": "2025-11-16T04:33:55.620Z"
+    },
+    {
+      "id": "player-042",
+      "firstName": "Kagiso",
+      "lastName": "Zwane",
+      "position": "Goalkeeper",
+      "email": "kagiso.zwane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_42.jpg",
+      "teamId": "team-008",
+      "joinedAt": "2025-11-01T10:32:34.850Z"
+    },
+    {
+      "id": "player-043",
+      "firstName": "Knowledge",
+      "lastName": "Khumalo",
+      "position": "Defender",
+      "email": "knowledge.khumalo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_43.jpg",
+      "teamId": "team-008",
+      "joinedAt": "2025-11-01T12:02:17.166Z"
+    },
+    {
+      "id": "player-044",
+      "firstName": "Innocent",
+      "lastName": "Tshabalala",
+      "position": "Defender",
+      "email": "innocent.tshabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_44.jpg",
+      "teamId": "team-008",
+      "joinedAt": "2025-11-16T07:17:06.215Z"
+    },
+    {
+      "id": "player-045",
+      "firstName": "Peace",
+      "lastName": "Mabena",
+      "position": "Midfielder",
+      "email": "peace.mabena@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_45.jpg",
+      "teamId": "team-008",
+      "joinedAt": "2025-11-12T09:07:17.240Z"
+    },
+    {
+      "id": "player-046",
+      "firstName": "Bongani",
+      "lastName": "Mkhize",
+      "position": "Forward",
+      "email": "bongani.mkhize@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_46.jpg",
+      "teamId": "team-008",
+      "joinedAt": "2025-11-02T01:32:02.563Z"
+    },
+    {
+      "id": "player-047",
+      "firstName": "Prince",
+      "lastName": "Tshabalala",
+      "position": "Midfielder",
+      "email": "prince.tshabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_47.jpg",
+      "teamId": "team-008",
+      "joinedAt": "2025-11-11T20:33:30.867Z"
+    },
+    {
+      "id": "player-048",
+      "firstName": "Mercy",
+      "lastName": "Chauke",
+      "position": "Goalkeeper",
+      "email": "mercy.chauke@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_48.jpg",
+      "teamId": "team-009",
+      "joinedAt": "2025-11-12T21:24:30.141Z"
+    },
+    {
+      "id": "player-049",
+      "firstName": "Kagiso",
+      "lastName": "Rikhotso",
+      "position": "Defender",
+      "email": "kagiso.rikhotso@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_49.jpg",
+      "teamId": "team-009",
+      "joinedAt": "2025-11-09T08:11:15.343Z"
+    },
+    {
+      "id": "player-050",
+      "firstName": "King",
+      "lastName": "Ntuli",
+      "position": "Defender",
+      "email": "king.ntuli@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_50.jpg",
+      "teamId": "team-009",
+      "joinedAt": "2025-11-19T17:36:06.789Z"
+    },
+    {
+      "id": "player-051",
+      "firstName": "Nandi",
+      "lastName": "Nkomo",
+      "position": "Midfielder",
+      "email": "nandi.nkomo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_51.jpg",
+      "teamId": "team-009",
+      "joinedAt": "2025-11-15T09:22:34.641Z"
+    },
+    {
+      "id": "player-052",
+      "firstName": "Mandla",
+      "lastName": "Myeni",
+      "position": "Forward",
+      "email": "mandla.myeni@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_52.jpg",
+      "teamId": "team-009",
+      "joinedAt": "2025-11-03T19:12:35.310Z"
+    },
+    {
+      "id": "player-053",
+      "firstName": "Katlego",
+      "lastName": "Ndlovu",
+      "position": "Midfielder",
+      "email": "katlego.ndlovu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_53.jpg",
+      "teamId": "team-009",
+      "joinedAt": "2025-11-09T07:32:13.081Z"
+    },
+    {
+      "id": "player-054",
+      "firstName": "Knowledge",
+      "lastName": "Ntuli",
+      "position": "Forward",
+      "email": "knowledge.ntuli@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_54.jpg",
+      "teamId": "team-009",
+      "joinedAt": "2025-11-12T08:07:07.629Z"
+    },
+    {
+      "id": "player-055",
+      "firstName": "Welcome",
+      "lastName": "Maluleke",
+      "position": "Goalkeeper",
+      "email": "welcome.maluleke@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_55.jpg",
+      "teamId": "team-010",
+      "joinedAt": "2025-11-16T01:22:55.228Z"
+    },
+    {
+      "id": "player-056",
+      "firstName": "Lucky",
+      "lastName": "Molefe",
+      "position": "Defender",
+      "email": "lucky.molefe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_56.jpg",
+      "teamId": "team-010",
+      "joinedAt": "2025-11-15T18:52:36.459Z"
+    },
+    {
+      "id": "player-057",
+      "firstName": "Palesa",
+      "lastName": "Mahlangu",
+      "position": "Defender",
+      "email": "palesa.mahlangu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_57.jpg",
+      "teamId": "team-010",
+      "joinedAt": "2025-11-20T00:12:22.494Z"
+    },
+    {
+      "id": "player-058",
+      "firstName": "Thabo",
+      "lastName": "Ndlovu",
+      "position": "Midfielder",
+      "email": "thabo.ndlovu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_58.jpg",
+      "teamId": "team-010",
+      "joinedAt": "2025-11-09T11:26:50.991Z"
+    },
+    {
+      "id": "player-059",
+      "firstName": "Hope",
+      "lastName": "Kekana",
+      "position": "Forward",
+      "email": "hope.kekana@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_59.jpg",
+      "teamId": "team-010",
+      "joinedAt": "2025-11-08T11:26:39.740Z"
+    },
+    {
+      "id": "player-060",
+      "firstName": "Knowledge",
+      "lastName": "Sithole",
+      "position": "Goalkeeper",
+      "email": "knowledge.sithole@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_60.jpg",
+      "teamId": "team-011",
+      "joinedAt": "2025-11-14T20:55:46.238Z"
+    },
+    {
+      "id": "player-061",
+      "firstName": "Victor",
+      "lastName": "Maluleke",
+      "position": "Defender",
+      "email": "victor.maluleke@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_61.jpg",
+      "teamId": "team-011",
+      "joinedAt": "2025-11-13T00:54:29.556Z"
+    },
+    {
+      "id": "player-062",
+      "firstName": "Justice",
+      "lastName": "Mathebula",
+      "position": "Defender",
+      "email": "justice.mathebula@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_62.jpg",
+      "teamId": "team-011",
+      "joinedAt": "2025-10-28T00:55:16.971Z"
+    },
+    {
+      "id": "player-063",
+      "firstName": "Precious",
+      "lastName": "Buthelezi",
+      "position": "Midfielder",
+      "email": "precious.buthelezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_63.jpg",
+      "teamId": "team-011",
+      "joinedAt": "2025-11-08T16:23:19.048Z"
+    },
+    {
+      "id": "player-064",
+      "firstName": "Sello",
+      "lastName": "Gumede",
+      "position": "Forward",
+      "email": "sello.gumede@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_64.jpg",
+      "teamId": "team-011",
+      "joinedAt": "2025-11-03T21:39:59.980Z"
+    },
+    {
+      "id": "player-065",
+      "firstName": "Prince",
+      "lastName": "Shabalala",
+      "position": "Midfielder",
+      "email": "prince.shabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_65.jpg",
+      "teamId": "team-011",
+      "joinedAt": "2025-11-16T10:05:56.866Z"
+    },
+    {
+      "id": "player-066",
+      "firstName": "Wisdom",
+      "lastName": "Mnguni",
+      "position": "Goalkeeper",
+      "email": "wisdom.mnguni@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_66.jpg",
+      "teamId": "team-012",
+      "joinedAt": "2025-10-24T19:32:57.171Z"
+    },
+    {
+      "id": "player-067",
+      "firstName": "Welcome",
+      "lastName": "Buthelezi",
+      "position": "Defender",
+      "email": "welcome.buthelezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_67.jpg",
+      "teamId": "team-012",
+      "joinedAt": "2025-11-16T03:53:11.646Z"
+    },
+    {
+      "id": "player-068",
+      "firstName": "Hope",
+      "lastName": "Ndlovu",
+      "position": "Defender",
+      "email": "hope.ndlovu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_68.jpg",
+      "teamId": "team-012",
+      "joinedAt": "2025-10-22T07:31:38.104Z"
+    },
+    {
+      "id": "player-069",
+      "firstName": "King",
+      "lastName": "Khoza",
+      "position": "Midfielder",
+      "email": "king.khoza@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_69.jpg",
+      "teamId": "team-012",
+      "joinedAt": "2025-11-06T07:09:08.617Z"
+    },
+    {
+      "id": "player-070",
+      "firstName": "Justice",
+      "lastName": "Molefe",
+      "position": "Forward",
+      "email": "justice.molefe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_70.jpg",
+      "teamId": "team-012",
+      "joinedAt": "2025-10-31T13:33:42.745Z"
+    },
+    {
+      "id": "player-071",
+      "firstName": "Prince",
+      "lastName": "Zulu",
+      "position": "Midfielder",
+      "email": "prince.zulu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_71.jpg",
+      "teamId": "team-012",
+      "joinedAt": "2025-11-12T17:29:15.557Z"
+    },
+    {
+      "id": "player-072",
+      "firstName": "Katlego",
+      "lastName": "Mashaba",
+      "position": "Forward",
+      "email": "katlego.mashaba@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_72.jpg",
+      "teamId": "team-012",
+      "joinedAt": "2025-11-19T21:03:32.535Z"
+    },
+    {
+      "id": "player-073",
+      "firstName": "King",
+      "lastName": "Rikhotso",
+      "position": "Goalkeeper",
+      "email": "king.rikhotso@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_73.jpg",
+      "teamId": "team-013",
+      "joinedAt": "2025-11-02T21:47:15.192Z"
+    },
+    {
+      "id": "player-074",
+      "firstName": "Patience",
+      "lastName": "Rikhotso",
+      "position": "Defender",
+      "email": "patience.rikhotso@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_74.jpg",
+      "teamId": "team-013",
+      "joinedAt": "2025-11-16T12:56:36.172Z"
+    },
+    {
+      "id": "player-075",
+      "firstName": "Sipho",
+      "lastName": "Chauke",
+      "position": "Defender",
+      "email": "sipho.chauke@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_75.jpg",
+      "teamId": "team-013",
+      "joinedAt": "2025-11-20T02:35:06.534Z"
+    },
+    {
+      "id": "player-076",
+      "firstName": "Zanele",
+      "lastName": "Mathebula",
+      "position": "Midfielder",
+      "email": "zanele.mathebula@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_76.jpg",
+      "teamId": "team-013",
+      "joinedAt": "2025-11-06T07:34:20.499Z"
+    },
+    {
+      "id": "player-077",
+      "firstName": "Zanele",
+      "lastName": "Nkomo",
+      "position": "Forward",
+      "email": "zanele.nkomo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_77.jpg",
+      "teamId": "team-013",
+      "joinedAt": "2025-11-05T02:12:15.992Z"
+    },
+    {
+      "id": "player-078",
+      "firstName": "Wisdom",
+      "lastName": "Zungu",
+      "position": "Goalkeeper",
+      "email": "wisdom.zungu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_78.jpg",
+      "teamId": "team-014",
+      "joinedAt": "2025-10-30T13:48:57.659Z"
+    },
+    {
+      "id": "player-079",
+      "firstName": "Prince",
+      "lastName": "Molefe",
+      "position": "Defender",
+      "email": "prince.molefe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_79.jpg",
+      "teamId": "team-014",
+      "joinedAt": "2025-11-05T13:22:39.200Z"
+    },
+    {
+      "id": "player-080",
+      "firstName": "Sipho",
+      "lastName": "Ndlovu",
+      "position": "Defender",
+      "email": "sipho.ndlovu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_80.jpg",
+      "teamId": "team-014",
+      "joinedAt": "2025-11-11T12:58:02.432Z"
+    },
+    {
+      "id": "player-081",
+      "firstName": "Hope",
+      "lastName": "Mnguni",
+      "position": "Midfielder",
+      "email": "hope.mnguni@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_81.jpg",
+      "teamId": "team-014",
+      "joinedAt": "2025-11-09T00:48:49.519Z"
+    },
+    {
+      "id": "player-082",
+      "firstName": "Knowledge",
+      "lastName": "Ngubane",
+      "position": "Forward",
+      "email": "knowledge.ngubane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_82.jpg",
+      "teamId": "team-014",
+      "joinedAt": "2025-10-22T22:14:27.571Z"
+    },
+    {
+      "id": "player-083",
+      "firstName": "Sizwe",
+      "lastName": "Cele",
+      "position": "Midfielder",
+      "email": "sizwe.cele@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_83.jpg",
+      "teamId": "team-014",
+      "joinedAt": "2025-11-15T21:33:05.863Z"
+    },
+    {
+      "id": "player-084",
+      "firstName": "Lucky",
+      "lastName": "Khoza",
+      "position": "Goalkeeper",
+      "email": "lucky.khoza@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_84.jpg",
+      "teamId": "team-015",
+      "joinedAt": "2025-10-28T06:35:53.459Z"
+    },
+    {
+      "id": "player-085",
+      "firstName": "Precious",
+      "lastName": "Kubheka",
+      "position": "Defender",
+      "email": "precious.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_85.jpg",
+      "teamId": "team-015",
+      "joinedAt": "2025-11-13T05:21:09.377Z"
+    },
+    {
+      "id": "player-086",
+      "firstName": "Prince",
+      "lastName": "Dlamini",
+      "position": "Defender",
+      "email": "prince.dlamini@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_86.jpg",
+      "teamId": "team-015",
+      "joinedAt": "2025-11-04T20:10:18.162Z"
+    },
+    {
+      "id": "player-087",
+      "firstName": "Blessing",
+      "lastName": "Kubheka",
+      "position": "Midfielder",
+      "email": "blessing.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_87.jpg",
+      "teamId": "team-015",
+      "joinedAt": "2025-11-16T22:44:26.179Z"
+    },
+    {
+      "id": "player-088",
+      "firstName": "Sizwe",
+      "lastName": "Mathebula",
+      "position": "Forward",
+      "email": "sizwe.mathebula@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_88.jpg",
+      "teamId": "team-015",
+      "joinedAt": "2025-11-19T17:44:46.250Z"
+    },
+    {
+      "id": "player-089",
+      "firstName": "Zanele",
+      "lastName": "Molefe",
+      "position": "Midfielder",
+      "email": "zanele.molefe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_89.jpg",
+      "teamId": "team-015",
+      "joinedAt": "2025-11-04T19:00:32.355Z"
+    },
+    {
+      "id": "player-090",
+      "firstName": "Queen",
+      "lastName": "Kekana",
+      "position": "Forward",
+      "email": "queen.kekana@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_90.jpg",
+      "teamId": "team-015",
+      "joinedAt": "2025-11-06T00:28:01.919Z"
+    },
+    {
+      "id": "player-091",
+      "firstName": "Innocent",
+      "lastName": "Shongwe",
+      "position": "Goalkeeper",
+      "email": "innocent.shongwe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_91.jpg",
+      "teamId": "team-016",
+      "joinedAt": "2025-11-15T16:23:03.658Z"
+    },
+    {
+      "id": "player-092",
+      "firstName": "Nomsa",
+      "lastName": "Maseko",
+      "position": "Defender",
+      "email": "nomsa.maseko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_92.jpg",
+      "teamId": "team-016",
+      "joinedAt": "2025-11-03T22:33:58.066Z"
+    },
+    {
+      "id": "player-093",
+      "firstName": "Sipho",
+      "lastName": "Mnguni",
+      "position": "Defender",
+      "email": "sipho.mnguni@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_93.jpg",
+      "teamId": "team-016",
+      "joinedAt": "2025-11-18T06:06:53.820Z"
+    },
+    {
+      "id": "player-094",
+      "firstName": "Nomsa",
+      "lastName": "Seema",
+      "position": "Midfielder",
+      "email": "nomsa.seema@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_94.jpg",
+      "teamId": "team-016",
+      "joinedAt": "2025-11-12T03:32:31.769Z"
+    },
+    {
+      "id": "player-095",
+      "firstName": "Wisdom",
+      "lastName": "Mahlangu",
+      "position": "Forward",
+      "email": "wisdom.mahlangu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_95.jpg",
+      "teamId": "team-016",
+      "joinedAt": "2025-10-27T03:59:32.507Z"
+    },
+    {
+      "id": "player-096",
+      "firstName": "Duke",
+      "lastName": "Kubheka",
+      "position": "Goalkeeper",
+      "email": "duke.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_96.jpg",
+      "teamId": "team-017",
+      "joinedAt": "2025-10-28T03:55:55.089Z"
+    },
+    {
+      "id": "player-097",
+      "firstName": "Thabo",
+      "lastName": "Chauke",
+      "position": "Defender",
+      "email": "thabo.chauke@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_97.jpg",
+      "teamId": "team-017",
+      "joinedAt": "2025-11-06T12:04:26.866Z"
+    },
+    {
+      "id": "player-098",
+      "firstName": "Lucky",
+      "lastName": "Dlamini",
+      "position": "Defender",
+      "email": "lucky.dlamini@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_98.jpg",
+      "teamId": "team-017",
+      "joinedAt": "2025-11-08T17:53:49.274Z"
+    },
+    {
+      "id": "player-099",
+      "firstName": "Patience",
+      "lastName": "Kubheka",
+      "position": "Midfielder",
+      "email": "patience.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_99.jpg",
+      "teamId": "team-017",
+      "joinedAt": "2025-11-09T07:56:03.424Z"
+    },
+    {
+      "id": "player-100",
+      "firstName": "Success",
+      "lastName": "Baloyi",
+      "position": "Forward",
+      "email": "success.baloyi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_100.jpg",
+      "teamId": "team-017",
+      "joinedAt": "2025-11-05T09:00:27.893Z"
+    },
+    {
+      "id": "player-101",
+      "firstName": "Duke",
+      "lastName": "Ndlovu",
+      "position": "Midfielder",
+      "email": "duke.ndlovu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_101.jpg",
+      "teamId": "team-017",
+      "joinedAt": "2025-10-31T12:44:24.847Z"
+    },
+    {
+      "id": "player-102",
+      "firstName": "Faith",
+      "lastName": "Shongwe",
+      "position": "Goalkeeper",
+      "email": "faith.shongwe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_102.jpg",
+      "teamId": "team-018",
+      "joinedAt": "2025-10-21T18:10:48.643Z"
+    },
+    {
+      "id": "player-103",
+      "firstName": "Rethabile",
+      "lastName": "Maseko",
+      "position": "Defender",
+      "email": "rethabile.maseko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_103.jpg",
+      "teamId": "team-018",
+      "joinedAt": "2025-11-13T04:08:16.647Z"
+    },
+    {
+      "id": "player-104",
+      "firstName": "Hope",
+      "lastName": "Memela",
+      "position": "Defender",
+      "email": "hope.memela@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_104.jpg",
+      "teamId": "team-018",
+      "joinedAt": "2025-11-05T20:34:27.813Z"
+    },
+    {
+      "id": "player-105",
+      "firstName": "Mandla",
+      "lastName": "Maseko",
+      "position": "Midfielder",
+      "email": "mandla.maseko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_105.jpg",
+      "teamId": "team-018",
+      "joinedAt": "2025-11-20T08:06:11.298Z"
+    },
+    {
+      "id": "player-106",
+      "firstName": "Mercy",
+      "lastName": "Tshabalala",
+      "position": "Forward",
+      "email": "mercy.tshabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_106.jpg",
+      "teamId": "team-018",
+      "joinedAt": "2025-11-03T01:46:28.419Z"
+    },
+    {
+      "id": "player-107",
+      "firstName": "Happy",
+      "lastName": "Seema",
+      "position": "Midfielder",
+      "email": "happy.seema@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_107.jpg",
+      "teamId": "team-018",
+      "joinedAt": "2025-10-21T14:46:21.942Z"
+    },
+    {
+      "id": "player-108",
+      "firstName": "Palesa",
+      "lastName": "Mthembu",
+      "position": "Forward",
+      "email": "palesa.mthembu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_108.jpg",
+      "teamId": "team-018",
+      "joinedAt": "2025-10-27T20:33:10.280Z"
+    },
+    {
+      "id": "player-109",
+      "firstName": "Champion",
+      "lastName": "Memela",
+      "position": "Goalkeeper",
+      "email": "champion.memela@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_109.jpg",
+      "teamId": "team-019",
+      "joinedAt": "2025-11-06T07:05:38.981Z"
+    },
+    {
+      "id": "player-110",
+      "firstName": "Rethabile",
+      "lastName": "Mabena",
+      "position": "Defender",
+      "email": "rethabile.mabena@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_110.jpg",
+      "teamId": "team-019",
+      "joinedAt": "2025-11-03T12:32:11.892Z"
+    },
+    {
+      "id": "player-111",
+      "firstName": "Zanele",
+      "lastName": "Ngubane",
+      "position": "Defender",
+      "email": "zanele.ngubane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_111.jpg",
+      "teamId": "team-019",
+      "joinedAt": "2025-11-03T12:57:16.993Z"
+    },
+    {
+      "id": "player-112",
+      "firstName": "Thandi",
+      "lastName": "Shezi",
+      "position": "Midfielder",
+      "email": "thandi.shezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_112.jpg",
+      "teamId": "team-019",
+      "joinedAt": "2025-10-25T01:19:19.669Z"
+    },
+    {
+      "id": "player-113",
+      "firstName": "Innocent",
+      "lastName": "Zulu",
+      "position": "Forward",
+      "email": "innocent.zulu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_113.jpg",
+      "teamId": "team-019",
+      "joinedAt": "2025-10-29T04:54:07.327Z"
+    },
+    {
+      "id": "player-114",
+      "firstName": "Prudence",
+      "lastName": "Vilakazi",
+      "position": "Goalkeeper",
+      "email": "prudence.vilakazi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_114.jpg",
+      "teamId": "team-020",
+      "joinedAt": "2025-11-09T01:51:32.136Z"
+    },
+    {
+      "id": "player-115",
+      "firstName": "Themba",
+      "lastName": "Hadebe",
+      "position": "Defender",
+      "email": "themba.hadebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_115.jpg",
+      "teamId": "team-020",
+      "joinedAt": "2025-11-19T23:09:24.629Z"
+    },
+    {
+      "id": "player-116",
+      "firstName": "Zanele",
+      "lastName": "Mazibuko",
+      "position": "Defender",
+      "email": "zanele.mazibuko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_116.jpg",
+      "teamId": "team-020",
+      "joinedAt": "2025-11-20T08:33:09.179Z"
+    },
+    {
+      "id": "player-117",
+      "firstName": "Dineo",
+      "lastName": "Mazibuko",
+      "position": "Midfielder",
+      "email": "dineo.mazibuko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_117.jpg",
+      "teamId": "team-020",
+      "joinedAt": "2025-11-06T14:14:53.795Z"
+    },
+    {
+      "id": "player-118",
+      "firstName": "Sipho",
+      "lastName": "Mohlala",
+      "position": "Forward",
+      "email": "sipho.mohlala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_118.jpg",
+      "teamId": "team-020",
+      "joinedAt": "2025-11-11T03:30:34.434Z"
+    },
+    {
+      "id": "player-119",
+      "firstName": "Happy",
+      "lastName": "Mashaba",
+      "position": "Midfielder",
+      "email": "happy.mashaba@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_119.jpg",
+      "teamId": "team-020",
+      "joinedAt": "2025-10-31T17:48:47.332Z"
+    },
+    {
+      "id": "player-120",
+      "firstName": "Themba",
+      "lastName": "Memela",
+      "position": "Goalkeeper",
+      "email": "themba.memela@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_120.jpg",
+      "teamId": "team-021",
+      "joinedAt": "2025-11-20T09:07:20.600Z"
+    },
+    {
+      "id": "player-121",
+      "firstName": "Grace",
+      "lastName": "Baloyi",
+      "position": "Defender",
+      "email": "grace.baloyi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_121.jpg",
+      "teamId": "team-021",
+      "joinedAt": "2025-11-17T23:35:46.378Z"
+    },
+    {
+      "id": "player-122",
+      "firstName": "Hope",
+      "lastName": "Khumalo",
+      "position": "Defender",
+      "email": "hope.khumalo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_122.jpg",
+      "teamId": "team-021",
+      "joinedAt": "2025-10-27T19:26:37.891Z"
+    },
+    {
+      "id": "player-123",
+      "firstName": "Faith",
+      "lastName": "Mkhize",
+      "position": "Midfielder",
+      "email": "faith.mkhize@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_123.jpg",
+      "teamId": "team-021",
+      "joinedAt": "2025-11-10T16:46:12.966Z"
+    },
+    {
+      "id": "player-124",
+      "firstName": "Palesa",
+      "lastName": "Nkomo",
+      "position": "Forward",
+      "email": "palesa.nkomo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_124.jpg",
+      "teamId": "team-021",
+      "joinedAt": "2025-11-04T23:38:16.902Z"
+    },
+    {
+      "id": "player-125",
+      "firstName": "Ntombi",
+      "lastName": "Gumede",
+      "position": "Midfielder",
+      "email": "ntombi.gumede@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_125.jpg",
+      "teamId": "team-021",
+      "joinedAt": "2025-11-19T18:52:38.551Z"
+    },
+    {
+      "id": "player-126",
+      "firstName": "Katlego",
+      "lastName": "Sithole",
+      "position": "Forward",
+      "email": "katlego.sithole@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_126.jpg",
+      "teamId": "team-021",
+      "joinedAt": "2025-10-27T03:14:44.824Z"
+    },
+    {
+      "id": "player-127",
+      "firstName": "Prudence",
+      "lastName": "Mnisi",
+      "position": "Goalkeeper",
+      "email": "prudence.mnisi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_127.jpg",
+      "teamId": "team-022",
+      "joinedAt": "2025-10-31T06:38:20.658Z"
+    },
+    {
+      "id": "player-128",
+      "firstName": "Faith",
+      "lastName": "Zwane",
+      "position": "Defender",
+      "email": "faith.zwane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_128.jpg",
+      "teamId": "team-022",
+      "joinedAt": "2025-11-06T11:04:20.581Z"
+    },
+    {
+      "id": "player-129",
+      "firstName": "Bongani",
+      "lastName": "Ntuli",
+      "position": "Defender",
+      "email": "bongani.ntuli@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_129.jpg",
+      "teamId": "team-022",
+      "joinedAt": "2025-10-30T11:28:07.745Z"
+    },
+    {
+      "id": "player-130",
+      "firstName": "Peace",
+      "lastName": "Hadebe",
+      "position": "Midfielder",
+      "email": "peace.hadebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_130.jpg",
+      "teamId": "team-022",
+      "joinedAt": "2025-11-11T01:50:53.103Z"
+    },
+    {
+      "id": "player-131",
+      "firstName": "Happy",
+      "lastName": "Mathebula",
+      "position": "Forward",
+      "email": "happy.mathebula@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_131.jpg",
+      "teamId": "team-022",
+      "joinedAt": "2025-10-25T05:50:09.965Z"
+    },
+    {
+      "id": "player-132",
+      "firstName": "Dineo",
+      "lastName": "Dube",
+      "position": "Goalkeeper",
+      "email": "dineo.dube@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_132.jpg",
+      "teamId": "team-023",
+      "joinedAt": "2025-11-08T21:39:00.657Z"
+    },
+    {
+      "id": "player-133",
+      "firstName": "Mercy",
+      "lastName": "Phiri",
+      "position": "Defender",
+      "email": "mercy.phiri@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_133.jpg",
+      "teamId": "team-023",
+      "joinedAt": "2025-11-07T17:33:37.168Z"
+    },
+    {
+      "id": "player-134",
+      "firstName": "Lerato",
+      "lastName": "Mnisi",
+      "position": "Defender",
+      "email": "lerato.mnisi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_134.jpg",
+      "teamId": "team-023",
+      "joinedAt": "2025-11-15T15:42:13.874Z"
+    },
+    {
+      "id": "player-135",
+      "firstName": "Prudence",
+      "lastName": "Madonsela",
+      "position": "Midfielder",
+      "email": "prudence.madonsela@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_135.jpg",
+      "teamId": "team-023",
+      "joinedAt": "2025-11-02T00:26:51.469Z"
+    },
+    {
+      "id": "player-136",
+      "firstName": "Grace",
+      "lastName": "Mohlala",
+      "position": "Forward",
+      "email": "grace.mohlala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_136.jpg",
+      "teamId": "team-023",
+      "joinedAt": "2025-10-30T20:45:55.601Z"
+    },
+    {
+      "id": "player-137",
+      "firstName": "Wisdom",
+      "lastName": "Sithole",
+      "position": "Midfielder",
+      "email": "wisdom.sithole@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_137.jpg",
+      "teamId": "team-023",
+      "joinedAt": "2025-11-17T17:31:45.914Z"
+    },
+    {
+      "id": "player-138",
+      "firstName": "Lerato",
+      "lastName": "Ngubane",
+      "position": "Goalkeeper",
+      "email": "lerato.ngubane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_138.jpg",
+      "teamId": "team-024",
+      "joinedAt": "2025-11-20T11:01:44.527Z"
+    },
+    {
+      "id": "player-139",
+      "firstName": "Sipho",
+      "lastName": "Khoza",
+      "position": "Defender",
+      "email": "sipho.khoza@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_139.jpg",
+      "teamId": "team-024",
+      "joinedAt": "2025-11-11T01:06:40.428Z"
+    },
+    {
+      "id": "player-140",
+      "firstName": "Lesedi",
+      "lastName": "Nkomo",
+      "position": "Defender",
+      "email": "lesedi.nkomo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_140.jpg",
+      "teamId": "team-024",
+      "joinedAt": "2025-11-08T08:36:16.140Z"
+    },
+    {
+      "id": "player-141",
+      "firstName": "Tshepo",
+      "lastName": "Hadebe",
+      "position": "Midfielder",
+      "email": "tshepo.hadebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_141.jpg",
+      "teamId": "team-024",
+      "joinedAt": "2025-11-19T22:50:25.790Z"
+    },
+    {
+      "id": "player-142",
+      "firstName": "Mpho",
+      "lastName": "Kubheka",
+      "position": "Forward",
+      "email": "mpho.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_142.jpg",
+      "teamId": "team-024",
+      "joinedAt": "2025-10-29T15:13:14.144Z"
+    },
+    {
+      "id": "player-143",
+      "firstName": "Thandi",
+      "lastName": "Mazibuko",
+      "position": "Midfielder",
+      "email": "thandi.mazibuko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_143.jpg",
+      "teamId": "team-024",
+      "joinedAt": "2025-11-06T05:12:49.053Z"
+    },
+    {
+      "id": "player-144",
+      "firstName": "Precious",
+      "lastName": "Mashaba",
+      "position": "Forward",
+      "email": "precious.mashaba@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_144.jpg",
+      "teamId": "team-024",
+      "joinedAt": "2025-11-06T04:31:41.426Z"
+    },
+    {
+      "id": "player-145",
+      "firstName": "Patience",
+      "lastName": "Shezi",
+      "position": "Goalkeeper",
+      "email": "patience.shezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_145.jpg",
+      "teamId": "team-025",
+      "joinedAt": "2025-10-27T00:29:09.063Z"
+    },
+    {
+      "id": "player-146",
+      "firstName": "Ntombi",
+      "lastName": "Mkhize",
+      "position": "Defender",
+      "email": "ntombi.mkhize@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_146.jpg",
+      "teamId": "team-025",
+      "joinedAt": "2025-11-07T07:53:20.949Z"
+    },
+    {
+      "id": "player-147",
+      "firstName": "Mpho",
+      "lastName": "Mazibuko",
+      "position": "Defender",
+      "email": "mpho.mazibuko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_147.jpg",
+      "teamId": "team-025",
+      "joinedAt": "2025-10-21T21:48:34.175Z"
+    },
+    {
+      "id": "player-148",
+      "firstName": "Precious",
+      "lastName": "Ndlovu",
+      "position": "Midfielder",
+      "email": "precious.ndlovu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_148.jpg",
+      "teamId": "team-025",
+      "joinedAt": "2025-11-03T12:08:06.031Z"
+    },
+    {
+      "id": "player-149",
+      "firstName": "Nandi",
+      "lastName": "Radebe",
+      "position": "Forward",
+      "email": "nandi.radebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_149.jpg",
+      "teamId": "team-025",
+      "joinedAt": "2025-10-28T00:50:48.985Z"
+    },
+    {
+      "id": "player-150",
+      "firstName": "Talent",
+      "lastName": "Chauke",
+      "position": "Goalkeeper",
+      "email": "talent.chauke@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_150.jpg",
+      "teamId": "team-026",
+      "joinedAt": "2025-10-26T05:18:23.610Z"
+    },
+    {
+      "id": "player-151",
+      "firstName": "Wisdom",
+      "lastName": "Ngcobo",
+      "position": "Defender",
+      "email": "wisdom.ngcobo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_151.jpg",
+      "teamId": "team-026",
+      "joinedAt": "2025-10-28T03:11:20.615Z"
+    },
+    {
+      "id": "player-152",
+      "firstName": "Blessing",
+      "lastName": "Sibiya",
+      "position": "Defender",
+      "email": "blessing.sibiya@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_152.jpg",
+      "teamId": "team-026",
+      "joinedAt": "2025-10-30T01:48:27.224Z"
+    },
+    {
+      "id": "player-153",
+      "firstName": "Precious",
+      "lastName": "Hadebe",
+      "position": "Midfielder",
+      "email": "precious.hadebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_153.jpg",
+      "teamId": "team-026",
+      "joinedAt": "2025-11-14T00:09:36.623Z"
+    },
+    {
+      "id": "player-154",
+      "firstName": "Nandi",
+      "lastName": "Ndlovu",
+      "position": "Forward",
+      "email": "nandi.ndlovu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_154.jpg",
+      "teamId": "team-026",
+      "joinedAt": "2025-10-28T10:11:26.710Z"
+    },
+    {
+      "id": "player-155",
+      "firstName": "Goodwill",
+      "lastName": "Hadebe",
+      "position": "Midfielder",
+      "email": "goodwill.hadebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_155.jpg",
+      "teamId": "team-026",
+      "joinedAt": "2025-11-10T15:48:24.573Z"
+    },
+    {
+      "id": "player-156",
+      "firstName": "Mpho",
+      "lastName": "Memela",
+      "position": "Goalkeeper",
+      "email": "mpho.memela@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_156.jpg",
+      "teamId": "team-027",
+      "joinedAt": "2025-11-09T15:54:13.049Z"
+    },
+    {
+      "id": "player-157",
+      "firstName": "Faith",
+      "lastName": "Ngcobo",
+      "position": "Defender",
+      "email": "faith.ngcobo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_157.jpg",
+      "teamId": "team-027",
+      "joinedAt": "2025-11-10T15:36:51.349Z"
+    },
+    {
+      "id": "player-158",
+      "firstName": "Katlego",
+      "lastName": "Kubheka",
+      "position": "Defender",
+      "email": "katlego.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_158.jpg",
+      "teamId": "team-027",
+      "joinedAt": "2025-11-19T08:23:46.725Z"
+    },
+    {
+      "id": "player-159",
+      "firstName": "Sipho",
+      "lastName": "Cele",
+      "position": "Midfielder",
+      "email": "sipho.cele@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_159.jpg",
+      "teamId": "team-027",
+      "joinedAt": "2025-11-19T19:00:16.464Z"
+    },
+    {
+      "id": "player-160",
+      "firstName": "Sizwe",
+      "lastName": "Zwane",
+      "position": "Forward",
+      "email": "sizwe.zwane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_160.jpg",
+      "teamId": "team-027",
+      "joinedAt": "2025-11-15T09:06:44.196Z"
+    },
+    {
+      "id": "player-161",
+      "firstName": "Grace",
+      "lastName": "Mnisi",
+      "position": "Midfielder",
+      "email": "grace.mnisi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_161.jpg",
+      "teamId": "team-027",
+      "joinedAt": "2025-10-28T09:40:53.359Z"
+    },
+    {
+      "id": "player-162",
+      "firstName": "Lesedi",
+      "lastName": "Nxumalo",
+      "position": "Forward",
+      "email": "lesedi.nxumalo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_162.jpg",
+      "teamId": "team-027",
+      "joinedAt": "2025-11-01T01:55:40.550Z"
+    },
+    {
+      "id": "player-163",
+      "firstName": "Thabo",
+      "lastName": "Maluleke",
+      "position": "Goalkeeper",
+      "email": "thabo.maluleke@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_163.jpg",
+      "teamId": "team-028",
+      "joinedAt": "2025-10-31T10:05:06.740Z"
+    },
+    {
+      "id": "player-164",
+      "firstName": "Thandi",
+      "lastName": "Myeni",
+      "position": "Defender",
+      "email": "thandi.myeni@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_164.jpg",
+      "teamId": "team-028",
+      "joinedAt": "2025-11-16T11:31:55.266Z"
+    },
+    {
+      "id": "player-165",
+      "firstName": "Mandla",
+      "lastName": "Cele",
+      "position": "Defender",
+      "email": "mandla.cele@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_165.jpg",
+      "teamId": "team-028",
+      "joinedAt": "2025-11-17T07:47:16.625Z"
+    },
+    {
+      "id": "player-166",
+      "firstName": "Joy",
+      "lastName": "Shabalala",
+      "position": "Midfielder",
+      "email": "joy.shabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_166.jpg",
+      "teamId": "team-028",
+      "joinedAt": "2025-11-17T16:49:14.452Z"
+    },
+    {
+      "id": "player-167",
+      "firstName": "Katlego",
+      "lastName": "Zwane",
+      "position": "Forward",
+      "email": "katlego.zwane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_167.jpg",
+      "teamId": "team-028",
+      "joinedAt": "2025-10-25T22:00:10.037Z"
+    },
+    {
+      "id": "player-168",
+      "firstName": "Given",
+      "lastName": "Zungu",
+      "position": "Goalkeeper",
+      "email": "given.zungu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_168.jpg",
+      "teamId": "team-029",
+      "joinedAt": "2025-11-13T22:09:20.093Z"
+    },
+    {
+      "id": "player-169",
+      "firstName": "Prudence",
+      "lastName": "Cele",
+      "position": "Defender",
+      "email": "prudence.cele@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_169.jpg",
+      "teamId": "team-029",
+      "joinedAt": "2025-10-28T23:54:56.507Z"
+    },
+    {
+      "id": "player-170",
+      "firstName": "Tshepo",
+      "lastName": "Buthelezi",
+      "position": "Defender",
+      "email": "tshepo.buthelezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_170.jpg",
+      "teamId": "team-029",
+      "joinedAt": "2025-11-09T05:12:09.802Z"
+    },
+    {
+      "id": "player-171",
+      "firstName": "Mpho",
+      "lastName": "Dlamini",
+      "position": "Midfielder",
+      "email": "mpho.dlamini@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_171.jpg",
+      "teamId": "team-029",
+      "joinedAt": "2025-11-14T01:46:21.449Z"
+    },
+    {
+      "id": "player-172",
+      "firstName": "Rethabile",
+      "lastName": "Nkosi",
+      "position": "Forward",
+      "email": "rethabile.nkosi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_172.jpg",
+      "teamId": "team-029",
+      "joinedAt": "2025-11-08T22:21:31.529Z"
+    },
+    {
+      "id": "player-173",
+      "firstName": "Lerato",
+      "lastName": "Kubheka",
+      "position": "Midfielder",
+      "email": "lerato.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_173.jpg",
+      "teamId": "team-029",
+      "joinedAt": "2025-11-02T01:05:54.485Z"
+    },
+    {
+      "id": "player-174",
+      "firstName": "Faith",
+      "lastName": "Nkomo",
+      "position": "Goalkeeper",
+      "email": "faith.nkomo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_174.jpg",
+      "teamId": "team-030",
+      "joinedAt": "2025-11-16T07:47:19.208Z"
+    },
+    {
+      "id": "player-175",
+      "firstName": "Welcome",
+      "lastName": "Madonsela",
+      "position": "Defender",
+      "email": "welcome.madonsela@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_175.jpg",
+      "teamId": "team-030",
+      "joinedAt": "2025-10-31T06:49:57.478Z"
+    },
+    {
+      "id": "player-176",
+      "firstName": "Prudence",
+      "lastName": "Sibiya",
+      "position": "Defender",
+      "email": "prudence.sibiya@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_176.jpg",
+      "teamId": "team-030",
+      "joinedAt": "2025-10-24T10:32:46.996Z"
+    },
+    {
+      "id": "player-177",
+      "firstName": "Lerato",
+      "lastName": "Phiri",
+      "position": "Midfielder",
+      "email": "lerato.phiri@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_177.jpg",
+      "teamId": "team-030",
+      "joinedAt": "2025-10-28T22:44:16.061Z"
+    },
+    {
+      "id": "player-178",
+      "firstName": "Blessing",
+      "lastName": "Zulu",
+      "position": "Forward",
+      "email": "blessing.zulu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_178.jpg",
+      "teamId": "team-030",
+      "joinedAt": "2025-11-06T11:33:52.874Z"
+    },
+    {
+      "id": "player-179",
+      "firstName": "Lesedi",
+      "lastName": "Ngubane",
+      "position": "Midfielder",
+      "email": "lesedi.ngubane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_179.jpg",
+      "teamId": "team-030",
+      "joinedAt": "2025-11-18T06:24:54.297Z"
+    },
+    {
+      "id": "player-180",
+      "firstName": "Zanele",
+      "lastName": "Maluleke",
+      "position": "Forward",
+      "email": "zanele.maluleke@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_180.jpg",
+      "teamId": "team-030",
+      "joinedAt": "2025-10-23T18:32:11.749Z"
+    },
+    {
+      "id": "player-181",
+      "firstName": "Success",
+      "lastName": "Ngubane",
+      "position": "Goalkeeper",
+      "email": "success.ngubane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_181.jpg",
+      "teamId": "team-031",
+      "joinedAt": "2025-11-09T20:30:01.092Z"
+    },
+    {
+      "id": "player-182",
+      "firstName": "Kagiso",
+      "lastName": "Shezi",
+      "position": "Defender",
+      "email": "kagiso.shezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_182.jpg",
+      "teamId": "team-031",
+      "joinedAt": "2025-11-03T18:55:12.274Z"
+    },
+    {
+      "id": "player-183",
+      "firstName": "Champion",
+      "lastName": "Mkhize",
+      "position": "Defender",
+      "email": "champion.mkhize@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_183.jpg",
+      "teamId": "team-031",
+      "joinedAt": "2025-10-30T07:14:59.852Z"
+    },
+    {
+      "id": "player-184",
+      "firstName": "Mokgadi",
+      "lastName": "Mazibuko",
+      "position": "Midfielder",
+      "email": "mokgadi.mazibuko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_184.jpg",
+      "teamId": "team-031",
+      "joinedAt": "2025-11-19T10:07:53.787Z"
+    },
+    {
+      "id": "player-185",
+      "firstName": "Thabo",
+      "lastName": "Buthelezi",
+      "position": "Forward",
+      "email": "thabo.buthelezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_185.jpg",
+      "teamId": "team-031",
+      "joinedAt": "2025-11-10T10:17:21.436Z"
+    },
+    {
+      "id": "player-186",
+      "firstName": "Grace",
+      "lastName": "Sithole",
+      "position": "Goalkeeper",
+      "email": "grace.sithole@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_186.jpg",
+      "teamId": "team-032",
+      "joinedAt": "2025-11-14T19:08:28.149Z"
+    },
+    {
+      "id": "player-187",
+      "firstName": "Blessing",
+      "lastName": "Sithole",
+      "position": "Defender",
+      "email": "blessing.sithole@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_187.jpg",
+      "teamId": "team-032",
+      "joinedAt": "2025-10-28T23:26:22.966Z"
+    },
+    {
+      "id": "player-188",
+      "firstName": "Queen",
+      "lastName": "Mthembu",
+      "position": "Defender",
+      "email": "queen.mthembu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_188.jpg",
+      "teamId": "team-032",
+      "joinedAt": "2025-11-05T06:02:17.872Z"
+    },
+    {
+      "id": "player-189",
+      "firstName": "Mokgadi",
+      "lastName": "Memela",
+      "position": "Midfielder",
+      "email": "mokgadi.memela@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_189.jpg",
+      "teamId": "team-032",
+      "joinedAt": "2025-11-13T14:17:30.843Z"
+    },
+    {
+      "id": "player-190",
+      "firstName": "Palesa",
+      "lastName": "Shongwe",
+      "position": "Forward",
+      "email": "palesa.shongwe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_190.jpg",
+      "teamId": "team-032",
+      "joinedAt": "2025-11-20T09:09:07.818Z"
+    },
+    {
+      "id": "player-191",
+      "firstName": "Wisdom",
+      "lastName": "Shongwe",
+      "position": "Midfielder",
+      "email": "wisdom.shongwe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_191.jpg",
+      "teamId": "team-032",
+      "joinedAt": "2025-11-18T12:41:44.463Z"
+    },
+    {
+      "id": "player-192",
+      "firstName": "Talent",
+      "lastName": "Myeni",
+      "position": "Goalkeeper",
+      "email": "talent.myeni@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_192.jpg",
+      "teamId": "team-033",
+      "joinedAt": "2025-10-27T19:39:55.227Z"
+    },
+    {
+      "id": "player-193",
+      "firstName": "Kagiso",
+      "lastName": "Dlamini",
+      "position": "Defender",
+      "email": "kagiso.dlamini@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_193.jpg",
+      "teamId": "team-033",
+      "joinedAt": "2025-11-03T20:30:57.673Z"
+    },
+    {
+      "id": "player-194",
+      "firstName": "Patience",
+      "lastName": "Maseko",
+      "position": "Defender",
+      "email": "patience.maseko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_194.jpg",
+      "teamId": "team-033",
+      "joinedAt": "2025-11-16T13:37:39.130Z"
+    },
+    {
+      "id": "player-195",
+      "firstName": "Sipho",
+      "lastName": "Madonsela",
+      "position": "Midfielder",
+      "email": "sipho.madonsela@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_195.jpg",
+      "teamId": "team-033",
+      "joinedAt": "2025-11-08T19:47:55.967Z"
+    },
+    {
+      "id": "player-196",
+      "firstName": "Duke",
+      "lastName": "Shabalala",
+      "position": "Forward",
+      "email": "duke.shabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_196.jpg",
+      "teamId": "team-033",
+      "joinedAt": "2025-11-13T21:57:26.287Z"
+    },
+    {
+      "id": "player-197",
+      "firstName": "Gift",
+      "lastName": "Baloyi",
+      "position": "Midfielder",
+      "email": "gift.baloyi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_197.jpg",
+      "teamId": "team-033",
+      "joinedAt": "2025-11-02T04:52:24.820Z"
+    },
+    {
+      "id": "player-198",
+      "firstName": "Given",
+      "lastName": "Buthelezi",
+      "position": "Forward",
+      "email": "given.buthelezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_198.jpg",
+      "teamId": "team-033",
+      "joinedAt": "2025-10-25T16:37:24.964Z"
+    },
+    {
+      "id": "player-199",
+      "firstName": "Dineo",
+      "lastName": "Ngubane",
+      "position": "Goalkeeper",
+      "email": "dineo.ngubane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_199.jpg",
+      "teamId": "team-034",
+      "joinedAt": "2025-11-13T14:49:25.513Z"
+    },
+    {
+      "id": "player-200",
+      "firstName": "Welcome",
+      "lastName": "Nkosi",
+      "position": "Defender",
+      "email": "welcome.nkosi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_200.jpg",
+      "teamId": "team-034",
+      "joinedAt": "2025-10-27T02:08:06.918Z"
+    },
+    {
+      "id": "player-201",
+      "firstName": "Wisdom",
+      "lastName": "Gumede",
+      "position": "Defender",
+      "email": "wisdom.gumede@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_201.jpg",
+      "teamId": "team-034",
+      "joinedAt": "2025-10-21T15:06:19.753Z"
+    },
+    {
+      "id": "player-202",
+      "firstName": "Queen",
+      "lastName": "Ntuli",
+      "position": "Midfielder",
+      "email": "queen.ntuli@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_202.jpg",
+      "teamId": "team-034",
+      "joinedAt": "2025-11-10T16:30:48.055Z"
+    },
+    {
+      "id": "player-203",
+      "firstName": "Sizwe",
+      "lastName": "Rikhotso",
+      "position": "Forward",
+      "email": "sizwe.rikhotso@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_203.jpg",
+      "teamId": "team-034",
+      "joinedAt": "2025-10-25T16:21:20.554Z"
+    },
+    {
+      "id": "player-204",
+      "firstName": "Lesedi",
+      "lastName": "Buthelezi",
+      "position": "Goalkeeper",
+      "email": "lesedi.buthelezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_204.jpg",
+      "teamId": "team-035",
+      "joinedAt": "2025-10-27T00:11:27.586Z"
+    },
+    {
+      "id": "player-205",
+      "firstName": "Patience",
+      "lastName": "Khumalo",
+      "position": "Defender",
+      "email": "patience.khumalo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_205.jpg",
+      "teamId": "team-035",
+      "joinedAt": "2025-11-13T23:35:47.066Z"
+    },
+    {
+      "id": "player-206",
+      "firstName": "Happy",
+      "lastName": "Mabena",
+      "position": "Defender",
+      "email": "happy.mabena@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_206.jpg",
+      "teamId": "team-035",
+      "joinedAt": "2025-11-16T03:05:18.914Z"
+    },
+    {
+      "id": "player-207",
+      "firstName": "Lesedi",
+      "lastName": "Mnisi",
+      "position": "Midfielder",
+      "email": "lesedi.mnisi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_207.jpg",
+      "teamId": "team-035",
+      "joinedAt": "2025-11-02T08:10:41.879Z"
+    },
+    {
+      "id": "player-208",
+      "firstName": "Ntombi",
+      "lastName": "Mohlala",
+      "position": "Forward",
+      "email": "ntombi.mohlala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_208.jpg",
+      "teamId": "team-035",
+      "joinedAt": "2025-11-10T01:26:58.479Z"
+    },
+    {
+      "id": "player-209",
+      "firstName": "Lerato",
+      "lastName": "Vilakazi",
+      "position": "Midfielder",
+      "email": "lerato.vilakazi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_209.jpg",
+      "teamId": "team-035",
+      "joinedAt": "2025-11-01T14:18:58.169Z"
+    },
+    {
+      "id": "player-210",
+      "firstName": "Lucky",
+      "lastName": "Maseko",
+      "position": "Goalkeeper",
+      "email": "lucky.maseko@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_210.jpg",
+      "teamId": "team-036",
+      "joinedAt": "2025-10-31T13:02:05.241Z"
+    },
+    {
+      "id": "player-211",
+      "firstName": "Lucky",
+      "lastName": "Zungu",
+      "position": "Defender",
+      "email": "lucky.zungu@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_211.jpg",
+      "teamId": "team-036",
+      "joinedAt": "2025-11-01T11:51:06.399Z"
+    },
+    {
+      "id": "player-212",
+      "firstName": "Dineo",
+      "lastName": "Ngcobo",
+      "position": "Defender",
+      "email": "dineo.ngcobo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_212.jpg",
+      "teamId": "team-036",
+      "joinedAt": "2025-11-15T10:15:24.813Z"
+    },
+    {
+      "id": "player-213",
+      "firstName": "Peace",
+      "lastName": "Mkhize",
+      "position": "Midfielder",
+      "email": "peace.mkhize@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_213.jpg",
+      "teamId": "team-036",
+      "joinedAt": "2025-11-14T22:17:27.278Z"
+    },
+    {
+      "id": "player-214",
+      "firstName": "Queen",
+      "lastName": "Sibiya",
+      "position": "Forward",
+      "email": "queen.sibiya@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_214.jpg",
+      "teamId": "team-036",
+      "joinedAt": "2025-11-04T02:37:00.613Z"
+    },
+    {
+      "id": "player-215",
+      "firstName": "Zanele",
+      "lastName": "Phiri",
+      "position": "Midfielder",
+      "email": "zanele.phiri@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_215.jpg",
+      "teamId": "team-036",
+      "joinedAt": "2025-11-08T00:26:34.358Z"
+    },
+    {
+      "id": "player-216",
+      "firstName": "Innocent",
+      "lastName": "Gumede",
+      "position": "Forward",
+      "email": "innocent.gumede@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_216.jpg",
+      "teamId": "team-036",
+      "joinedAt": "2025-11-02T08:24:25.787Z"
+    },
+    {
+      "id": "player-217",
+      "firstName": "Knowledge",
+      "lastName": "Cele",
+      "position": "Goalkeeper",
+      "email": "knowledge.cele@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_217.jpg",
+      "teamId": "team-037",
+      "joinedAt": "2025-11-14T08:53:58.091Z"
+    },
+    {
+      "id": "player-218",
+      "firstName": "Thandi",
+      "lastName": "Kekana",
+      "position": "Defender",
+      "email": "thandi.kekana@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_218.jpg",
+      "teamId": "team-037",
+      "joinedAt": "2025-11-19T22:30:12.481Z"
+    },
+    {
+      "id": "player-219",
+      "firstName": "Sipho",
+      "lastName": "Shabalala",
+      "position": "Defender",
+      "email": "sipho.shabalala@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_219.jpg",
+      "teamId": "team-037",
+      "joinedAt": "2025-11-11T04:02:03.778Z"
+    },
+    {
+      "id": "player-220",
+      "firstName": "Happy",
+      "lastName": "Kubheka",
+      "position": "Midfielder",
+      "email": "happy.kubheka@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_220.jpg",
+      "teamId": "team-037",
+      "joinedAt": "2025-11-10T13:07:48.087Z"
+    },
+    {
+      "id": "player-221",
+      "firstName": "Innocent",
+      "lastName": "Mokoena",
+      "position": "Forward",
+      "email": "innocent.mokoena@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_221.jpg",
+      "teamId": "team-037",
+      "joinedAt": "2025-11-17T00:11:05.118Z"
+    },
+    {
+      "id": "player-222",
+      "firstName": "Wisdom",
+      "lastName": "Sibiya",
+      "position": "Goalkeeper",
+      "email": "wisdom.sibiya@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_222.jpg",
+      "teamId": "team-038",
+      "joinedAt": "2025-11-10T15:11:56.727Z"
+    },
+    {
+      "id": "player-223",
+      "firstName": "Jabu",
+      "lastName": "Vilakazi",
+      "position": "Defender",
+      "email": "jabu.vilakazi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_223.jpg",
+      "teamId": "team-038",
+      "joinedAt": "2025-11-18T04:44:00.826Z"
+    },
+    {
+      "id": "player-224",
+      "firstName": "Queen",
+      "lastName": "Mathebula",
+      "position": "Defender",
+      "email": "queen.mathebula@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_224.jpg",
+      "teamId": "team-038",
+      "joinedAt": "2025-11-19T04:43:38.057Z"
+    },
+    {
+      "id": "player-225",
+      "firstName": "Katlego",
+      "lastName": "Nxumalo",
+      "position": "Midfielder",
+      "email": "katlego.nxumalo@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_225.jpg",
+      "teamId": "team-038",
+      "joinedAt": "2025-11-03T03:10:07.509Z"
+    },
+    {
+      "id": "player-226",
+      "firstName": "Joy",
+      "lastName": "Baloyi",
+      "position": "Forward",
+      "email": "joy.baloyi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_226.jpg",
+      "teamId": "team-038",
+      "joinedAt": "2025-11-06T21:53:08.522Z"
+    },
+    {
+      "id": "player-227",
+      "firstName": "Hope",
+      "lastName": "Cele",
+      "position": "Midfielder",
+      "email": "hope.cele@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_227.jpg",
+      "teamId": "team-038",
+      "joinedAt": "2025-10-28T07:28:38.422Z"
+    },
+    {
+      "id": "player-228",
+      "firstName": "Faith",
+      "lastName": "Rikhotso",
+      "position": "Goalkeeper",
+      "email": "faith.rikhotso@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_228.jpg",
+      "teamId": "team-039",
+      "joinedAt": "2025-11-17T11:00:59.168Z"
+    },
+    {
+      "id": "player-229",
+      "firstName": "Mpho",
+      "lastName": "Zwane",
+      "position": "Defender",
+      "email": "mpho.zwane@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_229.jpg",
+      "teamId": "team-039",
+      "joinedAt": "2025-11-12T02:57:18.194Z"
+    },
+    {
+      "id": "player-230",
+      "firstName": "Knowledge",
+      "lastName": "Dube",
+      "position": "Defender",
+      "email": "knowledge.dube@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_230.jpg",
+      "teamId": "team-039",
+      "joinedAt": "2025-11-07T23:29:11.385Z"
+    },
+    {
+      "id": "player-231",
+      "firstName": "Bongani",
+      "lastName": "Rikhotso",
+      "position": "Midfielder",
+      "email": "bongani.rikhotso@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_231.jpg",
+      "teamId": "team-039",
+      "joinedAt": "2025-10-27T23:07:32.335Z"
+    },
+    {
+      "id": "player-232",
+      "firstName": "Queen",
+      "lastName": "Molefe",
+      "position": "Forward",
+      "email": "queen.molefe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_232.jpg",
+      "teamId": "team-039",
+      "joinedAt": "2025-10-25T18:40:28.326Z"
+    },
+    {
+      "id": "player-233",
+      "firstName": "Patience",
+      "lastName": "Chauke",
+      "position": "Midfielder",
+      "email": "patience.chauke@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_233.jpg",
+      "teamId": "team-039",
+      "joinedAt": "2025-11-15T13:37:57.808Z"
+    },
+    {
+      "id": "player-234",
+      "firstName": "Lucky",
+      "lastName": "Phiri",
+      "position": "Forward",
+      "email": "lucky.phiri@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_234.jpg",
+      "teamId": "team-039",
+      "joinedAt": "2025-11-09T13:08:53.492Z"
+    },
+    {
+      "id": "player-235",
+      "firstName": "Jabu",
+      "lastName": "Shezi",
+      "position": "Goalkeeper",
+      "email": "jabu.shezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_235.jpg",
+      "teamId": "team-040",
+      "joinedAt": "2025-11-11T23:02:27.524Z"
+    },
+    {
+      "id": "player-236",
+      "firstName": "Prince",
+      "lastName": "Mashaba",
+      "position": "Defender",
+      "email": "prince.mashaba@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_236.jpg",
+      "teamId": "team-040",
+      "joinedAt": "2025-11-03T07:47:42.422Z"
+    },
+    {
+      "id": "player-237",
+      "firstName": "Sello",
+      "lastName": "Hadebe",
+      "position": "Defender",
+      "email": "sello.hadebe@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_237.jpg",
+      "teamId": "team-040",
+      "joinedAt": "2025-11-02T05:25:33.477Z"
+    },
+    {
+      "id": "player-238",
+      "firstName": "Sipho",
+      "lastName": "Shezi",
+      "position": "Midfielder",
+      "email": "sipho.shezi@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_238.jpg",
+      "teamId": "team-040",
+      "joinedAt": "2025-10-22T17:03:12.113Z"
+    },
+    {
+      "id": "player-239",
+      "firstName": "Mpho",
+      "lastName": "Mnguni",
+      "position": "Forward",
+      "email": "mpho.mnguni@team.com",
+      "photoUrl": "workflow/images/playerpictures/player_239.jpg",
+      "teamId": "team-040",
+      "joinedAt": "2025-11-13T22:09:44.255Z"
+    }
+  ],
+
+  "tournaments": [
+    {
+      "id": "tournament-001",
+      "name": "Gauteng Premier League 2025",
+      "description": "The premier esports tournament for Gauteng province featuring top teams competing for glory and prizes.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_1.jpg",
+      "bannerUrl": "workflow/images/banners/banner_1.jpg",
+      "organizerId": "org-001",
+      "startDate": "2025-12-01T08:00:00.000Z",
+      "endDate": "2026-01-25T08:00:00.000Z",
+      "registrationStartDate": "2025-11-21T08:00:00.000Z",
+      "registrationDeadline": "2025-11-27T08:00:00.000Z",
+      "maxTeams": 16,
+      "minTeams": 8,
+      "format": "League",
+      "status": "Published",
+      "prizePool": "R50,000",
+      "rules": "Standard tournament rules apply. Fair play expected.",
+      "createdAt": "2025-01-15T10:00:00Z",
+      "location": "Johannesburg Gaming Arena",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-002",
+      "name": "Western Cape Championship",
+      "description": "Annual championship bringing together the best teams from Cape Town and surrounding areas.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_2.jpg",
+      "bannerUrl": "workflow/images/banners/banner_2.jpg",
+      "organizerId": "org-001",
+      "startDate": "2025-12-18T08:00:00.000Z",
+      "endDate": "2026-02-01T08:00:00.000Z",
+      "registrationStartDate": "2025-11-27T08:00:00.000Z",
+      "registrationDeadline": "2025-12-10T08:00:00.000Z",
+      "maxTeams": 12,
+      "minTeams": 6,
+      "format": "Knockout",
+      "status": "Published",
+      "prizePool": "R35,000",
+      "rules": "Single elimination knockout format.",
+      "createdAt": "2025-01-16T10:00:00Z",
+      "location": "Cape Town Convention Centre",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-003",
+      "name": "KZN Coastal Cup",
+      "description": "Exciting coastal tournament featuring teams from Durban, Richards Bay, and Port Shepstone.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_3.jpg",
+      "bannerUrl": "workflow/images/banners/banner_3.jpg",
+      "organizerId": "org-001",
+      "startDate": "2025-12-25T08:00:00.000Z",
+      "endDate": "2026-02-08T08:00:00.000Z",
+      "registrationStartDate": "2025-12-04T08:00:00.000Z",
+      "registrationDeadline": "2025-12-15T08:00:00.000Z",
+      "maxTeams": 10,
+      "minTeams": 6,
+      "format": "League",
+      "status": "Draft",
+      "prizePool": "R25,000",
+      "rules": "Round-robin format with top 4 advancing to playoffs.",
+      "createdAt": "2025-01-17T10:00:00Z",
+      "location": "Durban ICC",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-004",
+      "name": "Free State Open Tournament",
+      "description": "Open tournament welcoming teams from across Free State province.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_4.jpg",
+      "bannerUrl": "workflow/images/banners/banner_4.jpg",
+      "organizerId": "org-001",
+      "startDate": "2026-01-01T08:00:00.000Z",
+      "endDate": "2026-02-15T08:00:00.000Z",
+      "registrationStartDate": "2025-12-11T08:00:00.000Z",
+      "registrationDeadline": "2025-12-22T08:00:00.000Z",
+      "maxTeams": 8,
+      "minTeams": 4,
+      "format": "Knockout",
+      "status": "Published",
+      "prizePool": "R15,000",
+      "rules": "Double elimination bracket.",
+      "createdAt": "2025-01-18T10:00:00Z",
+      "location": "Bloemfontein Sports Complex",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-005",
+      "name": "Eastern Cape Masters",
+      "description": "Elite tournament for experienced teams from Port Elizabeth and East London.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_5.jpg",
+      "bannerUrl": "workflow/images/banners/banner_5.jpg",
+      "organizerId": "org-002",
+      "startDate": "2026-01-08T08:00:00.000Z",
+      "endDate": "2026-02-22T08:00:00.000Z",
+      "registrationStartDate": "2025-12-18T08:00:00.000Z",
+      "registrationDeadline": "2025-12-30T08:00:00.000Z",
+      "maxTeams": 16,
+      "minTeams": 8,
+      "format": "League",
+      "status": "Published",
+      "prizePool": "R40,000",
+      "rules": "Professional conduct required. Masters division only.",
+      "createdAt": "2025-01-19T10:00:00Z",
+      "location": "Port Elizabeth Boardwalk",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-006",
+      "name": "Limpopo Rising Stars",
+      "description": "Development tournament for upcoming teams from Polokwane and Limpopo region.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_6.jpg",
+      "bannerUrl": "workflow/images/banners/banner_6.jpg",
+      "organizerId": "org-002",
+      "startDate": "2026-01-15T08:00:00.000Z",
+      "endDate": "2026-03-01T08:00:00.000Z",
+      "registrationStartDate": "2025-12-25T08:00:00.000Z",
+      "registrationDeadline": "2026-01-05T08:00:00.000Z",
+      "maxTeams": 12,
+      "minTeams": 6,
+      "format": "League",
+      "status": "Draft",
+      "prizePool": "R20,000",
+      "rules": "Development league for new teams.",
+      "createdAt": "2025-01-20T10:00:00Z",
+      "location": "Polokwane Game City",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-007",
+      "name": "Mpumalanga Invitational",
+      "description": "Invitation-only tournament featuring top teams from Nelspruit and Mbombela.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_7.jpg",
+      "bannerUrl": "workflow/images/banners/banner_7.jpg",
+      "organizerId": "org-002",
+      "startDate": "2026-01-22T08:00:00.000Z",
+      "endDate": "2026-03-08T08:00:00.000Z",
+      "registrationStartDate": "2026-01-01T08:00:00.000Z",
+      "registrationDeadline": "2026-01-12T08:00:00.000Z",
+      "maxTeams": 8,
+      "minTeams": 4,
+      "format": "Knockout",
+      "status": "Published",
+      "prizePool": "R30,000",
+      "rules": "Invitation only. Elite competition.",
+      "createdAt": "2025-01-21T10:00:00Z",
+      "location": "Mbombela Stadium Complex",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-008",
+      "name": "Northern Cape Challenge",
+      "description": "Regional challenge tournament for teams across Northern Cape province.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_8.jpg",
+      "bannerUrl": "workflow/images/banners/banner_8.jpg",
+      "organizerId": "org-002",
+      "startDate": "2026-01-29T08:00:00.000Z",
+      "endDate": "2026-03-15T08:00:00.000Z",
+      "registrationStartDate": "2026-01-08T08:00:00.000Z",
+      "registrationDeadline": "2026-01-20T08:00:00.000Z",
+      "maxTeams": 10,
+      "minTeams": 5,
+      "format": "League",
+      "status": "Published",
+      "prizePool": "R18,000",
+      "rules": "Regional teams only.",
+      "createdAt": "2025-01-22T10:00:00Z",
+      "location": "Kimberley Big Hole Complex",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-009",
+      "name": "National Championship Finals",
+      "description": "The ultimate South African esports championship featuring winners from all provincial tournaments.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_9.jpg",
+      "bannerUrl": "workflow/images/banners/banner_9.jpg",
+      "organizerId": "org-003",
+      "startDate": "2026-02-05T08:00:00.000Z",
+      "endDate": "2026-03-22T08:00:00.000Z",
+      "registrationStartDate": "2026-01-15T08:00:00.000Z",
+      "registrationDeadline": "2026-01-27T08:00:00.000Z",
+      "maxTeams": 16,
+      "minTeams": 8,
+      "format": "Knockout",
+      "status": "Published",
+      "prizePool": "R100,000",
+      "rules": "National championship rules. Top provincial teams only.",
+      "createdAt": "2025-01-23T10:00:00Z",
+      "location": "FNB Stadium, Johannesburg",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-010",
+      "name": "Springbok Summer Series",
+      "description": "Summer tournament series with multiple divisions and categories.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_10.jpg",
+      "bannerUrl": "workflow/images/banners/banner_10.jpg",
+      "organizerId": "org-003",
+      "startDate": "2026-02-12T08:00:00.000Z",
+      "endDate": "2026-03-29T08:00:00.000Z",
+      "registrationStartDate": "2026-01-22T08:00:00.000Z",
+      "registrationDeadline": "2026-02-02T08:00:00.000Z",
+      "maxTeams": 20,
+      "minTeams": 10,
+      "format": "League",
+      "status": "Draft",
+      "prizePool": "R75,000",
+      "rules": "Multiple divisions. All skill levels welcome.",
+      "createdAt": "2025-01-24T10:00:00Z",
+      "location": "Multiple Venues Nationwide",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-011",
+      "name": "Unity Cup - Nationwide",
+      "description": "Bringing together communities from all provinces in a celebration of esports.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_11.jpg",
+      "bannerUrl": "workflow/images/banners/banner_11.jpg",
+      "organizerId": "org-003",
+      "startDate": "2026-02-19T08:00:00.000Z",
+      "endDate": "2026-04-05T08:00:00.000Z",
+      "registrationStartDate": "2026-01-29T08:00:00.000Z",
+      "registrationDeadline": "2026-02-10T08:00:00.000Z",
+      "maxTeams": 24,
+      "minTeams": 12,
+      "format": "League",
+      "status": "Published",
+      "prizePool": "R60,000",
+      "rules": "Unity and sportsmanship emphasized.",
+      "createdAt": "2025-01-25T10:00:00Z",
+      "location": "Sandton Convention Centre",
+      "isPublic": true
+    },
+    {
+      "id": "tournament-012",
+      "name": "Rainbow Nation Grand Prix",
+      "description": "Grand prix style tournament celebrating diversity and competitive excellence.",
+      "logoUrl": "workflow/images/tournamentlogos/tournament_12.jpg",
+      "bannerUrl": "workflow/images/banners/banner_12.jpg",
+      "organizerId": "org-003",
+      "startDate": "2026-02-26T08:00:00.000Z",
+      "endDate": "2026-04-12T08:00:00.000Z",
+      "registrationStartDate": "2026-02-05T08:00:00.000Z",
+      "registrationDeadline": "2026-02-17T08:00:00.000Z",
+      "maxTeams": 16,
+      "minTeams": 8,
+      "format": "Knockout",
+      "status": "Draft",
+      "prizePool": "R85,000",
+      "rules": "Grand prix format with points system.",
+      "createdAt": "2025-01-26T10:00:00Z",
+      "location": "Moses Mabhida Stadium, Durban",
+      "isPublic": true
+    }
+  ]
+}
